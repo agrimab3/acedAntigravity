@@ -22,6 +22,51 @@ const tutorRequestSchema = z.object({
   targetDifficulty: z.string().trim().optional(),
 });
 
+function buildFallbackTutorReply({
+  message,
+  section,
+  topic,
+  explanation,
+}: {
+  message: string;
+  section: string;
+  topic?: string;
+  explanation: string;
+}) {
+  const lowerMessage = message.toLowerCase();
+  const lowerExplanation = explanation.toLowerCase();
+
+  if (lowerMessage.includes("hint")) {
+    if (lowerExplanation.includes("parallel")) {
+      return "Hint: check whether the two ideas being paired use the same grammatical form. After \"not only,\" the pattern should still match after \"but also.\"";
+    }
+
+    if (lowerExplanation.includes("data") || lowerExplanation.includes("graph")) {
+      return "Hint: do not interpret yet. First identify the exact numbers or relationship the chart gives you, then choose the answer that states only what the data supports.";
+    }
+
+    if (section === "math") {
+      return "Hint: before calculating, decide which formula or algebra move the question is really testing. Set that up first, then compute carefully.";
+    }
+
+    if (section === "reading") {
+      return "Hint: go back to the exact sentence or detail the question points to. The best ACT Reading answer is usually the one most directly supported by the passage.";
+    }
+
+    return `Hint: focus on the core pattern this ${topic || section} question is testing, not just the surface wording.`;
+  }
+
+  if (lowerMessage.includes("why") || lowerMessage.includes("wrong")) {
+    return `Quick coaching take: ${explanation} On ACT questions, wrong choices often break the rule, add something unsupported, or sound close without fully matching the evidence.`;
+  }
+
+  if (lowerMessage.includes("simple") || lowerMessage.includes("simpler")) {
+    return `In simpler terms: ${explanation}`;
+  }
+
+  return `Here’s the key idea to focus on: ${explanation}`;
+}
+
 export async function POST(req: Request) {
   const parsed = tutorRequestSchema.safeParse(await req.json());
   if (!parsed.success) {
@@ -67,21 +112,35 @@ export async function POST(req: Request) {
     }
   }
 
-  const response = await client.responses.create({
-    model: process.env.OPENAI_MODEL || 'gpt-5-mini',
-    max_output_tokens: 250,
-    instructions: buildTutorInstructions(profile, {
-      section,
-      topic,
-      question,
-      explanation,
-      difficulty: parsed.data.difficulty,
-      studentAccuracyPct: parsed.data.sessionAccuracyPct,
-      targetDifficulty: recommendedDifficulty,
-    }),
-    input: message,
-  });
+  try {
+    const response = await client.responses.create({
+      model: process.env.OPENAI_MODEL || 'gpt-5-mini',
+      max_output_tokens: 250,
+      instructions: buildTutorInstructions(profile, {
+        section,
+        topic,
+        question,
+        explanation,
+        difficulty: parsed.data.difficulty,
+        studentAccuracyPct: parsed.data.sessionAccuracyPct,
+        targetDifficulty: recommendedDifficulty,
+      }),
+      input: message,
+    });
 
-  const reply = response.output_text?.trim() || 'let me think about that!';
-  return NextResponse.json({ reply });
+    const reply = response.output_text?.trim() || 'let me think about that!';
+    return NextResponse.json({ reply });
+  } catch (error) {
+    console.error("Tutor request failed", error);
+
+    return NextResponse.json({
+      reply: buildFallbackTutorReply({
+        message,
+        section,
+        topic,
+        explanation,
+      }),
+      fallback: true,
+    });
+  }
 }
