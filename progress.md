@@ -39,6 +39,7 @@
 - Deployed the app to the VPS under PM2 as `aced-web`
 - Verified the app is serving from the VPS on internal port `3005`
 - Added a dedicated `/api/health` endpoint and deploy health checks
+- Simplified the GitHub Actions workflow to rely on the VPS-installed Node runtime for better runner stability
 
 ## Decisions Made
 

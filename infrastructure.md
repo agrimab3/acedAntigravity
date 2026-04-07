@@ -82,6 +82,7 @@
 - PM2 app name: `aced-web`
 - GitHub Actions runner install path: `/root/actions-runner-aced`
 - GitHub Actions runner service: `actions.runner.agrimab3-acedAntigravity.srv1001519-aced.service`
+- VPS Node runtime available system-wide: `node v22.22.0`
 
 ## Environment Variables In Scope
 
