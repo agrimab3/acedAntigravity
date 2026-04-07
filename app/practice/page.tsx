@@ -38,6 +38,8 @@ function PracticeContent() {
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [questionsLoading, setQuestionsLoading] = useState(true);
+  const [practiceSessionId, setPracticeSessionId] = useState<string | null>(null);
+  const [targetDifficulty, setTargetDifficulty] = useState("easy");
   const [qIndex, setQIndex] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -51,7 +53,9 @@ function PracticeContent() {
   const [aiLoading, setAiLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
+  const [sessionFinalized, setSessionFinalized] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [questionStartedAtMs, setQuestionStartedAtMs] = useState<number>(Date.now());
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const msgsRef = useRef<HTMLDivElement>(null);
 
@@ -67,12 +71,16 @@ function PracticeContent() {
     setQIndex(0);
     setPicked(null);
     setSubmitted(false);
+    setPracticeSessionId(null);
+    setTargetDifficulty("easy");
     setCorrect(0);
     setAnswered(0);
     setMissed([]);
     setDone(false);
     setSessionStarted(false);
+    setSessionFinalized(false);
     setElapsedSeconds(0);
+    setQuestionStartedAtMs(Date.now());
     setAiMessages([{ role: "bot", text: getIntroTutorMessage(topic) }]);
     setQuestionsLoading(true);
 
@@ -90,14 +98,22 @@ function PracticeContent() {
         const res = await fetch(`/api/questions?${params.toString()}`, {
           cache: "no-store",
         });
-        const data = (await res.json()) as { questions?: Question[] };
+        const data = (await res.json()) as {
+          questions?: Question[];
+          sessionId?: string | null;
+          adaptive?: { targetDifficulty?: string };
+        };
 
         if (!active) return;
         setQuestions(data.questions ?? []);
+        setPracticeSessionId(data.sessionId ?? null);
+        setTargetDifficulty(data.adaptive?.targetDifficulty ?? "easy");
       } catch (error) {
         console.error("Failed to fetch questions", error);
         if (!active) return;
         setQuestions([]);
+        setPracticeSessionId(null);
+        setTargetDifficulty("easy");
       } finally {
         if (active) {
           setQuestionsLoading(false);
@@ -167,15 +183,57 @@ function PracticeContent() {
     setPicked(letter);
   };
 
+  const finalizeSession = async () => {
+    if (sessionFinalized) return;
+
+    setSessionFinalized(true);
+
+    if (!practiceSessionId) return;
+
+    try {
+      await fetch("/api/practice/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: practiceSessionId,
+          durationSeconds: elapsedSeconds,
+        }),
+      });
+    } catch (error) {
+      console.error("Failed to finalize practice session", error);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!picked || submitted) return;
     setSubmitted(true);
     const isCorrect = picked === q.correct_answer;
+    const timeSpentSeconds = Math.max(1, Math.round((Date.now() - questionStartedAtMs) / 1000));
     const newAnswered = answered + 1;
     const newCorrect = isCorrect ? correct + 1 : correct;
     setAnswered(newAnswered);
     if (isCorrect) setCorrect(newCorrect);
     else setMissed(prev => [...prev, q]);
+
+    if (practiceSessionId && !q.id.startsWith("mock-")) {
+      try {
+        await fetch("/api/practice/answer", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sessionId: practiceSessionId,
+            questionId: q.id,
+            selectedAnswer: picked,
+            isCorrect,
+            timeSpentSeconds,
+            hintCount: 0,
+          }),
+        });
+      } catch (error) {
+        console.error("Failed to record answer", error);
+      }
+    }
+
     setAiMessages([{
       role: 'bot',
       text: isCorrect
@@ -185,13 +243,15 @@ function PracticeContent() {
 
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (qIndex + 1 >= questions.length) {
+      await finalizeSession();
       setDone(true);
     } else {
       setQIndex(i => i + 1);
       setPicked(null);
       setSubmitted(false);
+      setQuestionStartedAtMs(Date.now());
       setAiMessages([{ role: "bot", text: getIntroTutorMessage(topic) }]);
     }
   };
@@ -211,6 +271,9 @@ function PracticeContent() {
           question: q.question_text,
           section, topic,
           explanation: q.explanation,
+          difficulty: q.difficulty,
+          sessionAccuracyPct: answered > 0 ? Math.round((correct / answered) * 100) : 0,
+          targetDifficulty,
         }),
       });
       const data = await res.json();
@@ -309,7 +372,7 @@ function PracticeContent() {
             <button onClick={() => router.push('/dashboard')} style={{ flex: 1, padding: '12px', borderRadius: '10px', fontSize: '13px', cursor: 'pointer', background: 'transparent', border: '0.5px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.7)', fontFamily: 'DM Sans,sans-serif' }}>
               back
             </button>
-            <button onClick={() => setSessionStarted(true)} style={{ flex: 2, padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 500, cursor: 'pointer', background: meta.color, border: 'none', color: '#fff', fontFamily: 'DM Sans,sans-serif' }}>
+            <button onClick={() => { setQuestionStartedAtMs(Date.now()); setSessionStarted(true); }} style={{ flex: 2, padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 500, cursor: 'pointer', background: meta.color, border: 'none', color: '#fff', fontFamily: 'DM Sans,sans-serif' }}>
               continue →
             </button>
           </div>
@@ -331,7 +394,7 @@ function PracticeContent() {
           <div style={{ fontFamily: 'DM Serif Display,serif', fontSize: '18px' }}>Aced<em style={{ color: '#1D9E75' }}>.</em></div>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', fontVariantNumeric: 'tabular-nums' }}>{formatTime(elapsedSeconds)}</span>
-            <button onClick={() => setDone(true)} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', background: 'transparent', border: '0.5px solid rgba(255,255,255,0.12)', padding: '5px 12px', borderRadius: '20px', fontFamily: 'DM Sans,sans-serif' }}>end session</button>
+            <button onClick={() => { void finalizeSession(); setDone(true); }} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', background: 'transparent', border: '0.5px solid rgba(255,255,255,0.12)', padding: '5px 12px', borderRadius: '20px', fontFamily: 'DM Sans,sans-serif' }}>end session</button>
           </div>
         </nav>
 
@@ -349,7 +412,7 @@ function PracticeContent() {
 
             <div style={{ display: 'flex', gap: '8px', marginBottom: '.875rem', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '10px', fontWeight: 500, padding: '3px 10px', borderRadius: '20px', background: meta.color + '20', border: `0.5px solid ${meta.color}44`, color: meta.color }}>{section} · {meta.constellation}</span>
-              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', padding: '3px 8px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }}>{q.difficulty}</span>
+              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', padding: '3px 8px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }}>{q.difficulty} · target {targetDifficulty}</span>
             </div>
 
             <div style={{ fontFamily: 'DM Serif Display,serif', fontSize: '17px', lineHeight: 1.55, marginBottom: '1.25rem', color: 'rgba(255,255,255,0.92)' }}>{q.question_text}</div>
@@ -402,7 +465,7 @@ function PracticeContent() {
 
             {submitted && (
               <div style={{ display: 'flex', gap: '8px' }}>
-                <button onClick={handleNext} style={{ flex: 1, padding: '10px', borderRadius: '10px', fontSize: '13px', fontWeight: 500, cursor: 'pointer', border: 'none', background: picked === q.correct_answer ? meta.color : 'rgba(255,255,255,0.08)', color: picked === q.correct_answer ? '#0a1208' : 'rgba(255,255,255,0.7)', fontFamily: 'DM Sans,sans-serif' }}>
+                <button onClick={() => void handleNext()} style={{ flex: 1, padding: '10px', borderRadius: '10px', fontSize: '13px', fontWeight: 500, cursor: 'pointer', border: 'none', background: picked === q.correct_answer ? meta.color : 'rgba(255,255,255,0.08)', color: picked === q.correct_answer ? '#0a1208' : 'rgba(255,255,255,0.7)', fontFamily: 'DM Sans,sans-serif' }}>
                   {qIndex + 1 >= questions.length ? 'see results →' : 'next question →'}
                 </button>
               </div>

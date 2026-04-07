@@ -240,6 +240,8 @@ Store rolling adaptive difficulty and mastery state for each user-topic pair.
 - write the system prompt and tone rules
 - define remediation, coaching, and review modes
 - define hinting policy
+- status:
+  - reusable persona builder implemented in `lib/tutor-profile.ts`
 
 ### 2. Content Generation Pipeline
 
@@ -247,6 +249,8 @@ Store rolling adaptive difficulty and mastery state for each user-topic pair.
 - add response validation
 - add DB persistence for generated content
 - add batch generation scripts or admin endpoints
+- status:
+  - still pending
 
 ### 3. Adaptive Engine
 
@@ -254,10 +258,14 @@ Store rolling adaptive difficulty and mastery state for each user-topic pair.
 - add per-user topic state
 - implement difficulty movement rules
 - integrate question selection logic
+- status:
+  - first pass implemented with `topic_skill_state`, adaptive band selection, and answer recording APIs
 
 ### 4. Anti-Repetition Layer
 
 - track question exposures
+- status:
+  - first pass implemented with `question_exposures`
 - bias toward unseen questions
 - schedule spaced review for missed questions
 

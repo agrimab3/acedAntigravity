@@ -10,6 +10,7 @@
 ## Current Phase
 
 - Phase 1: architecture lock-in and production foundation
+- Phase 2: adaptive ACT intelligence foundation in progress
 
 ## Completed So Far
 
@@ -40,6 +41,14 @@
 - Verified the app is serving from the VPS on internal port `3005`
 - Added a dedicated `/api/health` endpoint and deploy health checks
 - Simplified the GitHub Actions workflow to rely on the VPS-installed Node runtime for better runner stability
+- Added the first Phase 2 adaptive schema tables:
+  - `question_exposures`
+  - `topic_skill_state`
+  - `ai_tutor_profiles`
+- Added adaptive question selection logic with repeat avoidance preferences
+- Added answer recording and practice completion APIs
+- Upgraded the tutor route to use a reusable ACT tutor persona builder
+- Applied the Phase 2 schema migration to the live `aced` database
 
 ## Decisions Made
 
@@ -65,6 +74,7 @@
   - adaptive difficulty
   - repetition prevention
   - personalized practice progression
+  - foundational adaptive tracking is now implemented
 
 ## Open Questions
 
@@ -77,6 +87,7 @@
   - pure live generation vs cached hybrid generation
   - validation rules for AI-generated content
   - how aggressive difficulty adjustments should be
+  - first real database-backed question inventory for each topic and difficulty band
 
 ## Next Milestones
 
@@ -87,6 +98,7 @@
 - Decide the VPS app process model for production runtime
 - Stand up the first CI/CD workflow from GitHub to the VPS
 - Define and implement Phase 2 adaptive AI architecture
+- Add question generation jobs and seed the first AI-reviewed ACT content batches
 
 ## Planned Next Phase
 

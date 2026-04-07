@@ -93,6 +93,70 @@ export const questions = pgTable("questions", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+export const questionExposures = pgTable(
+  "question_exposures",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    questionId: uuid("question_id")
+      .notNull()
+      .references(() => questions.id, { onDelete: "cascade" }),
+    timesSeen: integer("times_seen").default(0).notNull(),
+    timesCorrect: integer("times_correct").default(0).notNull(),
+    timesIncorrect: integer("times_incorrect").default(0).notNull(),
+    firstSeenAt: timestamp("first_seen_at", { withTimezone: true }).defaultNow().notNull(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).defaultNow().notNull(),
+    lastAnsweredAt: timestamp("last_answered_at", { withTimezone: true }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [uniqueIndex("question_exposures_user_question_idx").on(table.userId, table.questionId)]
+);
+
+export const topicSkillState = pgTable(
+  "topic_skill_state",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    topicId: uuid("topic_id")
+      .notNull()
+      .references(() => actTopics.id, { onDelete: "cascade" }),
+    currentDifficulty: text("current_difficulty").default("easy").notNull(),
+    recommendedDifficulty: text("recommended_difficulty").default("easy").notNull(),
+    recentAccuracyPct: integer("recent_accuracy_pct").default(0).notNull(),
+    rollingAccuracyPct: integer("rolling_accuracy_pct").default(0).notNull(),
+    averageTimeSpentSeconds: integer("average_time_spent_seconds").default(0).notNull(),
+    totalAnswered: integer("total_answered").default(0).notNull(),
+    totalCorrect: integer("total_correct").default(0).notNull(),
+    hintsUsed: integer("hints_used").default(0).notNull(),
+    correctStreak: integer("correct_streak").default(0).notNull(),
+    incorrectStreak: integer("incorrect_streak").default(0).notNull(),
+    lastAnsweredAt: timestamp("last_answered_at", { withTimezone: true }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [uniqueIndex("topic_skill_state_user_topic_idx").on(table.userId, table.topicId)]
+);
+
+export const aiTutorProfiles = pgTable(
+  "ai_tutor_profiles",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    slug: text("slug").notNull(),
+    name: text("name").notNull(),
+    version: integer("version").default(1).notNull(),
+    isActive: boolean("is_active").default(true).notNull(),
+    systemPrompt: text("system_prompt").notNull(),
+    hintPolicy: text("hint_policy"),
+    reviewPolicy: text("review_policy"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [uniqueIndex("ai_tutor_profiles_slug_idx").on(table.slug)]
+);
+
 export const practiceSessions = pgTable("practice_sessions", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id")

@@ -100,12 +100,14 @@ function buildQuestion(section: SectionKey, topic: string, index: number) {
 export function buildMockQuestions(
   section: SectionKey,
   topic: string,
-  limit = 10
+  limit = 10,
+  preferredDifficulty = "easy"
 ): PracticeQuestion[] {
   const safeTopic = topic || "Core Skills";
   const safeLimit = Math.min(Math.max(limit, 1), 10);
 
-  return Array.from({ length: safeLimit }, (_, index) =>
-    buildQuestion(section, safeTopic, index + 1)
-  );
+  return Array.from({ length: safeLimit }, (_, index) => ({
+    ...buildQuestion(section, safeTopic, index + 1),
+    difficulty: preferredDifficulty,
+  }));
 }
