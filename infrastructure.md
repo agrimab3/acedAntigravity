@@ -71,6 +71,17 @@
   - use a new subdomain once DNS is created
   - let Caddy terminate TLS and manage SSL
   - keep the local machine as the development environment, not the production serving environment
+  - current internal live app port: `3005`
+  - current process manager: `pm2`
+
+## Current Deployment Layout
+
+- Live app root: `/root/apps/aced`
+- Release directory synced by CI/CD: `/root/apps/aced/current`
+- Shared production env file: `/root/apps/aced/shared/.env`
+- PM2 app name: `aced-web`
+- GitHub Actions runner install path: `/root/actions-runner-aced`
+- GitHub Actions runner service: `actions.runner.agrimab3-acedAntigravity.srv1001519-aced.service`
 
 ## Environment Variables In Scope
 
@@ -89,7 +100,10 @@ Planned pipeline:
 1. Local development and verification
 2. Push to GitHub
 3. GitHub Actions CI/CD workflow
-4. VPS pulls latest code and deploys from `/root/apps/aced`
+4. Self-hosted GitHub Actions runner on the VPS checks out the repo
+5. CI/CD syncs code into `/root/apps/aced/current`
+6. CI/CD installs dependencies, builds Next.js, and restarts PM2
+7. CI/CD verifies `http://127.0.0.1:3005/api/health` before marking deploy successful
 
 Planned reverse proxy model:
 
@@ -123,14 +137,17 @@ Planned reverse proxy model:
 - OpenAI-backed tutor route
 - Server-side questions API with a mock fallback path
 - `.env.example` for production env setup
+- GitHub Actions deployment workflow
+- VPS self-hosted runner deployment target
+- PM2-based production runtime
+- deploy health check endpoint and verification step
+- Caddy reverse-proxy template for the final subdomain cutover
 
 ## Infrastructure Items Still To Decide
 
 - Final subdomain value and DNS routing
-- Reverse proxy choice and site configuration
-- TLS certificate handling
-- Process manager or container strategy for the app
-- GitHub Actions deployment mechanism
+- Final Caddy site block insertion into `/etc/caddy/Caddyfile`
+- Production Google OAuth origin and callback entries
 - Secrets management strategy on the VPS
 - Backup plan for the new `aced` database
 - Monitoring and log collection

@@ -34,6 +34,11 @@
 - Added the local `DATABASE_URL` and `AUTH_SECRET` env foundation
 - Applied the initial Drizzle migration to the live `aced` database
 - Verified that the expected tables exist in the live database
+- Set up the self-hosted GitHub Actions runner on the VPS
+- Added the first GitHub Actions deployment workflow for automatic VPS deploys
+- Deployed the app to the VPS under PM2 as `aced-web`
+- Verified the app is serving from the VPS on internal port `3005`
+- Added a dedicated `/api/health` endpoint and deploy health checks
 
 ## Decisions Made
 
@@ -44,6 +49,8 @@
 - Local development can run on `localhost`
 - Production traffic will go through the existing Caddy deployment once the new subdomain is created
 - The local git remote has been repointed to the new `acedAntigravity` GitHub repository
+- The VPS deploy runtime will use PM2 instead of Docker for the Next.js app process
+- The GitHub Actions deploy job will run directly on the VPS self-hosted runner
 - Phase 1 stack recommendation is:
   - Next.js
   - PostgreSQL
@@ -60,10 +67,10 @@
 
 ## Open Questions
 
-- Deployment runtime shape: Docker Compose vs system service based app deploy
 - Reverse proxy details for the production domain
-- CI/CD trigger and deployment strategy from GitHub Actions to the VPS
-- Google OAuth credentials and callback configuration
+- Final DNS/subdomain value for public launch
+- Final Caddy site block for the production host
+- Production Google OAuth callback and origin entries
 - ACT seed data shape and first content import path
 - Phase 2 generation strategy details:
   - pure live generation vs cached hybrid generation
