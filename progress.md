@@ -1,0 +1,105 @@
+# AcedAntigravity Progress
+
+## Project Snapshot
+
+- Project: `AcedAntigravity`
+- Product goal: production-ready, gamified ACT prep platform
+- Working model: local development -> GitHub -> VPS CI/CD deployment
+- Current repo baseline: earlier `Aced` prototype being upgraded
+
+## Current Phase
+
+- Phase 1: architecture lock-in and production foundation
+
+## Completed So Far
+
+- Reviewed the inherited `Aced` prototype and documented the app architecture
+- Confirmed the new GitHub repo: `https://github.com/agrimab3/acedAntigravity.git`
+- Confirmed VPS target path: `/root/apps/aced`
+- Verified SSH access to the VPS
+- Safely inspected the VPS and confirmed an existing PostgreSQL service is available
+- Confirmed the existing PostgreSQL cluster can likely support a separate `aced` database
+- Updated local env planning to use `OPENAI_API_KEY`
+- Created foundational project documentation files
+- Confirmed the existing VPS Caddy setup is present and the active Caddyfile is at `/etc/caddy/Caddyfile`
+- Confirmed the intended production pattern: app runs on the VPS and Caddy handles reverse proxy and SSL
+- Repointed the local repo to the new `acedAntigravity` GitHub remote
+- Replaced prototype auth wiring with `next-auth` session plumbing
+- Replaced the Anthropic tutor route with an OpenAI-based route
+- Added Drizzle ORM, PostgreSQL config, schema files, and initial migration output
+- Added a server-side practice questions API with a mock fallback until the database is seeded
+- Verified the refactored app with `npm run lint` and `npm run build`
+- Created the `aced` PostgreSQL database on the VPS
+- Created the dedicated `aced_app` database role
+- Added the local `DATABASE_URL` and `AUTH_SECRET` env foundation
+- Applied the initial Drizzle migration to the live `aced` database
+- Verified that the expected tables exist in the live database
+
+## Decisions Made
+
+- We will move toward production quality rather than continue as a loose prototype
+- We will use OpenAI instead of Anthropic for AI features
+- We will deploy to the VPS instead of a managed platform like Vercel
+- We are leaning toward reusing the existing PostgreSQL service with a separate database for this project
+- Local development can run on `localhost`
+- Production traffic will go through the existing Caddy deployment once the new subdomain is created
+- The local git remote has been repointed to the new `acedAntigravity` GitHub repository
+- Phase 1 stack recommendation is:
+  - Next.js
+  - PostgreSQL
+  - Drizzle ORM and Drizzle Kit migrations
+  - Auth.js with Google OAuth
+  - OpenAI API
+  - VPS app process behind Caddy
+- Phase 2 will cover:
+  - AI-assisted ACT question generation
+  - ACT tutor persona design
+  - adaptive difficulty
+  - repetition prevention
+  - personalized practice progression
+
+## Open Questions
+
+- Deployment runtime shape: Docker Compose vs system service based app deploy
+- Reverse proxy details for the production domain
+- CI/CD trigger and deployment strategy from GitHub Actions to the VPS
+- Google OAuth credentials and callback configuration
+- ACT seed data shape and first content import path
+- Phase 2 generation strategy details:
+  - pure live generation vs cached hybrid generation
+  - validation rules for AI-generated content
+  - how aggressive difficulty adjustments should be
+
+## Next Milestones
+
+- Establish deployment and environment conventions
+- Prepare the app to run behind Caddy on the VPS
+- Add Google OAuth env values and validate live sign-in
+- Seed the first ACT sections, topics, and question content
+- Decide the VPS app process model for production runtime
+- Stand up the first CI/CD workflow from GitHub to the VPS
+- Define and implement Phase 2 adaptive AI architecture
+
+## Planned Next Phase
+
+- Phase 2: adaptive ACT intelligence
+- Reference doc: `phase-two-plan.md`
+
+## Phase 1 Deliverables
+
+- Finalized architecture and toolchain
+- New GitHub remote configured
+- Database and migration direction documented
+- Production auth direction documented
+- Deployment assumptions documented for VPS plus Caddy
+
+## Phase 1 Scope
+
+- Lock architecture choices for auth, database access, migrations, and deployment runtime
+- Prepare the app to run locally during development and on the VPS in production
+- Separate the project from the old GitHub remote
+- Replace prototype-only service assumptions with production-ready conventions
+
+## Notes
+
+- Keep this file updated as decisions become firm so architecture, deployment, and product work stay aligned.
