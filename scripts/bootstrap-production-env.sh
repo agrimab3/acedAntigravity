@@ -20,8 +20,8 @@ AUTH_SECRET=replace_me
 AUTH_GOOGLE_ID=replace_me
 AUTH_GOOGLE_SECRET=replace_me
 DATABASE_URL=postgresql://aced_app:replace_me@127.0.0.1:54322/aced?sslmode=disable
-OPENAI_API_KEY=replace_me
-OPENAI_MODEL=gpt-5-mini
+GEMINI_API_KEY=replace_me
+GEMINI_MODEL=gemini-2.5-flash
 EOF
 
 chmod 600 "${ENV_FILE}"

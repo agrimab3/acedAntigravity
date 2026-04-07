@@ -1,11 +1,16 @@
 import OpenAI from 'openai';
 
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error('OPENAI_API_KEY is required to generate questions.');
+const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+
+if (!geminiApiKey) {
+  throw new Error('GEMINI_API_KEY is required to generate questions.');
 }
 
 const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: geminiApiKey,
+  baseURL:
+    process.env.GEMINI_BASE_URL ||
+    'https://generativelanguage.googleapis.com/v1beta/openai/',
 });
 
 const TOPICS = [
@@ -32,10 +37,18 @@ const TOPICS = [
 async function generateQuestions(section, topic) {
   console.log(`generating: ${section} — ${topic}`);
 
-  const response = await client.responses.create({
-    model: process.env.OPENAI_MODEL || 'gpt-5-mini',
-    max_output_tokens: 2200,
-    input: `Generate 5 ACT-style multiple choice questions for the ${section} section, topic: "${topic}".
+  const response = await client.chat.completions.create({
+    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+    max_tokens: 2200,
+    messages: [
+      {
+        role: 'system',
+        content:
+          'You are an ACT assessment writer. Return valid JSON only, with no markdown fences.',
+      },
+      {
+        role: 'user',
+        content: `Generate 5 ACT-style multiple choice questions for the ${section} section, topic: "${topic}".
 
 Return ONLY a JSON array, no other text. Each question must follow this exact format:
 [
@@ -56,9 +69,11 @@ Return ONLY a JSON array, no other text. Each question must follow this exact fo
 ]
 
 Make the questions realistic and at ACT difficulty level. For English, include a passage excerpt if needed. For Math, include actual numbers and calculations. For Reading, create a short passage. For Science, reference a simple experiment or data set.`
+      },
+    ],
   });
 
-  const text = response.output_text;
+  const text = response.choices[0]?.message?.content || '';
   const cleaned = text.replace(/```json|```/g, '').trim();
   return JSON.parse(cleaned);
 }

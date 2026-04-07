@@ -7,8 +7,15 @@ import { getAuthSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { buildTutorInstructions, getActiveTutorProfile } from "@/lib/tutor-profile";
 
-const client = process.env.OPENAI_API_KEY
-  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+
+const client = geminiApiKey
+  ? new OpenAI({
+      apiKey: geminiApiKey,
+      baseURL:
+        process.env.GEMINI_BASE_URL ||
+        "https://generativelanguage.googleapis.com/v1beta/openai/",
+    })
   : null;
 
 const tutorRequestSchema = z.object({
@@ -73,13 +80,21 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid tutor payload.' }, { status: 400 });
   }
 
+  const { message, question, section, topic, explanation } = parsed.data;
+
   if (!client) {
     return NextResponse.json({
-      reply: 'The AI tutor is not configured yet. Add OPENAI_API_KEY on the server to enable it.',
+      reply: buildFallbackTutorReply({
+        message,
+        section,
+        topic,
+        explanation,
+      }),
+      fallback: true,
+      provider: "local-fallback",
     });
   }
 
-  const { message, question, section, topic, explanation } = parsed.data;
   const session = await getAuthSession();
   const db = getDb();
   const profile = await getActiveTutorProfile();
@@ -113,22 +128,36 @@ export async function POST(req: Request) {
   }
 
   try {
-    const response = await client.responses.create({
-      model: process.env.OPENAI_MODEL || 'gpt-5-mini',
-      max_output_tokens: 250,
-      instructions: buildTutorInstructions(profile, {
-        section,
-        topic,
-        question,
-        explanation,
-        difficulty: parsed.data.difficulty,
-        studentAccuracyPct: parsed.data.sessionAccuracyPct,
-        targetDifficulty: recommendedDifficulty,
-      }),
-      input: message,
+    const response = await client.chat.completions.create({
+      model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+      max_tokens: 250,
+      messages: [
+        {
+          role: "system",
+          content: buildTutorInstructions(profile, {
+            section,
+            topic,
+            question,
+            explanation,
+            difficulty: parsed.data.difficulty,
+            studentAccuracyPct: parsed.data.sessionAccuracyPct,
+            targetDifficulty: recommendedDifficulty,
+          }),
+        },
+        {
+          role: "user",
+          content: message,
+        },
+      ],
     });
 
-    const reply = response.output_text?.trim() || 'let me think about that!';
+    const content = response.choices[0]?.message?.content;
+    const reply = typeof content === "string" ? content.trim() : "";
+
+    if (!reply) {
+      throw new Error("Gemini returned an empty tutor response.");
+    }
+
     return NextResponse.json({ reply });
   } catch (error) {
     console.error("Tutor request failed", error);
