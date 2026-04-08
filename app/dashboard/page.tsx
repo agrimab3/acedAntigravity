@@ -3,13 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
-
-type SectionKey = "english" | "math" | "reading" | "science";
+import {
+  ACT_TAXONOMY,
+  getChildTopics,
+  getTopicBySlug,
+  type ActTopicDefinition,
+  type SectionKey,
+} from "@/lib/act-taxonomy";
 
 type Point = {
   x: number;
   y: number;
-  topicIndex?: number;
+  topicSlug?: string;
 };
 
 type Section = {
@@ -19,7 +24,7 @@ type Section = {
   cx: number;
   cy: number;
   label: string;
-  topics: string[];
+  topics: ActTopicDefinition[];
   box: {
     x: number;
     y: number;
@@ -35,168 +40,135 @@ type Hit = { si: number; pi: number } | null;
 const W = 1400;
 const H = 700;
 
-const SECS: Section[] = [
-  {
-    key: "english",
-    name: "ENGLISH",
-    color: "#5DCAA5",
-    cx: 255,
-    cy: 178,
-    label: "Gemini",
-    topics: [
-      "Production of Writing",
-      "Knowledge of Language",
-      "Conventions of Standard English",
-      "Punctuation",
-      "Grammar & Usage",
-      "Sentence Structure",
-    ],
-    box: { x: 92, y: 52, width: 330, height: 240 },
+const SECTION_LAYOUTS: Record<
+  SectionKey,
+  Pick<Section, "cx" | "cy" | "box" | "points" | "lines">
+> = {
+  english: {
+    cx: 265,
+    cy: 182,
+    box: { x: 78, y: 44, width: 386, height: 270 },
     points: [
-      { x: 0.22, y: 0.12, topicIndex: 0 },
-      { x: 0.56, y: 0.14, topicIndex: 1 },
-      { x: 0.18, y: 0.34 },
-      { x: 0.58, y: 0.34 },
-      { x: 0.24, y: 0.58, topicIndex: 2 },
-      { x: 0.53, y: 0.58, topicIndex: 3 },
-      { x: 0.78, y: 0.42 },
-      { x: 0.91, y: 0.34, topicIndex: 4 },
-      { x: 0.70, y: 0.76, topicIndex: 5 },
+      { x: 0.18, y: 0.18, topicSlug: "production-of-writing" },
+      { x: 0.52, y: 0.13, topicSlug: "knowledge-of-language" },
+      { x: 0.30, y: 0.56, topicSlug: "conventions-of-standard-english" },
+      { x: 0.07, y: 0.34, topicSlug: "organization-and-flow" },
+      { x: 0.24, y: 0.38, topicSlug: "transitions-and-cohesion" },
+      { x: 0.63, y: 0.27, topicSlug: "precision-and-concision" },
+      { x: 0.83, y: 0.18, topicSlug: "style-and-tone" },
+      { x: 0.48, y: 0.61, topicSlug: "punctuation" },
+      { x: 0.81, y: 0.45, topicSlug: "grammar-and-usage" },
+      { x: 0.67, y: 0.82, topicSlug: "sentence-structure" },
     ],
     lines: [
       [0, 1],
       [0, 2],
-      [2, 4],
-      [1, 3],
-      [3, 5],
-      [2, 3],
+      [0, 3],
+      [0, 4],
+      [1, 5],
+      [1, 6],
+      [2, 7],
+      [2, 8],
+      [2, 9],
       [4, 5],
-      [3, 6],
-      [6, 7],
-      [5, 8],
-    ],
-  },
-  {
-    key: "math",
-    name: "MATH",
-    color: "#AFA9EC",
-    cx: 1065,
-    cy: 186,
-    label: "Aquarius",
-    topics: [
-      "Number & Quantity",
-      "Algebra",
-      "Functions",
-      "Geometry",
-      "Statistics & Probability",
-      "Integrating Essential Skills",
-      "Modeling",
-    ],
-    box: { x: 930, y: 38, width: 285, height: 280 },
-    points: [
-      { x: 0.72, y: 0.08, topicIndex: 0 },
-      { x: 0.57, y: 0.22, topicIndex: 1 },
-      { x: 0.43, y: 0.30 },
-      { x: 0.59, y: 0.34, topicIndex: 2 },
-      { x: 0.74, y: 0.39 },
-      { x: 0.90, y: 0.36, topicIndex: 3 },
-      { x: 0.30, y: 0.46 },
-      { x: 0.16, y: 0.60, topicIndex: 4 },
-      { x: 0.37, y: 0.83 },
-      { x: 0.58, y: 0.88, topicIndex: 5 },
-      { x: 0.80, y: 0.79, topicIndex: 6 },
-    ],
-    lines: [
-      [0, 1],
-      [1, 2],
-      [1, 3],
-      [3, 4],
-      [4, 5],
-      [2, 6],
-      [6, 7],
       [7, 8],
       [8, 9],
-      [9, 10],
     ],
   },
-  {
-    key: "reading",
-    name: "READING",
-    color: "#EF9F27",
-    cx: 255,
-    cy: 445,
-    label: "Virgo",
-    topics: ["Literary Narrative", "Social Science", "Humanities", "Natural Science"],
-    box: { x: 88, y: 308, width: 290, height: 230 },
+  math: {
+    cx: 1055,
+    cy: 194,
+    box: { x: 842, y: 28, width: 410, height: 304 },
     points: [
-      { x: 0.92, y: 0.10, topicIndex: 0 },
-      { x: 0.76, y: 0.23 },
-      { x: 0.60, y: 0.19 },
-      { x: 0.43, y: 0.31, topicIndex: 1 },
-      { x: 0.24, y: 0.33 },
-      { x: 0.06, y: 0.30 },
-      { x: 0.56, y: 0.50, topicIndex: 2 },
-      { x: 0.63, y: 0.68, topicIndex: 3 },
-      { x: 0.53, y: 0.84 },
-      { x: 0.66, y: 0.93 },
-      { x: 0.83, y: 0.88 },
-      { x: 0.90, y: 0.73 },
+      { x: 0.66, y: 0.08, topicSlug: "number-and-quantity" },
+      { x: 0.42, y: 0.18, topicSlug: "algebra" },
+      { x: 0.57, y: 0.29, topicSlug: "functions" },
+      { x: 0.86, y: 0.34, topicSlug: "geometry" },
+      { x: 0.18, y: 0.57, topicSlug: "statistics-and-probability" },
+      { x: 0.56, y: 0.88, topicSlug: "integrating-essential-skills" },
+      { x: 0.83, y: 0.76, topicSlug: "modeling" },
+      { x: 0.83, y: 0.14, topicSlug: "ratios-and-proportions" },
+      { x: 0.25, y: 0.28, topicSlug: "linear-equations" },
+      { x: 0.46, y: 0.45, topicSlug: "quadratics-and-polynomials" },
+      { x: 0.94, y: 0.54, topicSlug: "coordinate-geometry" },
+      { x: 0.09, y: 0.76, topicSlug: "data-analysis" },
+      { x: 0.31, y: 0.80, topicSlug: "applied-word-problems" },
     ],
     lines: [
       [0, 1],
       [1, 2],
       [2, 3],
-      [3, 4],
+      [1, 4],
       [4, 5],
-      [3, 6],
-      [6, 7],
-      [7, 11],
-      [7, 8],
+      [5, 6],
+      [0, 7],
+      [1, 8],
+      [2, 9],
+      [3, 10],
+      [4, 11],
+      [5, 12],
       [8, 9],
-      [9, 10],
-      [10, 11],
+      [11, 12],
     ],
   },
-  {
-    key: "science",
-    name: "SCIENCE",
-    color: "#F0997B",
-    cx: 1065,
+  reading: {
+    cx: 265,
     cy: 460,
-    label: "Sagittarius",
-    topics: ["Data Representation", "Research Summaries", "Conflicting Viewpoints"],
-    box: { x: 860, y: 332, width: 380, height: 280 },
+    box: { x: 76, y: 322, width: 372, height: 248 },
     points: [
-      { x: 0.27, y: 0.10 },
-      { x: 0.39, y: 0.18, topicIndex: 0 },
-      { x: 0.61, y: 0.24 },
-      { x: 0.74, y: 0.07, topicIndex: 1 },
-      { x: 0.89, y: 0.14 },
-      { x: 0.97, y: 0.21 },
-      { x: 0.65, y: 0.45 },
-      { x: 0.61, y: 0.71, topicIndex: 2 },
-      { x: 0.40, y: 0.77 },
-      { x: 0.20, y: 0.77 },
-      { x: 0.03, y: 0.77 },
-      { x: 0.35, y: 0.98 },
-      { x: 0.86, y: 0.82 },
+      { x: 0.88, y: 0.13, topicSlug: "literary-narrative" },
+      { x: 0.40, y: 0.30, topicSlug: "social-science" },
+      { x: 0.58, y: 0.55, topicSlug: "humanities" },
+      { x: 0.71, y: 0.80, topicSlug: "natural-science" },
+      { x: 0.16, y: 0.20, topicSlug: "main-idea-and-purpose" },
+      { x: 0.18, y: 0.55, topicSlug: "inference" },
+      { x: 0.42, y: 0.86, topicSlug: "evidence-integration" },
+      { x: 0.86, y: 0.46, topicSlug: "tone-and-point-of-view" },
+    ],
+    lines: [
+      [4, 1],
+      [1, 0],
+      [1, 2],
+      [2, 3],
+      [1, 5],
+      [2, 6],
+      [0, 7],
+      [5, 6],
+      [6, 3],
+    ],
+  },
+  science: {
+    cx: 1055,
+    cy: 468,
+    box: { x: 858, y: 334, width: 380, height: 282 },
+    points: [
+      { x: 0.34, y: 0.18, topicSlug: "data-representation" },
+      { x: 0.74, y: 0.10, topicSlug: "research-summaries" },
+      { x: 0.57, y: 0.72, topicSlug: "conflicting-viewpoints" },
+      { x: 0.18, y: 0.34, topicSlug: "charts-and-graphs" },
+      { x: 0.87, y: 0.28, topicSlug: "experimental-design" },
+      { x: 0.74, y: 0.46, topicSlug: "variable-relationships" },
+      { x: 0.35, y: 0.88, topicSlug: "compare-hypotheses" },
     ],
     lines: [
       [0, 1],
       [1, 2],
-      [2, 3],
-      [3, 4],
-      [4, 5],
+      [0, 3],
+      [1, 4],
+      [1, 5],
       [2, 6],
-      [6, 7],
-      [7, 8],
-      [8, 9],
-      [9, 10],
-      [8, 11],
-      [7, 12],
+      [3, 6],
+      [5, 2],
     ],
   },
-];
+};
+
+const SECS: Section[] = ACT_TAXONOMY.map((section) => ({
+  ...section,
+  name: section.name.toUpperCase(),
+  label: section.constellation,
+  ...SECTION_LAYOUTS[section.key],
+}));
 
 function pointToCanvas(sec: Section, point: Point) {
   return {
@@ -206,9 +178,9 @@ function pointToCanvas(sec: Section, point: Point) {
 }
 
 function getPointTopic(sec: Section, pointIndex: number) {
-  const topicIndex = sec.points[pointIndex]?.topicIndex;
-  if (topicIndex === undefined) return null;
-  return sec.topics[topicIndex] ?? null;
+  const topicSlug = sec.points[pointIndex]?.topicSlug;
+  if (!topicSlug) return null;
+  return getTopicBySlug(sec.key, topicSlug);
 }
 
 export default function Dashboard() {
@@ -307,7 +279,7 @@ export default function Dashboard() {
         const dy = Math.cos(t * 0.15 + si * 1.1) * 4;
 
         for (let pi = 0; pi < sec.points.length; pi += 1) {
-          if (sec.points[pi].topicIndex === undefined) continue;
+          if (!sec.points[pi].topicSlug) continue;
           const p = pointToCanvas(sec, sec.points[pi]);
           if (Math.hypot(mx - p.x - dx, my - p.y - dy) < 18) return { si, pi };
         }
@@ -435,12 +407,15 @@ export default function Dashboard() {
 
         sec.points.forEach((point, pi) => {
           const resolved = pointToCanvas(sec, point);
+          const topic = point.topicSlug ? getTopicBySlug(sec.key, point.topicSlug) : null;
           const isHover = hovered?.si === si && hovered?.pi === pi;
           const isSelected = currentSelection?.si === si && currentSelection?.pi === pi;
-          const isInteractive = point.topicIndex !== undefined;
+          const isInteractive = Boolean(topic);
+          const isOfficial = topic?.kind === "official";
           const twinkle = 0.8 + 0.2 * Math.sin(t * 1.1 + pi * 1.7 + si * 0.9);
           const pulse = isInteractive ? 0.82 + 0.18 * Math.sin(t * 2.2 + pi * 1.3 + si) : 1;
-          const radius = isHover ? 8.8 : isInteractive ? 6.2 + pulse * 0.9 : 3.2;
+          const baseRadius = isOfficial ? 7.6 : 5.5;
+          const radius = isHover ? baseRadius + 2.3 : isInteractive ? baseRadius + pulse * 0.9 : 3.2;
 
           if (isInteractive) {
             const halo = ctx.createRadialGradient(
@@ -462,9 +437,15 @@ export default function Dashboard() {
 
             ctx.globalAlpha = alpha * (isHover || isSelected ? 0.65 : 0.38);
             ctx.strokeStyle = `${sec.color}88`;
-            ctx.lineWidth = isHover || isSelected ? 1.5 : 1;
+            ctx.lineWidth = isOfficial ? 1.6 : isHover || isSelected ? 1.5 : 1;
             ctx.beginPath();
-            ctx.arc(resolved.x + dx, resolved.y + dy, radius + 5 + pulse * 1.5, 0, Math.PI * 2);
+            ctx.arc(
+              resolved.x + dx,
+              resolved.y + dy,
+              radius + (isOfficial ? 6.5 : 5) + pulse * 1.5,
+              0,
+              Math.PI * 2
+            );
             ctx.stroke();
           }
 
@@ -480,7 +461,13 @@ export default function Dashboard() {
           ctx.shadowBlur = 0;
           ctx.globalAlpha = alpha * (isInteractive ? 0.82 : 0.42) * twinkle;
           ctx.beginPath();
-          ctx.arc(resolved.x + dx, resolved.y + dy, isInteractive ? 1.5 : 1.05, 0, Math.PI * 2);
+          ctx.arc(
+            resolved.x + dx,
+            resolved.y + dy,
+            isInteractive ? (isOfficial ? 1.9 : 1.35) : 1.05,
+            0,
+            Math.PI * 2
+          );
           ctx.fill();
 
           if (isSelected) {
@@ -555,6 +542,10 @@ export default function Dashboard() {
 
   const selSec = selected ? SECS[selected.si] : null;
   const selTopic = selected ? getPointTopic(SECS[selected.si], selected.pi) : null;
+  const selParentTopic =
+    selSec && selTopic?.parentSlug ? getTopicBySlug(selSec.key, selTopic.parentSlug) : null;
+  const selChildTopics =
+    selSec && selTopic?.kind === "official" ? getChildTopics(selSec.key, selTopic.slug) : [];
 
   if (status === "loading") {
     return (
@@ -656,6 +647,10 @@ export default function Dashboard() {
           your universe is waiting - click any bright star
         </p>
 
+        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.34)", marginBottom: "1rem" }}>
+          larger stars map the official ACT domains. smaller stars map our finer-grained skill targets.
+        </p>
+
         <div style={{ display: "flex", gap: "6px", marginBottom: "0", flexWrap: "wrap" }}>
           {(["all", "english", "math", "reading", "science"] as const).map((section) => (
             <button
@@ -737,7 +732,39 @@ export default function Dashboard() {
                 >
                   {selSec.name} · {selSec.label}
                 </span>
-                <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px" }}>{selTopic}</div>
+                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "8px" }}>
+                  <span
+                    style={{
+                      fontSize: "11px",
+                      fontWeight: 500,
+                      padding: "3px 10px",
+                      borderRadius: "20px",
+                      background: "rgba(255,255,255,0.05)",
+                      color: "rgba(255,255,255,0.72)",
+                      border: "0.5px solid rgba(255,255,255,0.12)",
+                    }}
+                  >
+                    {selTopic.kind === "official" ? "official ACT domain" : "internal skill star"}
+                  </span>
+                  {selParentTopic && (
+                    <span
+                      style={{
+                        fontSize: "11px",
+                        fontWeight: 500,
+                        padding: "3px 10px",
+                        borderRadius: "20px",
+                        background: `${selSec.color}12`,
+                        color: selSec.color,
+                        border: `0.5px solid ${selSec.color}30`,
+                      }}
+                    >
+                      inside {selParentTopic.name}
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px" }}>
+                  {selTopic.name}
+                </div>
               </div>
               <div style={{ textAlign: "right" }}>
                 <div
@@ -774,11 +801,59 @@ export default function Dashboard() {
                 marginBottom: "1rem",
               }}
             >
-              no practice yet - start here to light this star up ✦
+              {selTopic.kind === "official"
+                ? "practice this official ACT domain to get a mixed set drawn from its linked skill stars."
+                : "practice this finer-grained skill star to target one specific ACT weakness at a time."}
             </div>
+            {selChildTopics.length > 0 && (
+              <div style={{ marginBottom: "1rem" }}>
+                <div
+                  style={{
+                    fontSize: "11px",
+                    letterSpacing: ".06em",
+                    color: "rgba(255,255,255,0.32)",
+                    marginBottom: "10px",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  linked internal stars
+                </div>
+                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                  {selChildTopics.map((childTopic) => (
+                    <button
+                      key={childTopic.slug}
+                      onClick={() => {
+                        const pointIndex = selSec.points.findIndex(
+                          (point) => point.topicSlug === childTopic.slug
+                        );
+                        if (pointIndex >= 0) {
+                          setSelected({ si: selected!.si, pi: pointIndex });
+                        }
+                      }}
+                      style={{
+                        padding: "6px 10px",
+                        borderRadius: "999px",
+                        border: `0.5px solid ${selSec.color}28`,
+                        background: "rgba(255,255,255,0.03)",
+                        color: "rgba(255,255,255,0.7)",
+                        fontSize: "12px",
+                        cursor: "pointer",
+                        fontFamily: "DM Sans,sans-serif",
+                      }}
+                    >
+                      {childTopic.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <div style={{ display: "flex", gap: "8px" }}>
               <button
-                onClick={() => router.push(`/practice?section=${selSec.key}&topic=${encodeURIComponent(selTopic)}`)}
+                onClick={() =>
+                  router.push(
+                    `/practice?section=${selSec.key}&topic=${encodeURIComponent(selTopic.name)}`
+                  )
+                }
                 style={{
                   flex: 1,
                   padding: "11px",

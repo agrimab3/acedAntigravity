@@ -2,6 +2,7 @@ import { and, desc, eq, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
+  actTopics,
   practiceAnswers,
   practiceSessions,
   questionExposures,
@@ -10,6 +11,7 @@ import {
   topicSkillState,
 } from "@/db/schema";
 import { chooseDifficultyBand, normalizeDifficultyBand } from "@/lib/adaptive";
+import { isTopicInPracticeScope, type SectionKey } from "@/lib/act-taxonomy";
 import { getAuthSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 
@@ -48,8 +50,10 @@ export async function POST(request: Request) {
     .select({
       id: questions.id,
       topicId: questions.topicId,
+      topicName: actTopics.name,
     })
     .from(questions)
+    .innerJoin(actTopics, eq(questions.topicId, actTopics.id))
     .where(eq(questions.id, questionId))
     .limit(1);
 
@@ -57,13 +61,25 @@ export async function POST(request: Request) {
     .select({
       id: practiceSessions.id,
       topicId: practiceSessions.topicId,
+      sectionKey: practiceSessions.sectionKey,
+      topicName: actTopics.name,
       questionCount: practiceSessions.questionCount,
     })
     .from(practiceSessions)
+    .innerJoin(actTopics, eq(practiceSessions.topicId, actTopics.id))
     .where(and(eq(practiceSessions.id, sessionId), eq(practiceSessions.userId, userId)))
     .limit(1);
 
-  if (!questionRow || !sessionRow || sessionRow.topicId !== questionRow.topicId) {
+  const isAllowedTopic =
+    questionRow &&
+    sessionRow &&
+    isTopicInPracticeScope(
+      sessionRow.sectionKey as SectionKey,
+      sessionRow.topicName,
+      questionRow.topicName
+    );
+
+  if (!questionRow || !sessionRow || !isAllowedTopic) {
     return NextResponse.json({ error: "Practice session not found." }, { status: 404 });
   }
 

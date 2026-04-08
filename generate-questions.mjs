@@ -167,6 +167,22 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
       "Focus on grammar, usage, punctuation, pronoun agreement, verb tense, modifier placement, and sentence-level correctness.",
       "These should feel like official ACT English convention questions, not broad rhetorical revision tasks.",
     ],
+    "english:organization-and-flow": [
+      "Focus on paragraph order, sentence placement, logical sequencing, and whether an idea belongs where it appears.",
+      "The best answer should improve coherence and flow, not sentence-level grammar.",
+    ],
+    "english:transitions-and-cohesion": [
+      "Focus on transition words, contrast, cause-effect, continuation, and how sentences or paragraphs connect.",
+      "Make the relationship between ideas explicit so the student's job is choosing the most coherent bridge.",
+    ],
+    "english:precision-and-concision": [
+      "Focus on cutting redundancy, choosing precise wording, and preserving meaning with the clearest phrasing.",
+      "Avoid grammar-only fixes unless they also improve precision and concision.",
+    ],
+    "english:style-and-tone": [
+      "Focus on matching tone, maintaining voice, and selecting wording that fits the passage's purpose and audience.",
+      "Do not drift into punctuation mechanics here.",
+    ],
     "english:punctuation": [
       "Focus on commas, semicolons, colons, dashes, apostrophes, and punctuation-driven sentence meaning.",
       "Use ACT-style sentence revision prompts rather than generic grammar trivia.",
@@ -207,6 +223,30 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
       "Focus on translating real-world situations into equations, functions, tables, or graphs and choosing the best mathematical representation.",
       "Use applied ACT-style scenarios where the main skill is setting up the model, not just doing arithmetic after the model is obvious.",
     ],
+    "math:ratios-and-proportions": [
+      "Focus on rates, scale factors, proportional reasoning, unit rates, and comparing quantities across contexts.",
+      "These should feel like applied ratio problems, not abstract function notation questions.",
+    ],
+    "math:linear-equations": [
+      "Focus on solving or interpreting linear equations and inequalities, including slope-intercept style relationships.",
+      "Make the linear structure central to the solution path.",
+    ],
+    "math:quadratics-and-polynomials": [
+      "Focus on factoring, roots, quadratic relationships, polynomial expressions, and how graph features connect to algebraic form.",
+      "Do not reduce these to basic arithmetic word problems.",
+    ],
+    "math:coordinate-geometry": [
+      "Focus on points, slope, midpoint, distance, lines, and geometry grounded on the coordinate plane.",
+      "The student should need coordinate reasoning, not just memorized area formulas.",
+    ],
+    "math:data-analysis": [
+      "Focus on interpreting tables, charts, distributions, percent change, median, mean, or outliers.",
+      "The data itself should matter to the reasoning, not just decorate an algebra problem.",
+    ],
+    "math:applied-word-problems": [
+      "Use multi-step real-world scenarios that blend arithmetic, algebra, and proportional reasoning.",
+      "These should feel like ACT problems where the challenge is setting up the right path through the situation.",
+    ],
     "reading:literary-narrative": [
       "Use a fictional or memoir-like passage with a character, scene, voice, or interpersonal moment.",
       "Questions should target tone, motivation, inference, narration, or how a detail shapes character or mood.",
@@ -224,6 +264,22 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
       "Use a popular-science reading passage about biology, chemistry, physics, Earth science, or astronomy.",
       "Keep it as ACT Reading, not ACT Science: focus on understanding what the author says, not computing data.",
     ],
+    "reading:main-idea-and-purpose": [
+      "Use any ACT Reading passage type, but make the question target the passage's central claim, purpose, or overall direction.",
+      "The correct answer should capture the big picture rather than a narrow detail.",
+    ],
+    "reading:inference": [
+      "Use evidence-rich passages where the student must infer what is implied but not stated directly.",
+      "Wrong answers should be plausible overreaches or distortions of the text.",
+    ],
+    "reading:evidence-integration": [
+      "Focus on how multiple lines or details work together to support a conclusion, comparison, or claim.",
+      "Require the student to synthesize, not just locate a single sentence.",
+    ],
+    "reading:tone-and-point-of-view": [
+      "Focus on narrator or author attitude, stance, perspective, or how viewpoint shapes interpretation.",
+      "Keep the answer choices tone-sensitive and text-grounded.",
+    ],
     "science:data-representation": [
       "Use a short setup that summarizes a table, graph, or data trend in words and includes concrete numbers or variable changes.",
       "Questions should ask for a trend, comparison, interpolation, or direct data-based conclusion.",
@@ -235,6 +291,22 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
     "science:conflicting-viewpoints": [
       "Use at least two named viewpoints such as Scientist 1 and Scientist 2 or Student 1 and Student 2.",
       "Questions should compare positions, assumptions, points of agreement, or how each viewpoint would respond to evidence.",
+    ],
+    "science:charts-and-graphs": [
+      "Focus tightly on reading plotted values, graph direction, axis interpretation, or comparing chart elements.",
+      "The student should succeed by interpreting visualized data relationships.",
+    ],
+    "science:experimental-design": [
+      "Focus on controls, variables, setup, procedure, or what change would strengthen or weaken an experiment.",
+      "Questions should feel like ACT Science reasoning about how the study is constructed.",
+    ],
+    "science:variable-relationships": [
+      "Focus on how one variable changes in response to another across trials, tables, or trend summaries.",
+      "Make the relationship pattern itself central to the answer.",
+    ],
+    "science:compare-hypotheses": [
+      "Focus on how two explanations differ, what evidence would support one over the other, or where they would agree.",
+      "Use direct ACT-style comparisons rather than general science trivia.",
     ],
   };
 

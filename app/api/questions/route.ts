@@ -1,4 +1,4 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
@@ -15,6 +15,10 @@ import {
   getDifficultySweep,
   normalizeDifficultyBand,
 } from "@/lib/adaptive";
+import {
+  getPracticeScopeTopics,
+  type SectionKey,
+} from "@/lib/act-taxonomy";
 import { getAuthSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { buildMockQuestions } from "@/lib/mock-questions";
@@ -47,9 +51,17 @@ export async function GET(request: Request) {
   const userId = session?.user?.id || null;
   let targetDifficulty = "easy";
   let topicId: string | null = null;
+  let practiceScopeTopicNames = topic ? [topic] : [];
 
   if (db) {
     if (topic) {
+      practiceScopeTopicNames = getPracticeScopeTopics(section as SectionKey, topic).map(
+        (topicDefinition) => topicDefinition.name
+      );
+      if (practiceScopeTopicNames.length === 0) {
+        practiceScopeTopicNames = [topic];
+      }
+
       const [topicRow] = await db
         .select({
           id: actTopics.id,
@@ -63,8 +75,9 @@ export async function GET(request: Request) {
     }
 
     if (userId && topicId) {
-      const [skillStateRow] = await db
+      const skillStateRows = await db
         .select({
+          topicName: actTopics.name,
           currentDifficulty: topicSkillState.currentDifficulty,
           recentAccuracyPct: topicSkillState.recentAccuracyPct,
           rollingAccuracyPct: topicSkillState.rollingAccuracyPct,
@@ -73,21 +86,79 @@ export async function GET(request: Request) {
           totalAnswered: topicSkillState.totalAnswered,
         })
         .from(topicSkillState)
-        .where(and(eq(topicSkillState.userId, userId), eq(topicSkillState.topicId, topicId)))
-        .limit(1);
+        .innerJoin(actTopics, eq(topicSkillState.topicId, actTopics.id))
+        .where(
+          and(
+            eq(topicSkillState.userId, userId),
+            eq(actTopics.sectionKey, section),
+            inArray(actTopics.name, practiceScopeTopicNames)
+          )
+        );
 
-      if (skillStateRow) {
-        targetDifficulty = chooseDifficultyBand(skillStateRow);
+      const directSkillStateRow =
+        skillStateRows.find((row) => row.topicName === topic) ??
+        skillStateRows.sort((a, b) => b.totalAnswered - a.totalAnswered)[0];
+
+      if (directSkillStateRow) {
+        const totalAnsweredAcrossScope = skillStateRows.reduce(
+          (sum, row) => sum + row.totalAnswered,
+          0
+        );
+        const aggregateRollingAccuracyPct =
+          totalAnsweredAcrossScope > 0
+            ? Math.round(
+                skillStateRows.reduce(
+                  (sum, row) => sum + row.rollingAccuracyPct * row.totalAnswered,
+                  0
+                ) / totalAnsweredAcrossScope
+              )
+            : directSkillStateRow.rollingAccuracyPct;
+        const aggregateRecentAccuracyPct =
+          totalAnsweredAcrossScope > 0
+            ? Math.round(
+                skillStateRows.reduce(
+                  (sum, row) => sum + row.recentAccuracyPct * row.totalAnswered,
+                  0
+                ) / totalAnsweredAcrossScope
+              )
+            : directSkillStateRow.recentAccuracyPct;
+
+        targetDifficulty = chooseDifficultyBand({
+          currentDifficulty: directSkillStateRow.currentDifficulty,
+          recentAccuracyPct: aggregateRecentAccuracyPct,
+          rollingAccuracyPct: aggregateRollingAccuracyPct,
+          correctStreak: directSkillStateRow.correctStreak,
+          incorrectStreak: directSkillStateRow.incorrectStreak,
+          totalAnswered: totalAnsweredAcrossScope,
+        });
       } else {
-        const [masteryRow] = await db
+        const masteryRows = await db
           .select({
+            topicName: actTopics.name,
             masteryPct: topicMastery.masteryPct,
+            attemptCount: topicMastery.attemptCount,
           })
           .from(topicMastery)
-          .where(and(eq(topicMastery.userId, userId), eq(topicMastery.topicId, topicId)))
-          .limit(1);
+          .innerJoin(actTopics, eq(topicMastery.topicId, actTopics.id))
+          .where(
+            and(
+              eq(topicMastery.userId, userId),
+              eq(actTopics.sectionKey, section),
+              inArray(actTopics.name, practiceScopeTopicNames)
+            )
+          );
 
-        const masteryPct = masteryRow?.masteryPct ?? 0;
+        const totalAttemptsAcrossScope = masteryRows.reduce(
+          (sum, row) => sum + row.attemptCount,
+          0
+        );
+        const masteryPct =
+          totalAttemptsAcrossScope > 0
+            ? Math.round(
+                masteryRows.reduce((sum, row) => sum + row.masteryPct * row.attemptCount, 0) /
+                  totalAttemptsAcrossScope
+              )
+            : 0;
         targetDifficulty =
           masteryPct >= 80 ? "hard" : masteryPct >= 60 ? "medium" : normalizeDifficultyBand();
       }
@@ -114,7 +185,7 @@ export async function GET(request: Request) {
         ? and(
             eq(questions.status, "published"),
             eq(actTopics.sectionKey, section),
-            eq(actTopics.name, topic),
+            inArray(actTopics.name, practiceScopeTopicNames),
             eq(questions.difficulty, difficulty)
           )
         : and(
