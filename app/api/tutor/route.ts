@@ -74,6 +74,11 @@ function buildFallbackTutorReply({
   return `Here’s the key idea to focus on: ${explanation}`;
 }
 
+function isUsableTutorReply(reply: string) {
+  const cleaned = reply.trim();
+  return cleaned.length >= 24 && /[.!?]$/.test(cleaned);
+}
+
 export async function POST(req: Request) {
   const parsed = tutorRequestSchema.safeParse(await req.json());
   if (!parsed.success) {
@@ -154,7 +159,7 @@ export async function POST(req: Request) {
     const content = response.choices[0]?.message?.content;
     const reply = typeof content === "string" ? content.trim() : "";
 
-    if (!reply) {
+    if (!reply || !isUsableTutorReply(reply)) {
       throw new Error("Gemini returned an empty tutor response.");
     }
 
