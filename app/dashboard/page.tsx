@@ -35,6 +35,16 @@ type Hit = { si: number; pi: number } | null;
 const W = 1400;
 const H = 700;
 
+const ENGLISH_TOPIC_CONTEXT: Record<string, string> = {
+  "Organization & Flow": "Production of Writing",
+  "Transitions & Cohesion": "Production of Writing",
+  "Precision & Concision": "Knowledge of Language",
+  "Style & Tone": "Knowledge of Language",
+  Punctuation: "Conventions of Standard English",
+  "Grammar & Usage": "Conventions of Standard English",
+  "Sentence Structure": "Conventions of Standard English",
+};
+
 const SECS: Section[] = [
   {
     key: "english",
@@ -210,6 +220,14 @@ function getPointTopic(sec: Section, pointIndex: number) {
   const topicIndex = sec.points[pointIndex]?.topicIndex;
   if (topicIndex === undefined) return null;
   return sec.topics[topicIndex] ?? null;
+}
+
+function getTopicContext(sectionKey: SectionKey, topic: string) {
+  if (sectionKey === "english") {
+    return ENGLISH_TOPIC_CONTEXT[topic] ?? null;
+  }
+
+  return null;
 }
 
 export default function Dashboard() {
@@ -556,6 +574,7 @@ export default function Dashboard() {
 
   const selSec = selected ? SECS[selected.si] : null;
   const selTopic = selected ? getPointTopic(SECS[selected.si], selected.pi) : null;
+  const selTopicContext = selSec && selTopic ? getTopicContext(selSec.key, selTopic) : null;
 
   if (status === "loading") {
     return (
@@ -656,6 +675,9 @@ export default function Dashboard() {
         <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)", marginBottom: "1rem" }}>
           your universe is waiting - click any bright star
         </p>
+        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.24)", marginBottom: "1rem" }}>
+          english stars now drill the exact skills inside the official ACT categories.
+        </p>
 
         <div style={{ display: "flex", gap: "6px", marginBottom: "0", flexWrap: "wrap" }}>
           {(["all", "english", "math", "reading", "science"] as const).map((section) => (
@@ -738,6 +760,19 @@ export default function Dashboard() {
                 >
                   {selSec.name} · {selSec.label}
                 </span>
+                {selTopicContext && (
+                  <div
+                    style={{
+                      fontSize: "11px",
+                      color: selSec.color,
+                      marginBottom: "8px",
+                      letterSpacing: ".05em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    official ACT category · {selTopicContext}
+                  </div>
+                )}
                 <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px" }}>{selTopic}</div>
               </div>
               <div style={{ textAlign: "right" }}>
@@ -775,7 +810,9 @@ export default function Dashboard() {
                 marginBottom: "1rem",
               }}
             >
-              no practice yet - start here to light this star up ✦
+              {selTopicContext
+                ? `no practice yet - start here to light up this ${selTopicContext.toLowerCase()} skill star ✦`
+                : "no practice yet - start here to light this star up ✦"}
             </div>
             <div style={{ display: "flex", gap: "8px" }}>
               <button
