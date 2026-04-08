@@ -423,9 +423,10 @@ export default function Dashboard() {
           const isSelected = currentSelection?.si === si && currentSelection?.pi === pi;
           const isInteractive = Boolean(topic);
           const isOfficial = topic?.kind === "official";
+          const useClassicSizing = sec.key === "math";
           const twinkle = 0.8 + 0.2 * Math.sin(t * 1.1 + pi * 1.7 + si * 0.9);
           const pulse = isInteractive ? 0.82 + 0.18 * Math.sin(t * 2.2 + pi * 1.3 + si) : 1;
-          const baseRadius = isOfficial ? 7.6 : 5.5;
+          const baseRadius = useClassicSizing ? 6.2 : isOfficial ? 7.6 : 5.5;
           const radius = isHover ? baseRadius + 2.3 : isInteractive ? baseRadius + pulse * 0.9 : 3.2;
 
           if (isInteractive) {
@@ -448,12 +449,12 @@ export default function Dashboard() {
 
             ctx.globalAlpha = alpha * (isHover || isSelected ? 0.65 : 0.38);
             ctx.strokeStyle = `${sec.color}88`;
-            ctx.lineWidth = isOfficial ? 1.6 : isHover || isSelected ? 1.5 : 1;
+            ctx.lineWidth = useClassicSizing ? (isHover || isSelected ? 1.5 : 1) : isOfficial ? 1.6 : isHover || isSelected ? 1.5 : 1;
             ctx.beginPath();
             ctx.arc(
               resolved.x + dx,
               resolved.y + dy,
-              radius + (isOfficial ? 6.5 : 5) + pulse * 1.5,
+              radius + (useClassicSizing ? 5 : isOfficial ? 6.5 : 5) + pulse * 1.5,
               0,
               Math.PI * 2
             );
@@ -475,7 +476,7 @@ export default function Dashboard() {
           ctx.arc(
             resolved.x + dx,
             resolved.y + dy,
-            isInteractive ? (isOfficial ? 1.9 : 1.35) : 1.05,
+            isInteractive ? (useClassicSizing ? 1.5 : isOfficial ? 1.9 : 1.35) : 1.05,
             0,
             Math.PI * 2
           );
