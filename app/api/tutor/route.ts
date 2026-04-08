@@ -63,9 +63,14 @@ function buildFallbackTutorReply({
   return `Here’s the key idea to focus on: ${explanation}`;
 }
 
-function isUsableTutorReply(reply: string) {
-  const cleaned = reply.trim();
-  return cleaned.length >= 24 && /[.!?]$/.test(cleaned);
+function normalizeTutorReply(reply: string) {
+  const cleaned = reply.replace(/\s+/g, " ").trim();
+
+  if (!cleaned) {
+    return "";
+  }
+
+  return /[.!?]$/.test(cleaned) ? cleaned : `${cleaned}.`;
 }
 
 export async function POST(req: Request) {
@@ -137,11 +142,13 @@ export async function POST(req: Request) {
       temperature: 0.35,
     });
 
-    if (!reply || !isUsableTutorReply(reply)) {
+    const normalizedReply = normalizeTutorReply(reply);
+
+    if (!normalizedReply || normalizedReply.length < 12) {
       throw new Error("Gemini returned an empty tutor response.");
     }
 
-    return NextResponse.json({ reply });
+    return NextResponse.json({ reply: normalizedReply });
   } catch (error) {
     console.error("Tutor request failed", error);
 
