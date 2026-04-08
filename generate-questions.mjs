@@ -175,7 +175,12 @@ ${getSectionSpecificInstructions(sectionKey)}
 `.trim();
 }
 
-function buildQuestionBatchSchema() {
+function buildQuestionBatchSchema(sectionKey) {
+  const passageSchema =
+    sectionKey === "reading" || sectionKey === "science"
+      ? { type: "string" }
+      : { type: ["string", "null"] };
+
   return {
     type: "object",
     properties: {
@@ -190,9 +195,7 @@ function buildQuestionBatchSchema() {
               type: "string",
               enum: DIFFICULTIES,
             },
-            passage: {
-              type: ["string", "null"],
-            },
+            passage: passageSchema,
             prompt: {
               type: "string",
             },
@@ -254,7 +257,7 @@ async function generateBatchForTopic(topic, attempt = 1) {
             temperature: 0.7,
             maxOutputTokens: 8192,
             responseMimeType: "application/json",
-            responseJsonSchema: buildQuestionBatchSchema(),
+            responseJsonSchema: buildQuestionBatchSchema(topic.section_key),
           },
         }),
       }
