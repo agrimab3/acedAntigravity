@@ -163,6 +163,10 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
       "Focus on style, tone, precision, concision, and maintaining consistency with the surrounding passage.",
       "Avoid grammar-only questions here; prioritize effective wording and rhetorical clarity.",
     ],
+    "english:conventions-of-standard-english": [
+      "Focus on grammar, usage, punctuation, pronoun agreement, verb tense, modifier placement, and sentence-level correctness.",
+      "These should feel like official ACT English convention questions, not broad rhetorical revision tasks.",
+    ],
     "english:punctuation": [
       "Focus on commas, semicolons, colons, dashes, apostrophes, and punctuation-driven sentence meaning.",
       "Use ACT-style sentence revision prompts rather than generic grammar trivia.",
@@ -198,6 +202,10 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
     "math:integrating-essential-skills": [
       "Mix algebra, arithmetic, proportional reasoning, data interpretation, and multi-step applied problem solving.",
       "These should feel like ACT integrated word problems rather than a single isolated skill drill.",
+    ],
+    "math:modeling": [
+      "Focus on translating real-world situations into equations, functions, tables, or graphs and choosing the best mathematical representation.",
+      "Use applied ACT-style scenarios where the main skill is setting up the model, not just doing arithmetic after the model is obvious.",
     ],
     "reading:literary-narrative": [
       "Use a fictional or memoir-like passage with a character, scene, voice, or interpersonal moment.",

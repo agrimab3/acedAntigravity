@@ -15,6 +15,7 @@ const SECTIONS = [
     topics: [
       "Production of Writing",
       "Knowledge of Language",
+      "Conventions of Standard English",
       "Punctuation",
       "Grammar & Usage",
       "Sentence Structure",
@@ -32,6 +33,7 @@ const SECTIONS = [
       "Geometry",
       "Statistics & Probability",
       "Integrating Essential Skills",
+      "Modeling",
     ],
   },
   {

@@ -46,6 +46,7 @@ const SECS: Section[] = [
     topics: [
       "Production of Writing",
       "Knowledge of Language",
+      "Conventions of Standard English",
       "Punctuation",
       "Grammar & Usage",
       "Sentence Structure",
@@ -60,7 +61,7 @@ const SECS: Section[] = [
       { x: 0.53, y: 0.58, topicIndex: 3 },
       { x: 0.78, y: 0.42 },
       { x: 0.91, y: 0.34, topicIndex: 4 },
-      { x: 0.70, y: 0.76 },
+      { x: 0.70, y: 0.76, topicIndex: 5 },
     ],
     lines: [
       [0, 1],
@@ -89,6 +90,7 @@ const SECS: Section[] = [
       "Geometry",
       "Statistics & Probability",
       "Integrating Essential Skills",
+      "Modeling",
     ],
     box: { x: 930, y: 38, width: 285, height: 280 },
     points: [
@@ -102,7 +104,7 @@ const SECS: Section[] = [
       { x: 0.16, y: 0.60, topicIndex: 4 },
       { x: 0.37, y: 0.83 },
       { x: 0.58, y: 0.88, topicIndex: 5 },
-      { x: 0.80, y: 0.79 },
+      { x: 0.80, y: 0.79, topicIndex: 6 },
     ],
     lines: [
       [0, 1],
