@@ -9,7 +9,8 @@ const DEFAULT_GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1bet
 
 const databaseUrl = process.env.DATABASE_URL;
 const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
-const geminiModel = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const generationModel =
+  process.env.GEMINI_GENERATION_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
 
 if (!databaseUrl) {
   throw new Error("DATABASE_URL is required.");
@@ -21,11 +22,12 @@ if (!geminiApiKey) {
 
 const args = parseArgs(process.argv.slice(2));
 const perDifficulty = Math.max(1, Number(args["per-difficulty"] || 3));
-const requestedStatus = (args.status || "published").trim().toLowerCase();
+const requestedStatus = (args.status || "draft").trim().toLowerCase();
 const sectionFilter = args.section?.trim().toLowerCase();
 const topicFilter = args.topic?.trim().toLowerCase();
 const topicLimit = args["limit-topics"] ? Math.max(1, Number(args["limit-topics"])) : null;
 const delayMs = Math.max(0, Number(args["delay-ms"] || 800));
+const jsonOnly = args.json === "true" || args.json === "1";
 
 if (sectionFilter && !SECTION_KEYS.includes(sectionFilter)) {
   throw new Error(`Invalid --section value: ${sectionFilter}`);
@@ -149,7 +151,89 @@ function getSectionSpecificInstructions(sectionKey) {
   }
 }
 
-function buildPrompt({ sectionKey, topicName }) {
+function getTopicSpecificInstructions(sectionKey, topicSlug) {
+  const topicKey = `${sectionKey}:${topicSlug}`;
+
+  const instructions = {
+    "english:production-of-writing": [
+      "Focus on organization, transitions, rhetorical purpose, and whether a sentence supports the paragraph's goal.",
+      "Ask for the best revision, sentence placement, addition, deletion, or transition choice.",
+    ],
+    "english:knowledge-of-language": [
+      "Focus on style, tone, precision, concision, and maintaining consistency with the surrounding passage.",
+      "Avoid grammar-only questions here; prioritize effective wording and rhetorical clarity.",
+    ],
+    "english:punctuation": [
+      "Focus on commas, semicolons, colons, dashes, apostrophes, and punctuation-driven sentence meaning.",
+      "Use ACT-style sentence revision prompts rather than generic grammar trivia.",
+    ],
+    "english:grammar-and-usage": [
+      "Focus on subject-verb agreement, pronoun agreement, modifier placement, verb tense, and idiomatic usage.",
+      "Do not drift into geometry, history, or general knowledge contexts that overshadow the grammar skill.",
+    ],
+    "english:sentence-structure": [
+      "Focus on clause relationships, fragments, run-ons, parallel structure, and logical sentence combination.",
+      "Keep the student's job centered on fixing structure, not only punctuation.",
+    ],
+    "math:number-and-quantity": [
+      "Focus on integers, rational and irrational numbers, ratios, units, magnitude, exponents, and numeric properties.",
+      "Do not substitute pure geometry questions here.",
+    ],
+    "math:algebra": [
+      "Focus on solving equations, expressions, inequalities, linear relationships, and algebraic manipulation.",
+      "Do not generate geometry-only questions about circles, triangles, or angle sums unless algebra is central to solving.",
+    ],
+    "math:functions": [
+      "Focus on interpreting functions, function notation, input-output relationships, sequences, and tables or graphs.",
+      "Make the relationship or rule central to the solution.",
+    ],
+    "math:geometry": [
+      "Focus on coordinate geometry, area, perimeter, volume, angles, triangles, circles, and geometric reasoning.",
+      "A geometry diagram is not required, but the problem should unmistakably be geometry-based.",
+    ],
+    "math:statistics-and-probability": [
+      "Focus on averages, distributions, percent, counting, probability, and interpreting summary statistics or data tables.",
+      "Do not generate pure algebra drills here.",
+    ],
+    "math:integrating-essential-skills": [
+      "Mix algebra, arithmetic, proportional reasoning, data interpretation, and multi-step applied problem solving.",
+      "These should feel like ACT integrated word problems rather than a single isolated skill drill.",
+    ],
+    "reading:literary-narrative": [
+      "Use a fictional or memoir-like passage with a character, scene, voice, or interpersonal moment.",
+      "Questions should target tone, motivation, inference, narration, or how a detail shapes character or mood.",
+      "Do not use expository encyclopedia-style passages here.",
+    ],
+    "reading:social-science": [
+      "Use a nonfiction passage about history, civics, economics, psychology, anthropology, or society.",
+      "Questions should target claims, evidence, author perspective, or implications of a social-science idea.",
+    ],
+    "reading:humanities": [
+      "Use a nonfiction passage about art, music, literature, philosophy, architecture, or cultural criticism.",
+      "Questions should focus on interpretation, author attitude, or the role of specific details in the argument.",
+    ],
+    "reading:natural-science": [
+      "Use a popular-science reading passage about biology, chemistry, physics, Earth science, or astronomy.",
+      "Keep it as ACT Reading, not ACT Science: focus on understanding what the author says, not computing data.",
+    ],
+    "science:data-representation": [
+      "Use a short setup that summarizes a table, graph, or data trend in words and includes concrete numbers or variable changes.",
+      "Questions should ask for a trend, comparison, interpolation, or direct data-based conclusion.",
+    ],
+    "science:research-summaries": [
+      "Use a short experiment or study summary with variables, procedure, and results.",
+      "Questions should ask about experimental design, controls, predicted outcomes, or what the results support.",
+    ],
+    "science:conflicting-viewpoints": [
+      "Use at least two named viewpoints such as Scientist 1 and Scientist 2 or Student 1 and Student 2.",
+      "Questions should compare positions, assumptions, points of agreement, or how each viewpoint would respond to evidence.",
+    ],
+  };
+
+  return (instructions[topicKey] || []).join("\n");
+}
+
+function buildPrompt({ sectionKey, topicName, slug }) {
   return `
 Generate ${perDifficulty * DIFFICULTIES.length} original ACT-style multiple-choice questions for:
 - Section: ${sectionKey}
@@ -169,9 +253,13 @@ Global rules:
 - Explanations must briefly justify the correct answer and mention why the best distractor(s) fail.
 - Keep the content ACT-authentic and skill-focused, not trivia-like.
 - Vary the tested skill inside the topic so the batch is not repetitive.
+- Match the topic exactly. Do not drift into a different ACT topic just because the section is similar.
 
 Section-specific rules:
 ${getSectionSpecificInstructions(sectionKey)}
+
+Topic-specific rules:
+${getTopicSpecificInstructions(sectionKey, slug)}
 `.trim();
 }
 
@@ -231,7 +319,7 @@ function buildQuestionBatchSchema(sectionKey) {
 async function generateBatchForTopic(topic, attempt = 1) {
   try {
     const response = await fetch(
-      `${resolveGeminiBaseUrl()}/models/${geminiModel}:generateContent`,
+      `${resolveGeminiBaseUrl()}/models/${generationModel}:generateContent`,
       {
         method: "POST",
         headers: {
@@ -250,7 +338,15 @@ async function generateBatchForTopic(topic, attempt = 1) {
           contents: [
             {
               role: "user",
-              parts: [{ text: buildPrompt(topic) }],
+              parts: [
+                {
+                  text: buildPrompt({
+                    sectionKey: topic.section_key,
+                    topicName: topic.name,
+                    slug: topic.slug,
+                  }),
+                },
+              ],
             },
           ],
           generationConfig: {
@@ -335,6 +431,78 @@ function sanitizeQuestion(sectionKey, topic, question) {
     throw new Error("Science question missing passage/setup.");
   }
 
+  const combinedText = `${passage || ""} ${prompt} ${explanation}`.toLowerCase();
+
+  if (
+    topic.slug === "algebra" &&
+    /\b(circle|triangle|radius|diameter|circumference|angle sum|perimeter|area of a circle)\b/.test(
+      combinedText
+    )
+  ) {
+    throw new Error("Algebra question drifted into geometry.");
+  }
+
+  if (
+    topic.slug === "literary-narrative" &&
+    !/\b(he|she|they|i|we|said|thought|looked|walked|felt|remembered)\b/.test(combinedText)
+  ) {
+    throw new Error("Literary Narrative passage does not read like narrative prose.");
+  }
+
+  if (
+    topic.slug === "social-science" &&
+    !/\b(society|government|community|economy|economics|psychology|history|citizens|voters|policy|researchers|study)\b/.test(
+      combinedText
+    )
+  ) {
+    throw new Error("Social Science passage does not reflect social-science content.");
+  }
+
+  if (
+    topic.slug === "humanities" &&
+    !/\b(art|music|literature|poetry|novel|painting|architecture|philosophy|culture|artist|composer)\b/.test(
+      combinedText
+    )
+  ) {
+    throw new Error("Humanities passage does not reflect humanities content.");
+  }
+
+  if (
+    topic.slug === "natural-science" &&
+    !/\b(scientists|species|cells|planet|chemical|physics|biology|ecosystem|climate|atom|energy)\b/.test(
+      combinedText
+    )
+  ) {
+    throw new Error("Natural Science passage does not reflect science content.");
+  }
+
+  if (
+    topic.slug === "data-representation" &&
+    !/\b(graph|table|figure|increased|decreased|trend|percent|temperature|rate|average)\b/.test(
+      combinedText
+    )
+  ) {
+    throw new Error("Data Representation item lacks clear data language.");
+  }
+
+  if (
+    topic.slug === "research-summaries" &&
+    !/\b(experiment|procedure|sample|trial|researchers|results|control|group|measured|study)\b/.test(
+      combinedText
+    )
+  ) {
+    throw new Error("Research Summaries item lacks experiment language.");
+  }
+
+  if (
+    topic.slug === "conflicting-viewpoints" &&
+    !/\b(scientist 1|scientist 2|student 1|student 2|researcher 1|researcher 2)\b/.test(
+      combinedText
+    )
+  ) {
+    throw new Error("Conflicting Viewpoints item lacks clearly named viewpoints.");
+  }
+
   return {
     sectionKey,
     topicId: topic.id,
@@ -346,6 +514,7 @@ function sanitizeQuestion(sectionKey, topic, question) {
     choices,
     correctAnswer: question.correctAnswer,
     explanation,
+    generationModel,
     fingerprint: buildFingerprint({
       sectionKey,
       topicSlug: topic.slug,
@@ -437,9 +606,10 @@ async function insertQuestions(topic, generatedQuestions) {
           correct_answer,
           explanation,
           source,
+          generation_model,
           status
         )
-        VALUES ($1, $2, $3, 'multiple_choice', $4, $5, $6, $7::jsonb, $8, $9, 'gemini', $10)
+        VALUES ($1, $2, $3, 'multiple_choice', $4, $5, $6, $7::jsonb, $8, $9, 'gemini', $10, $11)
         ON CONFLICT (fingerprint) DO NOTHING
         RETURNING id
       `,
@@ -453,6 +623,7 @@ async function insertQuestions(topic, generatedQuestions) {
         JSON.stringify(normalizedQuestion.choices),
         normalizedQuestion.correctAnswer,
         normalizedQuestion.explanation,
+        normalizedQuestion.generationModel,
         requestedStatus,
       ]
     );
@@ -514,8 +685,12 @@ async function main() {
       }
     }
 
-    console.log("\nGeneration summary:");
-    console.log(JSON.stringify(summary, null, 2));
+    if (jsonOnly) {
+      console.log(JSON.stringify(summary, null, 2));
+    } else {
+      console.log("\nGeneration summary:");
+      console.log(JSON.stringify(summary, null, 2));
+    }
   } finally {
     await client.end();
   }

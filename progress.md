@@ -54,6 +54,10 @@
 - Added question `fingerprint` support to reduce duplicate inventory across generation runs
 - Updated the practice UI and questions API to support passage-backed Reading and Science items
 - Updated the VPS deploy script to run Drizzle migrations during deployment
+- Added a lightweight admin review console at `/admin/review`
+- Added admin-only APIs for reviewing questions and triggering draft generation by topic
+- Added a backlog runner script for controlled Reading/Science inventory generation
+- Added review metadata fields for questions so content can be published or rejected intentionally
 
 ## Decisions Made
 
@@ -108,6 +112,8 @@
 - Add question generation jobs and seed the first AI-reviewed ACT content batches
 - Verify native Gemini tutor behavior in production
 - Seed the first real published ACT inventory for all active topics
+- Turn generation into a draft-first review flow for new content
+- Backfill remaining Reading and Science topics in controlled batches
 
 ## Planned Next Phase
 

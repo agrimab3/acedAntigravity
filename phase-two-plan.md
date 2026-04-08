@@ -252,7 +252,9 @@ Store rolling adaptive difficulty and mastery state for each user-topic pair.
 - status:
   - initial Gemini-native generation pipeline implemented in `generate-questions.mjs`
   - question fingerprinting added for dedupe-safe ingestion
-  - next step is seeding and reviewing the first broad ACT inventory batch
+  - draft-first review flow added via `/admin/review`
+  - backlog runner added for controlled section/topic backfills
+  - next step is finishing Reading and Science backfill through paced batches
 
 ### 3. Adaptive Engine
 
@@ -267,6 +269,8 @@ Store rolling adaptive difficulty and mastery state for each user-topic pair.
 - ACT content generation should produce structured JSON and persist directly into `questions`
 - Real Reading and Science items should support a `passage` field in both the data layer and the practice UI
 - The first inventory target should be enough published questions per topic to avoid regular fallback to mock content
+- New generation batches should default to `draft` so they can be reviewed before broad publication
+- Topic accuracy should be reinforced with topic-specific prompts plus validation heuristics
 - status:
   - first pass implemented with `topic_skill_state`, adaptive band selection, and answer recording APIs
 

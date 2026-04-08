@@ -89,7 +89,13 @@ export const questions = pgTable("questions", {
   correctAnswer: text("correct_answer").notNull(),
   explanation: text("explanation").notNull(),
   source: text("source").default("internal").notNull(),
+  generationModel: text("generation_model"),
   status: text("status").default("draft").notNull(),
+  reviewNotes: text("review_notes"),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  reviewedByUserId: uuid("reviewed_by_user_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 },

@@ -19,9 +19,11 @@ NEXTAUTH_URL=https://your-subdomain-here
 AUTH_SECRET=replace_me
 AUTH_GOOGLE_ID=replace_me
 AUTH_GOOGLE_SECRET=replace_me
+ADMIN_EMAILS=replace_me@example.com
 DATABASE_URL=postgresql://aced_app:replace_me@127.0.0.1:54322/aced?sslmode=disable
 GEMINI_API_KEY=replace_me
 GEMINI_MODEL=gemini-2.5-flash
+GEMINI_GENERATION_MODEL=gemini-2.5-flash-lite
 GEMINI_API_BASE_URL=https://generativelanguage.googleapis.com/v1beta
 EOF
 

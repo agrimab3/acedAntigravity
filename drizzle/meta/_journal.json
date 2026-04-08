@@ -22,6 +22,13 @@
       "when": 1775626141427,
       "tag": "0002_cute_wolfsbane",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1775632262900,
+      "tag": "0003_flat_johnny_blaze",
+      "breakpoints": true
     }
   ]
 }
