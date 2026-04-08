@@ -82,6 +82,20 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function extractRetryDelayMs(message) {
+  const match = message.match(/Please retry in\s+([\d.]+)s/i);
+
+  if (!match) {
+    return null;
+  }
+
+  return Math.ceil(Number(match[1]) * 1000);
+}
+
+function isRetryableGeminiError(message) {
+  return /quota exceeded|retry in|429/i.test(message);
+}
+
 function normalizeText(value) {
   return value.replace(/\s+/g, " ").trim().toLowerCase();
 }
@@ -211,67 +225,87 @@ function buildQuestionBatchSchema() {
   };
 }
 
-async function generateBatchForTopic(topic) {
-  const response = await fetch(`${resolveGeminiBaseUrl()}/models/${geminiModel}:generateContent`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-goog-api-key": geminiApiKey,
-    },
-    body: JSON.stringify({
-      systemInstruction: {
-        parts: [
-          {
-            text:
-              "You are Anti's ACT content engine. Write original ACT-style questions with precise explanations and no malformed output.",
-          },
-        ],
-      },
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: buildPrompt(topic) }],
-        },
-      ],
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 8192,
-        responseMimeType: "application/json",
-        responseJsonSchema: buildQuestionBatchSchema(),
-      },
-    }),
-  });
-
-  const rawBody = await response.text();
-  let payload;
-
+async function generateBatchForTopic(topic, attempt = 1) {
   try {
-    payload = rawBody ? JSON.parse(rawBody) : null;
-  } catch {
-    payload = null;
+    const response = await fetch(
+      `${resolveGeminiBaseUrl()}/models/${geminiModel}:generateContent`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": geminiApiKey,
+        },
+        body: JSON.stringify({
+          systemInstruction: {
+            parts: [
+              {
+                text:
+                  "You are Anti's ACT content engine. Write original ACT-style questions with precise explanations and no malformed output.",
+              },
+            ],
+          },
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: buildPrompt(topic) }],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 8192,
+            responseMimeType: "application/json",
+            responseJsonSchema: buildQuestionBatchSchema(),
+          },
+        }),
+      }
+    );
+
+    const rawBody = await response.text();
+    let payload;
+
+    try {
+      payload = rawBody ? JSON.parse(rawBody) : null;
+    } catch {
+      payload = null;
+    }
+
+    if (!response.ok) {
+      const message =
+        payload?.error?.message ||
+        payload?.promptFeedback?.blockReason ||
+        rawBody ||
+        `HTTP ${response.status}`;
+      throw new Error(`Gemini generation failed: ${message}`);
+    }
+
+    const text =
+      payload?.candidates
+        ?.flatMap((candidate) => candidate.content?.parts ?? [])
+        .map((part) => part.text ?? "")
+        .join("")
+        .trim() ?? "";
+
+    if (!text) {
+      throw new Error("Gemini returned an empty generation response.");
+    }
+
+    return generatedBatchSchema.parse(JSON.parse(text)).questions;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "unknown generation error";
+
+    if (attempt < 5 && isRetryableGeminiError(message)) {
+      const retryDelayMs = extractRetryDelayMs(message) ?? 35000;
+      console.warn(
+        `Rate limited for ${topic.section_key}/${topic.slug}; retrying in ${Math.ceil(
+          retryDelayMs / 1000
+        )}s (attempt ${attempt + 1}/5).`
+      );
+      await sleep(retryDelayMs + 1000);
+      return generateBatchForTopic(topic, attempt + 1);
+    }
+
+    throw error;
   }
-
-  if (!response.ok) {
-    const message =
-      payload?.error?.message ||
-      payload?.promptFeedback?.blockReason ||
-      rawBody ||
-      `HTTP ${response.status}`;
-    throw new Error(`Gemini generation failed: ${message}`);
-  }
-
-  const text =
-    payload?.candidates
-      ?.flatMap((candidate) => candidate.content?.parts ?? [])
-      .map((part) => part.text ?? "")
-      .join("")
-      .trim() ?? "";
-
-  if (!text) {
-    throw new Error("Gemini returned an empty generation response.");
-  }
-
-  return generatedBatchSchema.parse(JSON.parse(text)).questions;
 }
 
 function sanitizeQuestion(sectionKey, topic, question) {
