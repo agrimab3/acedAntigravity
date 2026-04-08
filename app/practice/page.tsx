@@ -9,6 +9,7 @@ type Question = {
   section: string;
   topic: string;
   difficulty: string;
+  passage?: string | null;
   question_text: string;
   choices: { A: string; B: string; C: string; D: string };
   correct_answer: string;
@@ -268,7 +269,9 @@ function PracticeContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: msg,
-          question: q.question_text,
+          question: q.passage
+            ? `Passage:\n${q.passage}\n\nQuestion:\n${q.question_text}`
+            : q.question_text,
           section, topic,
           explanation: q.explanation,
           difficulty: q.difficulty,
@@ -414,6 +417,17 @@ function PracticeContent() {
               <span style={{ fontSize: '10px', fontWeight: 500, padding: '3px 10px', borderRadius: '20px', background: meta.color + '20', border: `0.5px solid ${meta.color}44`, color: meta.color }}>{section} · {meta.constellation}</span>
               <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', padding: '3px 8px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }}>{q.difficulty} · target {targetDifficulty}</span>
             </div>
+
+            {q.passage && (
+              <div style={{ marginBottom: '1rem', padding: '14px 16px', borderRadius: '14px', background: 'rgba(255,255,255,0.04)', border: '0.5px solid rgba(255,255,255,0.1)' }}>
+                <div style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '.06em', color: 'rgba(255,255,255,0.38)', marginBottom: '8px' }}>
+                  PASSAGE / SETUP
+                </div>
+                <div style={{ fontSize: '13px', lineHeight: 1.7, color: 'rgba(255,255,255,0.8)', whiteSpace: 'pre-wrap' }}>
+                  {q.passage}
+                </div>
+              </div>
+            )}
 
             <div style={{ fontFamily: 'DM Serif Display,serif', fontSize: '17px', lineHeight: 1.55, marginBottom: '1.25rem', color: 'rgba(255,255,255,0.92)' }}>{q.question_text}</div>
 

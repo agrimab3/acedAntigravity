@@ -250,7 +250,9 @@ Store rolling adaptive difficulty and mastery state for each user-topic pair.
 - add DB persistence for generated content
 - add batch generation scripts or admin endpoints
 - status:
-  - still pending
+  - initial Gemini-native generation pipeline implemented in `generate-questions.mjs`
+  - question fingerprinting added for dedupe-safe ingestion
+  - next step is seeding and reviewing the first broad ACT inventory batch
 
 ### 3. Adaptive Engine
 
@@ -258,6 +260,13 @@ Store rolling adaptive difficulty and mastery state for each user-topic pair.
 - add per-user topic state
 - implement difficulty movement rules
 - integrate question selection logic
+
+## Phase 2B Delivery Notes
+
+- Tutor transport should use Gemini's native `generateContent` path instead of the OpenAI-compatible shim
+- ACT content generation should produce structured JSON and persist directly into `questions`
+- Real Reading and Science items should support a `passage` field in both the data layer and the practice UI
+- The first inventory target should be enough published questions per topic to avoid regular fallback to mock content
 - status:
   - first pass implemented with `topic_skill_state`, adaptive band selection, and answer recording APIs
 

@@ -42,6 +42,8 @@ set -a
 source "${RUN_ENV_FILE}"
 set +a
 
+npm run db:migrate
+
 pm2 describe "${PM2_APP_NAME}" >/dev/null 2>&1 || pm2 start ecosystem.config.cjs --only "${PM2_APP_NAME}"
 pm2 restart "${PM2_APP_NAME}" --update-env
 

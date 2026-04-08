@@ -101,6 +101,7 @@ export async function GET(request: Request) {
         section: string;
         topic: string;
         difficulty: string;
+        passage: string | null;
         question_text: string;
         choices: ChoiceMap;
         correct_answer: string;
@@ -129,6 +130,7 @@ export async function GET(request: Request) {
               section: questions.sectionKey,
               topic: actTopics.name,
               difficulty: questions.difficulty,
+              passage: questions.passage,
               question_text: questions.prompt,
               choices: questions.choices,
               correct_answer: questions.correctAnswer,
@@ -152,6 +154,7 @@ export async function GET(request: Request) {
               section: questions.sectionKey,
               topic: actTopics.name,
               difficulty: questions.difficulty,
+              passage: questions.passage,
               question_text: questions.prompt,
               choices: questions.choices,
               correct_answer: questions.correctAnswer,
@@ -170,6 +173,7 @@ export async function GET(request: Request) {
             section: row.section,
             topic: row.topic,
             difficulty: row.difficulty,
+            passage: row.passage,
             question_text: row.question_text,
             choices: row.choices,
             correct_answer: row.correct_answer,

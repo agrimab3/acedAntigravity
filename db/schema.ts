@@ -84,6 +84,7 @@ export const questions = pgTable("questions", {
   questionType: text("question_type").default("multiple_choice").notNull(),
   prompt: text("prompt").notNull(),
   passage: text("passage"),
+  fingerprint: text("fingerprint"),
   choices: jsonb("choices").$type<ChoiceMap>().notNull(),
   correctAnswer: text("correct_answer").notNull(),
   explanation: text("explanation").notNull(),
@@ -91,7 +92,9 @@ export const questions = pgTable("questions", {
   status: text("status").default("draft").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-});
+},
+  (table) => [uniqueIndex("questions_fingerprint_idx").on(table.fingerprint)]
+);
 
 export const questionExposures = pgTable(
   "question_exposures",

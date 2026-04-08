@@ -1,22 +1,11 @@
 import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
 import { z } from 'zod';
 import { and, eq } from "drizzle-orm";
 import { actTopics, topicSkillState } from "@/db/schema";
 import { getAuthSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import { generateGeminiText, hasGeminiApiKey } from "@/lib/gemini";
 import { buildTutorInstructions, getActiveTutorProfile } from "@/lib/tutor-profile";
-
-const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
-
-const client = geminiApiKey
-  ? new OpenAI({
-      apiKey: geminiApiKey,
-      baseURL:
-        process.env.GEMINI_BASE_URL ||
-        "https://generativelanguage.googleapis.com/v1beta/openai/",
-    })
-  : null;
 
 const tutorRequestSchema = z.object({
   message: z.string().trim().min(1),
@@ -87,7 +76,7 @@ export async function POST(req: Request) {
 
   const { message, question, section, topic, explanation } = parsed.data;
 
-  if (!client) {
+  if (!hasGeminiApiKey()) {
     return NextResponse.json({
       reply: buildFallbackTutorReply({
         message,
@@ -133,31 +122,20 @@ export async function POST(req: Request) {
   }
 
   try {
-    const response = await client.chat.completions.create({
-      model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
-      max_tokens: 220,
-      messages: [
-        {
-          role: "system",
-          content: buildTutorInstructions(profile, {
-            section,
-            topic,
-            question,
-            explanation,
-            difficulty: parsed.data.difficulty,
-            studentAccuracyPct: parsed.data.sessionAccuracyPct,
-            targetDifficulty: recommendedDifficulty,
-          }),
-        },
-        {
-          role: "user",
-          content: message,
-        },
-      ],
+    const reply = await generateGeminiText({
+      systemInstruction: buildTutorInstructions(profile, {
+        section,
+        topic,
+        question,
+        explanation,
+        difficulty: parsed.data.difficulty,
+        studentAccuracyPct: parsed.data.sessionAccuracyPct,
+        targetDifficulty: recommendedDifficulty,
+      }),
+      prompt: `Student message: ${message}`,
+      maxOutputTokens: 512,
+      temperature: 0.35,
     });
-
-    const content = response.choices[0]?.message?.content;
-    const reply = typeof content === "string" ? content.trim() : "";
 
     if (!reply || !isUsableTutorReply(reply)) {
       throw new Error("Gemini returned an empty tutor response.");

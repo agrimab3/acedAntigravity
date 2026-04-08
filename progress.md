@@ -49,6 +49,11 @@
 - Added answer recording and practice completion APIs
 - Upgraded the tutor route to use a reusable ACT tutor persona builder
 - Applied the Phase 2 schema migration to the live `aced` database
+- Replaced the Gemini OpenAI-compatibility path with a native Gemini `generateContent` integration
+- Added a structured ACT inventory generation pipeline that can write validated questions directly into PostgreSQL
+- Added question `fingerprint` support to reduce duplicate inventory across generation runs
+- Updated the practice UI and questions API to support passage-backed Reading and Science items
+- Updated the VPS deploy script to run Drizzle migrations during deployment
 
 ## Decisions Made
 
@@ -75,6 +80,8 @@
   - repetition prevention
   - personalized practice progression
   - foundational adaptive tracking is now implemented
+  - native Gemini tutor transport is now implemented
+  - the first database-backed ACT inventory pipeline is now implemented
 
 ## Open Questions
 
@@ -99,6 +106,8 @@
 - Stand up the first CI/CD workflow from GitHub to the VPS
 - Define and implement Phase 2 adaptive AI architecture
 - Add question generation jobs and seed the first AI-reviewed ACT content batches
+- Verify native Gemini tutor behavior in production
+- Seed the first real published ACT inventory for all active topics
 
 ## Planned Next Phase
 

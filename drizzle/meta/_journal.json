@@ -15,6 +15,13 @@
       "when": 1775533346514,
       "tag": "0001_happy_siren",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1775626141427,
+      "tag": "0002_cute_wolfsbane",
+      "breakpoints": true
     }
   ]
 }

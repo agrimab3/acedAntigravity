@@ -22,6 +22,7 @@ AUTH_GOOGLE_SECRET=replace_me
 DATABASE_URL=postgresql://aced_app:replace_me@127.0.0.1:54322/aced?sslmode=disable
 GEMINI_API_KEY=replace_me
 GEMINI_MODEL=gemini-2.5-flash
+GEMINI_API_BASE_URL=https://generativelanguage.googleapis.com/v1beta
 EOF
 
 chmod 600 "${ENV_FILE}"
