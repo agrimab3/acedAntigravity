@@ -130,7 +130,7 @@ export async function POST(req: Request) {
   try {
     const response = await client.chat.completions.create({
       model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
-      max_tokens: 250,
+      max_tokens: 160,
       messages: [
         {
           role: "system",
