@@ -1,13 +1,13 @@
 import { ACT_TAXONOMY_DATA } from "./act-taxonomy-data";
 
 export type SectionKey = "english" | "math" | "reading" | "science";
-export type TopicKind = "official" | "internal";
+export type TopicKind = "practice";
 
 export type ActTopicDefinition = {
   slug: string;
   name: string;
   kind: TopicKind;
-  parentSlug?: string;
+  officialCategory?: string;
   shortLabel?: string;
 };
 
@@ -41,22 +41,10 @@ export function getTopicByName(sectionKey: SectionKey, name: string) {
   return getTopicsForSection(sectionKey).find((topic) => topic.name === name) ?? null;
 }
 
-export function getChildTopics(sectionKey: SectionKey, parentSlug: string) {
-  return getTopicsForSection(sectionKey).filter((topic) => topic.parentSlug === parentSlug);
-}
-
 export function getPracticeScopeTopics(sectionKey: SectionKey, topicName: string) {
   const topic = getTopicByName(sectionKey, topicName);
 
-  if (!topic) {
-    return [];
-  }
-
-  if (topic.kind === "official") {
-    return [topic, ...getChildTopics(sectionKey, topic.slug)];
-  }
-
-  return [topic];
+  return topic ? [topic] : [];
 }
 
 export function isTopicInPracticeScope(

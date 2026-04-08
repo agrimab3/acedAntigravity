@@ -16,6 +16,8 @@ async function seed() {
 
   try {
     for (const [sectionIndex, section] of ACT_TAXONOMY_DATA.entries()) {
+      const activeSlugs = section.topics.map((topic) => topic.slug);
+
       await client.query(
         `
           INSERT INTO act_sections (key, name, color, constellation, display_order)
@@ -49,6 +51,17 @@ async function seed() {
           [section.key, topic.slug, topic.name, topicIndex + 1]
         );
       }
+
+      await client.query(
+        `
+          UPDATE act_topics
+          SET is_active = false,
+              updated_at = now()
+          WHERE section_key = $1
+            AND NOT (slug = ANY($2::text[]))
+        `,
+        [section.key, activeSlugs]
+      );
     }
 
     const sectionCount = await client.query("SELECT COUNT(*)::int AS count FROM act_sections");
