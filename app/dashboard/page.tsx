@@ -638,13 +638,6 @@ export default function Dashboard() {
       const t = ts * 0.001;
       ctx.clearRect(0, 0, W, H);
 
-      const bg = ctx.createLinearGradient(0, 0, 0, H);
-      bg.addColorStop(0, "#0d1b2a");
-      bg.addColorStop(0.48, "#060d1e");
-      bg.addColorStop(1, "#020408");
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, W, H);
-
       [
         { x: W * 0.15, y: H * 0.18, radius: 240, color: "rgba(38, 95, 143, 0.2)" },
         { x: W * 0.76, y: H * 0.2, radius: 240, color: "rgba(29, 158, 117, 0.14)" },
@@ -657,14 +650,6 @@ export default function Dashboard() {
         ctx.fillStyle = radial;
         ctx.fillRect(0, 0, W, H);
       });
-
-      const shadowVeil = ctx.createLinearGradient(0, 0, 0, H);
-      shadowVeil.addColorStop(0, "rgba(5,12,24,0.18)");
-      shadowVeil.addColorStop(0.28, "rgba(5,12,24,0.12)");
-      shadowVeil.addColorStop(0.58, "rgba(5,12,24,0.1)");
-      shadowVeil.addColorStop(1, "rgba(5,12,24,0.2)");
-      ctx.fillStyle = shadowVeil;
-      ctx.fillRect(0, 0, W, H);
 
       dust.forEach((s) => {
         s.x += s.dx;
@@ -997,7 +982,6 @@ export default function Dashboard() {
   return (
     <div
       style={{
-        background: DASHBOARD_GALAXY_BACKGROUND,
         minHeight: "100vh",
         color: "#fff",
         fontFamily: "DM Sans,sans-serif",
@@ -1032,7 +1016,17 @@ export default function Dashboard() {
         }
       `}</style>
 
-      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }}>
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          pointerEvents: "none",
+          zIndex: 0,
+          background: DASHBOARD_GALAXY_BACKGROUND,
+        }}
+      />
+
+      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 1 }}>
         {ambientGlows.map((glow) => (
           <span
             key={`ambient-glow-${glow.id}`}
@@ -1088,7 +1082,7 @@ export default function Dashboard() {
           position: "fixed",
           inset: 0,
           pointerEvents: "none",
-          zIndex: 1,
+          zIndex: 2,
           background:
             "radial-gradient(circle at 50% 24%, rgba(5, 12, 24, 0.14), transparent 18%), linear-gradient(180deg, rgba(5,12,24,0.3) 0%, rgba(5,12,24,0.18) 20%, rgba(5,12,24,0.12) 42%, rgba(5,12,24,0.16) 66%, rgba(5,12,24,0.24) 100%)",
         }}
@@ -1100,7 +1094,7 @@ export default function Dashboard() {
           position: "relative",
           overflow: "hidden",
           background: "transparent",
-          zIndex: 2,
+          zIndex: 3,
         }}
       >
         <nav
@@ -1219,8 +1213,18 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div style={{ position: "relative", zIndex: 2 }}>
-        <canvas ref={canvasRef} style={{ width: "100%", display: "block", border: "none", outline: "none" }} />
+      <div style={{ position: "relative", zIndex: 3 }}>
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "none",
+            background:
+              "linear-gradient(180deg, rgba(5,12,24,0.46) 0%, rgba(5,12,24,0.16) 10%, rgba(5,12,24,0) 18%, rgba(5,12,24,0) 82%, rgba(5,12,24,0.12) 90%, rgba(5,12,24,0.28) 100%)",
+            zIndex: 1,
+          }}
+        />
+        <canvas ref={canvasRef} style={{ width: "100%", display: "block", border: "none", outline: "none", position: "relative", zIndex: 0 }} />
         {hoverTooltip && (
           <div
             style={{
@@ -1228,6 +1232,7 @@ export default function Dashboard() {
               left: hoverTooltip.x,
               top: hoverTooltip.y,
               transform: "translateY(-100%)",
+              zIndex: 2,
               pointerEvents: "none",
               padding: "8px 10px",
               borderRadius: "12px",
@@ -1247,7 +1252,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      <div ref={detailRef} style={{ padding: "1rem 1.5rem 2rem", minHeight: "80px", position: "relative", zIndex: 2 }}>
+      <div ref={detailRef} style={{ padding: "1rem 1.5rem 2rem", minHeight: "80px", position: "relative", zIndex: 3 }}>
         {!selected && (
           <div
             style={{

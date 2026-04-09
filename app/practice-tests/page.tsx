@@ -201,7 +201,6 @@ export default function PracticeTestsPage() {
         fontFamily: "DM Sans,sans-serif",
         position: "relative",
         overflowX: "hidden",
-        background: PRACTICE_TEST_GALAXY_BACKGROUND,
       }}
     >
       <link
@@ -230,7 +229,16 @@ export default function PracticeTestsPage() {
           100% { transform: scale(0.94); opacity: 0.35; }
         }
       `}</style>
-      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }}>
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          pointerEvents: "none",
+          zIndex: 0,
+          background: PRACTICE_TEST_GALAXY_BACKGROUND,
+        }}
+      />
+      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 1 }}>
         {backgroundGlows.map((glow) => (
           <span
             key={`glow-${glow.id}`}
@@ -285,13 +293,13 @@ export default function PracticeTestsPage() {
           position: "fixed",
           inset: 0,
           pointerEvents: "none",
-          zIndex: 1,
+          zIndex: 2,
           background:
             "radial-gradient(circle at 50% 26%, rgba(5, 12, 24, 0.16), transparent 18%), linear-gradient(180deg, rgba(5,12,24,0.34) 0%, rgba(5,12,24,0.24) 18%, rgba(5,12,24,0.18) 38%, rgba(5,12,24,0.22) 60%, rgba(5,12,24,0.3) 100%)",
         }}
       />
 
-      <div style={{ padding: "1.5rem 1.5rem 2.5rem", maxWidth: "1240px", margin: "0 auto", position: "relative", zIndex: 2 }}>
+      <div style={{ padding: "1.5rem 1.5rem 2.5rem", maxWidth: "1240px", margin: "0 auto", position: "relative", zIndex: 3 }}>
         <nav
           style={{
             display: "grid",
