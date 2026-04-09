@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { and, eq } from "drizzle-orm";
 import { actTopics, topicSkillState } from "@/db/schema";
+import { getTopicByName, type SectionKey } from "@/lib/act-taxonomy";
 import { getAuthSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { generateGeminiText, hasGeminiApiKey } from "@/lib/gemini";
@@ -16,6 +17,7 @@ const tutorRequestSchema = z.object({
   difficulty: z.string().trim().optional(),
   sessionAccuracyPct: z.coerce.number().int().min(0).max(100).optional(),
   targetDifficulty: z.string().trim().optional(),
+  officialCategory: z.string().trim().optional(),
 });
 
 function buildFallbackTutorReply({
@@ -80,6 +82,11 @@ export async function POST(req: Request) {
   }
 
   const { message, question, section, topic, explanation } = parsed.data;
+  const taxonomyTopic =
+    topic && ["english", "math", "reading", "science"].includes(section)
+      ? getTopicByName(section as SectionKey, topic)
+      : null;
+  const officialCategory = parsed.data.officialCategory || taxonomyTopic?.officialCategory;
 
   if (!hasGeminiApiKey()) {
     return NextResponse.json({
@@ -131,6 +138,7 @@ export async function POST(req: Request) {
       systemInstruction: buildTutorInstructions(profile, {
         section,
         topic,
+        officialCategory,
         question,
         explanation,
         difficulty: parsed.data.difficulty,

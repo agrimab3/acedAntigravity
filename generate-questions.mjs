@@ -124,9 +124,10 @@ function getSectionSpecificInstructions(sectionKey) {
   switch (sectionKey) {
     case "english":
       return [
-        "Write ACT English items about revision, grammar, punctuation, sentence structure, and rhetorical effectiveness.",
-        "Use a sentence or short excerpt when helpful. Set passage to null unless the question truly needs a short excerpt block.",
-        "Keep the prompt phrased like an ACT editing question, not a trivia question.",
+        "Write ACT English revision items about organization, transitions, precision, style, grammar, punctuation, and sentence structure.",
+        "Every English question must include a short passage or excerpt in the passage field.",
+        "If the question refers to an underlined portion, mark the exact text in the passage with [underline]...[/underline].",
+        "Keep the prompt phrased like an ACT editing/revision question, not a grammar-definition or terminology quiz.",
       ].join("\n");
     case "math":
       return [
@@ -170,30 +171,37 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
     "english:organization-and-flow": [
       "Focus on paragraph order, sentence placement, logical sequencing, and whether an idea belongs where it appears.",
       "The best answer should improve coherence and flow, not sentence-level grammar.",
+      "Use passage-based revision prompts such as where a sentence should move, whether it should stay, or which order is most logical.",
     ],
     "english:transitions-and-cohesion": [
       "Focus on transition words, contrast, cause-effect, continuation, and how sentences or paragraphs connect.",
       "Make the relationship between ideas explicit so the student's job is choosing the most coherent bridge.",
+      "Use a short passage and mark the target sentence or phrase with [underline]...[/underline] when relevant.",
     ],
     "english:precision-and-concision": [
       "Focus on cutting redundancy, choosing precise wording, and preserving meaning with the clearest phrasing.",
       "Avoid grammar-only fixes unless they also improve precision and concision.",
+      "The student should usually choose the best replacement for an underlined phrase in context.",
     ],
     "english:style-and-tone": [
       "Focus on matching tone, maintaining voice, and selecting wording that fits the passage's purpose and audience.",
       "Do not drift into punctuation mechanics here.",
+      "Use revision questions where the student selects the phrase or sentence that best fits the tone of the surrounding passage.",
     ],
     "english:punctuation": [
       "Focus on commas, semicolons, colons, dashes, apostrophes, and punctuation-driven sentence meaning.",
       "Use ACT-style sentence revision prompts rather than generic grammar trivia.",
+      "Mark the revisable text with [underline]...[/underline] in the passage when the prompt refers to the underlined portion.",
     ],
     "english:grammar-and-usage": [
       "Focus on subject-verb agreement, pronoun agreement, modifier placement, verb tense, and idiomatic usage.",
       "Do not drift into geometry, history, or general knowledge contexts that overshadow the grammar skill.",
+      "Use revision-in-context prompts rather than asking students to define grammar terms.",
     ],
     "english:sentence-structure": [
       "Focus on clause relationships, fragments, run-ons, parallel structure, and logical sentence combination.",
       "Keep the student's job centered on fixing structure, not only punctuation.",
+      "Use passage-based choices that revise the underlined sentence or clause instead of asking students to label sentence parts.",
     ],
     "math:number-and-quantity": [
       "Focus on integers, rational and irrational numbers, ratios, units, magnitude, exponents, and numeric properties.",
@@ -511,7 +519,28 @@ function sanitizeQuestion(sectionKey, topic, question) {
     throw new Error("Science question missing passage/setup.");
   }
 
+  if (sectionKey === "english" && !passage) {
+    throw new Error("English question missing passage/setup.");
+  }
+
   const combinedText = `${passage || ""} ${prompt} ${explanation}`.toLowerCase();
+
+  if (
+    sectionKey === "english" &&
+    /\b(identify|what is the function|which punctuation mark|what is the subject|define|part of speech)\b/.test(
+      combinedText
+    )
+  ) {
+    throw new Error("English question reads like a terminology quiz instead of ACT revision.");
+  }
+
+  if (
+    sectionKey === "english" &&
+    /underlin/.test(combinedText) &&
+    !/\[underline\].*?\[\/underline\]|__(.*?)__|<u>.*?<\/u>/i.test(passage || "")
+  ) {
+    throw new Error("English question refers to underlined text without markup.");
+  }
 
   if (
     topic.slug === "algebra" &&

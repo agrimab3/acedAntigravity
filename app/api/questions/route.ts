@@ -30,6 +30,75 @@ const searchSchema = z.object({
   limit: z.coerce.number().int().min(1).max(10).default(10),
 });
 
+function normalizeCorrectAnswer(answer: string): keyof ChoiceMap | null {
+  const normalized = answer.trim().toUpperCase();
+  return ["A", "B", "C", "D"].includes(normalized) ? (normalized as keyof ChoiceMap) : null;
+}
+
+function normalizeChoices(choices: unknown): ChoiceMap | null {
+  if (!choices || typeof choices !== "object") {
+    return null;
+  }
+
+  const normalized = {} as ChoiceMap;
+
+  for (const choice of ["A", "B", "C", "D"] as const) {
+    const value = (choices as Record<string, unknown>)[choice];
+
+    if (typeof value !== "string" || value.trim().length === 0) {
+      return null;
+    }
+
+    normalized[choice] = value.trim();
+  }
+
+  return normalized;
+}
+
+function hasUnderlineMarkup(value: string | null | undefined) {
+  if (!value) {
+    return false;
+  }
+
+  return /\[underline\].*?\[\/underline\]|__(.*?)__|<u>.*?<\/u>/i.test(value);
+}
+
+function normalizeQuestionRow(row: {
+  id: string;
+  section: string;
+  topic: string;
+  difficulty: string;
+  passage: string | null;
+  question_text: string;
+  choices: unknown;
+  correct_answer: string;
+  explanation: string;
+}) {
+  const correctAnswer = normalizeCorrectAnswer(row.correct_answer);
+  const choices = normalizeChoices(row.choices);
+
+  if (!correctAnswer || !choices || !choices[correctAnswer]) {
+    return null;
+  }
+
+  const combinedText = `${row.question_text} ${row.passage ?? ""}`.toLowerCase();
+  if (combinedText.includes("underlin") && !hasUnderlineMarkup(row.question_text) && !hasUnderlineMarkup(row.passage)) {
+    return null;
+  }
+
+  return {
+    id: row.id,
+    section: row.section,
+    topic: row.topic,
+    difficulty: row.difficulty,
+    passage: row.passage,
+    question_text: row.question_text,
+    choices,
+    correct_answer: correctAnswer,
+    explanation: row.explanation,
+  };
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const parsed = searchSchema.safeParse({
@@ -218,7 +287,7 @@ export async function GET(request: Request) {
             )
             .where(whereClause)
             .orderBy(sql`coalesce(${questionExposures.timesSeen}, 0) asc`, sql`random()`)
-            .limit(limit)
+            .limit(limit * 4)
         : await db
             .select({
               id: questions.id,
@@ -235,21 +304,13 @@ export async function GET(request: Request) {
             .innerJoin(actTopics, eq(questions.topicId, actTopics.id))
             .where(whereClause)
             .orderBy(sql`random()`)
-            .limit(limit);
+            .limit(limit * 4);
 
       for (const row of rows) {
-        if (!selectedRows.has(row.id)) {
-          selectedRows.set(row.id, {
-            id: row.id,
-            section: row.section,
-            topic: row.topic,
-            difficulty: row.difficulty,
-            passage: row.passage,
-            question_text: row.question_text,
-            choices: row.choices,
-            correct_answer: row.correct_answer,
-            explanation: row.explanation,
-          });
+        const normalizedRow = normalizeQuestionRow(row);
+
+        if (normalizedRow && !selectedRows.has(normalizedRow.id)) {
+          selectedRows.set(normalizedRow.id, normalizedRow);
         }
       }
 

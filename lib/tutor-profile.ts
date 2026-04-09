@@ -72,6 +72,7 @@ export async function getActiveTutorProfile() {
 type TutorPromptContext = {
   section: string;
   topic?: string;
+  officialCategory?: string;
   question: string;
   explanation: string;
   difficulty?: string;
@@ -89,6 +90,7 @@ ${profile.systemPrompt}
 Current context:
 - ACT section: ${context.section}
 - Topic: ${context.topic || "General practice"}
+- Official ACT category: ${context.officialCategory || "Not specified"}
 - Question difficulty: ${context.difficulty || "unknown"}
 - Current target difficulty: ${context.targetDifficulty || "unknown"}
 - Student session accuracy so far: ${context.studentAccuracyPct ?? 0}%

@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 
 type BacklogTopic = {
   sectionKey: string;
@@ -34,6 +34,31 @@ type ReviewQuestion = {
 
 const sectionOptions = ["all", "english", "math", "reading", "science"] as const;
 const statusOptions = ["draft", "published", "rejected"] as const;
+
+function renderFormattedText(text: string) {
+  const normalized = text
+    .replace(/<u>(.*?)<\/u>/gi, "[underline]$1[/underline]")
+    .replace(/__(.*?)__/g, "[underline]$1[/underline]");
+  const lines = normalized.split("\n");
+
+  return lines.map((line, lineIndex) => {
+    const segments = line.split(/(\[underline\].*?\[\/underline\])/g);
+
+    return (
+      <Fragment key={`${line}-${lineIndex}`}>
+        {segments.map((segment, segmentIndex) => {
+          const match = segment.match(/^\[underline\](.*?)\[\/underline\]$/);
+          if (match) {
+            return <u key={`${segment}-${segmentIndex}`}>{match[1]}</u>;
+          }
+
+          return <Fragment key={`${segment}-${segmentIndex}`}>{segment}</Fragment>;
+        })}
+        {lineIndex < lines.length - 1 ? <br /> : null}
+      </Fragment>
+    );
+  });
+}
 
 export default function ReviewConsole() {
   const [backlog, setBacklog] = useState<BacklogTopic[]>([]);
@@ -415,7 +440,7 @@ export default function ReviewConsole() {
                       PASSAGE / SETUP
                     </div>
                     <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.7, fontSize: "13px", color: "rgba(255,255,255,0.78)" }}>
-                      {question.passage}
+                      {renderFormattedText(question.passage)}
                     </div>
                   </div>
                 ) : null}
@@ -428,7 +453,7 @@ export default function ReviewConsole() {
                     marginBottom: "12px",
                   }}
                 >
-                  {question.prompt}
+                  {renderFormattedText(question.prompt)}
                 </div>
 
                 <div style={{ display: "grid", gap: "8px", marginBottom: "12px" }}>
@@ -448,7 +473,7 @@ export default function ReviewConsole() {
                       }}
                     >
                       <strong style={{ marginRight: "8px" }}>{choice}</strong>
-                      {question.choices[choice]}
+                      {renderFormattedText(question.choices[choice])}
                     </div>
                   ))}
                 </div>

@@ -1,8 +1,9 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Fragment, Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { getTopicByName, type SectionKey } from "@/lib/act-taxonomy";
 
 type Question = {
   id: string;
@@ -23,9 +24,36 @@ const SECTION_META: Record<string, { color: string; constellation: string }> = {
   science: { color: '#F0997B', constellation: 'Sagittarius' },
 };
 
-function getIntroTutorMessage(topic: string) {
+function renderFormattedText(text: string) {
+  const normalized = text
+    .replace(/<u>(.*?)<\/u>/gi, "[underline]$1[/underline]")
+    .replace(/__(.*?)__/g, "[underline]$1[/underline]");
+  const lines = normalized.split("\n");
+
+  return lines.map((line, lineIndex) => {
+    const segments = line.split(/(\[underline\].*?\[\/underline\])/g);
+
+    return (
+      <Fragment key={`${line}-${lineIndex}`}>
+        {segments.map((segment, segmentIndex) => {
+          const match = segment.match(/^\[underline\](.*?)\[\/underline\]$/);
+
+          if (match) {
+            return <u key={`${segment}-${segmentIndex}`}>{match[1]}</u>;
+          }
+
+          return <Fragment key={`${segment}-${segmentIndex}`}>{segment}</Fragment>;
+        })}
+        {lineIndex < lines.length - 1 ? <br /> : null}
+      </Fragment>
+    );
+  });
+}
+
+function getIntroTutorMessage(topic: string, officialCategory?: string) {
+  const context = officialCategory ? `${topic} inside ${officialCategory}` : topic;
   return topic
-    ? `i'm here while you work on ${topic}. ask for a hint, a simpler explanation, or why an answer choice is wrong.`
+    ? `i'm here while you work on ${context}. ask for a hint, a simpler explanation, or why an answer choice is wrong.`
     : "i'm here while you practice. ask for a hint, a simpler explanation, or why an answer choice is wrong.";
 }
 
@@ -36,6 +64,8 @@ function PracticeContent() {
   const section = searchParams.get("section") || "english";
   const topic = searchParams.get("topic") || "";
   const meta = SECTION_META[section] || SECTION_META.english;
+  const topicDefinition = getTopicByName(section as SectionKey, topic);
+  const officialCategory = topicDefinition?.officialCategory;
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [questionsLoading, setQuestionsLoading] = useState(true);
@@ -48,7 +78,7 @@ function PracticeContent() {
   const [answered, setAnswered] = useState(0);
   const [missed, setMissed] = useState<Question[]>([]);
   const [aiMessages, setAiMessages] = useState<{role: string; text: string}[]>([
-    { role: "bot", text: getIntroTutorMessage(topic) },
+    { role: "bot", text: getIntroTutorMessage(topic, officialCategory) },
   ]);
   const [aiInput, setAiInput] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
@@ -82,7 +112,7 @@ function PracticeContent() {
     setSessionFinalized(false);
     setElapsedSeconds(0);
     setQuestionStartedAtMs(Date.now());
-    setAiMessages([{ role: "bot", text: getIntroTutorMessage(topic) }]);
+    setAiMessages([{ role: "bot", text: getIntroTutorMessage(topic, officialCategory) }]);
     setQuestionsLoading(true);
 
     const fetchQuestions = async () => {
@@ -127,7 +157,7 @@ function PracticeContent() {
     return () => {
       active = false;
     };
-  }, [section, topic]);
+  }, [officialCategory, section, topic]);
 
   // star canvas
   useEffect(() => {
@@ -253,7 +283,7 @@ function PracticeContent() {
       setPicked(null);
       setSubmitted(false);
       setQuestionStartedAtMs(Date.now());
-      setAiMessages([{ role: "bot", text: getIntroTutorMessage(topic) }]);
+      setAiMessages([{ role: "bot", text: getIntroTutorMessage(topic, officialCategory) }]);
     }
   };
 
@@ -277,6 +307,7 @@ function PracticeContent() {
           difficulty: q.difficulty,
           sessionAccuracyPct: answered > 0 ? Math.round((correct / answered) * 100) : 0,
           targetDifficulty,
+          officialCategory,
         }),
       });
       const data = await res.json();
@@ -325,6 +356,11 @@ function PracticeContent() {
             {accuracy >= 80 ? 'amazing work! ✦' : accuracy >= 60 ? 'nice effort! ✦' : 'keep going! ✦'}
           </div>
           <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', marginBottom: '1.5rem' }}>{topic} · {section}</div>
+          {officialCategory && (
+            <div style={{ fontSize: '12px', color: meta.color, marginBottom: '1rem' }}>
+              official ACT category: {officialCategory}
+            </div>
+          )}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '10px', marginBottom: '1.5rem' }}>
             {[{ val: correct, lbl: 'correct', col: meta.color }, { val: missed.length, lbl: 'missed', col: '#F0997B' }, { val: accuracy + '%', lbl: 'accuracy', col: '#AFA9EC' }, { val: formatTime(elapsedSeconds), lbl: 'time', col: '#ffffff' }].map(s => (
               <div key={s.lbl} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '12px', padding: '1rem' }}>
@@ -357,6 +393,11 @@ function PracticeContent() {
           <div style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '.08em', color: meta.color, marginBottom: '10px' }}>
             {section.toUpperCase()} · {meta.constellation}
           </div>
+          {officialCategory && (
+            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.42)', marginBottom: '10px' }}>
+              official ACT category: {officialCategory}
+            </div>
+          )}
           <div style={{ fontFamily: 'DM Serif Display,serif', fontSize: '32px', marginBottom: '10px' }}>
             ready to light up <em style={{ color: meta.color, fontStyle: 'italic' }}> {topic || 'this star'}</em>?
           </div>
@@ -416,6 +457,7 @@ function PracticeContent() {
             <div style={{ display: 'flex', gap: '8px', marginBottom: '.875rem', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '10px', fontWeight: 500, padding: '3px 10px', borderRadius: '20px', background: meta.color + '20', border: `0.5px solid ${meta.color}44`, color: meta.color }}>{section} · {meta.constellation}</span>
               <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', padding: '3px 8px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }}>{q.difficulty} · target {targetDifficulty}</span>
+              {officialCategory && <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.55)', padding: '3px 8px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }}>{officialCategory}</span>}
             </div>
 
             {q.passage && (
@@ -424,12 +466,12 @@ function PracticeContent() {
                   PASSAGE / SETUP
                 </div>
                 <div style={{ fontSize: '13px', lineHeight: 1.7, color: 'rgba(255,255,255,0.8)', whiteSpace: 'pre-wrap' }}>
-                  {q.passage}
+                  {renderFormattedText(q.passage)}
                 </div>
               </div>
             )}
 
-            <div style={{ fontFamily: 'DM Serif Display,serif', fontSize: '17px', lineHeight: 1.55, marginBottom: '1.25rem', color: 'rgba(255,255,255,0.92)' }}>{q.question_text}</div>
+            <div style={{ fontFamily: 'DM Serif Display,serif', fontSize: '17px', lineHeight: 1.55, marginBottom: '1.25rem', color: 'rgba(255,255,255,0.92)' }}>{renderFormattedText(q.question_text)}</div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '1rem' }}>
               {(['A', 'B', 'C', 'D'] as const).map(letter => {
@@ -456,7 +498,7 @@ function PracticeContent() {
                 return (
                   <div key={letter} onClick={() => handlePick(letter)} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '12px', border: `0.5px solid ${borderColor}`, background: bg, cursor: submitted ? 'default' : 'pointer', opacity, transition: 'all .15s' }}>
                     <div style={{ width: '26px', height: '26px', borderRadius: '7px', border: `0.5px solid ${letterBorder}`, background: letterBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 500, color: letterColor, flexShrink: 0, transition: 'all .15s' }}>{letter}</div>
-                    <div style={{ fontSize: '13px', lineHeight: 1.45, color: 'rgba(255,255,255,0.82)' }}>{q.choices[letter]}</div>
+                    <div style={{ fontSize: '13px', lineHeight: 1.45, color: 'rgba(255,255,255,0.82)' }}>{renderFormattedText(q.choices[letter])}</div>
                   </div>
                 );
               })}
