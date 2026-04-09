@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
+import { getTopicByName } from "@/lib/act-taxonomy";
 
 type SectionKey = "english" | "math" | "reading" | "science";
 
@@ -34,16 +35,6 @@ type Hit = { si: number; pi: number } | null;
 
 const W = 1400;
 const H = 700;
-
-const ENGLISH_TOPIC_CONTEXT: Record<string, string> = {
-  "Organization & Flow": "Production of Writing",
-  "Transitions & Cohesion": "Production of Writing",
-  "Precision & Concision": "Knowledge of Language",
-  "Style & Tone": "Knowledge of Language",
-  Punctuation: "Conventions of Standard English",
-  "Grammar & Usage": "Conventions of Standard English",
-  "Sentence Structure": "Conventions of Standard English",
-};
 
 const SECS: Section[] = [
   {
@@ -223,11 +214,7 @@ function getPointTopic(sec: Section, pointIndex: number) {
 }
 
 function getTopicContext(sectionKey: SectionKey, topic: string) {
-  if (sectionKey === "english") {
-    return ENGLISH_TOPIC_CONTEXT[topic] ?? null;
-  }
-
-  return null;
+  return getTopicByName(sectionKey, topic)?.officialCategory ?? null;
 }
 
 export default function Dashboard() {

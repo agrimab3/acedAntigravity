@@ -172,21 +172,26 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
       "Focus on paragraph order, sentence placement, logical sequencing, and whether an idea belongs where it appears.",
       "The best answer should improve coherence and flow, not sentence-level grammar.",
       "Use passage-based revision prompts such as where a sentence should move, whether it should stay, or which order is most logical.",
+      "Do not ask students to move a sentence to the position where it already appears, and do not make deletion the right answer unless the sentence is clearly off-topic.",
+      "Make the correct placement or revision clearly better than the distractors.",
     ],
     "english:transitions-and-cohesion": [
       "Focus on transition words, contrast, cause-effect, continuation, and how sentences or paragraphs connect.",
       "Make the relationship between ideas explicit so the student's job is choosing the most coherent bridge.",
       "Use a short passage and mark the target sentence or phrase with [underline]...[/underline] when relevant.",
+      "If the question asks for a transition, the underlined text in the passage should be the exact transition slot or sentence being revised.",
     ],
     "english:precision-and-concision": [
       "Focus on cutting redundancy, choosing precise wording, and preserving meaning with the clearest phrasing.",
       "Avoid grammar-only fixes unless they also improve precision and concision.",
       "The student should usually choose the best replacement for an underlined phrase in context.",
+      "Keep the answer choices close in meaning so only one is both concise and precise in context.",
     ],
     "english:style-and-tone": [
       "Focus on matching tone, maintaining voice, and selecting wording that fits the passage's purpose and audience.",
       "Do not drift into punctuation mechanics here.",
       "Use revision questions where the student selects the phrase or sentence that best fits the tone of the surrounding passage.",
+      "Avoid making the unchanged original wording obviously correct just because the other options are exaggerated or silly.",
     ],
     "english:punctuation": [
       "Focus on commas, semicolons, colons, dashes, apostrophes, and punctuation-driven sentence meaning.",
@@ -197,11 +202,15 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
       "Focus on subject-verb agreement, pronoun agreement, modifier placement, verb tense, and idiomatic usage.",
       "Do not drift into geometry, history, or general knowledge contexts that overshadow the grammar skill.",
       "Use revision-in-context prompts rather than asking students to define grammar terms.",
+      "Always mark the exact revisable words in the passage with [underline]...[/underline], and make the answer choices direct replacements for that text.",
+      "Make exactly one answer grammatically correct in context; avoid cases where two answers could reasonably work.",
     ],
     "english:sentence-structure": [
       "Focus on clause relationships, fragments, run-ons, parallel structure, and logical sentence combination.",
       "Keep the student's job centered on fixing structure, not only punctuation.",
       "Use passage-based choices that revise the underlined sentence or clause instead of asking students to label sentence parts.",
+      "Always mark the exact clause or sentence to revise with [underline]...[/underline] in the passage.",
+      "Avoid answer sets where more than one option would be grammatically acceptable; there must be one clearly best structural revision.",
     ],
     "math:number-and-quantity": [
       "Focus on integers, rational and irrational numbers, ratios, units, magnitude, exponents, and numeric properties.",

@@ -51,9 +51,9 @@ function renderFormattedText(text: string) {
 }
 
 function getIntroTutorMessage(topic: string, officialCategory?: string) {
-  const context = officialCategory ? `${topic} inside ${officialCategory}` : topic;
+  const context = officialCategory ? `${topic} in ${officialCategory}` : topic;
   return topic
-    ? `i'm here while you work on ${context}. ask for a hint, a simpler explanation, or why an answer choice is wrong.`
+    ? `i'm here while you work on ${context}. ask for a hint, a simpler explanation, or why a choice is wrong.`
     : "i'm here while you practice. ask for a hint, a simpler explanation, or why an answer choice is wrong.";
 }
 
