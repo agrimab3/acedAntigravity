@@ -129,6 +129,15 @@ function resolveGroqBaseUrl() {
   return configured.replace(/\/$/, "");
 }
 
+function supportsGroqJsonSchema(model) {
+  return [
+    "openai/gpt-oss-20b",
+    "openai/gpt-oss-120b",
+    "moonshotai/kimi-k2-instruct-0905",
+    "meta-llama/llama-4-scout-17b-16e-instruct",
+  ].includes(model);
+}
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -570,6 +579,13 @@ async function generateGeminiBatchText(topic) {
 }
 
 async function generateGroqBatchText(topic) {
+  const prompt = buildPrompt({
+    sectionKey: topic.section_key,
+    topicName: topic.name,
+    slug: topic.slug,
+  });
+  const groqSupportsJsonSchema = supportsGroqJsonSchema(generationModel);
+  const schema = buildQuestionBatchSchema(topic.section_key);
   const response = await fetch(`${resolveGroqBaseUrl()}/chat/completions`, {
     method: "POST",
     headers: {
@@ -584,25 +600,29 @@ async function generateGroqBatchText(topic) {
         {
           role: "system",
           content:
-            "You are Anti's ACT content engine. Write original ACT-style questions with precise explanations and no malformed output.",
+            groqSupportsJsonSchema
+              ? "You are Anti's ACT content engine. Write original ACT-style questions with precise explanations and no malformed output."
+              : `You are Anti's ACT content engine. Return one valid JSON object only, with no markdown or commentary, matching this schema exactly: ${JSON.stringify(
+                  schema
+                )}`,
         },
         {
           role: "user",
-          content: buildPrompt({
-            sectionKey: topic.section_key,
-            topicName: topic.name,
-            slug: topic.slug,
-          }),
+          content: prompt,
         },
       ],
-      response_format: {
-        type: "json_schema",
-        json_schema: {
-          name: `act_${topic.section_key}_${topic.slug}_batch`,
-          strict: true,
-          schema: buildQuestionBatchSchema(topic.section_key),
-        },
-      },
+      response_format: groqSupportsJsonSchema
+        ? {
+            type: "json_schema",
+            json_schema: {
+              name: `act_${topic.section_key}_${topic.slug}_batch`,
+              strict: true,
+              schema,
+            },
+          }
+        : {
+            type: "json_object",
+          },
     }),
   });
 
