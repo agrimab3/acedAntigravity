@@ -11,6 +11,7 @@ import {
 } from "@/db/schema";
 import type { ChoiceMap } from "@/db/schema";
 import {
+  buildAdaptiveFeedback,
   chooseDifficultyBand,
   getDifficultySweep,
   normalizeDifficultyBand,
@@ -133,6 +134,11 @@ export async function GET(request: Request) {
   const session = await getAuthSession();
   const userId = session?.user?.id || null;
   let targetDifficulty = "easy";
+  let adaptiveFeedback = buildAdaptiveFeedback({
+    previousDifficulty: "easy",
+    nextDifficulty: "easy",
+    totalAnswered: 0,
+  });
   let topicId: string | null = null;
   let practiceScopeTopicNames = topic ? [topic] : [];
 
@@ -214,6 +220,15 @@ export async function GET(request: Request) {
           incorrectStreak: directSkillStateRow.incorrectStreak,
           totalAnswered: totalAnsweredAcrossScope,
         });
+        adaptiveFeedback = buildAdaptiveFeedback({
+          previousDifficulty: directSkillStateRow.currentDifficulty,
+          nextDifficulty: targetDifficulty,
+          recentAccuracyPct: aggregateRecentAccuracyPct,
+          rollingAccuracyPct: aggregateRollingAccuracyPct,
+          correctStreak: directSkillStateRow.correctStreak,
+          incorrectStreak: directSkillStateRow.incorrectStreak,
+          totalAnswered: totalAnsweredAcrossScope,
+        });
       } else {
         const masteryRows = await db
           .select({
@@ -244,6 +259,13 @@ export async function GET(request: Request) {
             : 0;
         targetDifficulty =
           masteryPct >= 80 ? "hard" : masteryPct >= 60 ? "medium" : normalizeDifficultyBand();
+        adaptiveFeedback = buildAdaptiveFeedback({
+          previousDifficulty: targetDifficulty,
+          nextDifficulty: targetDifficulty,
+          recentAccuracyPct: masteryPct,
+          rollingAccuracyPct: masteryPct,
+          totalAnswered: totalAttemptsAcrossScope,
+        });
       }
     }
 
@@ -381,6 +403,9 @@ export async function GET(request: Request) {
         sessionId: practiceSessionId,
         adaptive: {
           targetDifficulty,
+          label: adaptiveFeedback.label,
+          description: adaptiveFeedback.description,
+          direction: adaptiveFeedback.direction,
           source: "database",
         },
       });
@@ -393,6 +418,9 @@ export async function GET(request: Request) {
     sessionId: null,
     adaptive: {
       targetDifficulty,
+      label: adaptiveFeedback.label,
+      description: adaptiveFeedback.description,
+      direction: adaptiveFeedback.direction,
       source: "mock",
     },
   });

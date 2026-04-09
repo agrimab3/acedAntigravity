@@ -248,6 +248,8 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
       "Avoid grammar-only fixes unless they also improve precision and concision.",
       "The student should usually choose the best replacement for an underlined phrase in context.",
       "Keep the answer choices close in meaning so only one is both concise and precise in context.",
+      "Always include an underlined phrase in the passage and make every answer choice a direct replacement for that exact phrase.",
+      "Avoid synonym-vocabulary quizzes; the student must improve clarity and economy within the sentence's meaning.",
     ],
     "english:style-and-tone": [
       "Focus on matching tone, maintaining voice, and selecting wording that fits the passage's purpose and audience.",
@@ -266,6 +268,7 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
       "Use revision-in-context prompts rather than asking students to define grammar terms.",
       "Always mark the exact revisable words in the passage with [underline]...[/underline], and make the answer choices direct replacements for that text.",
       "Make exactly one answer grammatically correct in context; avoid cases where two answers could reasonably work.",
+      "Keep the scenario plain and passage-driven; avoid answer choices that differ only by one barely visible stylistic nuance.",
     ],
     "english:sentence-structure": [
       "Focus on clause relationships, fragments, run-ons, parallel structure, and logical sentence combination.",
@@ -334,6 +337,7 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
     "reading:social-science": [
       "Use a nonfiction passage about history, civics, economics, psychology, anthropology, or society.",
       "Questions should target claims, evidence, author perspective, or implications of a social-science idea.",
+      "Make the passage explicitly social-science in content, using recognizable themes like public policy, communities, voting, labor, markets, behavior, culture, or historical change.",
     ],
     "reading:humanities": [
       "Use a nonfiction passage about art, music, literature, philosophy, architecture, or cultural criticism.",
@@ -370,6 +374,7 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
     "science:conflicting-viewpoints": [
       "Use at least two named viewpoints such as Scientist 1 and Scientist 2 or Student 1 and Student 2.",
       "Questions should compare positions, assumptions, points of agreement, or how each viewpoint would respond to evidence.",
+      "The passage must clearly label the viewpoints in a way the validator can detect, such as Scientist 1/Scientist 2, Student 1/Student 2, Researcher 1/Researcher 2, or Viewpoint 1/Viewpoint 2.",
     ],
     "science:charts-and-graphs": [
       "Focus tightly on reading plotted values, graph direction, axis interpretation, or comparing chart elements.",
@@ -714,7 +719,7 @@ function sanitizeQuestion(sectionKey, topic, question) {
 
   if (
     topic.slug === "social-science" &&
-    !/\b(society|government|community|economy|economics|psychology|history|citizens|voters|policy|researchers|study)\b/.test(
+    !/\b(society|government|community|economy|economics|psychology|history|citizens|voters|policy|researchers|study|public|culture|labor|market|behavior|historical|anthropology|civics)\b/.test(
       combinedText
     )
   ) {
@@ -759,7 +764,7 @@ function sanitizeQuestion(sectionKey, topic, question) {
 
   if (
     topic.slug === "conflicting-viewpoints" &&
-    !/\b(scientist 1|scientist 2|student 1|student 2|researcher 1|researcher 2)\b/.test(
+    !/\b(scientist [12ab]|student [12ab]|researcher [12ab]|viewpoint [12ab])\b/.test(
       combinedText
     )
   ) {

@@ -27,6 +27,8 @@ export async function GET() {
       totalAnswered: topicSkillState.totalAnswered,
       rollingAccuracyPct: topicSkillState.rollingAccuracyPct,
       currentDifficulty: topicSkillState.currentDifficulty,
+      averageTimeSpentSeconds: topicSkillState.averageTimeSpentSeconds,
+      hintsUsed: topicSkillState.hintsUsed,
     })
     .from(actTopics)
     .leftJoin(
@@ -41,17 +43,17 @@ export async function GET() {
 
   const topicSummaries = topics.map((topic) => {
     const summary = estimateTopicScore({
+      sectionKey: topic.sectionKey,
       topicName: topic.topicName,
       masteryPct: topic.masteryPct,
       rollingAccuracyPct: topic.rollingAccuracyPct,
       currentDifficulty: topic.currentDifficulty,
       totalAnswered: topic.totalAnswered,
+      averageTimeSpentSeconds: topic.averageTimeSpentSeconds,
+      hintsUsed: topic.hintsUsed,
     });
 
-    return {
-      sectionKey: topic.sectionKey,
-      ...summary,
-    };
+    return summary;
   });
 
   const sectionSummaries = ACT_TAXONOMY.map((section) =>

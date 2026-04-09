@@ -8,6 +8,12 @@ export const DIFFICULTY_BANDS = [
 
 export type DifficultyBand = (typeof DIFFICULTY_BANDS)[number];
 
+export type AdaptiveFeedback = {
+  direction: "up" | "down" | "steady";
+  label: string;
+  description: string;
+};
+
 type SkillSnapshot = {
   currentDifficulty?: string | null;
   recentAccuracyPct?: number | null;
@@ -27,6 +33,25 @@ export function normalizeDifficultyBand(value?: string | null): DifficultyBand {
   }
 
   return "easy";
+}
+
+export function formatDifficultyBand(value?: string | null) {
+  const normalized = normalizeDifficultyBand(value);
+
+  switch (normalized) {
+    case "foundation":
+      return "foundation";
+    case "easy":
+      return "easy";
+    case "medium":
+      return "medium";
+    case "hard":
+      return "hard";
+    case "challenge":
+      return "challenge";
+    default:
+      return normalized;
+  }
 }
 
 export function getDifficultySweep(target: DifficultyBand): DifficultyBand[] {
@@ -81,4 +106,74 @@ export function chooseDifficultyBand(snapshot?: SkillSnapshot | null): Difficult
   }
 
   return current;
+}
+
+export function buildAdaptiveFeedback({
+  previousDifficulty,
+  nextDifficulty,
+  recentAccuracyPct,
+  rollingAccuracyPct,
+  correctStreak,
+  incorrectStreak,
+  totalAnswered,
+}: {
+  previousDifficulty?: string | null;
+  nextDifficulty?: string | null;
+  recentAccuracyPct?: number | null;
+  rollingAccuracyPct?: number | null;
+  correctStreak?: number | null;
+  incorrectStreak?: number | null;
+  totalAnswered?: number | null;
+}): AdaptiveFeedback {
+  const previous = normalizeDifficultyBand(previousDifficulty);
+  const next = normalizeDifficultyBand(nextDifficulty);
+  const previousIndex = DIFFICULTY_BANDS.indexOf(previous);
+  const nextIndex = DIFFICULTY_BANDS.indexOf(next);
+  const recentAccuracy = recentAccuracyPct ?? 0;
+  const rollingAccuracy = rollingAccuracyPct ?? 0;
+  const answered = totalAnswered ?? 0;
+
+  if (nextIndex > previousIndex) {
+    return {
+      direction: "up",
+      label: "difficulty rising",
+      description:
+        recentAccuracy >= 80 || correctStreak
+          ? `You're handling this well, so Anti is moving you toward ${formatDifficultyBand(next)} ACT questions.`
+          : `Anti is nudging you toward ${formatDifficultyBand(next)} questions to keep you growing.`,
+    };
+  }
+
+  if (nextIndex < previousIndex) {
+    return {
+      direction: "down",
+      label: "rebuilding fundamentals",
+      description:
+        incorrectStreak && incorrectStreak >= 2
+          ? `Anti is dialing the difficulty back to ${formatDifficultyBand(next)} so you can lock in the core skill first.`
+          : `Anti is easing you back to ${formatDifficultyBand(next)} to rebuild the pattern cleanly.`,
+    };
+  }
+
+  if (answered < 3) {
+    return {
+      direction: "steady",
+      label: "finding your level",
+      description: `Anti is still calibrating this star, so the session is staying at ${formatDifficultyBand(next)} for now.`,
+    };
+  }
+
+  if (rollingAccuracy >= 75) {
+    return {
+      direction: "steady",
+      label: "holding strong",
+      description: `You’re performing steadily at ${formatDifficultyBand(next)}, so Anti is keeping the pressure right here.`,
+    };
+  }
+
+  return {
+    direction: "steady",
+    label: "staying targeted",
+    description: `Anti is keeping this at ${formatDifficultyBand(next)} while it learns what support you need most.`,
+  };
 }

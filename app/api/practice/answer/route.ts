@@ -10,7 +10,11 @@ import {
   topicMastery,
   topicSkillState,
 } from "@/db/schema";
-import { chooseDifficultyBand, normalizeDifficultyBand } from "@/lib/adaptive";
+import {
+  buildAdaptiveFeedback,
+  chooseDifficultyBand,
+  normalizeDifficultyBand,
+} from "@/lib/adaptive";
 import { isTopicInPracticeScope, type SectionKey } from "@/lib/act-taxonomy";
 import { getAuthSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
@@ -181,6 +185,7 @@ export async function POST(request: Request) {
   const nextIncorrectStreak = isCorrect ? 0 : (skillStateRow?.incorrectStreak ?? 0) + 1;
   const totalAnswered = (skillStateRow?.totalAnswered ?? 0) + 1;
   const totalCorrect = (skillStateRow?.totalCorrect ?? 0) + (isCorrect ? 1 : 0);
+  const previousDifficulty = normalizeDifficultyBand(skillStateRow?.currentDifficulty);
   const rollingAccuracyPct = Math.round((totalCorrect / totalAnswered) * 100);
   const recentAccuracyPct =
     recentAnswers.length > 0
@@ -197,7 +202,16 @@ export async function POST(request: Request) {
       : timeSpentSeconds;
 
   const recommendedDifficulty = chooseDifficultyBand({
-    currentDifficulty: normalizeDifficultyBand(skillStateRow?.currentDifficulty),
+    currentDifficulty: previousDifficulty,
+    recentAccuracyPct,
+    rollingAccuracyPct,
+    correctStreak: nextCorrectStreak,
+    incorrectStreak: nextIncorrectStreak,
+    totalAnswered,
+  });
+  const adaptiveFeedback = buildAdaptiveFeedback({
+    previousDifficulty,
+    nextDifficulty: recommendedDifficulty,
     recentAccuracyPct,
     rollingAccuracyPct,
     correctStreak: nextCorrectStreak,
@@ -264,9 +278,13 @@ export async function POST(request: Request) {
     answeredCount,
     questionCount: sessionRow.questionCount,
     adaptive: {
+      previousDifficulty,
       recommendedDifficulty,
       rollingAccuracyPct,
       recentAccuracyPct,
+      label: adaptiveFeedback.label,
+      description: adaptiveFeedback.description,
+      direction: adaptiveFeedback.direction,
     },
   });
 }

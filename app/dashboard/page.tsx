@@ -225,12 +225,16 @@ export default function Dashboard() {
   const [dashboardSummary, setDashboardSummary] = useState<{
     compositeEstimatedScore: number;
     confidence: number;
+    scoreLabel: string;
+    scoreExplanation: string;
     sectionSummaries: Array<{
       sectionKey: string;
       estimatedScore: number;
       confidence: number;
       answeredCount: number;
       topicsAttempted: number;
+      scoreLabel: string;
+      scoreExplanation: string;
     }>;
     topicSummaries: Array<{
       sectionKey: string;
@@ -238,6 +242,8 @@ export default function Dashboard() {
       masteryPct: number;
       estimatedScore: number;
       confidence: number;
+      scoreLabel: string;
+      scoreExplanation: string;
       totalAnswered: number;
     }>;
   } | null>(null);
@@ -597,6 +603,8 @@ export default function Dashboard() {
           : "ESTIMATED ACT SCORE";
       const centerConfidence =
         centerSectionSummary?.confidence ?? dashboardSummary?.confidence ?? 0;
+      const centerScoreLabelText =
+        centerSectionSummary?.scoreLabel ?? dashboardSummary?.scoreLabel ?? "baseline estimate";
       const centerSubtitle =
         activeSectionKey !== "all"
           ? `${activeSectionKey} section`
@@ -616,7 +624,7 @@ export default function Dashboard() {
         ctx.globalAlpha = 0.28;
         ctx.font = "11px sans-serif";
         ctx.fillText(
-          `confidence ${Math.round(centerConfidence * 100)}%`,
+          `${centerScoreLabelText} · confidence ${Math.round(centerConfidence * 100)}%`,
           W / 2,
           H / 2 + 66
         );
@@ -904,7 +912,7 @@ export default function Dashboard() {
                     {selectedTopicSummary.estimatedScore}/36
                   </div>
                   <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>
-                    confidence {Math.round((selectedTopicSummary.confidence ?? 0) * 100)}%
+                    {selectedTopicSummary.scoreLabel} · confidence {Math.round((selectedTopicSummary.confidence ?? 0) * 100)}%
                   </div>
                 </div>
                 {selectedSectionSummary && (
@@ -939,10 +947,25 @@ export default function Dashboard() {
                       {selectedSectionSummary.estimatedScore}/36
                     </div>
                     <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>
-                      {selSec.name.toLowerCase()} section
+                      {selectedSectionSummary.scoreLabel}
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+            {selectedTopicSummary && (
+              <div
+                style={{
+                  fontSize: "12px",
+                  color: "rgba(255,255,255,0.5)",
+                  padding: "10px 14px",
+                  background: "rgba(255,255,255,0.035)",
+                  borderRadius: "10px",
+                  borderLeft: `2px solid ${selSec.color}`,
+                  marginBottom: "1rem",
+                }}
+              >
+                {selectedTopicSummary.scoreExplanation}
               </div>
             )}
             <div

@@ -4,7 +4,11 @@ import { Fragment, Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { getTopicByName, type SectionKey } from "@/lib/act-taxonomy";
-import { normalizeDifficultyBand, type DifficultyBand } from "@/lib/adaptive";
+import {
+  formatDifficultyBand,
+  normalizeDifficultyBand,
+  type DifficultyBand,
+} from "@/lib/adaptive";
 
 type Question = {
   id: string;
@@ -16,6 +20,12 @@ type Question = {
   choices: { A: string; B: string; C: string; D: string };
   correct_answer: string;
   explanation: string;
+};
+
+type AdaptiveStatus = {
+  label: string;
+  description: string;
+  direction: "up" | "down" | "steady";
 };
 
 const DIFFICULTY_ORDER: DifficultyBand[] = [
@@ -92,6 +102,11 @@ function PracticeContent() {
   const [questionsLoading, setQuestionsLoading] = useState(true);
   const [practiceSessionId, setPracticeSessionId] = useState<string | null>(null);
   const [targetDifficulty, setTargetDifficulty] = useState("easy");
+  const [adaptiveStatus, setAdaptiveStatus] = useState<AdaptiveStatus>({
+    label: "finding your level",
+    description: "Anti is still calibrating this star, so the session is starting in easy mode.",
+    direction: "steady",
+  });
   const [qIndex, setQIndex] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -128,6 +143,11 @@ function PracticeContent() {
     setSubmitted(false);
     setPracticeSessionId(null);
     setTargetDifficulty("easy");
+    setAdaptiveStatus({
+      label: "finding your level",
+      description: "Anti is still calibrating this star, so the session is starting in easy mode.",
+      direction: "steady",
+    });
     setCorrect(0);
     setAnswered(0);
     setMissed([]);
@@ -159,13 +179,25 @@ function PracticeContent() {
         const data = (await res.json()) as {
           questions?: Question[];
           sessionId?: string | null;
-          adaptive?: { targetDifficulty?: string };
+          adaptive?: {
+            targetDifficulty?: string;
+            label?: string;
+            description?: string;
+            direction?: "up" | "down" | "steady";
+          };
         };
 
         if (!active) return;
         setQuestions(sortQuestionsTowardDifficulty(data.questions ?? [], data.adaptive?.targetDifficulty ?? "easy"));
         setPracticeSessionId(data.sessionId ?? null);
         setTargetDifficulty(data.adaptive?.targetDifficulty ?? "easy");
+        setAdaptiveStatus({
+          label: data.adaptive?.label ?? "finding your level",
+          description:
+            data.adaptive?.description ??
+            "Anti is still calibrating this star, so the session is starting in easy mode.",
+          direction: data.adaptive?.direction ?? "steady",
+        });
       } catch (error) {
         console.error("Failed to fetch questions", error);
         if (!active) return;
@@ -291,12 +323,24 @@ function PracticeContent() {
         });
 
         const data = (await res.json()) as {
-          adaptive?: { recommendedDifficulty?: string };
+          adaptive?: {
+            recommendedDifficulty?: string;
+            label?: string;
+            description?: string;
+            direction?: "up" | "down" | "steady";
+          };
         };
 
         if (data.adaptive?.recommendedDifficulty) {
           const recommendedDifficulty = data.adaptive.recommendedDifficulty;
           setTargetDifficulty(recommendedDifficulty);
+          setAdaptiveStatus({
+            label: data.adaptive.label ?? "staying targeted",
+            description:
+              data.adaptive.description ??
+              `Anti is keeping you at ${formatDifficultyBand(recommendedDifficulty)} difficulty for now.`,
+            direction: data.adaptive.direction ?? "steady",
+          });
           setQuestions((prev) => {
             const answered = prev.slice(0, qIndex + 1);
             const remaining = prev.slice(qIndex + 1);
@@ -371,6 +415,12 @@ function PracticeContent() {
     questionTimings.length > 0
       ? Math.round(questionTimings.reduce((sum, value) => sum + value, 0) / questionTimings.length)
       : 0;
+  const adaptiveToneColor =
+    adaptiveStatus.direction === "up"
+      ? "#5DCAA5"
+      : adaptiveStatus.direction === "down"
+        ? "#F0997B"
+        : "#AFA9EC";
 
   if (status === "loading" || questionsLoading) {
     return (
@@ -457,6 +507,12 @@ function PracticeContent() {
           <div style={{ fontSize: '14px', lineHeight: 1.7, color: 'rgba(255,255,255,0.45)', marginBottom: '1.5rem' }}>
             you’ll work through {questions.length} questions, get instant explanations, and can move on whenever you’re ready.
           </div>
+          <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', padding: '12px 14px', background: 'rgba(255,255,255,0.04)', borderRadius: '12px', borderLeft: `2px solid ${adaptiveToneColor}`, marginBottom: '1.5rem', textAlign: 'left' }}>
+            <div style={{ fontSize: '10px', letterSpacing: '.06em', textTransform: 'uppercase', color: adaptiveToneColor, marginBottom: '4px' }}>
+              {adaptiveStatus.label}
+            </div>
+            {adaptiveStatus.description}
+          </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '10px', marginBottom: '1.5rem' }}>
             {[{ val: questions.length, lbl: 'questions' }, { val: 'live', lbl: 'stopwatch' }, { val: 'AI', lbl: 'tutor on' }].map((item) => (
               <div key={item.lbl} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '12px', padding: '1rem' }}>
@@ -509,10 +565,16 @@ function PracticeContent() {
 
           <div style={{ display: 'flex', gap: '8px', marginBottom: '.875rem', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '10px', fontWeight: 500, padding: '3px 10px', borderRadius: '20px', background: meta.color + '20', border: `0.5px solid ${meta.color}44`, color: meta.color }}>{section} · {meta.constellation}</span>
-              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', padding: '3px 8px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }}>{q.difficulty} · target {targetDifficulty}</span>
+              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', padding: '3px 8px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }}>{q.difficulty} · target {formatDifficultyBand(targetDifficulty)}</span>
               <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.55)', padding: '3px 8px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }}>question timer {formatTime(questionElapsedSeconds)}</span>
               <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.55)', padding: '3px 8px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }}>ai hints {questionHintCount}</span>
               {officialCategory && <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.55)', padding: '3px 8px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }}>{officialCategory}</span>}
+            </div>
+            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.62)', padding: '10px 12px', background: 'rgba(255,255,255,0.04)', borderRadius: '12px', borderLeft: `2px solid ${adaptiveToneColor}`, marginBottom: '1rem' }}>
+              <div style={{ fontSize: '10px', letterSpacing: '.06em', textTransform: 'uppercase', color: adaptiveToneColor, marginBottom: '4px' }}>
+                {adaptiveStatus.label}
+              </div>
+              {adaptiveStatus.description}
             </div>
 
             {q.passage && (
