@@ -35,6 +35,8 @@ type Hit = { si: number; pi: number } | null;
 
 const W = 1400;
 const H = 700;
+const BASE_STAR_COLOR = "#F4F0E8";
+const BASE_CORE_COLOR = "#FFFDF8";
 
 const SECS: Section[] = [
   {
@@ -217,36 +219,170 @@ function getTopicContext(sectionKey: SectionKey, topic: string) {
   return getTopicByName(sectionKey, topic)?.officialCategory ?? null;
 }
 
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function hexToRgb(hex: string) {
+  const normalized = hex.replace("#", "");
+  const full = normalized.length === 3
+    ? normalized
+        .split("")
+        .map((char) => `${char}${char}`)
+        .join("")
+    : normalized;
+
+  const int = Number.parseInt(full, 16);
+
+  return {
+    r: (int >> 16) & 255,
+    g: (int >> 8) & 255,
+    b: int & 255,
+  };
+}
+
+function mixColor(fromHex: string, toHex: string, amount: number) {
+  const from = hexToRgb(fromHex);
+  const to = hexToRgb(toHex);
+  const t = clamp(amount, 0, 1);
+
+  return {
+    r: Math.round(from.r + (to.r - from.r) * t),
+    g: Math.round(from.g + (to.g - from.g) * t),
+    b: Math.round(from.b + (to.b - from.b) * t),
+  };
+}
+
+function toRgba(
+  color: { r: number; g: number; b: number } | string,
+  alpha: number
+) {
+  const rgb = typeof color === "string" ? hexToRgb(color) : color;
+  return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${clamp(alpha, 0, 1)})`;
+}
+
+function getTopicMasteryPct(
+  dashboardSummary: DashboardSummary | null,
+  sectionKey: SectionKey,
+  topicName: string | null
+) {
+  if (!dashboardSummary || !topicName) {
+    return 0;
+  }
+
+  return (
+    dashboardSummary.topicSummaries.find(
+      (summary) => summary.sectionKey === sectionKey && summary.topicName === topicName
+    )?.masteryPct ?? 0
+  );
+}
+
+function getLineMasteryPct(
+  dashboardSummary: DashboardSummary | null,
+  section: Section,
+  line: [number, number]
+) {
+  const topicNames = line
+    .map((pointIndex) => getPointTopic(section, pointIndex))
+    .filter((value): value is string => Boolean(value));
+
+  if (topicNames.length === 0) {
+    return 10;
+  }
+
+  const total = topicNames.reduce(
+    (sum, topicName) => sum + getTopicMasteryPct(dashboardSummary, section.key, topicName),
+    0
+  );
+
+  return total / topicNames.length;
+}
+
+function getStarVisualState({
+  sectionColor,
+  masteryPct,
+  interactive,
+  hovered,
+  selected,
+  pulse,
+  twinkle,
+}: {
+  sectionColor: string;
+  masteryPct: number;
+  interactive: boolean;
+  hovered: boolean;
+  selected: boolean;
+  pulse: number;
+  twinkle: number;
+}) {
+  const mastery = clamp(masteryPct, 0, 100) / 100;
+  const colorMix = interactive ? 0.08 + mastery * 0.92 : 0.02;
+  const bodyColor = mixColor(BASE_STAR_COLOR, sectionColor, colorMix);
+  const coreColor = mixColor(BASE_CORE_COLOR, sectionColor, 0.1 + mastery * 0.24);
+  const baseRadius = interactive ? 5.2 + mastery * 2.8 : 3.1;
+  const radiusBoost = hovered ? 1.5 : selected ? 1.1 : 0;
+  const radius = baseRadius + radiusBoost + (interactive ? pulse * 0.35 : 0);
+  const haloRadius = interactive ? 16 + mastery * 18 + pulse * 3 + (hovered || selected ? 7 : 0) : 0;
+  const haloAlpha = interactive ? 0.16 + mastery * 0.42 + (hovered || selected ? 0.12 : 0) : 0;
+  const ringAlpha = interactive ? 0.18 + mastery * 0.4 + (hovered || selected ? 0.16 : 0) : 0;
+  const bodyAlpha = interactive ? (0.72 + mastery * 0.28) * twinkle : 0.38 * twinkle;
+  const coreRadius = interactive ? 1.15 + mastery * 0.95 : 1.05;
+  const coreAlpha = interactive ? 0.76 + mastery * 0.24 : 0.42;
+  const lineAlpha = 0.08 + mastery * 0.44;
+  const lineWidth = 0.6 + mastery * 0.9;
+  const mastered = masteryPct >= 95;
+  const shimmerStrength = mastered ? 0.3 + 0.7 * pulse : 0;
+
+  return {
+    mastery,
+    bodyColor,
+    coreColor,
+    radius,
+    haloRadius,
+    haloAlpha,
+    ringAlpha,
+    bodyAlpha,
+    coreRadius,
+    coreAlpha,
+    lineAlpha,
+    lineWidth,
+    mastered,
+    shimmerStrength,
+  };
+}
+
+type DashboardSummary = {
+  compositeEstimatedScore: number;
+  confidence: number;
+  scoreLabel: string;
+  scoreExplanation: string;
+  sectionSummaries: Array<{
+    sectionKey: string;
+    estimatedScore: number;
+    confidence: number;
+    answeredCount: number;
+    topicsAttempted: number;
+    scoreLabel: string;
+    scoreExplanation: string;
+  }>;
+  topicSummaries: Array<{
+    sectionKey: string;
+    topicName: string;
+    masteryPct: number;
+    estimatedScore: number;
+    confidence: number;
+    scoreLabel: string;
+    scoreExplanation: string;
+    totalAnswered: number;
+  }>;
+};
+
 export default function Dashboard() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [activeSec, setActiveSec] = useState<SectionKey | "all">("all");
   const [selected, setSelected] = useState<Hit>(null);
-  const [dashboardSummary, setDashboardSummary] = useState<{
-    compositeEstimatedScore: number;
-    confidence: number;
-    scoreLabel: string;
-    scoreExplanation: string;
-    sectionSummaries: Array<{
-      sectionKey: string;
-      estimatedScore: number;
-      confidence: number;
-      answeredCount: number;
-      topicsAttempted: number;
-      scoreLabel: string;
-      scoreExplanation: string;
-    }>;
-    topicSummaries: Array<{
-      sectionKey: string;
-      topicName: string;
-      masteryPct: number;
-      estimatedScore: number;
-      confidence: number;
-      scoreLabel: string;
-      scoreExplanation: string;
-      totalAnswered: number;
-    }>;
-  } | null>(null);
+  const [dashboardSummary, setDashboardSummary] = useState<DashboardSummary | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const detailRef = useRef<HTMLDivElement>(null);
   const stateRef = useRef({
@@ -481,14 +617,24 @@ export default function Dashboard() {
         ctx.arc(sec.cx + dx, sec.cy + dy, 180, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.globalAlpha = alpha * (0.4 + 0.15 * Math.sin(t * 0.5 + si * 0.8));
-        ctx.strokeStyle = sec.color;
-        ctx.lineWidth = 0.9;
-        ctx.shadowColor = sec.color;
-        ctx.shadowBlur = 5;
         sec.lines.forEach(([a, b]) => {
+          const lineMastery = getLineMasteryPct(dashboardSummary, sec, [a, b]);
+          const lineVisual = getStarVisualState({
+            sectionColor: sec.color,
+            masteryPct: lineMastery,
+            interactive: true,
+            hovered: false,
+            selected: false,
+            pulse: 0.8 + 0.2 * Math.sin(t * 1.3 + a + b),
+            twinkle: 1,
+          });
           const pa = pointToCanvas(sec, sec.points[a]);
           const pb = pointToCanvas(sec, sec.points[b]);
+          ctx.globalAlpha = alpha * lineVisual.lineAlpha;
+          ctx.strokeStyle = toRgba(lineVisual.bodyColor, 1);
+          ctx.lineWidth = lineVisual.lineWidth;
+          ctx.shadowColor = toRgba(lineVisual.bodyColor, 0.7);
+          ctx.shadowBlur = 3 + lineVisual.mastery * 7;
           ctx.beginPath();
           ctx.moveTo(pa.x + dx, pa.y + dy);
           ctx.lineTo(pb.x + dx, pb.y + dy);
@@ -501,9 +647,21 @@ export default function Dashboard() {
           const isHover = hovered?.si === si && hovered?.pi === pi;
           const isSelected = currentSelection?.si === si && currentSelection?.pi === pi;
           const isInteractive = point.topicIndex !== undefined;
+          const topicName = getPointTopic(sec, pi);
+          const masteryPct = isInteractive
+            ? getTopicMasteryPct(dashboardSummary, sec.key, topicName)
+            : 0;
           const twinkle = 0.8 + 0.2 * Math.sin(t * 1.1 + pi * 1.7 + si * 0.9);
           const pulse = isInteractive ? 0.82 + 0.18 * Math.sin(t * 2.2 + pi * 1.3 + si) : 1;
-          const radius = isHover ? 8.8 : isInteractive ? 6.2 + pulse * 0.9 : 3.2;
+          const visual = getStarVisualState({
+            sectionColor: sec.color,
+            masteryPct,
+            interactive: isInteractive,
+            hovered: isHover,
+            selected: isSelected,
+            pulse,
+            twinkle,
+          });
 
           if (isInteractive) {
             const halo = ctx.createRadialGradient(
@@ -512,51 +670,85 @@ export default function Dashboard() {
               0,
               resolved.x + dx,
               resolved.y + dy,
-              26 + pulse * 8
+              visual.haloRadius
             );
-            halo.addColorStop(0, `${sec.color}66`);
-            halo.addColorStop(0.45, `${sec.color}24`);
-            halo.addColorStop(1, `${sec.color}00`);
-            ctx.globalAlpha = alpha * (isSelected ? 0.65 : 0.42);
+            halo.addColorStop(0, toRgba(visual.bodyColor, 0.85));
+            halo.addColorStop(0.38, toRgba(visual.bodyColor, 0.2 + visual.mastery * 0.18));
+            halo.addColorStop(1, toRgba(visual.bodyColor, 0));
+            ctx.globalAlpha = alpha * visual.haloAlpha;
             ctx.fillStyle = halo;
             ctx.beginPath();
-            ctx.arc(resolved.x + dx, resolved.y + dy, 26 + pulse * 8, 0, Math.PI * 2);
+            ctx.arc(resolved.x + dx, resolved.y + dy, visual.haloRadius, 0, Math.PI * 2);
             ctx.fill();
 
-            ctx.globalAlpha = alpha * (isHover || isSelected ? 0.65 : 0.38);
-            ctx.strokeStyle = `${sec.color}88`;
+            ctx.globalAlpha = alpha * visual.ringAlpha;
+            ctx.strokeStyle = toRgba(visual.bodyColor, 0.95);
             ctx.lineWidth = isHover || isSelected ? 1.5 : 1;
             ctx.beginPath();
-            ctx.arc(resolved.x + dx, resolved.y + dy, radius + 5 + pulse * 1.5, 0, Math.PI * 2);
+            ctx.arc(
+              resolved.x + dx,
+              resolved.y + dy,
+              visual.radius + 5 + visual.mastery * 1.5 + pulse * 0.9,
+              0,
+              Math.PI * 2
+            );
             ctx.stroke();
           }
 
-          ctx.globalAlpha = alpha * (isInteractive ? 0.98 : 0.35) * twinkle;
-          ctx.shadowColor = sec.color;
-          ctx.shadowBlur = isHover || isSelected ? 32 : isInteractive ? 20 : 4;
-          ctx.fillStyle = sec.color;
+          ctx.globalAlpha = alpha * visual.bodyAlpha;
+          ctx.shadowColor = toRgba(visual.bodyColor, 0.95);
+          ctx.shadowBlur = isHover || isSelected ? 34 : isInteractive ? 10 + visual.mastery * 20 : 4;
+          ctx.fillStyle = toRgba(visual.bodyColor, 1);
           ctx.beginPath();
-          ctx.arc(resolved.x + dx, resolved.y + dy, radius, 0, Math.PI * 2);
+          ctx.arc(resolved.x + dx, resolved.y + dy, visual.radius, 0, Math.PI * 2);
           ctx.fill();
 
-          ctx.fillStyle = isInteractive ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.68)";
+          ctx.fillStyle = toRgba(visual.coreColor, 1);
           ctx.shadowBlur = 0;
-          ctx.globalAlpha = alpha * (isInteractive ? 0.82 : 0.42) * twinkle;
+          ctx.globalAlpha = alpha * visual.coreAlpha * twinkle;
           ctx.beginPath();
-          ctx.arc(resolved.x + dx, resolved.y + dy, isInteractive ? 1.5 : 1.05, 0, Math.PI * 2);
+          ctx.arc(resolved.x + dx, resolved.y + dy, visual.coreRadius, 0, Math.PI * 2);
           ctx.fill();
 
           if (isSelected) {
             const selectedPulse = 0.5 + 0.5 * Math.sin(t * 3.2);
-            ctx.globalAlpha = alpha * (0.4 + 0.2 * selectedPulse);
-            ctx.strokeStyle = sec.color;
+            ctx.globalAlpha = alpha * (0.26 + 0.22 * selectedPulse + visual.mastery * 0.15);
+            ctx.strokeStyle = toRgba(visual.bodyColor, 1);
             ctx.lineWidth = 1.3;
             ctx.beginPath();
-            ctx.arc(resolved.x + dx, resolved.y + dy, radius + 7 + selectedPulse * 3, 0, Math.PI * 2);
+            ctx.arc(
+              resolved.x + dx,
+              resolved.y + dy,
+              visual.radius + 7 + selectedPulse * 3,
+              0,
+              Math.PI * 2
+            );
             ctx.stroke();
-            ctx.globalAlpha = alpha * (0.15 + 0.08 * selectedPulse);
+            ctx.globalAlpha = alpha * (0.08 + 0.12 * selectedPulse + visual.mastery * 0.06);
             ctx.beginPath();
-            ctx.arc(resolved.x + dx, resolved.y + dy, radius + 16 + selectedPulse * 4, 0, Math.PI * 2);
+            ctx.arc(
+              resolved.x + dx,
+              resolved.y + dy,
+              visual.radius + 16 + selectedPulse * 4,
+              0,
+              Math.PI * 2
+            );
+            ctx.stroke();
+          }
+
+          if (visual.mastered) {
+            const shimmer = 0.35 + 0.65 * Math.sin(t * 4 + pi * 1.9 + si);
+            const sparkleRadius = visual.radius + 9 + visual.shimmerStrength * 3;
+            ctx.globalAlpha = alpha * 0.22 * shimmer;
+            ctx.strokeStyle = toRgba(visual.coreColor, 1);
+            ctx.lineWidth = 0.9;
+            ctx.beginPath();
+            ctx.moveTo(resolved.x + dx - sparkleRadius, resolved.y + dy);
+            ctx.lineTo(resolved.x + dx + sparkleRadius, resolved.y + dy);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(resolved.x + dx, resolved.y + dy - sparkleRadius);
+            ctx.lineTo(resolved.x + dx, resolved.y + dy + sparkleRadius);
             ctx.stroke();
           }
         });
