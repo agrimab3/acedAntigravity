@@ -578,24 +578,20 @@ function PracticeContent() {
             </div>
 
             {q.passage && (
-              <div style={{ marginBottom: '1rem', padding: '14px 16px', borderRadius: '14px', background: 'rgba(255,255,255,0.04)', border: '0.5px solid rgba(255,255,255,0.1)' }}>
+              <div style={{ marginBottom: '1.25rem' }}>
                 <div style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '.06em', color: 'rgba(255,255,255,0.38)', marginBottom: '8px' }}>
                   PASSAGE / SETUP
                 </div>
-                <div style={{ fontSize: '13px', lineHeight: 1.7, color: 'rgba(255,255,255,0.8)', whiteSpace: 'pre-wrap' }}>
+                <div style={{ fontSize: '15px', lineHeight: 1.85, color: 'rgba(255,255,255,0.84)', whiteSpace: 'pre-wrap', maxWidth: '780px' }}>
                   {renderFormattedText(q.passage)}
                 </div>
+                <div style={{ height: '1px', background: 'linear-gradient(90deg, rgba(255,255,255,0.16), rgba(255,255,255,0))', marginTop: '16px' }} />
               </div>
             )}
 
             <div
               style={{
-                marginBottom: '1.25rem',
-                padding: '18px 18px 16px',
-                borderRadius: '16px',
-                background: 'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))',
-                border: `1px solid ${meta.color}45`,
-                boxShadow: `0 16px 40px ${meta.color}14`,
+                marginBottom: '1.5rem',
               }}
             >
               <div
@@ -613,10 +609,12 @@ function PracticeContent() {
               <div
                 style={{
                   fontFamily: 'DM Serif Display,serif',
-                  fontSize: '21px',
-                  lineHeight: 1.6,
+                  fontSize: 'clamp(1.45rem, 2.5vw, 2rem)',
+                  lineHeight: 1.65,
                   color: '#ffffff',
                   textWrap: 'pretty',
+                  maxWidth: '820px',
+                  textShadow: '0 8px 30px rgba(0,0,0,0.18)',
                 }}
               >
                 {renderFormattedText(q.question_text)}
