@@ -1045,36 +1045,66 @@ export default function Dashboard() {
           >
             <button
               style={{
-                background: "rgba(29,158,117,0.12)",
+                background: "transparent",
                 border: "none",
                 color: "#fff",
                 fontSize: "17px",
                 fontWeight: 500,
                 cursor: "default",
-                padding: "8px 16px",
-                borderRadius: "999px",
-                boxShadow: "0 0 26px rgba(29,158,117,0.18)",
+                padding: "6px 4px",
+                position: "relative",
+                textShadow: "0 0 14px rgba(29,158,117,0.28)",
                 fontFamily: "DM Sans,sans-serif",
               }}
             >
-              your universe
+              <span
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "50%",
+                  width: "calc(100% + 22px)",
+                  height: "20px",
+                  transform: "translate(-50%, -50%)",
+                  borderRadius: "999px",
+                  background: "radial-gradient(circle, rgba(29,158,117,0.2) 0%, rgba(29,158,117,0.08) 52%, transparent 80%)",
+                  filter: "blur(10px)",
+                  zIndex: 0,
+                  pointerEvents: "none",
+                }}
+              />
+              <span style={{ position: "relative", zIndex: 1 }}>your universe</span>
             </button>
             <button
               onClick={() => router.push("/practice-tests")}
               style={{
-                background: "rgba(255,255,255,0.04)",
+                background: "transparent",
                 border: "none",
                 color: "rgba(255,255,255,0.78)",
                 fontSize: "17px",
                 fontWeight: 500,
                 cursor: "pointer",
-                padding: "8px 16px",
-                borderRadius: "999px",
-                boxShadow: "0 0 24px rgba(255,255,255,0.04)",
+                padding: "6px 4px",
+                position: "relative",
+                textShadow: "0 0 12px rgba(255,255,255,0.12)",
                 fontFamily: "DM Sans,sans-serif",
               }}
             >
-              practice tests
+              <span
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "50%",
+                  width: "calc(100% + 18px)",
+                  height: "18px",
+                  transform: "translate(-50%, -50%)",
+                  borderRadius: "999px",
+                  background: "radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 56%, transparent 82%)",
+                  filter: "blur(10px)",
+                  zIndex: 0,
+                  pointerEvents: "none",
+                }}
+              />
+              <span style={{ position: "relative", zIndex: 1 }}>practice tests</span>
             </button>
           </div>
           <div style={{ display: "flex", gap: "1rem", alignItems: "center", justifySelf: "end" }}>
