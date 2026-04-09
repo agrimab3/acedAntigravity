@@ -38,7 +38,7 @@ const H = 700;
 const BASE_STAR_COLOR = "#F4F0E8";
 const BASE_CORE_COLOR = "#FFFDF8";
 const DASHBOARD_GALAXY_BACKGROUND =
-  "radial-gradient(circle at 15% 18%, rgba(38, 95, 143, 0.22), transparent 24%), radial-gradient(circle at 76% 20%, rgba(29, 158, 117, 0.16), transparent 24%), radial-gradient(circle at 50% 78%, rgba(118, 63, 143, 0.18), transparent 30%), linear-gradient(180deg,#0d1b2a 0%,#060d1e 48%,#020408 100%)";
+  "radial-gradient(circle at 18% 16%, rgba(74, 128, 178, 0.12), transparent 32%), radial-gradient(circle at 74% 24%, rgba(88, 138, 188, 0.08), transparent 34%), radial-gradient(circle at 52% 72%, rgba(120, 136, 182, 0.06), transparent 40%), linear-gradient(180deg,#0d1b2a 0%,#081221 44%,#020408 100%)";
 
 const SECS: Section[] = [
   {
@@ -464,7 +464,7 @@ export default function Dashboard() {
     []
   );
   const ambientGlows = useMemo(
-    () => buildDashboardAmbientGlows(12),
+    () => buildDashboardAmbientGlows(7),
     []
   );
 
@@ -639,9 +639,9 @@ export default function Dashboard() {
       ctx.clearRect(0, 0, W, H);
 
       [
-        { x: W * 0.15, y: H * 0.18, radius: 240, color: "rgba(38, 95, 143, 0.2)" },
-        { x: W * 0.76, y: H * 0.2, radius: 240, color: "rgba(29, 158, 117, 0.14)" },
-        { x: W * 0.5, y: H * 0.78, radius: 280, color: "rgba(118, 63, 143, 0.16)" },
+        { x: W * 0.18, y: H * 0.18, radius: 260, color: "rgba(74, 128, 178, 0.1)" },
+        { x: W * 0.76, y: H * 0.24, radius: 250, color: "rgba(88, 138, 188, 0.07)" },
+        { x: W * 0.52, y: H * 0.76, radius: 300, color: "rgba(120, 136, 182, 0.05)" },
       ].forEach((glow) => {
         const radial = ctx.createRadialGradient(glow.x, glow.y, 0, glow.x, glow.y, glow.radius);
         radial.addColorStop(0, glow.color);
@@ -1039,15 +1039,13 @@ export default function Dashboard() {
               borderRadius: "999px",
               transform: "translate(-50%, -50%)",
               background:
-                glow.id % 4 === 0
-                  ? "radial-gradient(circle, rgba(93,202,165,0.24) 0%, rgba(93,202,165,0.04) 44%, transparent 74%)"
-                  : glow.id % 4 === 1
-                    ? "radial-gradient(circle, rgba(175,169,236,0.2) 0%, rgba(175,169,236,0.04) 45%, transparent 74%)"
-                    : glow.id % 4 === 2
-                      ? "radial-gradient(circle, rgba(240,153,123,0.2) 0%, rgba(240,153,123,0.04) 42%, transparent 72%)"
-                      : "radial-gradient(circle, rgba(239,159,39,0.18) 0%, rgba(239,159,39,0.03) 46%, transparent 74%)",
-              opacity: glow.opacity,
-              filter: "blur(16px)",
+                glow.id % 3 === 0
+                  ? "radial-gradient(circle, rgba(112, 188, 222, 0.12) 0%, rgba(112, 188, 222, 0.03) 48%, transparent 78%)"
+                  : glow.id % 3 === 1
+                    ? "radial-gradient(circle, rgba(176, 188, 236, 0.1) 0%, rgba(176, 188, 236, 0.025) 48%, transparent 80%)"
+                    : "radial-gradient(circle, rgba(146, 196, 187, 0.09) 0%, rgba(146, 196, 187, 0.02) 50%, transparent 80%)",
+              opacity: glow.opacity * 0.7,
+              filter: "blur(24px)",
               animation: `dashboardNebulaFloat ${glow.duration}s ease-in-out ${glow.delay}s infinite`,
               display: "block",
             }}
@@ -1084,7 +1082,7 @@ export default function Dashboard() {
           pointerEvents: "none",
           zIndex: 2,
           background:
-            "radial-gradient(circle at 50% 24%, rgba(5, 12, 24, 0.14), transparent 18%), linear-gradient(180deg, rgba(5,12,24,0.3) 0%, rgba(5,12,24,0.18) 20%, rgba(5,12,24,0.12) 42%, rgba(5,12,24,0.16) 66%, rgba(5,12,24,0.24) 100%)",
+            "radial-gradient(circle at 50% 24%, rgba(5, 12, 24, 0.08), transparent 20%), linear-gradient(180deg, rgba(5,12,24,0.2) 0%, rgba(5,12,24,0.12) 22%, rgba(5,12,24,0.08) 48%, rgba(5,12,24,0.1) 68%, rgba(5,12,24,0.16) 100%)",
         }}
       />
 

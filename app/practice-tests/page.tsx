@@ -85,7 +85,7 @@ const SECTION_TEST_TOPIC_COPY: Record<string, string> = {
 };
 
 const PRACTICE_TEST_GALAXY_BACKGROUND =
-  "radial-gradient(circle at 15% 18%, rgba(38, 95, 143, 0.22), transparent 24%), radial-gradient(circle at 76% 20%, rgba(29, 158, 117, 0.16), transparent 24%), radial-gradient(circle at 50% 78%, rgba(118, 63, 143, 0.18), transparent 30%), linear-gradient(180deg,#0d1b2a 0%,#060d1e 48%,#020408 100%)";
+  "radial-gradient(circle at 18% 16%, rgba(74, 128, 178, 0.12), transparent 32%), radial-gradient(circle at 74% 24%, rgba(88, 138, 188, 0.08), transparent 34%), radial-gradient(circle at 52% 72%, rgba(120, 136, 182, 0.06), transparent 40%), linear-gradient(180deg,#0d1b2a 0%,#081221 44%,#020408 100%)";
 
 export default function PracticeTestsPage() {
   const router = useRouter();
@@ -121,7 +121,7 @@ export default function PracticeTestsPage() {
     []
   );
   const backgroundGlows = useMemo(
-    () => buildPracticeTestAmbientGlows(16),
+    () => buildPracticeTestAmbientGlows(8),
     []
   );
 
@@ -201,7 +201,6 @@ export default function PracticeTestsPage() {
         fontFamily: "DM Sans,sans-serif",
         position: "relative",
         overflowX: "hidden",
-        background: PRACTICE_TEST_GALAXY_BACKGROUND,
       }}
     >
       <link
@@ -230,6 +229,15 @@ export default function PracticeTestsPage() {
           100% { transform: scale(0.94); opacity: 0.35; }
         }
       `}</style>
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          pointerEvents: "none",
+          zIndex: 0,
+          background: PRACTICE_TEST_GALAXY_BACKGROUND,
+        }}
+      />
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1 }}>
         {backgroundGlows.map((glow) => (
           <span
@@ -243,15 +251,13 @@ export default function PracticeTestsPage() {
               transform: "translate(-50%, -50%)",
               borderRadius: "999px",
               background:
-                glow.id % 4 === 0
-                  ? "radial-gradient(circle, rgba(93,202,165,0.24) 0%, rgba(93,202,165,0.04) 44%, transparent 74%)"
-                  : glow.id % 4 === 1
-                    ? "radial-gradient(circle, rgba(175,169,236,0.2) 0%, rgba(175,169,236,0.04) 45%, transparent 74%)"
-                    : glow.id % 4 === 2
-                      ? "radial-gradient(circle, rgba(240,153,123,0.2) 0%, rgba(240,153,123,0.04) 42%, transparent 72%)"
-                      : "radial-gradient(circle, rgba(239,159,39,0.18) 0%, rgba(239,159,39,0.03) 46%, transparent 74%)",
-              opacity: glow.opacity,
-              filter: "blur(10px)",
+                glow.id % 3 === 0
+                  ? "radial-gradient(circle, rgba(112, 188, 222, 0.12) 0%, rgba(112, 188, 222, 0.03) 48%, transparent 78%)"
+                  : glow.id % 3 === 1
+                    ? "radial-gradient(circle, rgba(176, 188, 236, 0.1) 0%, rgba(176, 188, 236, 0.025) 48%, transparent 80%)"
+                    : "radial-gradient(circle, rgba(146, 196, 187, 0.09) 0%, rgba(146, 196, 187, 0.02) 50%, transparent 80%)",
+              opacity: glow.opacity * 0.7,
+              filter: "blur(24px)",
               animation: `practiceTestNebulaPulse ${glow.duration}s ease-in-out ${glow.delay}s infinite`,
               display: "block",
             }}
@@ -287,7 +293,7 @@ export default function PracticeTestsPage() {
           pointerEvents: "none",
           zIndex: 2,
           background:
-            "radial-gradient(circle at 50% 26%, rgba(5, 12, 24, 0.16), transparent 18%), linear-gradient(180deg, rgba(5,12,24,0.34) 0%, rgba(5,12,24,0.24) 18%, rgba(5,12,24,0.18) 38%, rgba(5,12,24,0.22) 60%, rgba(5,12,24,0.3) 100%)",
+            "radial-gradient(circle at 50% 26%, rgba(5, 12, 24, 0.08), transparent 20%), linear-gradient(180deg, rgba(5,12,24,0.2) 0%, rgba(5,12,24,0.12) 22%, rgba(5,12,24,0.08) 48%, rgba(5,12,24,0.1) 68%, rgba(5,12,24,0.16) 100%)",
         }}
       />
 
