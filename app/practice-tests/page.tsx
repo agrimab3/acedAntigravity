@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import {
@@ -91,6 +91,14 @@ export default function PracticeTestsPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [selectedModeKey, setSelectedModeKey] = useState(PRACTICE_TEST_MODES[0]?.key);
+  const [aiInput, setAiInput] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiMessages, setAiMessages] = useState<Array<{ role: "bot" | "user"; text: string }>>([
+    {
+      role: "bot",
+      text: "Ask for test-day strategy, pacing help, or which stars to practice next and I’ll coach you through it.",
+    },
+  ]);
   const [historyLoading, setHistoryLoading] = useState(true);
   const [history, setHistory] = useState<
     Array<{
@@ -111,6 +119,7 @@ export default function PracticeTestsPage() {
       }>;
     }>
   >([]);
+  const msgsRef = useRef<HTMLDivElement>(null);
 
   const selectedMode = useMemo(
     () => PRACTICE_TEST_MODES.find((mode) => mode.key === selectedModeKey) ?? PRACTICE_TEST_MODES[0],
@@ -124,6 +133,21 @@ export default function PracticeTestsPage() {
     () => buildPracticeTestAmbientGlows(8),
     []
   );
+
+  useEffect(() => {
+    setAiMessages([
+      {
+        role: "bot",
+        text: `Ask about ${selectedMode.shortLabel.toLowerCase()} pacing, test-day strategy, or what stars to focus on after this run.`,
+      },
+    ]);
+    setAiInput("");
+  }, [selectedMode]);
+
+  useEffect(() => {
+    if (!msgsRef.current) return;
+    msgsRef.current.scrollTop = msgsRef.current.scrollHeight;
+  }, [aiMessages]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -192,6 +216,53 @@ export default function PracticeTestsPage() {
   if (status === "unauthenticated") {
     return null;
   }
+
+  const tutorSection =
+    selectedMode.format === "section"
+      ? selectedMode.sections[0]?.key ?? "english"
+      : selectedMode.sections[0]?.key ?? "english";
+  const tutorExplanation =
+    selectedMode.format === "section"
+      ? `The student is preparing for the ${selectedMode.title} ACT section test and wants pacing, strategy, and next-star recommendations.`
+      : `The student is preparing for the ${selectedMode.title} ACT full test and wants pacing, strategy, and next-star recommendations.`;
+
+  const sendAI = async () => {
+    if (!aiInput.trim() || aiLoading) return;
+    const msg = aiInput.trim();
+    setAiInput("");
+    setAiMessages((prev) => [...prev, { role: "user", text: msg }]);
+    setAiLoading(true);
+
+    try {
+      const res = await fetch("/api/tutor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: msg,
+          question: `Help the student prepare for the ${selectedMode.title} practice test with timing, pacing, and recovery advice.`,
+          section: tutorSection,
+          explanation: tutorExplanation,
+          officialCategory:
+            selectedMode.format === "section"
+              ? SECTION_TEST_TOPIC_COPY[selectedMode.key] ?? selectedMode.description
+              : selectedMode.description,
+        }),
+      });
+
+      const data = await res.json();
+      setAiMessages((prev) => [
+        ...prev,
+        { role: "bot", text: data.reply ?? "I had trouble answering that. Try again in a second." },
+      ]);
+    } catch {
+      setAiMessages((prev) => [
+        ...prev,
+        { role: "bot", text: "Sorry, I had trouble connecting. Try again in a second." },
+      ]);
+    }
+
+    setAiLoading(false);
+  };
 
   return (
     <div
@@ -307,7 +378,7 @@ export default function PracticeTestsPage() {
             marginBottom: "2rem",
           }}
         >
-          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px", justifySelf: "start" }}>
+          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "26px", justifySelf: "start" }}>
             Aced<em style={{ color: "#1D9E75" }}>.</em>
           </div>
           <div
@@ -322,13 +393,15 @@ export default function PracticeTestsPage() {
             <button
               onClick={() => router.push("/dashboard")}
               style={{
-                background: "transparent",
-                border: "none",
-                color: "rgba(255,255,255,0.58)",
-                fontSize: "16px",
+                background: "rgba(255,255,255,0.04)",
+                border: "0.5px solid rgba(255,255,255,0.08)",
+                color: "rgba(255,255,255,0.78)",
+                fontSize: "17px",
                 fontWeight: 500,
                 cursor: "pointer",
-                padding: 0,
+                padding: "8px 16px",
+                borderRadius: "999px",
+                boxShadow: "0 0 24px rgba(255,255,255,0.04)",
                 fontFamily: "DM Sans,sans-serif",
               }}
             >
@@ -336,13 +409,15 @@ export default function PracticeTestsPage() {
             </button>
             <button
               style={{
-                background: "transparent",
-                border: "none",
+                background: "rgba(29,158,117,0.12)",
+                border: "0.5px solid rgba(29,158,117,0.32)",
                 color: "#fff",
-                fontSize: "16px",
+                fontSize: "17px",
                 fontWeight: 500,
                 cursor: "default",
-                padding: 0,
+                padding: "8px 16px",
+                borderRadius: "999px",
+                boxShadow: "0 0 26px rgba(29,158,117,0.18)",
                 fontFamily: "DM Sans,sans-serif",
               }}
             >
@@ -623,146 +698,249 @@ export default function PracticeTestsPage() {
 
           <aside
             style={{
-              background: "rgba(255,255,255,0.04)",
-              border: `0.5px solid ${selectedMode.accentColor}44`,
-              borderRadius: "20px",
-              padding: "1.25rem",
+              display: "grid",
+              gap: "16px",
               position: "sticky",
               top: "1.5rem",
             }}
           >
-            <div
+            <section
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                fontSize: "11px",
-                letterSpacing: ".06em",
-                textTransform: "uppercase",
-                color: selectedMode.accentColor,
-                marginBottom: "10px",
+                background: "rgba(255,255,255,0.04)",
+                border: `0.5px solid ${selectedMode.accentColor}55`,
+                boxShadow: `0 0 0 1px ${selectedMode.accentColor}18 inset, 0 14px 38px rgba(0,0,0,0.18)`,
+                borderRadius: "20px",
+                padding: "1.25rem",
               }}
             >
-              {selectedMode.format === "section" ? "section rehearsal" : "full test rehearsal"}
-            </div>
-
-            <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "30px", marginBottom: "10px" }}>
-              {selectedMode.title}
-            </div>
-            <div style={{ fontSize: "13px", lineHeight: 1.7, color: "rgba(255,255,255,0.55)", marginBottom: "1rem" }}>
-              {selectedMode.description}
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "10px", marginBottom: "1rem" }}>
-              {[
-                { value: selectedMode.questionCount, label: "questions" },
-                { value: formatDuration(selectedMode.durationMinutes), label: "timed" },
-                { value: selectedMode.includesDesmos ? "desmos" : "focus", label: selectedMode.includesDesmos ? "math tool" : "mode" },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  style={{
-                    borderRadius: "14px",
-                    background: "rgba(255,255,255,0.035)",
-                    border: "0.5px solid rgba(255,255,255,0.08)",
-                    padding: "0.9rem 0.8rem",
-                    textAlign: "center",
-                  }}
-                >
-                  <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "24px", color: selectedMode.accentColor }}>
-                    {item.value}
-                  </div>
-                  <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.32)" }}>{item.label}</div>
-                </div>
-              ))}
-            </div>
-
-            <div
-              style={{
-                borderRadius: "14px",
-                background: "rgba(255,255,255,0.03)",
-                border: "0.5px solid rgba(255,255,255,0.08)",
-                padding: "0.95rem 1rem",
-                marginBottom: "1rem",
-              }}
-            >
-              <div style={{ fontSize: "11px", letterSpacing: ".06em", textTransform: "uppercase", color: "rgba(255,255,255,0.34)", marginBottom: "8px" }}>
-                section flow
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  fontSize: "11px",
+                  letterSpacing: ".06em",
+                  textTransform: "uppercase",
+                  color: selectedMode.accentColor,
+                  marginBottom: "10px",
+                }}
+              >
+                {selectedMode.format === "section" ? "section test" : "full test"}
               </div>
-              <div style={{ display: "grid", gap: "8px" }}>
-                {selectedMode.sections.map((section, index) => (
+
+              <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "30px", marginBottom: "10px" }}>
+                {selectedMode.title}
+              </div>
+              <div style={{ fontSize: "13px", lineHeight: 1.7, color: "rgba(255,255,255,0.55)", marginBottom: "1rem" }}>
+                {selectedMode.description}
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "10px", marginBottom: "1rem" }}>
+                {[
+                  { value: selectedMode.questionCount, label: "questions" },
+                  { value: formatDuration(selectedMode.durationMinutes), label: "timed" },
+                  { value: selectedMode.includesDesmos ? "desmos" : "focus", label: selectedMode.includesDesmos ? "math tool" : "mode" },
+                ].map((item) => (
                   <div
-                    key={section.key}
+                    key={item.label}
                     style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      gap: "12px",
-                      fontSize: "12px",
-                      color: "rgba(255,255,255,0.62)",
+                      borderRadius: "14px",
+                      background: "rgba(255,255,255,0.035)",
+                      border: `0.5px solid ${selectedMode.accentColor}22`,
+                      padding: "0.9rem 0.8rem",
+                      textAlign: "center",
                     }}
                   >
-                    <span>
-                      {index + 1}. {section.label}
-                    </span>
-                    <span style={{ color: "rgba(255,255,255,0.36)" }}>
-                      {section.questionCount}q · {section.durationMinutes}m
-                    </span>
+                    <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "24px", color: selectedMode.accentColor }}>
+                      {item.value}
+                    </div>
+                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.32)" }}>{item.label}</div>
                   </div>
                 ))}
               </div>
-            </div>
 
-            <div style={{ display: "flex", gap: "8px" }}>
-              <button
-                onClick={() => router.push("/dashboard")}
+              <div
                 style={{
-                  flex: 1,
-                  padding: "11px 12px",
-                  borderRadius: "12px",
-                  background: "transparent",
-                  border: "0.5px solid rgba(255,255,255,0.12)",
-                  color: "rgba(255,255,255,0.7)",
-                  cursor: "pointer",
-                  fontSize: "13px",
+                  borderRadius: "14px",
+                  background: "rgba(255,255,255,0.03)",
+                  border: `0.5px solid ${selectedMode.accentColor}20`,
+                  padding: "0.95rem 1rem",
+                  marginBottom: "1rem",
                 }}
               >
-                back to universe
-              </button>
-              <button
-                onClick={() => {
-                  router.push(`/practice-tests/run?mode=${selectedMode.key}`);
-                }}
-                style={{
-                  flex: 1.4,
-                  padding: "11px 12px",
-                  borderRadius: "12px",
-                  background: selectedMode.accentColor,
-                  border: "none",
-                  color: "#081018",
-                  cursor: "pointer",
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  opacity: 0.92,
-                }}
-              >
-                {selectedMode.format === "section" ? "start timed section →" : "start full test →"}
-              </button>
-            </div>
+                <div style={{ fontSize: "11px", letterSpacing: ".06em", textTransform: "uppercase", color: "rgba(255,255,255,0.34)", marginBottom: "8px" }}>
+                  section flow
+                </div>
+                <div style={{ display: "grid", gap: "8px" }}>
+                  {selectedMode.sections.map((section, index) => (
+                    <div
+                      key={section.key}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        gap: "12px",
+                        fontSize: "12px",
+                        color: "rgba(255,255,255,0.62)",
+                      }}
+                    >
+                      <span>
+                        {index + 1}. {section.label}
+                      </span>
+                      <span style={{ color: "rgba(255,255,255,0.36)" }}>
+                        {section.questionCount}q · {section.durationMinutes}m
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button
+                  onClick={() => router.push("/dashboard")}
+                  style={{
+                    flex: 1,
+                    padding: "11px 12px",
+                    borderRadius: "12px",
+                    background: "transparent",
+                    border: "0.5px solid rgba(255,255,255,0.12)",
+                    color: "rgba(255,255,255,0.7)",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                  }}
+                >
+                  back to universe
+                </button>
+                <button
+                  onClick={() => {
+                    router.push(`/practice-tests/run?mode=${selectedMode.key}`);
+                  }}
+                  style={{
+                    flex: 1.4,
+                    padding: "11px 12px",
+                    borderRadius: "12px",
+                    background: selectedMode.accentColor,
+                    border: "none",
+                    color: "#081018",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    opacity: 0.92,
+                    boxShadow: `0 0 26px ${selectedMode.accentColor}26`,
+                  }}
+                >
+                  {selectedMode.format === "section" ? "start section ✦" : "start full test ✦"}
+                </button>
+              </div>
+            </section>
 
             <section
               style={{
-                marginTop: "1rem",
-                borderRadius: "14px",
-                background: "rgba(255,255,255,0.03)",
-                border: "0.5px solid rgba(255,255,255,0.08)",
-                padding: "0.95rem 1rem",
+                background: "rgba(255,255,255,0.035)",
+                border: `0.5px solid ${selectedMode.accentColor}33`,
+                boxShadow: `0 0 0 1px ${selectedMode.accentColor}14 inset`,
+                borderRadius: "20px",
+                padding: "1.05rem 1rem",
               }}
             >
               <div style={{ fontSize: "11px", letterSpacing: ".06em", textTransform: "uppercase", color: selectedMode.accentColor, marginBottom: "8px" }}>
-                ai chatbot
+                ask your AI tutor
               </div>
-              <div style={{ fontSize: "12px", lineHeight: 1.7, color: "rgba(255,255,255,0.54)" }}>
-                Ask Aced for test-day strategy, section pacing help, star recommendations, and post-run recovery suggestions if you want a cleaner next step.
+              <div style={{ fontSize: "12px", lineHeight: 1.7, color: "rgba(255,255,255,0.54)", marginBottom: "0.9rem" }}>
+                Ask for test-day strategy, section pacing tips, or which stars to focus on next.
+              </div>
+              <div style={{ display: "flex", gap: "8px", alignItems: "stretch", marginBottom: "0.9rem" }}>
+                <textarea
+                  value={aiInput}
+                  onChange={(event) => setAiInput(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" && !event.shiftKey) {
+                      event.preventDefault();
+                      void sendAI();
+                    }
+                  }}
+                  placeholder="ask about pacing, strategy, or next stars..."
+                  rows={2}
+                  style={{
+                    flex: 1,
+                    resize: "none",
+                    borderRadius: "12px",
+                    border: "0.5px solid rgba(255,255,255,0.12)",
+                    background: "rgba(8,16,24,0.76)",
+                    color: "#fff",
+                    padding: "10px 12px",
+                    fontSize: "12px",
+                    fontFamily: "DM Sans,sans-serif",
+                    outline: "none",
+                  }}
+                />
+                <button
+                  onClick={() => void sendAI()}
+                  disabled={aiLoading || !aiInput.trim()}
+                  style={{
+                    alignSelf: "stretch",
+                    padding: "0 14px",
+                    borderRadius: "12px",
+                    border: "none",
+                    background: selectedMode.accentColor,
+                    color: "#081018",
+                    cursor: aiLoading || !aiInput.trim() ? "default" : "pointer",
+                    opacity: aiLoading || !aiInput.trim() ? 0.5 : 0.95,
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    fontFamily: "DM Sans,sans-serif",
+                  }}
+                >
+                  send
+                </button>
+              </div>
+              <div
+                ref={msgsRef}
+                style={{
+                  display: "grid",
+                  gap: "8px",
+                  maxHeight: "220px",
+                  overflowY: "auto",
+                  paddingRight: "4px",
+                }}
+              >
+                {aiMessages.map((message, index) => (
+                  <div
+                    key={`${message.role}-${index}`}
+                    style={{
+                      justifySelf: message.role === "user" ? "end" : "stretch",
+                      maxWidth: message.role === "user" ? "86%" : "100%",
+                      borderRadius: "14px",
+                      padding: "10px 12px",
+                      background:
+                        message.role === "user"
+                          ? `${selectedMode.accentColor}1a`
+                          : "rgba(255,255,255,0.04)",
+                      border:
+                        message.role === "user"
+                          ? `0.5px solid ${selectedMode.accentColor}33`
+                          : "0.5px solid rgba(255,255,255,0.08)",
+                      color: message.role === "user" ? "#fff" : "rgba(255,255,255,0.72)",
+                      fontSize: "12px",
+                      lineHeight: 1.65,
+                    }}
+                  >
+                    {message.text}
+                  </div>
+                ))}
+                {aiLoading && (
+                  <div
+                    style={{
+                      borderRadius: "14px",
+                      padding: "10px 12px",
+                      background: "rgba(255,255,255,0.04)",
+                      border: "0.5px solid rgba(255,255,255,0.08)",
+                      color: "rgba(255,255,255,0.5)",
+                      fontSize: "12px",
+                    }}
+                  >
+                    Aced is thinking...
+                  </div>
+                )}
               </div>
             </section>
           </aside>

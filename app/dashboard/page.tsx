@@ -878,14 +878,14 @@ export default function Dashboard() {
         ctx.globalAlpha = 1;
       });
 
-      ctx.globalAlpha = 0.08;
+      ctx.globalAlpha = 0.09;
       ctx.strokeStyle = "#fff";
-      ctx.lineWidth = 0.7;
+      ctx.lineWidth = 0.85;
       ctx.beginPath();
-      ctx.arc(W / 2, H / 2, 98, 0, Math.PI * 2);
+      ctx.arc(W / 2, H / 2, 122, 0, Math.PI * 2);
       ctx.stroke();
       ctx.beginPath();
-      ctx.arc(W / 2, H / 2, 128, 0, Math.PI * 2);
+      ctx.arc(W / 2, H / 2, 158, 0, Math.PI * 2);
       ctx.stroke();
       const activeSectionKey = stateRef.current.activeSec;
       const centerSectionSummary =
@@ -900,8 +900,6 @@ export default function Dashboard() {
         activeSectionKey !== "all"
           ? `ESTIMATED ${activeSectionKey.toUpperCase()} SCORE`
           : "ESTIMATED ACT SCORE";
-      const centerConfidence =
-        centerSectionSummary?.confidence ?? dashboardSummary?.confidence ?? 0;
       const centerScoreLabelText =
         centerSectionSummary?.scoreLabel ?? dashboardSummary?.scoreLabel ?? "baseline estimate";
       const centerSubtitle =
@@ -910,22 +908,22 @@ export default function Dashboard() {
           : "out of 36";
       ctx.globalAlpha = 0.92;
       ctx.fillStyle = "#FFFFFF";
-      ctx.font = "700 16px sans-serif";
+      ctx.font = "700 17px sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText(centerScoreTitle, W / 2, H / 2 - 32);
+      ctx.fillText(centerScoreTitle, W / 2, H / 2 - 40);
       ctx.globalAlpha = 0.88;
-      ctx.font = "italic bold 48px serif";
-      ctx.fillText(centerScoreLabel, W / 2, H / 2 + 18);
+      ctx.font = "italic bold 58px serif";
+      ctx.fillText(centerScoreLabel, W / 2, H / 2 + 16);
       ctx.globalAlpha = 0.16;
-      ctx.font = "13px sans-serif";
-      ctx.fillText(centerSubtitle, W / 2, H / 2 + 44);
+      ctx.font = "14px sans-serif";
+      ctx.fillText(centerSubtitle, W / 2, H / 2 + 48);
       if (dashboardSummary) {
-        ctx.globalAlpha = 0.28;
-        ctx.font = "11px sans-serif";
+        ctx.globalAlpha = 0.3;
+        ctx.font = "12px sans-serif";
         ctx.fillText(
-          `${centerScoreLabelText} · confidence ${Math.round(centerConfidence * 100)}%`,
+          `${centerScoreLabelText} · estimate improves as you practice`,
           W / 2,
-          H / 2 + 66
+          H / 2 + 74
         );
       }
       ctx.globalAlpha = 1;
@@ -1092,7 +1090,7 @@ export default function Dashboard() {
           position: "relative",
           overflow: "hidden",
           background: "transparent",
-          zIndex: 3,
+          zIndex: 5,
         }}
       >
         <nav
@@ -1104,7 +1102,7 @@ export default function Dashboard() {
             marginBottom: "1.5rem",
           }}
         >
-          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px", justifySelf: "start" }}>
+          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "26px", justifySelf: "start" }}>
             Aced<em style={{ color: "#1D9E75" }}>.</em>
           </div>
           <div
@@ -1118,13 +1116,15 @@ export default function Dashboard() {
           >
             <button
               style={{
-                background: "transparent",
-                border: "none",
+                background: "rgba(29,158,117,0.12)",
+                border: "0.5px solid rgba(29,158,117,0.32)",
                 color: "#fff",
-                fontSize: "16px",
+                fontSize: "17px",
                 fontWeight: 500,
                 cursor: "default",
-                padding: 0,
+                padding: "8px 16px",
+                borderRadius: "999px",
+                boxShadow: "0 0 26px rgba(29,158,117,0.18)",
                 fontFamily: "DM Sans,sans-serif",
               }}
             >
@@ -1133,13 +1133,15 @@ export default function Dashboard() {
             <button
               onClick={() => router.push("/practice-tests")}
               style={{
-                background: "transparent",
-                border: "none",
-                color: "rgba(255,255,255,0.58)",
-                fontSize: "16px",
+                background: "rgba(255,255,255,0.04)",
+                border: "0.5px solid rgba(255,255,255,0.08)",
+                color: "rgba(255,255,255,0.78)",
+                fontSize: "17px",
                 fontWeight: 500,
                 cursor: "pointer",
-                padding: 0,
+                padding: "8px 16px",
+                borderRadius: "999px",
+                boxShadow: "0 0 24px rgba(255,255,255,0.04)",
                 fontFamily: "DM Sans,sans-serif",
               }}
             >
