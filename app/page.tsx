@@ -31,6 +31,8 @@ export default function Home() {
       opacity: 0.18 + Math.random() * 0.72,
       speed: 0.2 + Math.random() * 1.3,
       phase: Math.random() * Math.PI * 2,
+      driftX: -0.004 + Math.random() * 0.008,
+      driftY: 0.01 + Math.random() * 0.045,
     }));
 
     const resize = () => {
@@ -44,11 +46,24 @@ export default function Home() {
     window.addEventListener("resize", resize);
 
     let raf = 0;
+    let lastTimestamp = 0;
     const draw = (timestamp: number) => {
       const t = timestamp * 0.001;
+      const deltaSeconds = lastTimestamp === 0 ? 0 : Math.min((timestamp - lastTimestamp) / 1000, 0.05);
+      lastTimestamp = timestamp;
       ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
 
       for (const star of stars) {
+        star.x += star.driftX * deltaSeconds;
+        star.y += star.driftY * deltaSeconds;
+
+        if (star.x > 1.04) star.x = -0.04;
+        if (star.x < -0.04) star.x = 1.04;
+        if (star.y > 1.06) {
+          star.y = -0.06;
+          star.x = Math.random();
+        }
+
         const x = star.x * canvas.offsetWidth;
         const y = star.y * canvas.offsetHeight;
         const twinkle = 0.55 + 0.45 * Math.sin(t * star.speed + star.phase);
