@@ -85,7 +85,7 @@ export default function Home() {
           marginBottom: "2.5rem",
         }}
       >
-        beautiful AI-powered prep for the ACT. know exactly which stars in your universe need work.
+        your ACT prep, written in the stars.
       </p>
 
       <button
