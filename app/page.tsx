@@ -73,7 +73,11 @@ export default function Home() {
           fontWeight: 400,
         }}
       >
-        are you ready to <em style={{ color: "#1D9E75" }}>ace it</em>?
+        <>
+          are you ready to
+          <br />
+          <em style={{ color: "#1D9E75" }}>ace it</em>?
+        </>
       </h1>
 
       <p
