@@ -1,6 +1,7 @@
 import { createHash } from "crypto";
 import { Client } from "pg";
 import { z } from "zod";
+import { reviewQuestionQuality } from "./lib/question-utils.ts";
 
 const SECTION_KEYS = ["english", "math", "reading", "science"];
 const DIFFICULTIES = ["easy", "medium", "hard"];
@@ -476,12 +477,20 @@ Global rules:
 - Medium questions should feel like real ACT core difficulty, not entry-level warmups.
 - Hard questions should require a clear second step, tighter reading, or stronger distractor discrimination than medium.
 - Avoid overly obvious answer sets where one option is clearly different in length, precision, or plausibility from the others.
+- The explanation must agree with the keyed correct answer letter. Never say "Choice B" if the correct answer is C.
+- Never rely on "closest" or approximation reasoning unless the prompt explicitly asks for the nearest or approximate value.
+- Never create a question where two answers could reasonably both be correct.
 
 Difficulty expectations:
 - easy should still feel like official ACT warm-up difficulty, not elementary school arithmetic or giveaway reading.
 - medium should feel like standard real-test difficulty and usually require either a second reasoning step, closer passage discrimination, or stronger distractor filtering.
 - hard should feel upper-range ACT: tighter wording, more deceptive distractors, or a deeper multi-step setup without becoming impossible.
 - Do not label a question medium or hard if a student could solve it instantly from a single obvious pattern.
+
+Known rejection patterns to avoid:
+- For medium or hard math, do not write one-step substitution drills, plain nth-term plug-ins, simple angle-sum questions, direct circle-formula recall, or routine "solve for x" warmups.
+- For reading, the passage must clearly match the topic label. Literary Narrative must feel like narrative prose, not science or social-science exposition.
+- For English, medium and hard questions must isolate one clearly best revision in context, not two arguable grammatical answers.
 
 Section-specific rules:
 ${getSectionSpecificInstructions(sectionKey)}
@@ -851,6 +860,38 @@ function sanitizeQuestion(sectionKey, topic, question) {
     )
   ) {
     throw new Error("Conflicting Viewpoints item lacks clearly named viewpoints.");
+  }
+
+  const qualityReview = reviewQuestionQuality({
+    id: `${topic.id}:${question.difficulty}:${prompt.slice(0, 32)}`,
+    section: sectionKey,
+    topic: topic.name,
+    difficulty: question.difficulty,
+    passage,
+    question_text: prompt,
+    choices,
+    correct_answer: question.correctAnswer,
+    explanation,
+  });
+
+  if (qualityReview.blockingFlags.length > 0) {
+    throw new Error(
+      `Quality review blocked the question: ${qualityReview.blockingFlags
+        .map((flag) => flag.code)
+        .join(", ")}`
+    );
+  }
+
+  if (
+    qualityReview.warningFlags.some((flag) => flag.code.includes("drift")) ||
+    ((question.difficulty === "medium" || question.difficulty === "hard") &&
+      qualityReview.warningFlags.length > 0)
+  ) {
+    throw new Error(
+      `Quality review rejected the question for risk: ${qualityReview.warningFlags
+        .map((flag) => flag.code)
+        .join(", ")}`
+    );
   }
 
   return {
