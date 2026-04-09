@@ -907,15 +907,14 @@ export default function Dashboard() {
       >
         <nav
           style={{
-            display: "flex",
-            justifyContent: "space-between",
+            display: "grid",
+            gridTemplateColumns: "1fr auto 1fr",
             alignItems: "center",
             gap: "1rem",
             marginBottom: "1.5rem",
-            flexWrap: "wrap",
           }}
         >
-          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px" }}>
+          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px", justifySelf: "start" }}>
             Aced<em style={{ color: "#1D9E75" }}>.</em>
           </div>
           <div
@@ -924,8 +923,7 @@ export default function Dashboard() {
               alignItems: "center",
               justifyContent: "center",
               gap: "2.8rem",
-              flex: 1,
-              minWidth: "220px",
+              justifySelf: "center",
             }}
           >
             <button
@@ -958,7 +956,7 @@ export default function Dashboard() {
               practice tests
             </button>
           </div>
-          <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+          <div style={{ display: "flex", gap: "1rem", alignItems: "center", justifySelf: "end" }}>
             <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)" }}>
               {session?.user?.email}
             </span>

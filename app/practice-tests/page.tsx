@@ -76,15 +76,14 @@ export default function PracticeTestsPage() {
       <div style={{ padding: "1.5rem 1.5rem 2.5rem", maxWidth: "1240px", margin: "0 auto" }}>
         <nav
           style={{
-            display: "flex",
-            justifyContent: "space-between",
+            display: "grid",
+            gridTemplateColumns: "1fr auto 1fr",
             alignItems: "center",
             gap: "1rem",
             marginBottom: "2rem",
-            flexWrap: "wrap",
           }}
         >
-          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px" }}>
+          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px", justifySelf: "start" }}>
             Aced<em style={{ color: "#1D9E75" }}>.</em>
           </div>
           <div
@@ -93,8 +92,7 @@ export default function PracticeTestsPage() {
               alignItems: "center",
               justifyContent: "center",
               gap: "2.8rem",
-              flex: 1,
-              minWidth: "220px",
+              justifySelf: "center",
             }}
           >
             <button
@@ -127,7 +125,7 @@ export default function PracticeTestsPage() {
               practice tests
             </button>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", justifySelf: "end" }}>
             <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.28)" }}>
               {session?.user?.email}
             </span>
