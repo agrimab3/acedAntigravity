@@ -1,9 +1,10 @@
 import { getAuthSession } from "@/lib/auth";
 
+const REPO_ADMIN_EMAILS = ["agrima.b3@gmail.com"];
+
 function getAdminEmailSet() {
   return new Set(
-    (process.env.ADMIN_EMAILS || "")
-      .split(",")
+    [...REPO_ADMIN_EMAILS, ...(process.env.ADMIN_EMAILS || "").split(",")]
       .map((value) => value.trim().toLowerCase())
       .filter(Boolean)
   );
