@@ -110,7 +110,7 @@ export default function PracticeTestsPage() {
                 fontFamily: "DM Sans,sans-serif",
               }}
             >
-              practice
+              your universe
             </button>
             <button
               style={{
@@ -124,7 +124,7 @@ export default function PracticeTestsPage() {
                 fontFamily: "DM Sans,sans-serif",
               }}
             >
-              full tests
+              practice tests
             </button>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", flexWrap: "wrap" }}>

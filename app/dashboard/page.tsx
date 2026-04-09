@@ -940,7 +940,7 @@ export default function Dashboard() {
                 fontFamily: "DM Sans,sans-serif",
               }}
             >
-              practice
+              your universe
             </button>
             <button
               onClick={() => router.push("/practice-tests")}
@@ -955,7 +955,7 @@ export default function Dashboard() {
                 fontFamily: "DM Sans,sans-serif",
               }}
             >
-              full tests
+              practice tests
             </button>
           </div>
           <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
