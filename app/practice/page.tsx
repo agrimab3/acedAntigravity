@@ -570,13 +570,6 @@ function PracticeContent() {
               <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.55)', padding: '3px 8px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }}>ai hints {questionHintCount}</span>
               {officialCategory && <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.55)', padding: '3px 8px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }}>{officialCategory}</span>}
             </div>
-            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.62)', padding: '10px 12px', background: 'rgba(255,255,255,0.04)', borderRadius: '12px', borderLeft: `2px solid ${adaptiveToneColor}`, marginBottom: '1rem' }}>
-              <div style={{ fontSize: '10px', letterSpacing: '.06em', textTransform: 'uppercase', color: adaptiveToneColor, marginBottom: '4px' }}>
-                {adaptiveStatus.label}
-              </div>
-              {adaptiveStatus.description}
-            </div>
-
             {q.passage && (
               <div style={{ marginBottom: '1.25rem' }}>
                 <div style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '.06em', color: 'rgba(255,255,255,0.38)', marginBottom: '8px' }}>
@@ -609,7 +602,7 @@ function PracticeContent() {
               <div
                 style={{
                   fontFamily: 'DM Serif Display,serif',
-                  fontSize: 'clamp(1.45rem, 2.5vw, 2rem)',
+                  fontSize: 'clamp(1.28rem, 2.2vw, 1.72rem)',
                   lineHeight: 1.65,
                   color: '#ffffff',
                   textWrap: 'pretty',
@@ -677,13 +670,22 @@ function PracticeContent() {
           </div>
 
           <div style={{ flex: '0 0 340px', width: '340px', maxWidth: '100%', position: 'sticky', top: '1.25rem', alignSelf: 'flex-start' }}>
-            <div style={{ borderRadius: '16px', border: '0.5px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.18)' }}>
+            <div style={{ borderRadius: '16px', border: '0.5px solid rgba(255,255,255,0.16)', background: 'rgba(255,255,255,0.03)', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.18), 0 0 28px rgba(255,255,255,0.08)' }}>
               <div style={{ padding: '12px 14px', borderBottom: '0.5px solid rgba(255,255,255,0.07)', fontSize: '11px', color: 'rgba(255,255,255,0.42)', letterSpacing: '.05em', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: meta.color }} />
                   AI tutor
                 </div>
                 <span style={{ color: 'rgba(255,255,255,0.28)' }}>{topic || 'practice'}</span>
+              </div>
+
+              <div style={{ padding: '12px 14px 0' }}>
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.66)', padding: '10px 12px', background: 'rgba(255,255,255,0.04)', borderRadius: '12px', borderLeft: `2px solid ${adaptiveToneColor}` }}>
+                  <div style={{ fontSize: '10px', letterSpacing: '.06em', textTransform: 'uppercase', color: adaptiveToneColor, marginBottom: '4px' }}>
+                    {adaptiveStatus.label}
+                  </div>
+                  {adaptiveStatus.description}
+                </div>
               </div>
 
               <div ref={msgsRef} style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '8px', minHeight: '360px', maxHeight: '520px', overflowY: 'auto' }}>
