@@ -1213,14 +1213,21 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div style={{ position: "relative", zIndex: 3 }}>
+      <div
+        style={{
+          position: "relative",
+          zIndex: 3,
+          marginTop: "-44px",
+          paddingTop: "44px",
+        }}
+      >
         <div
           style={{
             position: "absolute",
             inset: 0,
             pointerEvents: "none",
             background:
-              "linear-gradient(180deg, rgba(5,12,24,0.46) 0%, rgba(5,12,24,0.16) 10%, rgba(5,12,24,0) 18%, rgba(5,12,24,0) 82%, rgba(5,12,24,0.12) 90%, rgba(5,12,24,0.28) 100%)",
+              "linear-gradient(180deg, rgba(5,12,24,0.1) 0%, rgba(5,12,24,0.05) 10%, rgba(5,12,24,0) 22%, rgba(5,12,24,0) 82%, rgba(5,12,24,0.1) 92%, rgba(5,12,24,0.22) 100%)",
             zIndex: 1,
           }}
         />

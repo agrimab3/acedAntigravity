@@ -201,6 +201,7 @@ export default function PracticeTestsPage() {
         fontFamily: "DM Sans,sans-serif",
         position: "relative",
         overflowX: "hidden",
+        background: PRACTICE_TEST_GALAXY_BACKGROUND,
       }}
     >
       <link
@@ -229,16 +230,7 @@ export default function PracticeTestsPage() {
           100% { transform: scale(0.94); opacity: 0.35; }
         }
       `}</style>
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          pointerEvents: "none",
-          zIndex: 0,
-          background: PRACTICE_TEST_GALAXY_BACKGROUND,
-        }}
-      />
-      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 1 }}>
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1 }}>
         {backgroundGlows.map((glow) => (
           <span
             key={`glow-${glow.id}`}
@@ -290,7 +282,7 @@ export default function PracticeTestsPage() {
       </div>
       <div
         style={{
-          position: "fixed",
+          position: "absolute",
           inset: 0,
           pointerEvents: "none",
           zIndex: 2,
