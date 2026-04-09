@@ -81,6 +81,11 @@
   - missed-question review
 - Added Math calculator support inside the timed runner via Desmos
 - Synced completed practice-test results back into the dashboard ACT estimate model so timed tests now influence section/composite score estimates
+- Added practice-test history on the `Practice Tests` page
+- Added pacing analytics to timed test reports and history cards
+- Strengthened timed-test score calibration so real ACT-style pace affects dashboard estimate blending
+- Tightened live question-quality filters so equivalent answer choices and obviously too-simple medium/hard math items are rejected before serving
+- Upgraded fallback/mock question difficulty so thin inventory feels less toy-like
 
 ## Decisions Made
 
@@ -144,9 +149,10 @@
 - Seed the first real published ACT inventory for all active topics
 - Turn generation into a draft-first review flow for new content
 - Backfill remaining Reading and Science topics in controlled batches
-- Finish refining full-test UX and test-history surfaces
+- Continue refining full-test UX and test-history surfaces
 - Add richer post-test pacing analysis and review flows
 - Continue calibrating practice-test score mapping against ACT-style expectations
+- Rebuild weaker question inventory with the stricter difficulty/answer-quality rules
 
 ## Planned Next Phase
 

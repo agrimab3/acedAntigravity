@@ -14,6 +14,8 @@ import { getDb } from "@/lib/db";
 import {
   estimatePracticeTestCompositeScore,
   estimatePracticeTestSectionScore,
+  summarizeCompositePacing,
+  summarizePracticeTestPacing,
 } from "@/lib/practice-test-score";
 
 const completeSchema = z.object({
@@ -74,6 +76,7 @@ export async function POST(
       sectionKey: practiceTestSections.sectionKey,
       title: practiceTestSections.title,
       questionCount: practiceTestSections.questionCount,
+      timeLimitSeconds: practiceTestSections.timeLimitSeconds,
       sectionOrder: practiceTestSections.sectionOrder,
     })
     .from(practiceTestSections)
@@ -98,7 +101,9 @@ export async function POST(
     correctCount: number;
     accuracyPct: number;
     estimatedScore: number;
+    timeLimitSeconds: number;
     durationSeconds: number;
+    pacingSummary: ReturnType<typeof summarizePracticeTestPacing>;
   }> = [];
 
   const answeredRealQuestions: Array<{ questionId: string; isCorrect: boolean }> = [];
@@ -169,6 +174,13 @@ export async function POST(
       correctCount,
       storedSection.questionCount
     );
+    const pacingSummary = summarizePracticeTestPacing({
+      sectionKey: storedSection.sectionKey as "english" | "math" | "reading" | "science",
+      questionCount: storedSection.questionCount,
+      answeredCount,
+      durationSeconds: submittedSection.durationSeconds,
+      timeLimitSeconds: storedSection.timeLimitSeconds,
+    });
 
     await db
       .update(practiceTestSections)
@@ -192,7 +204,9 @@ export async function POST(
       correctCount,
       accuracyPct,
       estimatedScore,
+      timeLimitSeconds: storedSection.timeLimitSeconds,
       durationSeconds: submittedSection.durationSeconds,
+      pacingSummary,
     });
   }
 
@@ -301,6 +315,9 @@ export async function POST(
   const compositeEstimatedScore = estimatePracticeTestCompositeScore(
     sectionReports.map((section) => section.estimatedScore)
   );
+  const overallPacing = summarizeCompositePacing(
+    sectionReports.map((section) => section.pacingSummary)
+  );
 
   await db
     .update(practiceTestSessions)
@@ -369,6 +386,7 @@ export async function POST(
     correctCount,
     accuracyPct,
     compositeEstimatedScore,
+    overallPacing,
     sectionReports: sectionReports.sort(
       (a, b) =>
         (sectionOrderById.get(a.sectionRunId) ?? Number.MAX_SAFE_INTEGER) -

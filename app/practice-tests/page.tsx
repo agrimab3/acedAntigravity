@@ -24,6 +24,26 @@ export default function PracticeTestsPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [selectedModeKey, setSelectedModeKey] = useState(PRACTICE_TEST_MODES[0]?.key);
+  const [historyLoading, setHistoryLoading] = useState(true);
+  const [history, setHistory] = useState<
+    Array<{
+      sessionId: string;
+      title: string;
+      shortLabel: string;
+      format: "section" | "full";
+      accuracyPct: number;
+      compositeEstimatedScore: number | null;
+      durationSeconds: number;
+      completedAt: string | null;
+      overallPacing: { label: string; description: string };
+      sections: Array<{
+        title: string;
+        estimatedScore: number | null;
+        accuracyPct: number;
+        pacingSummary: { label: string };
+      }>;
+    }>
+  >([]);
 
   const selectedMode = useMemo(
     () => PRACTICE_TEST_MODES.find((mode) => mode.key === selectedModeKey) ?? PRACTICE_TEST_MODES[0],
@@ -35,6 +55,46 @@ export default function PracticeTestsPage() {
       router.replace("/");
     }
   }, [router, status]);
+
+  useEffect(() => {
+    if (status !== "authenticated") {
+      return;
+    }
+
+    let active = true;
+
+    const loadHistory = async () => {
+      setHistoryLoading(true);
+
+      try {
+        const res = await fetch("/api/practice-tests/history", {
+          cache: "no-store",
+        });
+
+        if (!res.ok) {
+          return;
+        }
+
+        const data = await res.json();
+
+        if (active) {
+          setHistory(data.history ?? []);
+        }
+      } catch (error) {
+        console.error("Failed to load practice test history", error);
+      } finally {
+        if (active) {
+          setHistoryLoading(false);
+        }
+      }
+    };
+
+    void loadHistory();
+
+    return () => {
+      active = false;
+    };
+  }, [status]);
 
   if (status === "loading") {
     return (
@@ -287,6 +347,122 @@ export default function PracticeTestsPage() {
                   );
                 })}
               </div>
+            </section>
+
+            <section
+              style={{
+                background: "rgba(255,255,255,0.03)",
+                border: "0.5px solid rgba(255,255,255,0.08)",
+                borderRadius: "18px",
+                padding: "1.2rem",
+              }}
+            >
+              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginBottom: "0.9rem" }}>
+                recent test history
+              </div>
+              {historyLoading ? (
+                <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>
+                  loading recent timed runs...
+                </div>
+              ) : history.length === 0 ? (
+                <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)", lineHeight: 1.7 }}>
+                  Your completed practice tests will show up here with score and pacing reads once you start logging timed runs.
+                </div>
+              ) : (
+                <div style={{ display: "grid", gap: "12px" }}>
+                  {history.map((entry) => (
+                    <div
+                      key={entry.sessionId}
+                      style={{
+                        borderRadius: "16px",
+                        padding: "1rem",
+                        background: "rgba(255,255,255,0.025)",
+                        border: "0.5px solid rgba(255,255,255,0.08)",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          gap: "12px",
+                          alignItems: "flex-start",
+                          marginBottom: "8px",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "24px", marginBottom: "4px" }}>
+                            {entry.title}
+                          </div>
+                          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>
+                            {entry.completedAt
+                              ? new Date(entry.completedAt).toLocaleString([], {
+                                  month: "short",
+                                  day: "numeric",
+                                  hour: "numeric",
+                                  minute: "2-digit",
+                                })
+                              : "completed run"}
+                          </div>
+                        </div>
+                        <div style={{ textAlign: "right" }}>
+                          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "28px", color: selectedMode.accentColor }}>
+                            {entry.compositeEstimatedScore ? `${entry.compositeEstimatedScore}/36` : "--"}
+                          </div>
+                          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>
+                            {entry.format === "full" ? "composite estimate" : "section estimate"}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "10px", marginBottom: "10px" }}>
+                        {[
+                          { value: `${entry.accuracyPct}%`, label: "accuracy" },
+                          { value: formatDuration(Math.round(entry.durationSeconds / 60)), label: "duration" },
+                          { value: entry.overallPacing.label, label: "pace" },
+                        ].map((item) => (
+                          <div
+                            key={item.label}
+                            style={{
+                              borderRadius: "12px",
+                              background: "rgba(255,255,255,0.03)",
+                              padding: "0.8rem",
+                              textAlign: "center",
+                            }}
+                          >
+                            <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "20px", color: "#fff" }}>
+                              {item.value}
+                            </div>
+                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.32)" }}>{item.label}</div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, marginBottom: "10px" }}>
+                        {entry.overallPacing.description}
+                      </div>
+
+                      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                        {entry.sections.map((section) => (
+                          <div
+                            key={`${entry.sessionId}-${section.title}`}
+                            style={{
+                              padding: "8px 10px",
+                              borderRadius: "999px",
+                              background: "rgba(255,255,255,0.03)",
+                              border: "0.5px solid rgba(255,255,255,0.08)",
+                              fontSize: "11px",
+                              color: "rgba(255,255,255,0.58)",
+                            }}
+                          >
+                            {section.title} · {section.estimatedScore ?? "--"}/36 · {section.pacingSummary.label}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </section>
           </div>
 

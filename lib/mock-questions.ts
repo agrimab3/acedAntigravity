@@ -67,38 +67,50 @@ const englishFactories: QuestionFactory[] = [
 const mathFactories: QuestionFactory[] = [
   (topic, index, difficulty) => {
     const base = 5 + index;
+    const isHarder = difficulty === "medium" || difficulty === "hard" || difficulty === "challenge";
+    const harderArea = base * (2 * base + 3);
     return {
       id: `mock-math-${topic}-${index}`,
       section: "math",
       topic,
       difficulty,
-      question_text: `A rectangle has length ${base + 6} and width ${base - 1}. What is its area?`,
+      question_text: isHarder
+        ? `A rectangular garden has area ${harderArea} square feet and length 3 feet more than twice its width. What is the width, in feet, of the garden?`
+        : `A rectangle has length ${base + 6} and width ${base - 1}. What is its area?`,
       choices: {
-        A: `${(base + 6) + (base - 1)}`,
-        B: `${(base + 6) * (base - 1)}`,
-        C: `${(base + 6) * 2 + (base - 1) * 2}`,
-        D: `${(base + 6) - (base - 1)}`,
+        A: isHarder ? `${base - 2}` : `${(base + 6) + (base - 1)}`,
+        B: isHarder ? `${base}` : `${(base + 6) * (base - 1)}`,
+        C: isHarder ? `${base + 2}` : `${(base + 6) * 2 + (base - 1) * 2}`,
+        D: isHarder ? `${base + 4}` : `${(base + 6) - (base - 1)}`,
       },
       correct_answer: "B",
-      explanation: `${topic} questions often test formula selection. Area of a rectangle is length times width.`,
+      explanation: isHarder
+        ? `${topic} should still require setup. Let the width be w, so the length is 2w + 3 and the area equation is w(2w + 3) = ${harderArea}, which gives w = ${base}.`
+        : `${topic} questions often test formula selection. Area of a rectangle is length times width.`,
     };
   },
   (topic, index, difficulty) => {
-    const x = index + 3;
+    const offset = index + 3;
+    const harderAnswer = 3 * offset + 3;
+    const isHarder = difficulty === "medium" || difficulty === "hard" || difficulty === "challenge";
     return {
       id: `mock-math-${topic}-${index}`,
       section: "math",
       topic,
       difficulty,
-      question_text: `Solve for x: 3x + ${x} = ${4 * x + 6}`,
+      question_text: isHarder
+        ? `For real numbers x, the expression 3(x - ${offset}) + 4 is equal to 2x + 7. What is the value of x?`
+        : `Solve for x: 3x + ${offset} = ${offset + 18}`,
       choices: {
-        A: "3",
-        B: "6",
-        C: "9",
-        D: "12",
+        A: isHarder ? `${harderAnswer}` : "3",
+        B: isHarder ? `${harderAnswer - 3}` : "6",
+        C: isHarder ? `${harderAnswer + 3}` : "9",
+        D: isHarder ? `${harderAnswer + 6}` : "12",
       },
-      correct_answer: "B",
-      explanation: `${topic} often tests one-variable equations. Subtract 3x from both sides to get ${x} = x + 6, then subtract ${x}.`,
+      correct_answer: isHarder ? "A" : "B",
+      explanation: isHarder
+        ? `${topic} at ACT level should require a clean multi-step solve. Expanding gives 3x - ${3 * offset} + 4 = 2x + 7, so x = ${harderAnswer}.`
+        : `${topic} often tests one-variable equations. Subtract 3x from both sides to get ${offset} = x + 6, then subtract 6.`,
     };
   },
   (topic, index, difficulty) => {
@@ -235,7 +247,7 @@ export function buildMockQuestions(
   section: SectionKey,
   topic: string,
   limit = 10,
-  preferredDifficulty = "easy"
+  preferredDifficulty = "medium"
 ): PracticeQuestion[] {
   const safeTopic = topic || "Core Skills";
   const safeLimit = Math.min(Math.max(limit, 1), 10);

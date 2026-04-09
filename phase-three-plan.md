@@ -152,12 +152,13 @@ Phase 3B/3C foundation is now live:
 3. report screens include missed-skill and missed-question review
 4. Math sections can open Desmos inside the runner
 5. completed timed tests now influence the main dashboard ACT estimates
+6. practice-test history and pacing analytics are now live
 
 ## Immediate Next Step
 
 Refine the practice-test system into a fuller performance layer:
 
-1. add test-history surfaces
-2. improve pacing analytics and review navigation
-3. keep calibrating score mapping against ACT-style performance
-4. expand remediation plans from report -> targeted star practice
+1. keep calibrating score mapping against ACT-style performance
+2. expand remediation plans from report -> targeted star practice
+3. add deeper history drilldowns and test retake flows
+4. keep strengthening real question-bank quality across all active stars

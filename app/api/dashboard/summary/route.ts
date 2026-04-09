@@ -12,6 +12,7 @@ import {
   estimateSectionScore,
   estimateTopicScore,
 } from "@/lib/act-score";
+import { summarizePracticeTestPacing } from "@/lib/practice-test-score";
 import { ACT_TAXONOMY } from "@/lib/act-taxonomy";
 import { getAuthSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
@@ -39,16 +40,54 @@ function blendSectionWithPracticeTest<T extends {
   answeredCount: number;
   topicsAttempted: number;
   scoreExplanation: string;
-}>(summary: T, timedScores: number[]) {
-  if (timedScores.length === 0) {
+}>(
+  summary: T,
+  timedSignals: Array<{
+    estimatedScore: number;
+    answeredCount: number;
+    questionCount: number;
+    durationSeconds: number;
+    timeLimitSeconds: number;
+    accuracyPct: number;
+  }>
+) {
+  if (timedSignals.length === 0) {
     return summary;
   }
 
-  const recentScores = timedScores.slice(0, 3);
+  const recentSignals = timedSignals.slice(0, 3);
+  const weightedSignals = recentSignals.map((signal, index) => {
+    const pacing = summarizePracticeTestPacing({
+      sectionKey: summary.sectionKey as "english" | "math" | "reading" | "science",
+      questionCount: signal.questionCount,
+      answeredCount: signal.answeredCount,
+      durationSeconds: signal.durationSeconds,
+      timeLimitSeconds: signal.timeLimitSeconds,
+    });
+    const recencyWeight = Math.max(0.72, 1 - index * 0.14);
+    const completionWeight = clamp(signal.answeredCount / Math.max(signal.questionCount, 1), 0.4, 1);
+    const pacingWeight =
+      pacing.tone === "steady" ? 1.14 : pacing.tone === "ahead" ? 1.08 : 0.88;
+    const accuracyWeight = clamp(signal.accuracyPct / 100, 0.55, 1);
+    const weight = recencyWeight * completionWeight * pacingWeight * accuracyWeight;
+
+    return {
+      ...signal,
+      pacing,
+      weight,
+    };
+  });
+
+  const weightTotal = weightedSignals.reduce((sum, signal) => sum + signal.weight, 0) || 1;
   const practiceAverage =
-    recentScores.reduce((sum, score) => sum + score, 0) / recentScores.length;
-  const blendWeight = Math.min(0.62, 0.34 + (recentScores.length - 1) * 0.1);
-  const timedConfidence = clamp(0.58 + recentScores.length * 0.12, 0, 0.94);
+    weightedSignals.reduce((sum, signal) => sum + signal.estimatedScore * signal.weight, 0) /
+    weightTotal;
+  const blendWeight = Math.min(0.74, 0.42 + (weightedSignals.length - 1) * 0.1);
+  const timedConfidence = clamp(
+    weightedSignals.reduce((sum, signal) => sum + signal.weight, 0) / weightedSignals.length,
+    0.62,
+    0.96
+  );
   const estimatedScore = Math.round(
     summary.estimatedScore * (1 - blendWeight) + practiceAverage * blendWeight
   );
@@ -57,7 +96,7 @@ function blendSectionWithPracticeTest<T extends {
     0,
     1
   );
-  const answeredCount = summary.answeredCount + recentScores.length * 6;
+  const answeredCount = summary.answeredCount + recentSignals.length * 8;
 
   return {
     ...summary,
@@ -65,7 +104,7 @@ function blendSectionWithPracticeTest<T extends {
     confidence,
     answeredCount,
     scoreLabel: getEstimateLabel(confidence, answeredCount),
-    scoreExplanation: `${summary.scoreExplanation} Completed timed ${summary.sectionKey} test${recentScores.length === 1 ? "" : "s"} are now pulling this estimate closer to real ACT pacing.`,
+    scoreExplanation: `${summary.scoreExplanation} Completed timed ${summary.sectionKey} test${recentSignals.length === 1 ? "" : "s"} with real pacing are now pulling this estimate closer to actual ACT performance.`,
   };
 }
 
@@ -126,6 +165,11 @@ export async function GET() {
     .select({
       sectionKey: practiceTestSections.sectionKey,
       estimatedScore: practiceTestSections.estimatedScore,
+      answeredCount: practiceTestSections.answeredCount,
+      questionCount: practiceTestSections.questionCount,
+      durationSeconds: practiceTestSections.durationSeconds,
+      timeLimitSeconds: practiceTestSections.timeLimitSeconds,
+      accuracyPct: practiceTestSections.accuracyPct,
     })
     .from(practiceTestSections)
     .innerJoin(practiceTestSessions, eq(practiceTestSections.sessionId, practiceTestSessions.id))
@@ -138,14 +182,31 @@ export async function GET() {
     )
     .orderBy(desc(practiceTestSections.completedAt), desc(practiceTestSections.updatedAt));
 
-  const timedSectionScores = new Map<string, number[]>();
+  const timedSectionScores = new Map<
+    string,
+    Array<{
+      estimatedScore: number;
+      answeredCount: number;
+      questionCount: number;
+      durationSeconds: number;
+      timeLimitSeconds: number;
+      accuracyPct: number;
+    }>
+  >();
 
   completedSectionTests.forEach((row) => {
     if (row.estimatedScore === null) {
       return;
     }
     const current = timedSectionScores.get(row.sectionKey) ?? [];
-    current.push(row.estimatedScore);
+    current.push({
+      estimatedScore: row.estimatedScore,
+      answeredCount: row.answeredCount,
+      questionCount: row.questionCount,
+      durationSeconds: row.durationSeconds,
+      timeLimitSeconds: row.timeLimitSeconds,
+      accuracyPct: row.accuracyPct,
+    });
     timedSectionScores.set(row.sectionKey, current);
   });
 
@@ -157,6 +218,9 @@ export async function GET() {
   const completedFullTests = await db
     .select({
       compositeEstimatedScore: practiceTestSessions.compositeEstimatedScore,
+      answeredCount: practiceTestSessions.answeredCount,
+      totalQuestionCount: practiceTestSessions.totalQuestionCount,
+      durationSeconds: practiceTestSessions.durationSeconds,
     })
     .from(practiceTestSessions)
     .where(
@@ -171,18 +235,44 @@ export async function GET() {
     .limit(2);
 
   const timedCompositeScores = completedFullTests
-    .map((row) => row.compositeEstimatedScore)
-    .filter((score): score is number => score !== null);
+    .filter((row) => row.compositeEstimatedScore !== null)
+    .map((row, index) => {
+      const completionWeight = clamp(
+        row.answeredCount / Math.max(row.totalQuestionCount, 1),
+        0.45,
+        1
+      );
+      const recencyWeight = Math.max(0.76, 1 - index * 0.12);
+      const targetSecondsPerQuestion =
+        (165 * 60) / Math.max(row.totalQuestionCount, 1);
+      const avgSecondsPerAnswered =
+        row.durationSeconds / Math.max(row.answeredCount, 1);
+      const pacingWeight =
+        avgSecondsPerAnswered <= targetSecondsPerQuestion + 6 ? 1.12 : 0.9;
+
+      return {
+        score: row.compositeEstimatedScore as number,
+        weight: completionWeight * recencyWeight * pacingWeight,
+      };
+    });
   const blendedComposite =
     timedCompositeScores.length > 0
       ? (() => {
+          const totalWeight =
+            timedCompositeScores.reduce((sum, row) => sum + row.weight, 0) || 1;
           const timedAverage =
-            timedCompositeScores.reduce((sum, score) => sum + score, 0) /
-            timedCompositeScores.length;
-          const blendWeight = timedCompositeScores.length > 1 ? 0.62 : 0.48;
+            timedCompositeScores.reduce((sum, row) => sum + row.score * row.weight, 0) /
+            totalWeight;
+          const blendWeight = timedCompositeScores.length > 1 ? 0.68 : 0.54;
           const confidence = clamp(
             composite.confidence * (1 - blendWeight * 0.8) +
-              clamp(0.66 + timedCompositeScores.length * 0.12, 0, 0.96) * blendWeight,
+              clamp(
+                timedCompositeScores.reduce((sum, row) => sum + row.weight, 0) /
+                  timedCompositeScores.length,
+                0.7,
+                0.97
+              ) *
+                blendWeight,
             0,
             1
           );
@@ -198,7 +288,7 @@ export async function GET() {
               blendedSectionSummaries.reduce((sum, section) => sum + section.answeredCount, 0) +
                 timedCompositeScores.length * 18
             ),
-            scoreExplanation: `${composite.scoreExplanation} Completed full-length practice test${timedCompositeScores.length === 1 ? "" : "s"} are now shaping this overall estimate too.`,
+            scoreExplanation: `${composite.scoreExplanation} Completed full-length practice test${timedCompositeScores.length === 1 ? "" : "s"} are now shaping this overall estimate more aggressively because they reflect real ACT pacing and endurance.`,
           };
         })()
       : composite;

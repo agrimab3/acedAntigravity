@@ -130,6 +130,7 @@ export function normalizeQuestionRow(row: {
   }
 
   const combinedText = `${row.question_text} ${row.passage ?? ""}`.toLowerCase();
+  const normalizedDifficulty = row.difficulty.trim().toLowerCase();
 
   if (row.section === "english" && (!row.passage || row.passage.trim().length === 0)) {
     return null;
@@ -145,6 +146,20 @@ export function normalizeQuestionRow(row: {
   }
 
   if (combinedText.includes("underlin") && !hasUnderlineMarkup(row.question_text) && !hasUnderlineMarkup(row.passage)) {
+    return null;
+  }
+
+  if (
+    row.section === "math" &&
+    normalizedDifficulty !== "easy" &&
+    (
+      /a rectangle has length .* what is its area\?/i.test(row.question_text) ||
+      /what is the slope of the line passing through/i.test(row.question_text) ||
+      /^solve for x:\s*[-\d+x\s=+]+$/i.test(row.question_text) ||
+      (row.question_text.trim().length < 85 &&
+        Object.values(choices).every((choice) => /^-?\d+(\.\d+)?$/.test(choice.trim())))
+    )
+  ) {
     return null;
   }
 

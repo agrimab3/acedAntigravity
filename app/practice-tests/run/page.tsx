@@ -11,6 +11,8 @@ import {
 import {
   estimatePracticeTestCompositeScore,
   estimatePracticeTestSectionScore,
+  summarizeCompositePacing,
+  summarizePracticeTestPacing,
 } from "@/lib/practice-test-score";
 
 type TestQuestion = {
@@ -55,8 +57,22 @@ type CompletionReport = {
     correctCount: number;
     accuracyPct: number;
     estimatedScore: number;
+    timeLimitSeconds?: number;
     durationSeconds: number;
+    pacingSummary?: {
+      label: string;
+      tone: "ahead" | "steady" | "behind";
+      avgSecondsPerAnswered: number;
+      targetSecondsPerQuestion: number;
+      paceDeltaSeconds: number;
+      description: string;
+    };
   }>;
+  overallPacing?: {
+    label: string;
+    tone: "ahead" | "steady" | "behind";
+    description: string;
+  };
   missedAnalysis: Array<{
     sectionKey: string;
     topicName: string;
@@ -345,17 +361,41 @@ function PracticeTestRunContent() {
       compositeEstimatedScore: estimatePracticeTestCompositeScore(
         allSectionScores.map((section) => section.estimatedScore)
       ),
-      sectionReports: sections.map((section, sectionIndex) => ({
-        sectionRunId: section.sectionRunId ?? `section-${sectionIndex}`,
-        sectionKey: section.sectionKey,
-        title: section.title,
-        questionCount: section.questions.length,
-        answeredCount: allSectionScores[sectionIndex]?.answeredCount ?? 0,
-        correctCount: allSectionScores[sectionIndex]?.correctCount ?? 0,
-        accuracyPct: allSectionScores[sectionIndex]?.accuracyPct ?? 0,
-        estimatedScore: allSectionScores[sectionIndex]?.estimatedScore ?? 1,
-        durationSeconds: section.durationMinutes * 60 - (timeRemainingBySection[sectionIndex] ?? 0),
-      })),
+      sectionReports: sections.map((section, sectionIndex) => {
+        const durationSeconds =
+          section.durationMinutes * 60 - (timeRemainingBySection[sectionIndex] ?? 0);
+        return {
+          sectionRunId: section.sectionRunId ?? `section-${sectionIndex}`,
+          sectionKey: section.sectionKey,
+          title: section.title,
+          questionCount: section.questions.length,
+          answeredCount: allSectionScores[sectionIndex]?.answeredCount ?? 0,
+          correctCount: allSectionScores[sectionIndex]?.correctCount ?? 0,
+          accuracyPct: allSectionScores[sectionIndex]?.accuracyPct ?? 0,
+          estimatedScore: allSectionScores[sectionIndex]?.estimatedScore ?? 1,
+          timeLimitSeconds: section.durationMinutes * 60,
+          durationSeconds,
+          pacingSummary: summarizePracticeTestPacing({
+            sectionKey: section.sectionKey,
+            questionCount: section.questions.length,
+            answeredCount: allSectionScores[sectionIndex]?.answeredCount ?? 0,
+            durationSeconds,
+            timeLimitSeconds: section.durationMinutes * 60,
+          }),
+        };
+      }),
+      overallPacing: summarizeCompositePacing(
+        sections.map((section, sectionIndex) =>
+          summarizePracticeTestPacing({
+            sectionKey: section.sectionKey,
+            questionCount: section.questions.length,
+            answeredCount: allSectionScores[sectionIndex]?.answeredCount ?? 0,
+            durationSeconds:
+              section.durationMinutes * 60 - (timeRemainingBySection[sectionIndex] ?? 0),
+            timeLimitSeconds: section.durationMinutes * 60,
+          })
+        )
+      ),
       missedAnalysis: [],
       missedQuestions: sections.flatMap((section, sectionIndex) =>
         section.questions
@@ -821,12 +861,13 @@ function PracticeTestRunContent() {
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "12px", marginBottom: "1.2rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: "12px", marginBottom: "1.2rem" }}>
             {[
               { value: `${report.correctCount}/${report.totalQuestionCount}`, label: "raw score" },
               { value: `${report.accuracyPct}%`, label: "accuracy" },
               { value: report.compositeEstimatedScore ? `${report.compositeEstimatedScore}/36` : "--", label: mode.format === "full" ? "composite estimate" : "section estimate" },
               { value: `${report.answeredCount}`, label: "answered" },
+              { value: report.overallPacing?.label ?? "on pace", label: "pace read" },
             ].map((item) => (
               <div key={item.label} style={{ borderRadius: "16px", background: "rgba(255,255,255,0.04)", padding: "1rem" }}>
                 <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "30px", color: topMeta.accentColor, marginBottom: "4px" }}>
@@ -850,9 +891,14 @@ function PracticeTestRunContent() {
                           {section.estimatedScore}/36
                         </div>
                       </div>
-                      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.52)" }}>
+                      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.52)", marginBottom: "6px" }}>
                         {section.correctCount}/{section.questionCount} correct · {section.accuracyPct}% accuracy · {formatCountdown(section.durationSeconds)}
                       </div>
+                      {section.pacingSummary && (
+                        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>
+                          {section.pacingSummary.label} · {section.pacingSummary.description}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -912,6 +958,40 @@ function PracticeTestRunContent() {
             </div>
 
             <aside style={{ display: "grid", gap: "14px" }}>
+              <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.035)", border: "0.5px solid rgba(255,255,255,0.08)", padding: "1.1rem" }}>
+                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", marginBottom: "10px" }}>pacing analytics</div>
+                <div style={{ fontSize: "13px", lineHeight: 1.75, color: "rgba(255,255,255,0.56)", marginBottom: "10px" }}>
+                  {report.overallPacing?.description ?? "Your timing read will show up here after the run."}
+                </div>
+                <div style={{ display: "grid", gap: "8px" }}>
+                  {report.sectionReports.map((section) => (
+                    <div
+                      key={`${section.sectionRunId}-pace`}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        gap: "10px",
+                        padding: "10px 12px",
+                        borderRadius: "12px",
+                        background: "rgba(255,255,255,0.03)",
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontSize: "13px", color: "#fff" }}>{section.title}</div>
+                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>
+                          {section.pacingSummary
+                            ? `${section.pacingSummary.avgSecondsPerAnswered}s per answered question vs ${section.pacingSummary.targetSecondsPerQuestion}s target`
+                            : "no pacing data"}
+                        </div>
+                      </div>
+                      <div style={{ color: topMeta.accentColor, fontFamily: "DM Serif Display,serif", fontSize: "22px" }}>
+                        {section.pacingSummary?.label ?? "--"}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
               <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.035)", border: "0.5px solid rgba(255,255,255,0.08)", padding: "1.1rem" }}>
                 <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", marginBottom: "10px" }}>missed-skill analysis</div>
                 <div style={{ display: "grid", gap: "8px" }}>

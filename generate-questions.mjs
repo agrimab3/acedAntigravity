@@ -477,6 +477,12 @@ Global rules:
 - Hard questions should require a clear second step, tighter reading, or stronger distractor discrimination than medium.
 - Avoid overly obvious answer sets where one option is clearly different in length, precision, or plausibility from the others.
 
+Difficulty expectations:
+- easy should still feel like official ACT warm-up difficulty, not elementary school arithmetic or giveaway reading.
+- medium should feel like standard real-test difficulty and usually require either a second reasoning step, closer passage discrimination, or stronger distractor filtering.
+- hard should feel upper-range ACT: tighter wording, more deceptive distractors, or a deeper multi-step setup without becoming impossible.
+- Do not label a question medium or hard if a student could solve it instantly from a single obvious pattern.
+
 Section-specific rules:
 ${getSectionSpecificInstructions(sectionKey)}
 
