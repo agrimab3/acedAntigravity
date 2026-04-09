@@ -237,6 +237,7 @@ export default function Dashboard() {
       topicName: string;
       masteryPct: number;
       estimatedScore: number;
+      confidence: number;
       totalAnswered: number;
     }>;
   } | null>(null);
@@ -845,6 +846,87 @@ export default function Dashboard() {
                 <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>mastery</div>
               </div>
             </div>
+            {selectedTopicSummary && (
+              <div
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  flexWrap: "wrap",
+                  marginBottom: "1rem",
+                }}
+              >
+                <div
+                  style={{
+                    padding: "10px 12px",
+                    borderRadius: "12px",
+                    background: "rgba(255,255,255,0.04)",
+                    border: `0.5px solid ${selSec.color}30`,
+                    minWidth: "150px",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "10px",
+                      letterSpacing: ".06em",
+                      textTransform: "uppercase",
+                      color: "rgba(255,255,255,0.34)",
+                      marginBottom: "4px",
+                    }}
+                  >
+                    topic ACT estimate
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "DM Serif Display,serif",
+                      fontSize: "26px",
+                      color: selSec.color,
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    {selectedTopicSummary.estimatedScore}/36
+                  </div>
+                  <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>
+                    confidence {Math.round((selectedTopicSummary.confidence ?? 0) * 100)}%
+                  </div>
+                </div>
+                {selectedSectionSummary && (
+                  <div
+                    style={{
+                      padding: "10px 12px",
+                      borderRadius: "12px",
+                      background: "rgba(255,255,255,0.03)",
+                      border: "0.5px solid rgba(255,255,255,0.08)",
+                      minWidth: "150px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "10px",
+                        letterSpacing: ".06em",
+                        textTransform: "uppercase",
+                        color: "rgba(255,255,255,0.34)",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      section estimate
+                    </div>
+                    <div
+                      style={{
+                        fontFamily: "DM Serif Display,serif",
+                        fontSize: "22px",
+                        color: "rgba(255,255,255,0.86)",
+                        lineHeight: 1.1,
+                      }}
+                    >
+                      {selectedSectionSummary.estimatedScore}/36
+                    </div>
+                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>
+                      {selSec.name.toLowerCase()} section
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
             <div
               style={{
                 height: "4px",
@@ -879,17 +961,6 @@ export default function Dashboard() {
                   ? `no practice yet - start here to light up this ${selTopicContext.toLowerCase()} skill star ✦`
                   : "no practice yet - start here to light this star up ✦"}
             </div>
-            {selectedSectionSummary && (
-              <div
-                style={{
-                  fontSize: "12px",
-                  color: "rgba(255,255,255,0.48)",
-                  marginBottom: "1rem",
-                }}
-              >
-                estimated {selSec.name.toLowerCase()} score: {selectedSectionSummary.estimatedScore}/36
-              </div>
-            )}
             <div style={{ display: "flex", gap: "8px" }}>
               <button
                 onClick={() => router.push(`/practice?section=${selSec.key}&topic=${encodeURIComponent(selTopic)}`)}
