@@ -316,9 +316,12 @@ function getStarVisualState({
   twinkle: number;
 }) {
   const mastery = clamp(masteryPct, 0, 100) / 100;
-  const colorMix = interactive ? 0.08 + mastery * 0.92 : 0.02;
-  const bodyColor = mixColor(BASE_STAR_COLOR, sectionColor, colorMix);
-  const coreColor = mixColor(BASE_CORE_COLOR, sectionColor, 0.1 + mastery * 0.24);
+  const bodyColor = interactive
+    ? mixColor(BASE_STAR_COLOR, "#FFFFFF", 0.08 + mastery * 0.18)
+    : mixColor(BASE_STAR_COLOR, sectionColor, 0.02);
+  const coreColor = interactive
+    ? mixColor(BASE_CORE_COLOR, "#FFFFFF", 0.2 + mastery * 0.2)
+    : mixColor(BASE_CORE_COLOR, sectionColor, 0.08);
   const baseRadius = interactive ? 5.2 + mastery * 2.8 : 3.1;
   const radiusBoost = hovered ? 1.5 : selected ? 1.1 : 0;
   const radius = baseRadius + radiusBoost + (interactive ? pulse * 0.35 : 0);
@@ -383,6 +386,12 @@ export default function Dashboard() {
   const [activeSec, setActiveSec] = useState<SectionKey | "all">("all");
   const [selected, setSelected] = useState<Hit>(null);
   const [dashboardSummary, setDashboardSummary] = useState<DashboardSummary | null>(null);
+  const [hoverTooltip, setHoverTooltip] = useState<{
+    x: number;
+    y: number;
+    topicName: string;
+    masteryPct: number;
+  } | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const detailRef = useRef<HTMLDivElement>(null);
   const stateRef = useRef({
@@ -517,8 +526,26 @@ export default function Dashboard() {
 
     const onMove = (e: MouseEvent) => {
       const { mx, my } = getCoords(e);
-      stateRef.current.hovered = hitTest(mx, my);
+      const hoveredHit = hitTest(mx, my);
+      stateRef.current.hovered = hoveredHit;
       canvasEl.style.cursor = stateRef.current.hovered ? "pointer" : "default";
+
+      if (hoveredHit) {
+        const sec = SECS[hoveredHit.si];
+        const topicName = getPointTopic(sec, hoveredHit.pi);
+
+        if (topicName) {
+          setHoverTooltip({
+            x: e.clientX - canvasEl.getBoundingClientRect().left + 14,
+            y: e.clientY - canvasEl.getBoundingClientRect().top - 10,
+            topicName,
+            masteryPct: getTopicMasteryPct(dashboardSummary, sec.key, topicName),
+          });
+          return;
+        }
+      }
+
+      setHoverTooltip(null);
     };
 
     const onClick = (e: MouseEvent) => {
@@ -527,8 +554,15 @@ export default function Dashboard() {
       if (hit) setSelected(hit);
     };
 
+    const onLeave = () => {
+      stateRef.current.hovered = null;
+      canvasEl.style.cursor = "default";
+      setHoverTooltip(null);
+    };
+
     canvasEl.addEventListener("mousemove", onMove);
     canvasEl.addEventListener("click", onClick);
+    canvasEl.addEventListener("mouseleave", onLeave);
 
     let raf = 0;
 
@@ -631,9 +665,9 @@ export default function Dashboard() {
           const pa = pointToCanvas(sec, sec.points[a]);
           const pb = pointToCanvas(sec, sec.points[b]);
           ctx.globalAlpha = alpha * lineVisual.lineAlpha;
-          ctx.strokeStyle = toRgba(lineVisual.bodyColor, 1);
+          ctx.strokeStyle = toRgba(sec.color, 1);
           ctx.lineWidth = lineVisual.lineWidth;
-          ctx.shadowColor = toRgba(lineVisual.bodyColor, 0.7);
+          ctx.shadowColor = toRgba(sec.color, 0.5);
           ctx.shadowBlur = 3 + lineVisual.mastery * 7;
           ctx.beginPath();
           ctx.moveTo(pa.x + dx, pa.y + dy);
@@ -831,6 +865,7 @@ export default function Dashboard() {
       cancelAnimationFrame(raf);
       canvasEl.removeEventListener("mousemove", onMove);
       canvasEl.removeEventListener("click", onClick);
+      canvasEl.removeEventListener("mouseleave", onLeave);
     };
   }, [dashboardSummary, status]);
 
@@ -980,9 +1015,10 @@ export default function Dashboard() {
         <h1
           style={{
             fontFamily: "DM Serif Display,serif",
-            fontSize: "clamp(1.5rem,3vw,2.2rem)",
+            fontSize: "clamp(2rem,4vw,3.25rem)",
             fontWeight: 400,
             marginBottom: "4px",
+            lineHeight: 1.06,
           }}
         >
           ready to <em style={{ color: "#1D9E75" }}>ace it,</em> {firstName}?
@@ -1023,7 +1059,33 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <canvas ref={canvasRef} style={{ width: "100%", display: "block", border: "none", outline: "none" }} />
+      <div style={{ position: "relative" }}>
+        <canvas ref={canvasRef} style={{ width: "100%", display: "block", border: "none", outline: "none" }} />
+        {hoverTooltip && (
+          <div
+            style={{
+              position: "absolute",
+              left: hoverTooltip.x,
+              top: hoverTooltip.y,
+              transform: "translateY(-100%)",
+              pointerEvents: "none",
+              padding: "8px 10px",
+              borderRadius: "12px",
+              background: "rgba(5, 11, 22, 0.92)",
+              border: "0.5px solid rgba(255,255,255,0.14)",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.28)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <div style={{ fontSize: "10px", letterSpacing: ".06em", textTransform: "uppercase", color: "rgba(255,255,255,0.34)", marginBottom: "3px" }}>
+              mastery
+            </div>
+            <div style={{ fontSize: "12px", color: "#fff" }}>
+              {hoverTooltip.topicName} · {hoverTooltip.masteryPct}%
+            </div>
+          </div>
+        )}
+      </div>
 
       <div ref={detailRef} style={{ padding: "1rem 1.5rem 2rem", minHeight: "80px" }}>
         {!selected && (

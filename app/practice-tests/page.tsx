@@ -49,6 +49,19 @@ export default function PracticeTestsPage() {
     () => PRACTICE_TEST_MODES.find((mode) => mode.key === selectedModeKey) ?? PRACTICE_TEST_MODES[0],
     [selectedModeKey]
   );
+  const backgroundStars = useMemo(
+    () =>
+      Array.from({ length: 28 }, (_, index) => ({
+        id: index,
+        left: `${4 + Math.random() * 92}%`,
+        top: `${4 + Math.random() * 88}%`,
+        size: 1 + Math.random() * 2.4,
+        opacity: 0.22 + Math.random() * 0.6,
+        duration: 7 + Math.random() * 9,
+        delay: Math.random() * 5,
+      })),
+    []
+  );
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -124,6 +137,8 @@ export default function PracticeTestsPage() {
         minHeight: "100vh",
         color: "#fff",
         fontFamily: "DM Sans,sans-serif",
+        position: "relative",
+        overflow: "hidden",
         background:
           "radial-gradient(circle at 15% 18%, rgba(38, 95, 143, 0.22), transparent 24%), radial-gradient(circle at 76% 20%, rgba(29, 158, 117, 0.16), transparent 24%), radial-gradient(circle at 50% 78%, rgba(118, 63, 143, 0.18), transparent 30%), linear-gradient(180deg,#0d1b2a 0%,#060d1e 48%,#020408 100%)",
       }}
@@ -132,8 +147,34 @@ export default function PracticeTestsPage() {
         href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap"
         rel="stylesheet"
       />
+      <style>{`
+        @keyframes practiceTestStarDrift {
+          0% { transform: translate3d(0, 0, 0) scale(0.96); opacity: 0.28; }
+          50% { transform: translate3d(0, -10px, 0) scale(1.08); opacity: 0.78; }
+          100% { transform: translate3d(0, 0, 0) scale(0.96); opacity: 0.28; }
+        }
+      `}</style>
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+        {backgroundStars.map((star) => (
+          <span
+            key={star.id}
+            style={{
+              position: "absolute",
+              left: star.left,
+              top: star.top,
+              width: `${star.size}px`,
+              height: `${star.size}px`,
+              borderRadius: "999px",
+              background: "rgba(255,255,255,0.95)",
+              boxShadow: "0 0 10px rgba(255,255,255,0.4)",
+              opacity: star.opacity,
+              animation: `practiceTestStarDrift ${star.duration}s ease-in-out ${star.delay}s infinite`,
+            }}
+          />
+        ))}
+      </div>
 
-      <div style={{ padding: "1.5rem 1.5rem 2.5rem", maxWidth: "1240px", margin: "0 auto" }}>
+      <div style={{ padding: "1.5rem 1.5rem 2.5rem", maxWidth: "1240px", margin: "0 auto", position: "relative", zIndex: 1 }}>
         <nav
           style={{
             display: "grid",
