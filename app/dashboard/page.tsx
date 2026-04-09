@@ -582,23 +582,41 @@ export default function Dashboard() {
       ctx.beginPath();
       ctx.arc(W / 2, H / 2, 128, 0, Math.PI * 2);
       ctx.stroke();
-      const estimatedScoreLabel = dashboardSummary?.compositeEstimatedScore?.toString() ?? "--";
+      const activeSectionKey = stateRef.current.activeSec;
+      const centerSectionSummary =
+        activeSectionKey !== "all"
+          ? dashboardSummary?.sectionSummaries.find((summary) => summary.sectionKey === activeSectionKey)
+          : null;
+      const centerScoreLabel =
+        centerSectionSummary?.estimatedScore?.toString() ??
+        dashboardSummary?.compositeEstimatedScore?.toString() ??
+        "--";
+      const centerScoreTitle =
+        activeSectionKey !== "all"
+          ? `ESTIMATED ${activeSectionKey.toUpperCase()} SCORE`
+          : "ESTIMATED ACT SCORE";
+      const centerConfidence =
+        centerSectionSummary?.confidence ?? dashboardSummary?.confidence ?? 0;
+      const centerSubtitle =
+        activeSectionKey !== "all"
+          ? `${activeSectionKey} section`
+          : "out of 36";
       ctx.globalAlpha = 0.92;
       ctx.fillStyle = "#FFFFFF";
       ctx.font = "700 16px sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText("ESTIMATED ACT SCORE", W / 2, H / 2 - 32);
+      ctx.fillText(centerScoreTitle, W / 2, H / 2 - 32);
       ctx.globalAlpha = 0.88;
       ctx.font = "italic bold 48px serif";
-      ctx.fillText(estimatedScoreLabel, W / 2, H / 2 + 18);
+      ctx.fillText(centerScoreLabel, W / 2, H / 2 + 18);
       ctx.globalAlpha = 0.16;
       ctx.font = "13px sans-serif";
-      ctx.fillText("out of 36", W / 2, H / 2 + 44);
+      ctx.fillText(centerSubtitle, W / 2, H / 2 + 44);
       if (dashboardSummary) {
         ctx.globalAlpha = 0.28;
         ctx.font = "11px sans-serif";
         ctx.fillText(
-          `confidence ${Math.round((dashboardSummary.confidence ?? 0) * 100)}%`,
+          `confidence ${Math.round(centerConfidence * 100)}%`,
           W / 2,
           H / 2 + 66
         );
