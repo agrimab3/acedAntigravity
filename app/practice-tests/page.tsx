@@ -401,7 +401,7 @@ export default function PracticeTestsPage() {
                 cursor: "pointer",
                 padding: "6px 4px",
                 position: "relative",
-                textShadow: "0 0 12px rgba(255,255,255,0.12)",
+                textShadow: "0 0 14px rgba(255,255,255,0.18)",
                 fontFamily: "DM Sans,sans-serif",
               }}
             >
@@ -410,12 +410,12 @@ export default function PracticeTestsPage() {
                   position: "absolute",
                   left: "50%",
                   top: "50%",
-                  width: "calc(100% + 18px)",
-                  height: "18px",
+                  width: "calc(100% + 22px)",
+                  height: "20px",
                   transform: "translate(-50%, -50%)",
                   borderRadius: "999px",
-                  background: "radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 56%, transparent 82%)",
-                  filter: "blur(10px)",
+                  background: "radial-gradient(circle, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.045) 58%, transparent 84%)",
+                  filter: "blur(11px)",
                   zIndex: 0,
                   pointerEvents: "none",
                 }}
@@ -432,7 +432,7 @@ export default function PracticeTestsPage() {
                 cursor: "default",
                 padding: "6px 4px",
                 position: "relative",
-                textShadow: "0 0 14px rgba(29,158,117,0.28)",
+                textShadow: "0 0 18px rgba(29,158,117,0.4)",
                 fontFamily: "DM Sans,sans-serif",
               }}
             >
@@ -441,12 +441,12 @@ export default function PracticeTestsPage() {
                   position: "absolute",
                   left: "50%",
                   top: "50%",
-                  width: "calc(100% + 22px)",
-                  height: "20px",
+                  width: "calc(100% + 26px)",
+                  height: "24px",
                   transform: "translate(-50%, -50%)",
                   borderRadius: "999px",
-                  background: "radial-gradient(circle, rgba(29,158,117,0.2) 0%, rgba(29,158,117,0.08) 52%, transparent 80%)",
-                  filter: "blur(10px)",
+                  background: "radial-gradient(circle, rgba(29,158,117,0.26) 0%, rgba(29,158,117,0.12) 54%, transparent 82%)",
+                  filter: "blur(12px)",
                   zIndex: 0,
                   pointerEvents: "none",
                 }}
