@@ -11,7 +11,7 @@
 
 - Phase 1: architecture lock-in and production foundation
 - Phase 2: adaptive ACT intelligence foundation in progress
-- Phase 3: practice test foundation started
+- Phase 3: practice tests moving into persistent timed runs
 
 ## Completed So Far
 
@@ -69,6 +69,18 @@
   - question nav and flagging
   - auto-submit on timer expiry
   - post-section raw-score summary
+- Added persistent practice-test storage in PostgreSQL:
+  - `practice_test_sessions`
+  - `practice_test_sections`
+  - `practice_test_answers`
+- Added DB-backed practice-test session creation and completion APIs
+- Added full section/full-test orchestration in the timed runner
+- Added post-test reporting with:
+  - section score breakdowns
+  - missed-skill analysis
+  - missed-question review
+- Added Math calculator support inside the timed runner via Desmos
+- Synced completed practice-test results back into the dashboard ACT estimate model so timed tests now influence section/composite score estimates
 
 ## Decisions Made
 
@@ -103,6 +115,7 @@
   - timed test runner UX
   - section/full-test scoring reports
   - Math calculator integration
+  - syncing timed test performance into main score estimates
 
 ## Open Questions
 
@@ -131,8 +144,9 @@
 - Seed the first real published ACT inventory for all active topics
 - Turn generation into a draft-first review flow for new content
 - Backfill remaining Reading and Science topics in controlled batches
-- Build the timed section-test shell for the new `Practice Tests` area
-- Add persistence and reporting for practice-test sessions
+- Finish refining full-test UX and test-history surfaces
+- Add richer post-test pacing analysis and review flows
+- Continue calibrating practice-test score mapping against ACT-style expectations
 
 ## Planned Next Phase
 

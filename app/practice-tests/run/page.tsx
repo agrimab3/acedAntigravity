@@ -5,10 +5,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
   PRACTICE_TEST_MODES,
-  SECTION_TESTS,
   type PracticeTestMode,
   type PracticeTestSectionKey,
 } from "@/lib/practice-tests";
+import {
+  estimatePracticeTestCompositeScore,
+  estimatePracticeTestSectionScore,
+} from "@/lib/practice-test-score";
 
 type TestQuestion = {
   id: string;
@@ -21,6 +24,56 @@ type TestQuestion = {
   correct_answer: "A" | "B" | "C" | "D";
   explanation: string;
 };
+
+type RunnerSection = {
+  sectionRunId: string | null;
+  sectionKey: PracticeTestSectionKey;
+  title: string;
+  questionCount: number;
+  durationMinutes: number;
+  questions: TestQuestion[];
+  usesMockFill: boolean;
+  availableCount: number;
+};
+
+type CompletionReport = {
+  persisted: boolean;
+  sessionId: string | null;
+  modeKey: string;
+  format: "section" | "full";
+  totalQuestionCount: number;
+  answeredCount: number;
+  correctCount: number;
+  accuracyPct: number;
+  compositeEstimatedScore: number | null;
+  sectionReports: Array<{
+    sectionRunId: string;
+    sectionKey: string;
+    title: string;
+    questionCount: number;
+    answeredCount: number;
+    correctCount: number;
+    accuracyPct: number;
+    estimatedScore: number;
+    durationSeconds: number;
+  }>;
+  missedAnalysis: Array<{
+    sectionKey: string;
+    topicName: string;
+    misses: number;
+  }>;
+  missedQuestions: Array<{
+    sectionKey: string;
+    sectionTitle: string;
+    questionOrder: number;
+    topicName: string;
+    selectedAnswer: string | null;
+    correctAnswer: string;
+    question: TestQuestion;
+  }>;
+};
+
+type RunnerPhase = "intro" | "running" | "section-break" | "report";
 
 function formatDurationLabel(minutes: number) {
   if (minutes < 60) {
@@ -73,6 +126,10 @@ function renderFormattedText(text: string) {
   });
 }
 
+function keyFor(sectionIndex: number, questionIndex: number) {
+  return `${sectionIndex}:${questionIndex}`;
+}
+
 function PracticeTestRunContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -84,14 +141,22 @@ function PracticeTestRunContent() {
   );
 
   const [loading, setLoading] = useState(true);
-  const [questions, setQuestions] = useState<TestQuestion[]>([]);
-  const [started, setStarted] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<number, "A" | "B" | "C" | "D" | null>>({});
-  const [flagged, setFlagged] = useState<number[]>([]);
-  const [timeRemaining, setTimeRemaining] = useState(0);
-  const [usedMockFill, setUsedMockFill] = useState(false);
+  const [phase, setPhase] = useState<RunnerPhase>("intro");
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [persistedSession, setPersistedSession] = useState(false);
+  const [sections, setSections] = useState<RunnerSection[]>([]);
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+  const [currentQuestionIndices, setCurrentQuestionIndices] = useState<Record<number, number>>({});
+  const [selectedAnswers, setSelectedAnswers] = useState<
+    Record<string, "A" | "B" | "C" | "D" | null>
+  >({});
+  const [flaggedKeys, setFlaggedKeys] = useState<string[]>([]);
+  const [timeRemainingBySection, setTimeRemainingBySection] = useState<Record<number, number>>({});
+  const [timeSpentByQuestion, setTimeSpentByQuestion] = useState<Record<string, number>>({});
+  const [questionStartedAtMs, setQuestionStartedAtMs] = useState<number | null>(null);
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [report, setReport] = useState<CompletionReport | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -100,31 +165,52 @@ function PracticeTestRunContent() {
   }, [router, status]);
 
   useEffect(() => {
-    if (!mode || mode.format !== "section") {
+    if (!mode) {
       setLoading(false);
       return;
     }
 
     let active = true;
 
-    const load = async () => {
+    const createSession = async () => {
       setLoading(true);
 
       try {
-        const res = await fetch(`/api/practice-tests?mode=${mode.key}`, {
-          cache: "no-store",
+        const res = await fetch("/api/practice-tests/session", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ mode: mode.key }),
         });
         const data = await res.json();
 
         if (!active) return;
 
-        setQuestions(data.questions ?? []);
-        setTimeRemaining((mode.durationMinutes ?? 0) * 60);
-        setUsedMockFill(Boolean(data.usesMockFill));
+        const nextSections: RunnerSection[] = data.sections ?? [];
+        setSessionId(data.sessionId ?? null);
+        setPersistedSession(Boolean(data.persisted));
+        setSections(nextSections);
+        setCurrentSectionIndex(0);
+        setCurrentQuestionIndices(
+          Object.fromEntries(nextSections.map((_, index) => [index, 0]))
+        );
+        setTimeRemainingBySection(
+          Object.fromEntries(
+            nextSections.map((section, index) => [index, section.durationMinutes * 60])
+          )
+        );
+        setSelectedAnswers({});
+        setFlaggedKeys([]);
+        setTimeSpentByQuestion({});
+        setQuestionStartedAtMs(null);
+        setShowCalculator(false);
+        setPhase("intro");
+        setReport(null);
       } catch (error) {
-        console.error("Failed to load practice test", error);
+        console.error("Failed to create practice test session", error);
         if (!active) return;
-        setQuestions([]);
+        setSections([]);
       } finally {
         if (active) {
           setLoading(false);
@@ -132,30 +218,244 @@ function PracticeTestRunContent() {
       }
     };
 
-    void load();
+    void createSession();
 
     return () => {
       active = false;
     };
   }, [mode]);
 
+  const currentSection = sections[currentSectionIndex] ?? null;
+  const currentQuestionIndex = currentQuestionIndices[currentSectionIndex] ?? 0;
+  const currentQuestion = currentSection?.questions[currentQuestionIndex] ?? null;
+  const currentQuestionKey = currentSection ? keyFor(currentSectionIndex, currentQuestionIndex) : null;
+  const totalQuestionCount = sections.reduce((sum, section) => sum + section.questions.length, 0);
+  const answeredCount = Object.values(selectedAnswers).filter((value) => value !== null).length;
+  const flaggedCount = flaggedKeys.length;
+  const remainingCount = totalQuestionCount - answeredCount;
+  const currentTimeRemaining = timeRemainingBySection[currentSectionIndex] ?? 0;
+  const allSectionScores = sections.map((section, sectionIndex) => {
+    const correctCount = section.questions.filter(
+      (question, questionIndex) =>
+        selectedAnswers[keyFor(sectionIndex, questionIndex)] === question.correct_answer
+    ).length;
+
+    return {
+      sectionKey: section.sectionKey,
+      correctCount,
+      answeredCount: section.questions.filter(
+        (_, questionIndex) => selectedAnswers[keyFor(sectionIndex, questionIndex)] !== null
+      ).length,
+      accuracyPct:
+        section.questions.length > 0
+          ? Math.round((correctCount / section.questions.length) * 100)
+          : 0,
+      estimatedScore: estimatePracticeTestSectionScore(
+        section.sectionKey,
+        correctCount,
+        section.questions.length
+      ),
+    };
+  });
+
+  function flushCurrentQuestionTime() {
+    if (phase !== "running" || !currentQuestionKey || questionStartedAtMs === null) {
+      return;
+    }
+
+    const elapsed = Math.max(0, Math.round((Date.now() - questionStartedAtMs) / 1000));
+
+    if (elapsed > 0) {
+      setTimeSpentByQuestion((current) => ({
+        ...current,
+        [currentQuestionKey]: (current[currentQuestionKey] ?? 0) + elapsed,
+      }));
+    }
+
+    setQuestionStartedAtMs(Date.now());
+  }
+
   useEffect(() => {
-    if (!started || submitted) return;
+    if (phase !== "running") return;
 
     const timer = window.setInterval(() => {
-      setTimeRemaining((current) => {
-        if (current <= 1) {
-          window.clearInterval(timer);
-          setSubmitted(true);
-          return 0;
-        }
-
-        return current - 1;
+      setTimeRemainingBySection((current) => {
+        const nextRemaining = Math.max(0, (current[currentSectionIndex] ?? 0) - 1);
+        return {
+          ...current,
+          [currentSectionIndex]: nextRemaining,
+        };
       });
     }, 1000);
 
     return () => window.clearInterval(timer);
-  }, [started, submitted]);
+  }, [currentSectionIndex, phase]);
+
+  useEffect(() => {
+    if (phase === "running" && currentTimeRemaining === 0 && sections.length > 0) {
+      void handleSectionAdvance(true);
+    }
+  }, [currentTimeRemaining, phase, sections.length]);
+
+  async function handleFinalizeTest() {
+    if (!mode) return;
+
+    flushCurrentQuestionTime();
+    setSubmitting(true);
+
+    const payloadSections = sections.map((section, sectionIndex) => ({
+      sectionRunId: section.sectionRunId ?? `section-${sectionIndex}`,
+      sectionKey: section.sectionKey,
+      durationSeconds: section.durationMinutes * 60 - (timeRemainingBySection[sectionIndex] ?? 0),
+      answers: section.questions.map((_, questionIndex) => {
+        const answerKey = keyFor(sectionIndex, questionIndex);
+        return {
+          questionOrder: questionIndex,
+          selectedAnswer: selectedAnswers[answerKey] ?? null,
+          flagged: flaggedKeys.includes(answerKey),
+          timeSpentSeconds: timeSpentByQuestion[answerKey] ?? 0,
+        };
+      }),
+    }));
+
+    const localReport: CompletionReport = {
+      persisted: false,
+      sessionId,
+      modeKey: mode.key,
+      format: mode.format,
+      totalQuestionCount,
+      answeredCount,
+      correctCount: allSectionScores.reduce((sum, section) => sum + section.correctCount, 0),
+      accuracyPct:
+        totalQuestionCount > 0
+          ? Math.round(
+              (allSectionScores.reduce((sum, section) => sum + section.correctCount, 0) /
+                totalQuestionCount) *
+                100
+            )
+          : 0,
+      compositeEstimatedScore: estimatePracticeTestCompositeScore(
+        allSectionScores.map((section) => section.estimatedScore)
+      ),
+      sectionReports: sections.map((section, sectionIndex) => ({
+        sectionRunId: section.sectionRunId ?? `section-${sectionIndex}`,
+        sectionKey: section.sectionKey,
+        title: section.title,
+        questionCount: section.questions.length,
+        answeredCount: allSectionScores[sectionIndex]?.answeredCount ?? 0,
+        correctCount: allSectionScores[sectionIndex]?.correctCount ?? 0,
+        accuracyPct: allSectionScores[sectionIndex]?.accuracyPct ?? 0,
+        estimatedScore: allSectionScores[sectionIndex]?.estimatedScore ?? 1,
+        durationSeconds: section.durationMinutes * 60 - (timeRemainingBySection[sectionIndex] ?? 0),
+      })),
+      missedAnalysis: [],
+      missedQuestions: sections.flatMap((section, sectionIndex) =>
+        section.questions
+          .map((question, questionIndex) => {
+            const answerKey = keyFor(sectionIndex, questionIndex);
+            const selectedAnswer = selectedAnswers[answerKey] ?? null;
+            if (selectedAnswer === null || selectedAnswer === question.correct_answer) {
+              return null;
+            }
+
+            return {
+              sectionKey: section.sectionKey,
+              sectionTitle: section.title,
+              questionOrder: questionIndex,
+              topicName: question.topic,
+              selectedAnswer,
+              correctAnswer: question.correct_answer,
+              question,
+            };
+          })
+          .filter(Boolean)
+      ) as CompletionReport["missedQuestions"],
+    };
+
+    localReport.missedAnalysis = Array.from(
+      localReport.missedQuestions.reduce((map, question) => {
+        const existing = map.get(`${question.sectionKey}:${question.topicName}`) ?? {
+          sectionKey: question.sectionKey,
+          topicName: question.topicName,
+          misses: 0,
+        };
+        existing.misses += 1;
+        map.set(`${question.sectionKey}:${question.topicName}`, existing);
+        return map;
+      }, new Map<string, { sectionKey: string; topicName: string; misses: number }>())
+    )
+      .map(([, value]) => value)
+      .sort((a, b) => b.misses - a.misses);
+
+    if (persistedSession && sessionId) {
+      try {
+        const res = await fetch(`/api/practice-tests/session/${sessionId}/complete`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            durationSeconds: sections.reduce(
+              (sum, section, sectionIndex) =>
+                sum + (section.durationMinutes * 60 - (timeRemainingBySection[sectionIndex] ?? 0)),
+              0
+            ),
+            sections: payloadSections,
+          }),
+        });
+
+        if (res.ok) {
+          const data = (await res.json()) as CompletionReport;
+          setReport(data);
+        } else {
+          setReport(localReport);
+        }
+      } catch (error) {
+        console.error("Failed to persist practice test completion", error);
+        setReport(localReport);
+      }
+    } else {
+      setReport(localReport);
+    }
+
+    setSubmitting(false);
+    setPhase("report");
+  }
+
+  async function handleSectionAdvance(fromTimer = false) {
+    if (phase !== "running") {
+      return;
+    }
+
+    flushCurrentQuestionTime();
+    setShowCalculator(false);
+
+    if (currentSectionIndex >= sections.length - 1) {
+      await handleFinalizeTest();
+      return;
+    }
+
+    setPhase("section-break");
+  }
+
+  function goToQuestion(questionIndex: number) {
+    flushCurrentQuestionTime();
+    setCurrentQuestionIndices((current) => ({
+      ...current,
+      [currentSectionIndex]: questionIndex,
+    }));
+    setQuestionStartedAtMs(Date.now());
+  }
+
+  function toggleFlag() {
+    if (!currentQuestionKey) return;
+
+    setFlaggedKeys((current) =>
+      current.includes(currentQuestionKey)
+        ? current.filter((key) => key !== currentQuestionKey)
+        : [...current, currentQuestionKey]
+    );
+  }
 
   if (status === "loading" || loading) {
     return (
@@ -175,7 +475,7 @@ function PracticeTestRunContent() {
     );
   }
 
-  if (!mode || mode.format !== "section") {
+  if (!mode || sections.length === 0) {
     return (
       <div
         style={{
@@ -189,12 +489,12 @@ function PracticeTestRunContent() {
           padding: "2rem",
         }}
       >
-        <div style={{ maxWidth: "520px", textAlign: "center" }}>
+        <div style={{ maxWidth: "540px", textAlign: "center" }}>
           <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "34px", marginBottom: "10px" }}>
-            full test runner next
+            practice test unavailable
           </div>
           <div style={{ color: "rgba(255,255,255,0.5)", lineHeight: 1.7, marginBottom: "1.25rem" }}>
-            Phase 3B starts with section tests. Full ACT orchestration is the next layer once the section runner is fully tuned.
+            This test mode could not be prepared yet. Try again in a moment or head back to the launcher.
           </div>
           <button
             onClick={() => router.push("/practice-tests")}
@@ -214,21 +514,9 @@ function PracticeTestRunContent() {
     );
   }
 
-  const currentQuestion = questions[currentIndex];
-  const answeredCount = Object.values(selectedAnswers).filter(Boolean).length;
-  const correctCount = submitted
-    ? questions.filter((question, index) => selectedAnswers[index] === question.correct_answer).length
-    : 0;
-  const flaggedCount = flagged.length;
-  const remainingCount = questions.length - answeredCount;
-  const accuracyPct = questions.length > 0 ? Math.round((correctCount / questions.length) * 100) : 0;
-  const estimatedSectionScore = submitted
-    ? Math.max(1, Math.min(36, Math.round((correctCount / Math.max(questions.length, 1)) * 36)))
-    : null;
+  const topMeta = mode as PracticeTestMode;
 
-  const topMeta = mode as PracticeTestMode & { sectionKey: PracticeTestSectionKey };
-
-  if (!started) {
+  if (phase === "intro") {
     return (
       <div
         style={{
@@ -244,7 +532,7 @@ function PracticeTestRunContent() {
           href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap"
           rel="stylesheet"
         />
-        <div style={{ maxWidth: "920px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "940px", margin: "0 auto" }}>
           <nav
             style={{
               display: "grid",
@@ -273,7 +561,7 @@ function PracticeTestRunContent() {
             </div>
           </nav>
 
-          <div style={{ maxWidth: "720px", marginBottom: "1.5rem" }}>
+          <div style={{ maxWidth: "760px", marginBottom: "1.5rem" }}>
             <div style={{ fontSize: "11px", letterSpacing: ".08em", textTransform: "uppercase", color: topMeta.accentColor, marginBottom: "10px" }}>
               {topMeta.shortLabel} · {topMeta.constellation}
             </div>
@@ -283,16 +571,17 @@ function PracticeTestRunContent() {
               <em style={{ color: topMeta.accentColor }}>{topMeta.shortLabel} test</em>?
             </h1>
             <p style={{ fontSize: "15px", lineHeight: 1.75, color: "rgba(255,255,255,0.56)" }}>
-              Official ACT timing, no instant answer feedback, and a full section score summary at the end. This is rehearsal mode.
+              Official ACT timing, real section sequencing, no instant answer feedback, and a full section-by-section score report
+              at the end.
             </p>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "12px", marginBottom: "1.25rem" }}>
             {[
-              { value: questions.length, label: "questions" },
+              { value: totalQuestionCount, label: "questions" },
               { value: formatDurationLabel(mode.durationMinutes), label: "timer" },
-              { value: mode.includesDesmos ? "calculator next" : "focus mode", label: "tools" },
-              { value: usedMockFill ? "mixed bank" : "live bank", label: "question set" },
+              { value: mode.includesDesmos ? "calculator" : "focus mode", label: "tools" },
+              { value: sections.some((section) => section.usesMockFill) ? "mixed bank" : "live bank", label: "question set" },
             ].map((item) => (
               <div
                 key={item.label}
@@ -323,8 +612,34 @@ function PracticeTestRunContent() {
               marginBottom: "1.25rem",
             }}
           >
-            You can move between questions, flag any you want to revisit, and submit early if you're done. When the timer hits zero,
-            Aced will auto-submit the section.
+            Aced will save this test in the database, score each finished section, and map missed questions back to the skill
+            stars you should rebuild next.
+          </div>
+
+          <div style={{ display: "grid", gap: "8px", marginBottom: "1.25rem" }}>
+            {sections.map((section, index) => (
+              <div
+                key={`${section.sectionKey}-${index}`}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: "12px",
+                  padding: "10px 12px",
+                  borderRadius: "12px",
+                  background: "rgba(255,255,255,0.03)",
+                  border: "0.5px solid rgba(255,255,255,0.07)",
+                  color: "rgba(255,255,255,0.64)",
+                  fontSize: "13px",
+                }}
+              >
+                <span>
+                  {index + 1}. {section.title}
+                </span>
+                <span style={{ color: "rgba(255,255,255,0.38)" }}>
+                  {section.questionCount}q · {section.durationMinutes}m
+                </span>
+              </div>
+            ))}
           </div>
 
           <div style={{ display: "flex", gap: "10px" }}>
@@ -344,8 +659,8 @@ function PracticeTestRunContent() {
             </button>
             <button
               onClick={() => {
-                setStarted(true);
-                setTimeRemaining(mode.durationMinutes * 60);
+                setPhase("running");
+                setQuestionStartedAtMs(Date.now());
               }}
               style={{
                 flex: 1.6,
@@ -358,12 +673,299 @@ function PracticeTestRunContent() {
                 fontWeight: 600,
               }}
             >
-              start timed section →
+              start timed test →
             </button>
           </div>
         </div>
       </div>
     );
+  }
+
+  if (phase === "section-break") {
+    const completedSection = sections[currentSectionIndex];
+    const completedStats = allSectionScores[currentSectionIndex];
+    const nextSection = sections[currentSectionIndex + 1];
+
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "linear-gradient(180deg,#0d1b2a 0%,#060d1e 56%,#020408 100%)",
+          color: "#fff",
+          fontFamily: "DM Sans,sans-serif",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "2rem",
+        }}
+      >
+        <div style={{ maxWidth: "620px", width: "100%" }}>
+          <div style={{ fontSize: "11px", letterSpacing: ".08em", textTransform: "uppercase", color: topMeta.accentColor, marginBottom: "10px" }}>
+            section complete
+          </div>
+          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "38px", marginBottom: "10px" }}>
+            {completedSection.title}
+            <br />
+            <em style={{ color: topMeta.accentColor }}>is locked in</em>
+          </div>
+          <div style={{ fontSize: "14px", lineHeight: 1.75, color: "rgba(255,255,255,0.54)", marginBottom: "1rem" }}>
+            Aced has saved your answers for this section. Next up: {nextSection?.title}.
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "10px", marginBottom: "1rem" }}>
+            {[
+              { value: `${completedStats.correctCount}/${completedSection.questionCount}`, label: "raw" },
+              { value: `${completedStats.accuracyPct}%`, label: "accuracy" },
+              { value: `${completedStats.estimatedScore}/36`, label: "estimate" },
+            ].map((item) => (
+              <div key={item.label} style={{ borderRadius: "14px", background: "rgba(255,255,255,0.04)", padding: "0.95rem 0.9rem" }}>
+                <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "26px", color: topMeta.accentColor, marginBottom: "4px" }}>
+                  {item.value}
+                </div>
+                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>{item.label}</div>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={() => {
+              setCurrentSectionIndex((current) => current + 1);
+              setPhase("running");
+              setQuestionStartedAtMs(Date.now());
+            }}
+            style={{
+              width: "100%",
+              padding: "12px 14px",
+              borderRadius: "12px",
+              border: "none",
+              background: topMeta.accentColor,
+              color: "#081018",
+              cursor: "pointer",
+              fontWeight: 600,
+            }}
+          >
+            start {nextSection?.title.toLowerCase()} →
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (phase === "report" && report) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "linear-gradient(180deg,#0d1b2a 0%,#060d1e 56%,#020408 100%)",
+          color: "#fff",
+          fontFamily: "DM Sans,sans-serif",
+          padding: "1.5rem",
+        }}
+      >
+        <link
+          href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap"
+          rel="stylesheet"
+        />
+        <div style={{ maxWidth: "1180px", margin: "0 auto" }}>
+          <nav
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr auto 1fr",
+              alignItems: "center",
+              gap: "1rem",
+              marginBottom: "2rem",
+            }}
+          >
+            <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px", justifySelf: "start" }}>
+              Aced<em style={{ color: "#1D9E75" }}>.</em>
+            </div>
+            <div style={{ display: "flex", gap: "2.8rem", justifySelf: "center" }}>
+              <button
+                onClick={() => router.push("/dashboard")}
+                style={{ background: "transparent", border: "none", color: "rgba(255,255,255,0.58)", fontSize: "16px", cursor: "pointer" }}
+              >
+                your universe
+              </button>
+              <button
+                onClick={() => router.push("/practice-tests")}
+                style={{ background: "transparent", border: "none", color: "#fff", fontSize: "16px", cursor: "pointer" }}
+              >
+                practice tests
+              </button>
+            </div>
+            <div style={{ justifySelf: "end", color: "rgba(255,255,255,0.3)", fontSize: "12px" }}>
+              report saved
+            </div>
+          </nav>
+
+          <div style={{ marginBottom: "1.5rem", maxWidth: "760px" }}>
+            <div style={{ fontSize: "11px", letterSpacing: ".08em", textTransform: "uppercase", color: topMeta.accentColor, marginBottom: "10px" }}>
+              {mode.title} report
+            </div>
+            <h1 style={{ fontFamily: "DM Serif Display,serif", fontSize: "clamp(2rem,4.4vw,3.6rem)", fontWeight: 400, lineHeight: 1.06, marginBottom: "10px" }}>
+              your test is
+              <br />
+              <em style={{ color: topMeta.accentColor }}>written in the stars</em>
+            </h1>
+            <p style={{ fontSize: "15px", lineHeight: 1.75, color: "rgba(255,255,255,0.56)" }}>
+              These scores now live in your practice-test history and give Aced a more test-like read on where you are right now.
+            </p>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "12px", marginBottom: "1.2rem" }}>
+            {[
+              { value: `${report.correctCount}/${report.totalQuestionCount}`, label: "raw score" },
+              { value: `${report.accuracyPct}%`, label: "accuracy" },
+              { value: report.compositeEstimatedScore ? `${report.compositeEstimatedScore}/36` : "--", label: mode.format === "full" ? "composite estimate" : "section estimate" },
+              { value: `${report.answeredCount}`, label: "answered" },
+            ].map((item) => (
+              <div key={item.label} style={{ borderRadius: "16px", background: "rgba(255,255,255,0.04)", padding: "1rem" }}>
+                <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "30px", color: topMeta.accentColor, marginBottom: "4px" }}>
+                  {item.value}
+                </div>
+                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>{item.label}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 380px", gap: "18px", alignItems: "start" }}>
+            <div style={{ display: "grid", gap: "14px" }}>
+              <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.035)", border: "0.5px solid rgba(255,255,255,0.08)", padding: "1.1rem" }}>
+                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", marginBottom: "10px" }}>section breakdown</div>
+                <div style={{ display: "grid", gap: "10px" }}>
+                  {report.sectionReports.map((section) => (
+                    <div key={section.sectionRunId} style={{ borderRadius: "14px", background: "rgba(255,255,255,0.03)", padding: "0.95rem 1rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: "6px" }}>
+                        <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px" }}>{section.title}</div>
+                        <div style={{ color: topMeta.accentColor, fontFamily: "DM Serif Display,serif", fontSize: "24px" }}>
+                          {section.estimatedScore}/36
+                        </div>
+                      </div>
+                      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.52)" }}>
+                        {section.correctCount}/{section.questionCount} correct · {section.accuracyPct}% accuracy · {formatCountdown(section.durationSeconds)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.035)", border: "0.5px solid rgba(255,255,255,0.08)", padding: "1.1rem" }}>
+                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", marginBottom: "10px" }}>missed-question review</div>
+                <div style={{ display: "grid", gap: "12px" }}>
+                  {report.missedQuestions.length === 0 && (
+                    <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.54)", lineHeight: 1.7 }}>
+                      Clean run. No missed questions to review here.
+                    </div>
+                  )}
+                  {report.missedQuestions.map((item) => (
+                    <div key={`${item.sectionKey}-${item.questionOrder}`} style={{ borderRadius: "14px", background: "rgba(255,255,255,0.03)", padding: "0.95rem 1rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", marginBottom: "8px" }}>
+                        <div style={{ fontSize: "11px", color: topMeta.accentColor, letterSpacing: ".06em", textTransform: "uppercase" }}>
+                          {item.sectionTitle} · question {item.questionOrder + 1}
+                        </div>
+                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.36)" }}>{item.topicName}</div>
+                      </div>
+                      {item.question.passage && (
+                        <div style={{ fontSize: "12px", lineHeight: 1.7, color: "rgba(255,255,255,0.5)", marginBottom: "10px" }}>
+                          {renderFormattedText(item.question.passage)}
+                        </div>
+                      )}
+                      <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "20px", lineHeight: 1.55, marginBottom: "10px" }}>
+                        {renderFormattedText(item.question.question_text)}
+                      </div>
+                      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.54)", marginBottom: "8px" }}>
+                        You chose {item.selectedAnswer}. Correct answer: {item.correctAnswer}.
+                      </div>
+                      <div style={{ fontSize: "12px", lineHeight: 1.7, color: "rgba(255,255,255,0.7)" }}>
+                        {item.question.explanation}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </div>
+
+            <aside style={{ display: "grid", gap: "14px" }}>
+              <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.035)", border: "0.5px solid rgba(255,255,255,0.08)", padding: "1.1rem" }}>
+                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", marginBottom: "10px" }}>missed-skill analysis</div>
+                <div style={{ display: "grid", gap: "8px" }}>
+                  {report.missedAnalysis.length === 0 && (
+                    <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.54)" }}>
+                      No obvious weak stars from this run.
+                    </div>
+                  )}
+                  {report.missedAnalysis.map((item) => (
+                    <div
+                      key={`${item.sectionKey}-${item.topicName}`}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        gap: "10px",
+                        padding: "10px 12px",
+                        borderRadius: "12px",
+                        background: "rgba(255,255,255,0.03)",
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontSize: "13px", color: "#fff" }}>{item.topicName}</div>
+                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>{item.sectionKey}</div>
+                      </div>
+                      <div style={{ color: topMeta.accentColor, fontFamily: "DM Serif Display,serif", fontSize: "24px" }}>
+                        {item.misses}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.035)", border: "0.5px solid rgba(255,255,255,0.08)", padding: "1.1rem" }}>
+                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", marginBottom: "10px" }}>what this means</div>
+                <div style={{ fontSize: "13px", lineHeight: 1.75, color: "rgba(255,255,255,0.56)" }}>
+                  Aced now syncs this run into your saved practice-test history and uses the section results as a more test-shaped score signal
+                  than a normal skill drill session.
+                </div>
+              </section>
+
+              <div style={{ display: "grid", gap: "10px" }}>
+                <button
+                  onClick={() => router.push("/practice-tests")}
+                  style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    borderRadius: "12px",
+                    border: "none",
+                    background: topMeta.accentColor,
+                    color: "#081018",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                  }}
+                >
+                  back to practice tests
+                </button>
+                <button
+                  onClick={() => router.push("/dashboard")}
+                  style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    borderRadius: "12px",
+                    border: "0.5px solid rgba(255,255,255,0.12)",
+                    background: "transparent",
+                    color: "rgba(255,255,255,0.72)",
+                    cursor: "pointer",
+                  }}
+                >
+                  return to your universe
+                </button>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentSection || !currentQuestion) {
+    return null;
   }
 
   return (
@@ -386,45 +988,46 @@ function PracticeTestRunContent() {
             Aced<em style={{ color: "#1D9E75" }}>.</em>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-            <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>{mode.title}</span>
+            <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>
+              {currentSection.title} · section {currentSectionIndex + 1}/{sections.length}
+            </span>
             <div
               style={{
                 padding: "8px 14px",
                 borderRadius: "999px",
-                background: submitted ? "rgba(255,255,255,0.08)" : `${topMeta.accentColor}1c`,
-                border: `0.5px solid ${submitted ? "rgba(255,255,255,0.12)" : `${topMeta.accentColor}55`}`,
-                color: submitted ? "rgba(255,255,255,0.72)" : topMeta.accentColor,
+                background: `${topMeta.accentColor}1c`,
+                border: `0.5px solid ${topMeta.accentColor}55`,
+                color: topMeta.accentColor,
                 fontWeight: 600,
                 minWidth: "94px",
                 textAlign: "center",
               }}
             >
-              {submitted ? "submitted" : formatCountdown(timeRemaining)}
+              {formatCountdown(currentTimeRemaining)}
             </div>
-            {!submitted && (
-              <button
-                onClick={() => setSubmitted(true)}
-                style={{
-                  padding: "8px 14px",
-                  borderRadius: "999px",
-                  border: "0.5px solid rgba(255,255,255,0.12)",
-                  background: "transparent",
-                  color: "rgba(255,255,255,0.7)",
-                  cursor: "pointer",
-                }}
-              >
-                submit section
-              </button>
-            )}
+            <button
+              onClick={() => void handleSectionAdvance(false)}
+              disabled={submitting}
+              style={{
+                padding: "8px 14px",
+                borderRadius: "999px",
+                border: "0.5px solid rgba(255,255,255,0.12)",
+                background: "transparent",
+                color: "rgba(255,255,255,0.7)",
+                cursor: "pointer",
+              }}
+            >
+              {currentSectionIndex >= sections.length - 1 ? "submit test" : "submit section"}
+            </button>
           </div>
         </nav>
 
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.2fr) 320px", gap: "18px", alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.2fr) 340px", gap: "18px", alignItems: "start" }}>
           <div>
             <div style={{ marginBottom: "1rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px", gap: "10px", flexWrap: "wrap" }}>
                 <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.36)" }}>
-                  question {currentIndex + 1} of {questions.length}
+                  {currentSection.title} · question {currentQuestionIndex + 1} of {currentSection.questions.length}
                 </span>
                 <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>
                   {answeredCount} answered · {flaggedCount} flagged · {remainingCount} remaining
@@ -434,7 +1037,7 @@ function PracticeTestRunContent() {
                 <div
                   style={{
                     height: "100%",
-                    width: `${((currentIndex + 1) / Math.max(questions.length, 1)) * 100}%`,
+                    width: `${((currentQuestionIndex + 1) / Math.max(currentSection.questions.length, 1)) * 100}%`,
                     background: topMeta.accentColor,
                     borderRadius: "999px",
                   }}
@@ -444,7 +1047,7 @@ function PracticeTestRunContent() {
 
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "0.9rem" }}>
               <span style={{ fontSize: "10px", padding: "4px 10px", borderRadius: "999px", background: `${topMeta.accentColor}16`, border: `0.5px solid ${topMeta.accentColor}44`, color: topMeta.accentColor }}>
-                {topMeta.shortLabel} · {topMeta.constellation}
+                {currentSection.sectionKey} · {topMeta.constellation}
               </span>
               <span style={{ fontSize: "10px", padding: "4px 10px", borderRadius: "999px", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.52)" }}>
                 {currentQuestion.topic}
@@ -485,33 +1088,15 @@ function PracticeTestRunContent() {
 
             <div style={{ display: "grid", gap: "8px", marginBottom: "1rem" }}>
               {(["A", "B", "C", "D"] as const).map((letter) => {
-                const selectedAnswer = selectedAnswers[currentIndex];
+                const selectedAnswer = currentQuestionKey ? selectedAnswers[currentQuestionKey] : null;
                 const isPicked = selectedAnswer === letter;
-                const isCorrect = currentQuestion.correct_answer === letter;
-
-                let background = "rgba(255,255,255,0.03)";
-                let borderColor = "rgba(255,255,255,0.1)";
-                let textColor = "rgba(255,255,255,0.82)";
-
-                if (submitted) {
-                  if (isCorrect) {
-                    background = "rgba(93,202,165,0.1)";
-                    borderColor = "#5DCAA5";
-                  } else if (isPicked) {
-                    background = "rgba(240,153,123,0.1)";
-                    borderColor = "#F0997B";
-                  }
-                } else if (isPicked) {
-                  background = "rgba(255,255,255,0.08)";
-                  borderColor = "rgba(255,255,255,0.34)";
-                }
 
                 return (
                   <button
                     key={letter}
                     onClick={() => {
-                      if (submitted) return;
-                      setSelectedAnswers((current) => ({ ...current, [currentIndex]: letter }));
+                      if (!currentQuestionKey) return;
+                      setSelectedAnswers((current) => ({ ...current, [currentQuestionKey]: letter }));
                     }}
                     style={{
                       textAlign: "left",
@@ -520,10 +1105,10 @@ function PracticeTestRunContent() {
                       gap: "12px",
                       padding: "12px 14px",
                       borderRadius: "12px",
-                      border: `0.5px solid ${borderColor}`,
-                      background,
-                      color: textColor,
-                      cursor: submitted ? "default" : "pointer",
+                      border: `0.5px solid ${isPicked ? "rgba(255,255,255,0.34)" : "rgba(255,255,255,0.1)"}`,
+                      background: isPicked ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.03)",
+                      color: "rgba(255,255,255,0.82)",
+                      cursor: "pointer",
                     }}
                   >
                     <div
@@ -536,7 +1121,7 @@ function PracticeTestRunContent() {
                         alignItems: "center",
                         justifyContent: "center",
                         flexShrink: 0,
-                        color: submitted && isCorrect ? "#5DCAA5" : "rgba(255,255,255,0.76)",
+                        color: "rgba(255,255,255,0.76)",
                       }}
                     >
                       {letter}
@@ -549,64 +1134,44 @@ function PracticeTestRunContent() {
               })}
             </div>
 
-            {submitted && (
-              <div
-                style={{
-                  borderRadius: "14px",
-                  background: "rgba(255,255,255,0.04)",
-                  borderLeft: `2px solid ${topMeta.accentColor}`,
-                  padding: "12px 14px",
-                  marginBottom: "1rem",
-                  fontSize: "13px",
-                  lineHeight: 1.7,
-                  color: "rgba(255,255,255,0.7)",
-                }}
-              >
-                <div style={{ fontSize: "10px", letterSpacing: ".06em", color: topMeta.accentColor, marginBottom: "4px" }}>
-                  answer review
-                </div>
-                Correct answer: {currentQuestion.correct_answer}. {currentQuestion.explanation}
-              </div>
-            )}
-
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
               <button
-                onClick={() => setFlagged((current) => (current.includes(currentIndex) ? current.filter((value) => value !== currentIndex) : [...current, currentIndex]))}
+                onClick={toggleFlag}
                 style={{
                   padding: "10px 14px",
                   borderRadius: "12px",
                   border: "0.5px solid rgba(255,255,255,0.12)",
-                  background: flagged.includes(currentIndex) ? `${topMeta.accentColor}16` : "transparent",
-                  color: flagged.includes(currentIndex) ? topMeta.accentColor : "rgba(255,255,255,0.68)",
+                  background: currentQuestionKey && flaggedKeys.includes(currentQuestionKey) ? `${topMeta.accentColor}16` : "transparent",
+                  color: currentQuestionKey && flaggedKeys.includes(currentQuestionKey) ? topMeta.accentColor : "rgba(255,255,255,0.68)",
                   cursor: "pointer",
                 }}
               >
-                {flagged.includes(currentIndex) ? "flagged" : "flag for review"}
+                {currentQuestionKey && flaggedKeys.includes(currentQuestionKey) ? "flagged" : "flag for review"}
               </button>
               <button
-                onClick={() => setCurrentIndex((current) => Math.max(0, current - 1))}
-                disabled={currentIndex === 0}
+                onClick={() => goToQuestion(Math.max(0, currentQuestionIndex - 1))}
+                disabled={currentQuestionIndex === 0}
                 style={{
                   padding: "10px 14px",
                   borderRadius: "12px",
                   border: "0.5px solid rgba(255,255,255,0.12)",
                   background: "transparent",
-                  color: currentIndex === 0 ? "rgba(255,255,255,0.26)" : "rgba(255,255,255,0.7)",
-                  cursor: currentIndex === 0 ? "default" : "pointer",
+                  color: currentQuestionIndex === 0 ? "rgba(255,255,255,0.26)" : "rgba(255,255,255,0.7)",
+                  cursor: currentQuestionIndex === 0 ? "default" : "pointer",
                 }}
               >
                 previous
               </button>
               <button
-                onClick={() => setCurrentIndex((current) => Math.min(questions.length - 1, current + 1))}
-                disabled={currentIndex >= questions.length - 1}
+                onClick={() => goToQuestion(Math.min(currentSection.questions.length - 1, currentQuestionIndex + 1))}
+                disabled={currentQuestionIndex >= currentSection.questions.length - 1}
                 style={{
                   padding: "10px 14px",
                   borderRadius: "12px",
                   border: "0.5px solid rgba(255,255,255,0.12)",
                   background: "transparent",
-                  color: currentIndex >= questions.length - 1 ? "rgba(255,255,255,0.26)" : "rgba(255,255,255,0.7)",
-                  cursor: currentIndex >= questions.length - 1 ? "default" : "pointer",
+                  color: currentQuestionIndex >= currentSection.questions.length - 1 ? "rgba(255,255,255,0.26)" : "rgba(255,255,255,0.7)",
+                  cursor: currentQuestionIndex >= currentSection.questions.length - 1 ? "default" : "pointer",
                 }}
               >
                 next
@@ -628,14 +1193,15 @@ function PracticeTestRunContent() {
               section map
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: "8px", marginBottom: "1rem" }}>
-              {questions.map((question, index) => {
-                const isCurrent = index === currentIndex;
-                const isAnswered = Boolean(selectedAnswers[index]);
-                const isFlagged = flagged.includes(index);
+              {currentSection.questions.map((question, index) => {
+                const answerKey = keyFor(currentSectionIndex, index);
+                const isCurrent = index === currentQuestionIndex;
+                const isAnswered = Boolean(selectedAnswers[answerKey]);
+                const isFlagged = flaggedKeys.includes(answerKey);
                 return (
                   <button
                     key={question.id}
-                    onClick={() => setCurrentIndex(index)}
+                    onClick={() => goToQuestion(index)}
                     style={{
                       width: "100%",
                       aspectRatio: "1 / 1",
@@ -686,41 +1252,51 @@ function PracticeTestRunContent() {
               ))}
             </div>
 
-            {submitted ? (
-              <div
-                style={{
-                  borderRadius: "14px",
-                  background: "rgba(255,255,255,0.04)",
-                  borderLeft: `2px solid ${topMeta.accentColor}`,
-                  padding: "0.95rem 1rem",
-                }}
-              >
-                <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "28px", color: topMeta.accentColor, marginBottom: "4px" }}>
-                  {correctCount}/{questions.length}
-                </div>
-                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.38)", marginBottom: "10px" }}>raw score</div>
-                <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.72)", marginBottom: "6px" }}>
-                  accuracy {accuracyPct}% · quick estimate {estimatedSectionScore}/36
-                </div>
-                <div style={{ fontSize: "12px", lineHeight: 1.7, color: "rgba(255,255,255,0.5)" }}>
-                  Detailed scaled scoring and star recovery plans are next in Phase 3B.
-                </div>
-              </div>
-            ) : (
-              <div
-                style={{
-                  borderRadius: "14px",
-                  background: "rgba(255,255,255,0.03)",
-                  borderLeft: `2px solid ${topMeta.accentColor}`,
-                  padding: "0.95rem 1rem",
-                  fontSize: "12px",
-                  lineHeight: 1.7,
-                  color: "rgba(255,255,255,0.52)",
-                }}
-              >
-                No instant answer reveals here. Take it like a real section, then review once you submit or run out of time.
+            {currentSection.sectionKey === "math" && mode.includesDesmos && (
+              <div style={{ marginBottom: "1rem" }}>
+                <button
+                  onClick={() => setShowCalculator((current) => !current)}
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    borderRadius: "12px",
+                    border: "0.5px solid rgba(255,255,255,0.12)",
+                    background: showCalculator ? `${topMeta.accentColor}16` : "transparent",
+                    color: showCalculator ? topMeta.accentColor : "rgba(255,255,255,0.72)",
+                    cursor: "pointer",
+                    marginBottom: showCalculator ? "10px" : 0,
+                  }}
+                >
+                  {showCalculator ? "hide calculator" : "open calculator"}
+                </button>
+                {showCalculator && (
+                  <div style={{ borderRadius: "14px", overflow: "hidden", border: "0.5px solid rgba(255,255,255,0.08)", background: "rgba(0,0,0,0.2)" }}>
+                    <div style={{ padding: "8px 10px", fontSize: "11px", color: "rgba(255,255,255,0.46)", borderBottom: "0.5px solid rgba(255,255,255,0.08)" }}>
+                      Desmos Graphing Calculator
+                    </div>
+                    <iframe
+                      title="Desmos Graphing Calculator"
+                      src="https://www.desmos.com/calculator"
+                      style={{ width: "100%", height: "360px", border: "none", display: "block" }}
+                    />
+                  </div>
+                )}
               </div>
             )}
+
+            <div
+              style={{
+                borderRadius: "14px",
+                background: "rgba(255,255,255,0.03)",
+                borderLeft: `2px solid ${topMeta.accentColor}`,
+                padding: "0.95rem 1rem",
+                fontSize: "12px",
+                lineHeight: 1.7,
+                color: "rgba(255,255,255,0.52)",
+              }}
+            >
+              No instant answer reveals here. Take it like a real section, then review once you submit or run out of time.
+            </div>
           </aside>
         </div>
       </div>

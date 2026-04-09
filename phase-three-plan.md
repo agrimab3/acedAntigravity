@@ -125,6 +125,7 @@ This is what makes Aced better than a plain stopwatch.
 - support question navigation and flagging
 - add auto-submit on time expiration
 - store test session results
+- add section report/review screens with missed-question analysis
 
 ## Phase 3C Scope
 
@@ -132,6 +133,7 @@ This is what makes Aced better than a plain stopwatch.
 - add break/transition handling
 - add final test reporting
 - add Math calculator integration
+- sync completed practice-test results back into Aced's main ACT score model
 
 ## Future Stretch
 
@@ -141,11 +143,21 @@ This is what makes Aced better than a plain stopwatch.
 - test history timeline
 - score trend over time
 
+## Current Status
+
+Phase 3B/3C foundation is now live:
+
+1. timed runner works for section and full-test modes
+2. practice-test sessions/results persist in PostgreSQL
+3. report screens include missed-skill and missed-question review
+4. Math sections can open Desmos inside the runner
+5. completed timed tests now influence the main dashboard ACT estimates
+
 ## Immediate Next Step
 
-Implement the Phase 3A foundation:
+Refine the practice-test system into a fuller performance layer:
 
-1. shared test-mode config
-2. separate `Practice Tests` page/tab
-3. launcher cards for section and full-test modes
-4. then build the timed section shell on top of that structure
+1. add test-history surfaces
+2. improve pacing analytics and review navigation
+3. keep calibrating score mapping against ACT-style performance
+4. expand remediation plans from report -> targeted star practice

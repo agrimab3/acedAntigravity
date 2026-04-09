@@ -10,6 +10,17 @@ import {
 } from "drizzle-orm/pg-core";
 
 export type ChoiceMap = Record<"A" | "B" | "C" | "D", string>;
+export type PracticeTestQuestionSnapshot = {
+  id: string;
+  section: string;
+  topic: string;
+  difficulty: string;
+  passage: string | null;
+  question_text: string;
+  choices: ChoiceMap;
+  correct_answer: "A" | "B" | "C" | "D";
+  explanation: string;
+};
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -219,4 +230,79 @@ export const topicMastery = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [uniqueIndex("topic_mastery_user_topic_idx").on(table.userId, table.topicId)]
+);
+
+export const practiceTestSessions = pgTable("practice_test_sessions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  modeKey: text("mode_key").notNull(),
+  format: text("format").notNull(),
+  status: text("status").default("in_progress").notNull(),
+  scienceIncluded: boolean("science_included").default(false).notNull(),
+  totalQuestionCount: integer("total_question_count").default(0).notNull(),
+  answeredCount: integer("answered_count").default(0).notNull(),
+  correctCount: integer("correct_count").default(0).notNull(),
+  accuracyPct: integer("accuracy_pct").default(0).notNull(),
+  compositeEstimatedScore: integer("composite_estimated_score"),
+  durationSeconds: integer("duration_seconds").default(0).notNull(),
+  startedAt: timestamp("started_at", { withTimezone: true }).defaultNow().notNull(),
+  completedAt: timestamp("completed_at", { withTimezone: true }),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const practiceTestSections = pgTable(
+  "practice_test_sections",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    sessionId: uuid("session_id")
+      .notNull()
+      .references(() => practiceTestSessions.id, { onDelete: "cascade" }),
+    sectionKey: text("section_key")
+      .notNull()
+      .references(() => actSections.key, { onDelete: "cascade" }),
+    sectionOrder: integer("section_order").notNull(),
+    title: text("title").notNull(),
+    questionCount: integer("question_count").default(0).notNull(),
+    answeredCount: integer("answered_count").default(0).notNull(),
+    correctCount: integer("correct_count").default(0).notNull(),
+    accuracyPct: integer("accuracy_pct").default(0).notNull(),
+    estimatedScore: integer("estimated_score"),
+    timeLimitSeconds: integer("time_limit_seconds").default(0).notNull(),
+    durationSeconds: integer("duration_seconds").default(0).notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }).defaultNow().notNull(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [uniqueIndex("practice_test_sections_session_order_idx").on(table.sessionId, table.sectionOrder)]
+);
+
+export const practiceTestAnswers = pgTable(
+  "practice_test_answers",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    sessionId: uuid("session_id")
+      .notNull()
+      .references(() => practiceTestSessions.id, { onDelete: "cascade" }),
+    sectionRunId: uuid("section_run_id")
+      .notNull()
+      .references(() => practiceTestSections.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    questionId: uuid("question_id").references(() => questions.id, { onDelete: "set null" }),
+    questionOrder: integer("question_order").notNull(),
+    topicName: text("topic_name").notNull(),
+    selectedAnswer: text("selected_answer"),
+    correctAnswer: text("correct_answer").notNull(),
+    isCorrect: boolean("is_correct"),
+    flagged: boolean("flagged").default(false).notNull(),
+    timeSpentSeconds: integer("time_spent_seconds").default(0).notNull(),
+    questionSnapshot: jsonb("question_snapshot").$type<PracticeTestQuestionSnapshot>().notNull(),
+    answeredAt: timestamp("answered_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [uniqueIndex("practice_test_answers_section_question_order_idx").on(table.sectionRunId, table.questionOrder)]
 );

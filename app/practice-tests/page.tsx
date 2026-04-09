@@ -156,7 +156,7 @@ export default function PracticeTestsPage() {
               marginBottom: "10px",
             }}
           >
-            Phase 3A
+            Phase 3B
           </div>
           <h1
             style={{
@@ -393,8 +393,8 @@ export default function PracticeTestsPage() {
                 marginBottom: "1rem",
               }}
             >
-              Phase 3A foundation is live now. Next up is the real timed test shell with answer nav, autosubmit, section reports,
-              and Math calculator support.
+              Timed section runs, full-test orchestration, database persistence, score reports, missed-question review, and
+              Math calculator support are now part of the live practice-test flow.
             </div>
 
             <div style={{ display: "flex", gap: "8px" }}>
@@ -415,24 +415,22 @@ export default function PracticeTestsPage() {
               </button>
               <button
                 onClick={() => {
-                  if (selectedMode.format === "section") {
-                    router.push(`/practice-tests/run?mode=${selectedMode.key}`);
-                  }
+                  router.push(`/practice-tests/run?mode=${selectedMode.key}`);
                 }}
                 style={{
                   flex: 1.4,
                   padding: "11px 12px",
                   borderRadius: "12px",
-                  background: selectedMode.format === "section" ? selectedMode.accentColor : "rgba(255,255,255,0.08)",
+                  background: selectedMode.accentColor,
                   border: "none",
-                  color: selectedMode.format === "section" ? "#081018" : "rgba(255,255,255,0.42)",
-                  cursor: selectedMode.format === "section" ? "pointer" : "not-allowed",
+                  color: "#081018",
+                  cursor: "pointer",
                   fontSize: "13px",
                   fontWeight: 600,
                   opacity: 0.92,
                 }}
               >
-                {selectedMode.format === "section" ? "start timed section →" : "full runner next →"}
+                {selectedMode.format === "section" ? "start timed section →" : "start full test →"}
               </button>
             </div>
           </aside>
