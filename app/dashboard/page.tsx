@@ -910,27 +910,55 @@ export default function Dashboard() {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            gap: "1rem",
             marginBottom: "1.5rem",
+            flexWrap: "wrap",
           }}
         >
           <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px" }}>
             Aced<em style={{ color: "#1D9E75" }}>.</em>
           </div>
-          <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "2.8rem",
+              flex: 1,
+              minWidth: "220px",
+            }}
+          >
+            <button
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "#fff",
+                fontSize: "16px",
+                fontWeight: 500,
+                cursor: "default",
+                padding: 0,
+                fontFamily: "DM Sans,sans-serif",
+              }}
+            >
+              practice
+            </button>
             <button
               onClick={() => router.push("/practice-tests")}
               style={{
-                background: "rgba(255,255,255,0.06)",
-                border: "0.5px solid rgba(255,255,255,0.14)",
-                color: "rgba(255,255,255,0.72)",
-                padding: "7px 16px",
-                borderRadius: "20px",
-                fontSize: "12px",
+                background: "transparent",
+                border: "none",
+                color: "rgba(255,255,255,0.58)",
+                fontSize: "16px",
+                fontWeight: 500,
                 cursor: "pointer",
+                padding: 0,
+                fontFamily: "DM Sans,sans-serif",
               }}
             >
-              practice tests
+              full tests
             </button>
+          </div>
+          <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
             <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)" }}>
               {session?.user?.email}
             </span>
