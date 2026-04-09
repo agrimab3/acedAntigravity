@@ -1,5 +1,5 @@
 import type { ChoiceMap } from "@/db/schema";
-import { reviewQuestionQuality } from "@/lib/question-utils";
+import { reviewQuestionQuality } from "./question-utils";
 
 export const CONTENT_DIFFICULTIES = ["easy", "medium", "hard"] as const;
 export const CONTENT_PUBLISHED_TARGET = 10;
@@ -64,6 +64,13 @@ export type ContentTopicAudit = {
   recommendedPerDifficulty: number;
   priorityScore: number;
   difficultyBreakdown: ContentDifficultyAudit[];
+};
+
+export type ContentTopicSelectionOptions = {
+  sectionKeys?: string[];
+  priorities?: ContentReviewPriority[];
+  preferredDifficulties?: ContentDifficultyKey[];
+  maxTopics?: number;
 };
 
 function clamp(value: number, min: number, max: number) {
@@ -139,6 +146,79 @@ function resolveFocusDifficulty(breakdown: ContentDifficultyAudit[]) {
   });
 
   return ranked[0]?.publishedGapCount > 0 ? ranked[0].difficulty : "balanced";
+}
+
+export function getDifficultyGapCount(
+  topic: ContentTopicAudit,
+  difficulty: ContentDifficultyKey
+) {
+  return (
+    topic.difficultyBreakdown.find((entry) => entry.difficulty === difficulty)?.publishedGapCount ?? 0
+  );
+}
+
+export function scoreTopicForBacklogFill(
+  topic: ContentTopicAudit,
+  preferredDifficulties: ContentDifficultyKey[] = ["hard", "medium", "easy"]
+) {
+  return preferredDifficulties.reduce((score, difficulty, index) => {
+    const weight = preferredDifficulties.length - index + 1;
+    return score + getDifficultyGapCount(topic, difficulty) * weight * 3;
+  }, topic.priorityScore);
+}
+
+export function sortTopicsByPriority(
+  topics: ContentTopicAudit[],
+  preferredDifficulties: ContentDifficultyKey[] = ["hard", "medium", "easy"]
+) {
+  return [...topics].sort((left, right) => {
+    if (left.needsWork !== right.needsWork) {
+      return left.needsWork ? -1 : 1;
+    }
+
+    const leftScore = scoreTopicForBacklogFill(left, preferredDifficulties);
+    const rightScore = scoreTopicForBacklogFill(right, preferredDifficulties);
+
+    if (leftScore !== rightScore) {
+      return rightScore - leftScore;
+    }
+
+    if (left.sectionKey !== right.sectionKey) {
+      return left.sectionKey.localeCompare(right.sectionKey);
+    }
+
+    return left.topicName.localeCompare(right.topicName);
+  });
+}
+
+export function selectTopicsForBacklogFill(
+  topics: ContentTopicAudit[],
+  {
+    sectionKeys,
+    priorities = ["critical"],
+    preferredDifficulties = ["hard", "medium", "easy"],
+    maxTopics = 6,
+  }: ContentTopicSelectionOptions = {}
+) {
+  const normalizedSectionKeys = sectionKeys?.map((sectionKey) => sectionKey.trim().toLowerCase()) ?? null;
+
+  return sortTopicsByPriority(topics, preferredDifficulties)
+    .filter((topic) => {
+      if (!topic.needsWork) {
+        return false;
+      }
+
+      if (normalizedSectionKeys && normalizedSectionKeys.length > 0 && !normalizedSectionKeys.includes(topic.sectionKey)) {
+        return false;
+      }
+
+      if (priorities.length > 0 && !priorities.includes(topic.reviewPriority)) {
+        return false;
+      }
+
+      return true;
+    })
+    .slice(0, maxTopics);
 }
 
 export function auditTopicInventory(

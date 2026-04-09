@@ -5,26 +5,38 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { actTopics, questions } from "@/db/schema";
 import { getAdminSession } from "@/lib/admin";
-import { auditTopicInventory } from "@/lib/content-audit";
+import {
+  auditTopicInventory,
+  selectTopicsForBacklogFill,
+  sortTopicsByPriority,
+} from "@/lib/content-audit";
 import { getDb } from "@/lib/db";
 
 const execFileAsync = promisify(execFile);
+const sectionKeySchema = z.enum(["english", "math", "reading", "science"]);
+const difficultyKeySchema = z.enum(["easy", "medium", "hard"]);
+const prioritySchema = z.enum(["critical", "rebuild", "watch", "healthy"]);
 
-const generateSchema = z.object({
+const singleGenerateSchema = z.object({
+  mode: z.literal("single").optional(),
   sectionKey: z.enum(["english", "math", "reading", "science"]),
   topicSlug: z.string().trim().min(1),
   perDifficulty: z.coerce.number().int().min(1).max(3).default(1),
   status: z.enum(["draft", "published"]).default("draft"),
 });
 
-export async function GET() {
-  const session = await getAdminSession();
-  const db = getDb();
+const bulkGenerateSchema = z.object({
+  mode: z.literal("bulk"),
+  sectionKeys: z.array(sectionKeySchema).min(1).max(4).default(["math", "reading"]),
+  priorities: z.array(prioritySchema).min(1).max(4).default(["critical"]),
+  preferredDifficulties: z.array(difficultyKeySchema).min(1).max(3).default(["hard", "medium"]),
+  maxTopics: z.coerce.number().int().min(1).max(12).default(6),
+  status: z.enum(["draft", "published"]).default("draft"),
+});
 
-  if (!session || !db) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  }
+const generateSchema = z.union([singleGenerateSchema, bulkGenerateSchema]);
 
+async function loadAuditedTopics(db: NonNullable<ReturnType<typeof getDb>>) {
   const [topicRows, questionRows] = await Promise.all([
     db
       .select({
@@ -66,25 +78,20 @@ export async function GET() {
     new Map<typeof topicRows[number]["id"], typeof questionRows>()
   );
 
-  const topics = topicRows
-    .map((topic) =>
-      auditTopicInventory(topic, questionsByTopicId.get(topic.id) ?? [])
-    )
-    .sort((left, right) => {
-      if (left.needsWork !== right.needsWork) {
-        return left.needsWork ? -1 : 1;
-      }
+  return sortTopicsByPriority(
+    topicRows.map((topic) => auditTopicInventory(topic, questionsByTopicId.get(topic.id) ?? []))
+  );
+}
 
-      if (left.priorityScore !== right.priorityScore) {
-        return right.priorityScore - left.priorityScore;
-      }
+export async function GET() {
+  const session = await getAdminSession();
+  const db = getDb();
 
-      if (left.sectionKey !== right.sectionKey) {
-        return left.sectionKey.localeCompare(right.sectionKey);
-      }
+  if (!session || !db) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
 
-      return left.topicName.localeCompare(right.topicName);
-    });
+  const topics = await loadAuditedTopics(db);
 
   return NextResponse.json({ topics });
 }
@@ -118,10 +125,54 @@ function resolveGenerationModel(provider: string) {
   return process.env.GEMINI_GENERATION_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
 }
 
+async function runGeneration({
+  sectionKey,
+  topicSlug,
+  perDifficulty,
+  status,
+}: {
+  sectionKey: string;
+  topicSlug: string;
+  perDifficulty: number;
+  status: "draft" | "published";
+}) {
+  const provider = resolveGenerationProvider();
+  const model = resolveGenerationModel(provider);
+  const child = await execFileAsync(
+    "node",
+    [
+      "generate-questions.mjs",
+      `--section=${sectionKey}`,
+      `--topic=${topicSlug}`,
+      `--per-difficulty=${perDifficulty}`,
+      `--status=${status}`,
+      `--provider=${provider}`,
+      `--model=${model}`,
+      "--delay-ms=0",
+      "--json=1",
+    ],
+    {
+      cwd: process.cwd(),
+      env: process.env,
+      timeout: 240000,
+      maxBuffer: 1024 * 1024 * 4,
+    }
+  );
+
+  return {
+    provider,
+    model,
+    summary: extractJsonSummary(child.stdout),
+    stdout: child.stdout,
+    stderr: child.stderr,
+  };
+}
+
 export async function POST(request: Request) {
   const session = await getAdminSession();
+  const db = getDb();
 
-  if (!session) {
+  if (!session || !db) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
@@ -132,33 +183,61 @@ export async function POST(request: Request) {
   }
 
   try {
-    const provider = resolveGenerationProvider();
-    const model = resolveGenerationModel(provider);
-    const child = await execFileAsync(
-      "node",
-      [
-        "generate-questions.mjs",
-        `--section=${parsed.data.sectionKey}`,
-        `--topic=${parsed.data.topicSlug}`,
-        `--per-difficulty=${parsed.data.perDifficulty}`,
-        `--status=${parsed.data.status}`,
-        `--provider=${provider}`,
-        `--model=${model}`,
-        "--delay-ms=0",
-        "--json=1",
-      ],
-      {
-        cwd: process.cwd(),
-        env: process.env,
-        timeout: 240000,
-        maxBuffer: 1024 * 1024 * 4,
+    if (parsed.data.mode === "bulk") {
+      const auditedTopics = await loadAuditedTopics(db);
+      const selectedTopics = selectTopicsForBacklogFill(auditedTopics, {
+        sectionKeys: parsed.data.sectionKeys,
+        priorities: parsed.data.priorities,
+        preferredDifficulties: parsed.data.preferredDifficulties,
+        maxTopics: parsed.data.maxTopics,
+      });
+
+      const results = [];
+
+      for (const topic of selectedTopics) {
+        const generation = await runGeneration({
+          sectionKey: topic.sectionKey,
+          topicSlug: topic.topicSlug,
+          perDifficulty: topic.recommendedPerDifficulty,
+          status: parsed.data.status,
+        });
+
+        results.push({
+          sectionKey: topic.sectionKey,
+          topicSlug: topic.topicSlug,
+          topicName: topic.topicName,
+          perDifficulty: topic.recommendedPerDifficulty,
+          reviewPriority: topic.reviewPriority,
+          focusDifficulty: topic.focusDifficulty,
+          publishedGapCount: topic.publishedGapCount,
+          summary: generation.summary,
+        });
       }
-    );
+
+      return NextResponse.json({
+        selection: {
+          sectionKeys: parsed.data.sectionKeys,
+          priorities: parsed.data.priorities,
+          preferredDifficulties: parsed.data.preferredDifficulties,
+          maxTopics: parsed.data.maxTopics,
+          selectedTopicCount: selectedTopics.length,
+          status: parsed.data.status,
+        },
+        results,
+      });
+    }
+
+    const generation = await runGeneration({
+      sectionKey: parsed.data.sectionKey,
+      topicSlug: parsed.data.topicSlug,
+      perDifficulty: parsed.data.perDifficulty,
+      status: parsed.data.status,
+    });
 
     return NextResponse.json({
-      summary: extractJsonSummary(child.stdout),
-      stdout: child.stdout,
-      stderr: child.stderr,
+      summary: generation.summary,
+      stdout: generation.stdout,
+      stderr: generation.stderr,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Generation failed.";

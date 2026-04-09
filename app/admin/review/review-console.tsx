@@ -73,6 +73,10 @@ type ReviewQuestion = {
 
 const sectionOptions = ["all", "english", "math", "reading", "science"] as const;
 const statusOptions = ["draft", "published", "rejected"] as const;
+const reviewQualityOptions = ["all", "blocked", "warning", "clean"] as const;
+const reviewSortOptions = ["blocked-first", "highest-risk", "newest"] as const;
+const bulkScopeOptions = ["math-reading", "current-filter", "all-sections"] as const;
+const bulkCountOptions = [3, 6, 9] as const;
 
 function getBacklogPriorityBadge(topic: BacklogTopic) {
   if (topic.reviewPriority === "critical") {
@@ -137,9 +141,14 @@ export default function ReviewConsole() {
   const [activeSection, setActiveSection] = useState<(typeof sectionOptions)[number]>("all");
   const [activeStatus, setActiveStatus] = useState<(typeof statusOptions)[number]>("draft");
   const [activeTopic, setActiveTopic] = useState("all");
+  const [reviewQualityFilter, setReviewQualityFilter] = useState<(typeof reviewQualityOptions)[number]>("all");
+  const [reviewSort, setReviewSort] = useState<(typeof reviewSortOptions)[number]>("blocked-first");
+  const [bulkScope, setBulkScope] = useState<(typeof bulkScopeOptions)[number]>("math-reading");
+  const [bulkTopicCount, setBulkTopicCount] = useState<(typeof bulkCountOptions)[number]>(6);
   const [loadingBacklog, setLoadingBacklog] = useState(true);
   const [loadingQuestions, setLoadingQuestions] = useState(true);
   const [runningTopic, setRunningTopic] = useState<string | null>(null);
+  const [runningBulkFill, setRunningBulkFill] = useState(false);
   const [savingQuestionId, setSavingQuestionId] = useState<string | null>(null);
   const [notesByQuestionId, setNotesByQuestionId] = useState<Record<string, string>>({});
   const [flashMessage, setFlashMessage] = useState<string | null>(null);
@@ -162,6 +171,23 @@ export default function ReviewConsole() {
     });
   }, [availableTopics]);
 
+  const reviewQueueSummary = useMemo(() => {
+    return questions.reduce(
+      (summary, question) => {
+        if (question.qualityReview.blockingFlags.length > 0) {
+          summary.blocked += 1;
+        } else if (question.qualityReview.warningFlags.length > 0) {
+          summary.warning += 1;
+        } else {
+          summary.clean += 1;
+        }
+
+        return summary;
+      },
+      { blocked: 0, warning: 0, clean: 0 }
+    );
+  }, [questions]);
+
   async function loadBacklog() {
     setLoadingBacklog(true);
     try {
@@ -179,7 +205,9 @@ export default function ReviewConsole() {
     try {
       const params = new URLSearchParams({
         status: activeStatus,
-        limit: "16",
+        limit: "24",
+        qualityFilter: reviewQualityFilter,
+        sort: reviewSort,
       });
 
       if (activeSection !== "all") {
@@ -214,7 +242,56 @@ export default function ReviewConsole() {
 
   useEffect(() => {
     handleLoadQuestions();
-  }, [activeSection, activeStatus, activeTopic]);
+  }, [activeSection, activeStatus, activeTopic, reviewQualityFilter, reviewSort]);
+
+  async function bulkFillCriticalTopics() {
+    setRunningBulkFill(true);
+    setFlashMessage(null);
+
+    const sectionKeys =
+      bulkScope === "math-reading"
+        ? ["math", "reading"]
+        : bulkScope === "all-sections"
+          ? ["english", "math", "reading", "science"]
+          : activeSection === "all"
+            ? ["english", "math", "reading", "science"]
+            : [activeSection];
+
+    try {
+      const res = await fetch("/api/admin/backlog", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode: "bulk",
+          sectionKeys,
+          priorities: ["critical"],
+          preferredDifficulties: ["hard", "medium"],
+          maxTopics: bulkTopicCount,
+          status: "draft",
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Bulk generation failed.");
+      }
+
+      const inserted = (data.results ?? []).reduce(
+        (sum: number, result: { summary?: { inserted?: number } }) => sum + Number(result.summary?.inserted ?? 0),
+        0
+      );
+
+      setFlashMessage(
+        `Filled ${data.selection?.selectedTopicCount ?? 0} critical topic batch${data.selection?.selectedTopicCount === 1 ? "" : "es"} and inserted ${inserted} draft question${inserted === 1 ? "" : "s"}.`
+      );
+      await Promise.all([loadBacklog(), loadQuestions()]);
+    } catch (error) {
+      setFlashMessage(error instanceof Error ? error.message : "Bulk generation failed.");
+    } finally {
+      setRunningBulkFill(false);
+    }
+  }
 
   async function generateDraftBatch(topic: BacklogTopic) {
     setRunningTopic(topic.topicSlug);
@@ -331,6 +408,40 @@ export default function ReviewConsole() {
                 </option>
               ))}
             </select>
+
+            <select
+              value={reviewQualityFilter}
+              onChange={(event) => setReviewQualityFilter(event.target.value as (typeof reviewQualityOptions)[number])}
+              style={selectStyle}
+            >
+              {reviewQualityOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option === "all"
+                    ? "all quality reads"
+                    : option === "blocked"
+                      ? "serve blocked only"
+                      : option === "warning"
+                        ? "warnings only"
+                        : "clean only"}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={reviewSort}
+              onChange={(event) => setReviewSort(event.target.value as (typeof reviewSortOptions)[number])}
+              style={selectStyle}
+            >
+              {reviewSortOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option === "blocked-first"
+                    ? "blocked first"
+                    : option === "highest-risk"
+                      ? "highest risk"
+                      : "newest first"}
+                </option>
+              ))}
+            </select>
           </div>
         </section>
 
@@ -361,6 +472,71 @@ export default function ReviewConsole() {
             </div>
             <button onClick={() => void loadBacklog()} style={ghostButtonStyle}>
               refresh
+            </button>
+          </div>
+
+          <div
+            style={{
+              borderRadius: "14px",
+              border: "1px solid rgba(255,255,255,0.08)",
+              background: "rgba(255,255,255,0.035)",
+              padding: "12px",
+              marginBottom: "12px",
+            }}
+          >
+            <div style={{ fontSize: "11px", letterSpacing: ".06em", color: "rgba(255,255,255,0.38)" }}>
+              BULK FILL
+            </div>
+            <div style={{ marginTop: "6px", fontSize: "13px", color: "rgba(255,255,255,0.68)", lineHeight: 1.55 }}>
+              queue critical draft batches without clicking topic by topic
+            </div>
+            <div style={{ display: "grid", gap: "8px", marginTop: "12px" }}>
+              <select
+                value={bulkScope}
+                onChange={(event) => setBulkScope(event.target.value as (typeof bulkScopeOptions)[number])}
+                style={selectStyle}
+              >
+                {bulkScopeOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option === "math-reading"
+                      ? "math + reading critical gaps"
+                      : option === "current-filter"
+                        ? "current section filter"
+                        : "all critical topics"}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={String(bulkTopicCount)}
+                onChange={(event) => setBulkTopicCount(Number(event.target.value) as (typeof bulkCountOptions)[number])}
+                style={selectStyle}
+              >
+                {bulkCountOptions.map((count) => (
+                  <option key={count} value={count}>
+                    top {count} topics
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              onClick={() => void bulkFillCriticalTopics()}
+              disabled={runningBulkFill}
+              style={{
+                marginTop: "12px",
+                width: "100%",
+                padding: "10px 12px",
+                borderRadius: "12px",
+                border: "none",
+                background: "linear-gradient(135deg, #1D9E75 0%, #4a85c2 100%)",
+                color: "#fff",
+                cursor: runningBulkFill ? "progress" : "pointer",
+                opacity: runningBulkFill ? 0.75 : 1,
+                fontSize: "13px",
+              }}
+            >
+              {runningBulkFill ? "filling critical topics…" : "fill critical draft batches"}
             </button>
           </div>
 
@@ -481,6 +657,11 @@ export default function ReviewConsole() {
             <div style={{ marginTop: "4px", color: "rgba(255,255,255,0.66)", fontSize: "13px" }}>
               inspect draft content before broad rollout
             </div>
+          </div>
+          <div style={{ display: "flex", gap: "7px", flexWrap: "wrap" }}>
+            <Badge text={`${reviewQueueSummary.blocked} blocked`} tone="danger" />
+            <Badge text={`${reviewQueueSummary.warning} warning-heavy`} tone="warning" />
+            <Badge text={`${reviewQueueSummary.clean} clean`} tone="success" />
           </div>
           <button onClick={() => void loadQuestions()} style={ghostButtonStyle}>
             refresh

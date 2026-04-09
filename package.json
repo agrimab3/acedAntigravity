@@ -12,7 +12,8 @@
     "db:studio": "drizzle-kit studio",
     "db:seed": "node --env-file=.env scripts/seed-core.mjs",
     "questions:generate": "node --env-file=.env generate-questions.mjs",
-    "content:backlog": "node --env-file=.env scripts/run-content-backlog.mjs"
+    "content:backlog": "node --env-file=.env scripts/run-content-backlog.mjs",
+    "content:critical": "node --experimental-specifier-resolution=node --env-file=.env scripts/fill-critical-backlog.mts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",

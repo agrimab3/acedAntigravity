@@ -10,6 +10,8 @@ const listSchema = z.object({
   status: z.enum(["draft", "published", "rejected"]).optional(),
   section: z.enum(["english", "math", "reading", "science"]).optional(),
   topic: z.string().trim().optional(),
+  qualityFilter: z.enum(["all", "blocked", "warning", "clean"]).default("all"),
+  sort: z.enum(["blocked-first", "highest-risk", "newest"]).default("newest"),
   limit: z.coerce.number().int().min(1).max(50).default(12),
 });
 
@@ -32,6 +34,10 @@ export async function GET(request: Request) {
     status: url.searchParams.get("status") ?? undefined,
     section: url.searchParams.get("section") ?? undefined,
     topic: url.searchParams.get("topic") ?? undefined,
+    qualityFilter: url.searchParams.get("qualityFilter") ?? "all",
+    sort:
+      url.searchParams.get("sort") ??
+      ((url.searchParams.get("status") ?? "draft") === "draft" ? "blocked-first" : "newest"),
     limit: url.searchParams.get("limit") ?? 12,
   });
 
@@ -76,23 +82,81 @@ export async function GET(request: Request) {
     .innerJoin(actTopics, eq(questions.topicId, actTopics.id))
     .where(filters.length > 0 ? and(...filters) : undefined)
     .orderBy(desc(questions.createdAt))
-    .limit(parsed.data.limit);
+    .limit(Math.min(Math.max(parsed.data.limit * 8, 80), 240));
+
+  const reviewedRows = rows.map((row) => ({
+    ...row,
+    qualityReview: reviewQuestionQuality({
+      id: row.id,
+      section: row.sectionKey,
+      topic: row.topicName,
+      difficulty: row.difficulty,
+      passage: row.passage,
+      question_text: row.prompt,
+      choices: row.choices,
+      correct_answer: row.correctAnswer,
+      explanation: row.explanation,
+    }),
+  }));
+
+  const filteredRows = reviewedRows.filter((row) => {
+    if (parsed.data.qualityFilter === "blocked") {
+      return row.qualityReview.blockingFlags.length > 0;
+    }
+
+    if (parsed.data.qualityFilter === "warning") {
+      return (
+        row.qualityReview.blockingFlags.length === 0 && row.qualityReview.warningFlags.length > 0
+      );
+    }
+
+    if (parsed.data.qualityFilter === "clean") {
+      return (
+        row.qualityReview.blockingFlags.length === 0 && row.qualityReview.warningFlags.length === 0
+      );
+    }
+
+    return true;
+  });
+
+  const sortedRows = [...filteredRows].sort((left, right) => {
+    if (parsed.data.sort === "newest") {
+      return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
+    }
+
+    if (parsed.data.sort === "highest-risk") {
+      if (right.qualityReview.riskScore !== left.qualityReview.riskScore) {
+        return right.qualityReview.riskScore - left.qualityReview.riskScore;
+      }
+
+      if (right.qualityReview.blockingFlags.length !== left.qualityReview.blockingFlags.length) {
+        return right.qualityReview.blockingFlags.length - left.qualityReview.blockingFlags.length;
+      }
+
+      if (right.qualityReview.warningFlags.length !== left.qualityReview.warningFlags.length) {
+        return right.qualityReview.warningFlags.length - left.qualityReview.warningFlags.length;
+      }
+
+      return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
+    }
+
+    if (right.qualityReview.blockingFlags.length !== left.qualityReview.blockingFlags.length) {
+      return right.qualityReview.blockingFlags.length - left.qualityReview.blockingFlags.length;
+    }
+
+    if (right.qualityReview.riskScore !== left.qualityReview.riskScore) {
+      return right.qualityReview.riskScore - left.qualityReview.riskScore;
+    }
+
+    if (right.qualityReview.warningFlags.length !== left.qualityReview.warningFlags.length) {
+      return right.qualityReview.warningFlags.length - left.qualityReview.warningFlags.length;
+    }
+
+    return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
+  });
 
   return NextResponse.json({
-    questions: rows.map((row) => ({
-      ...row,
-      qualityReview: reviewQuestionQuality({
-        id: row.id,
-        section: row.sectionKey,
-        topic: row.topicName,
-        difficulty: row.difficulty,
-        passage: row.passage,
-        question_text: row.prompt,
-        choices: row.choices,
-        correct_answer: row.correctAnswer,
-        explanation: row.explanation,
-      }),
-    })),
+    questions: sortedRows.slice(0, parsed.data.limit),
   });
 }
 
