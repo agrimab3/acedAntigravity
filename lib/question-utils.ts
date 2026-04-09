@@ -114,6 +114,16 @@ export function hasUnderlineMarkup(value: string | null | undefined) {
   return /\[underline\].*?\[\/underline\]|__(.*?)__|<u>.*?<\/u>/i.test(value);
 }
 
+function normalizeTopicLabel(value: string) {
+  return value.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function findExplanationChoiceMentions(explanation: string) {
+  return Array.from(explanation.matchAll(/\b(?:choice|answer)\s*([A-D])\b/gi))
+    .map((match) => match[1]?.toUpperCase())
+    .filter((value): value is keyof ChoiceMap => Boolean(value));
+}
+
 function countWords(value: string | null | undefined) {
   if (!value) {
     return 0;
@@ -171,10 +181,12 @@ export function reviewQuestionQuality(row: {
   }
 
   const combinedText = `${row.question_text} ${row.passage ?? ""}`.toLowerCase();
+  const normalizedTopic = normalizeTopicLabel(row.topic);
   const normalizedDifficulty = row.difficulty.trim().toLowerCase();
   const promptWordCount = countWords(row.question_text);
   const passageWordCount = countWords(row.passage);
   const explanationWordCount = countWords(row.explanation);
+  const explanationChoiceMentions = findExplanationChoiceMentions(row.explanation);
   const allNumericChoices =
     choices !== null &&
     Object.values(choices).every((choice) => /^-?\d+(\.\d+)?$/.test(choice.trim()));
@@ -237,6 +249,92 @@ export function reviewQuestionQuality(row: {
     );
   }
 
+  if (
+    correctAnswer &&
+    explanationChoiceMentions.length > 0 &&
+    explanationChoiceMentions.some((choice) => choice !== correctAnswer)
+  ) {
+    pushFlag(
+      flags,
+      "reject",
+      "explanation-answer-mismatch",
+      "Explanation points to a different answer choice than the keyed correct answer."
+    );
+  }
+
+  if (
+    row.section === "math" &&
+    /\b(closest|nearest|approximately|approximate)\b/i.test(row.explanation) &&
+    !/\b(closest|nearest|approximately|approximate|about|round)\b/i.test(row.question_text)
+  ) {
+    pushFlag(
+      flags,
+      "reject",
+      "unsignaled-approximation",
+      "Explanation relies on approximation or nearest-choice reasoning that the prompt never signals."
+    );
+  }
+
+  if (
+    row.section === "reading" &&
+    normalizedTopic.includes("literary narrative") &&
+    !/\b(he|she|they|i|we|said|thought|looked|walked|felt|remembered|voice|scene|character)\b/i.test(
+      combinedText
+    )
+  ) {
+    pushFlag(
+      flags,
+      "reject",
+      "literary-narrative-drift",
+      "Reading item is labeled Literary Narrative but does not read like narrative prose."
+    );
+  }
+
+  if (
+    row.section === "reading" &&
+    normalizedTopic.includes("social science") &&
+    !/\b(society|government|community|economy|economics|psychology|history|citizens|voters|policy|researchers|study|public|culture|labor|market|behavior|historical|anthropology|civics)\b/i.test(
+      combinedText
+    )
+  ) {
+    pushFlag(
+      flags,
+      "warn",
+      "social-science-drift",
+      "Reading item is labeled Social Science but lacks clear social-science content."
+    );
+  }
+
+  if (
+    row.section === "reading" &&
+    normalizedTopic.includes("humanities") &&
+    !/\b(art|music|literature|poetry|novel|painting|architecture|philosophy|culture|artist|composer)\b/i.test(
+      combinedText
+    )
+  ) {
+    pushFlag(
+      flags,
+      "warn",
+      "humanities-drift",
+      "Reading item is labeled Humanities but lacks clear humanities content."
+    );
+  }
+
+  if (
+    row.section === "reading" &&
+    normalizedTopic.includes("natural science") &&
+    !/\b(scientists|species|cells|planet|chemical|physics|biology|ecosystem|climate|atom|energy)\b/i.test(
+      combinedText
+    )
+  ) {
+    pushFlag(
+      flags,
+      "warn",
+      "natural-science-drift",
+      "Reading item is labeled Natural Science but lacks clear science content."
+    );
+  }
+
   if (isMediumHard && explanationWordCount < 16) {
     pushFlag(
       flags,
@@ -293,6 +391,32 @@ export function reviewQuestionQuality(row: {
         "Stem opens like a direct classroom drill instead of a fuller ACT setup."
       );
     }
+
+    if (
+      /\b([fgh]\s*\(\s*x\s*\)\s*=|[fgh]\s*\(\s*-?\d+\s*\)|5th term|nth term|sum of the first \d+ terms?|value of [fgh]\([^)]+\))\b/i.test(
+        row.question_text
+      )
+    ) {
+      pushFlag(
+        flags,
+        "warn",
+        "formula-substitution-math",
+        "Math item leans on direct substitution or a routine sequence plug-in more than ACT-style reasoning."
+      );
+    }
+
+    if (
+      /\b(angle[s]? of a triangle|triangle has angle measures|diameter of 14|radius of \d+|area of a circle|circumference of a circle)\b/i.test(
+        row.question_text
+      )
+    ) {
+      pushFlag(
+        flags,
+        "warn",
+        "formula-recall-math",
+        "Math item reads like a direct formula recall problem for its labeled difficulty."
+      );
+    }
   }
 
   if (row.section === "reading" && isMediumHard) {
@@ -324,6 +448,17 @@ export function reviewQuestionQuality(row: {
         "warn",
         "low-demand-reading-ask",
         "Reading stem may be too generic to reliably feel like true ACT medium or hard difficulty."
+      );
+    }
+  }
+
+  if (row.section === "english" && isMediumHard) {
+    if (!hasUnderlineMarkup(row.question_text) && !hasUnderlineMarkup(row.passage)) {
+      pushFlag(
+        flags,
+        "warn",
+        "unmarked-english-revision",
+        "English medium or hard item does not mark the exact revision target in context."
       );
     }
   }

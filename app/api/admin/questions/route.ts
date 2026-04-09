@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { actTopics, questions } from "@/db/schema";
@@ -15,11 +15,21 @@ const listSchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(12),
 });
 
-const patchSchema = z.object({
+const singlePatchSchema = z.object({
+  mode: z.literal("single").optional(),
   questionId: z.string().uuid(),
   status: z.enum(["draft", "published", "rejected"]),
   reviewNotes: z.string().trim().max(2000).optional().nullable(),
 });
+
+const bulkPatchSchema = z.object({
+  mode: z.literal("bulk"),
+  questionIds: z.array(z.string().uuid()).min(1).max(100),
+  status: z.enum(["draft", "published", "rejected"]),
+  reviewNotes: z.string().trim().max(2000).optional().nullable(),
+});
+
+const patchSchema = z.union([singlePatchSchema, bulkPatchSchema]);
 
 export async function GET(request: Request) {
   const session = await getAdminSession();
@@ -177,6 +187,30 @@ export async function PATCH(request: Request) {
   const now = new Date();
   const reviewNotes =
     parsed.data.reviewNotes && parsed.data.reviewNotes.length > 0 ? parsed.data.reviewNotes : null;
+
+  if (parsed.data.mode === "bulk") {
+    const updatedQuestions = await db
+      .update(questions)
+      .set({
+        status: parsed.data.status,
+        reviewNotes,
+        reviewedAt: now,
+        reviewedByUserId: session.user.id,
+        updatedAt: now,
+      })
+      .where(inArray(questions.id, parsed.data.questionIds))
+      .returning({
+        id: questions.id,
+        status: questions.status,
+        reviewNotes: questions.reviewNotes,
+        reviewedAt: questions.reviewedAt,
+      });
+
+    return NextResponse.json({
+      updatedCount: updatedQuestions.length,
+      questions: updatedQuestions,
+    });
+  }
 
   const [updatedQuestion] = await db
     .update(questions)

@@ -150,7 +150,9 @@ export default function ReviewConsole() {
   const [runningTopic, setRunningTopic] = useState<string | null>(null);
   const [runningBulkFill, setRunningBulkFill] = useState(false);
   const [savingQuestionId, setSavingQuestionId] = useState<string | null>(null);
+  const [bulkSaving, setBulkSaving] = useState(false);
   const [notesByQuestionId, setNotesByQuestionId] = useState<Record<string, string>>({});
+  const [selectedQuestionIds, setSelectedQuestionIds] = useState<Record<string, boolean>>({});
   const [flashMessage, setFlashMessage] = useState<string | null>(null);
 
   const availableTopics = useMemo(() => {
@@ -187,6 +189,14 @@ export default function ReviewConsole() {
       { blocked: 0, warning: 0, clean: 0 }
     );
   }, [questions]);
+
+  const selectedQuestionCount = useMemo(
+    () => questions.filter((question) => selectedQuestionIds[question.id]).length,
+    [questions, selectedQuestionIds]
+  );
+
+  const allVisibleQuestionsSelected =
+    questions.length > 0 && questions.every((question) => selectedQuestionIds[question.id]);
 
   async function loadBacklog() {
     setLoadingBacklog(true);
@@ -226,6 +236,13 @@ export default function ReviewConsole() {
       setQuestions(nextQuestions);
       setNotesByQuestionId(
         Object.fromEntries(nextQuestions.map((question) => [question.id, question.reviewNotes ?? ""]))
+      );
+      setSelectedQuestionIds((current) =>
+        Object.fromEntries(
+          nextQuestions
+            .filter((question) => current[question.id])
+            .map((question) => [question.id, true])
+        )
       );
     } finally {
       setLoadingQuestions(false);
@@ -355,6 +372,55 @@ export default function ReviewConsole() {
       setFlashMessage(error instanceof Error ? error.message : "Review update failed.");
     } finally {
       setSavingQuestionId(null);
+    }
+  }
+
+  async function bulkReviewQuestions(status: (typeof statusOptions)[number]) {
+    const questionIds = questions
+      .filter((question) => selectedQuestionIds[question.id])
+      .map((question) => question.id);
+
+    if (questionIds.length === 0) {
+      setFlashMessage("Select at least one question first.");
+      return;
+    }
+
+    setBulkSaving(true);
+    setFlashMessage(null);
+
+    try {
+      const notes = Array.from(
+        new Set(
+          questionIds
+            .map((questionId) => notesByQuestionId[questionId]?.trim())
+            .filter((value): value is string => Boolean(value))
+        )
+      ).join("\n\n");
+
+      const res = await fetch("/api/admin/questions", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode: "bulk",
+          questionIds,
+          status,
+          reviewNotes: notes,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Bulk review update failed.");
+      }
+
+      setFlashMessage(`Moved ${data.updatedCount ?? questionIds.length} question(s) to ${status}.`);
+      setSelectedQuestionIds({});
+      await Promise.all([loadBacklog(), loadQuestions()]);
+    } catch (error) {
+      setFlashMessage(error instanceof Error ? error.message : "Bulk review update failed.");
+    } finally {
+      setBulkSaving(false);
     }
   }
 
@@ -683,6 +749,65 @@ export default function ReviewConsole() {
           </div>
         )}
 
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "0.75rem",
+            flexWrap: "wrap",
+            marginBottom: "14px",
+            padding: "11px 12px",
+            borderRadius: "12px",
+            background: "rgba(255,255,255,0.035)",
+            border: "1px solid rgba(255,255,255,0.08)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "rgba(255,255,255,0.82)" }}>
+              <input
+                type="checkbox"
+                checked={allVisibleQuestionsSelected}
+                onChange={(event) =>
+                  setSelectedQuestionIds(
+                    event.target.checked
+                      ? Object.fromEntries(questions.map((question) => [question.id, true]))
+                      : {}
+                  )
+                }
+              />
+              select visible
+            </label>
+            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>
+              {selectedQuestionCount} selected
+            </span>
+          </div>
+
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            <button
+              onClick={() => void bulkReviewQuestions("rejected")}
+              disabled={bulkSaving}
+              style={secondaryButtonStyle}
+            >
+              {bulkSaving ? "saving…" : "bulk reject"}
+            </button>
+            <button
+              onClick={() => void bulkReviewQuestions("draft")}
+              disabled={bulkSaving}
+              style={ghostButtonStyle}
+            >
+              keep as draft
+            </button>
+            <button
+              onClick={() => void bulkReviewQuestions("published")}
+              disabled={bulkSaving}
+              style={primaryButtonStyle}
+            >
+              bulk publish
+            </button>
+          </div>
+        </div>
+
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
           {loadingQuestions ? (
             <div style={mutedTextStyle}>loading questions…</div>
@@ -708,7 +833,19 @@ export default function ReviewConsole() {
                     marginBottom: "10px",
                   }}
                 >
-                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+                    <label style={{ display: "inline-flex", alignItems: "center", cursor: "pointer" }}>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(selectedQuestionIds[question.id])}
+                        onChange={(event) =>
+                          setSelectedQuestionIds((current) => ({
+                            ...current,
+                            [question.id]: event.target.checked,
+                          }))
+                        }
+                      />
+                    </label>
                     <Badge text={`${question.sectionKey} · ${question.topicName}`} />
                     <Badge text={question.difficulty} />
                     <Badge text={question.status} subtle />
