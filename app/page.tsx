@@ -186,7 +186,7 @@ export default function Home() {
           }}
         >
           <>
-            are you ready to
+            Are you ready to
             <br />
             <em style={{ color: "#1D9E75" }}>ace it</em>?
           </>
@@ -201,7 +201,7 @@ export default function Home() {
             marginBottom: "2.5rem",
           }}
         >
-          your ACT prep, written in the stars.
+          AI-powered ACT prep, written in the stars. your universe is waiting.
         </p>
 
         <button
