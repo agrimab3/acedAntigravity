@@ -75,17 +75,29 @@ function clampPercent(value: number, min: number, max: number) {
 
 const SECTION_TEST_TOPIC_COPY: Record<string, string> = {
   english:
-    "Organization & Flow, Transitions & Cohesion, Precision & Concision, Style & Tone, Punctuation, Grammar & Usage, and Sentence Structure under official pacing.",
+    "Organization & Flow, Transitions & Cohesion, Precision & Concision, Style & Tone, Punctuation, Grammar & Usage, Sentence Structure.",
   math:
-    "Number & Quantity, Algebra, Functions, Geometry, Statistics & Probability, Integrating Essential Skills, and Modeling with calculator support.",
+    "Number & Quantity, Algebra, Functions, Geometry, Statistics & Probability, Integrating Essential Skills, Modeling.",
   reading:
-    "Literary Narrative, Social Science, Humanities, and Natural Science passage work with real ACT-style timing pressure.",
+    "Literary Narrative, Social Science, Humanities, Natural Science.",
   science:
-    "Data Representation, Research Summaries, and Conflicting Viewpoints with experiment reading, data comparison, and inference pressure.",
+    "Data Representation, Research Summaries, Conflicting Viewpoints.",
+};
+
+const FULL_TEST_TOPIC_COPY: Record<string, string> = {
+  "full-with-science": "English, Math, Reading, Science.",
+  "full-core": "English, Math, Reading.",
 };
 
 const PRACTICE_TEST_GALAXY_BACKGROUND =
   "radial-gradient(circle at 18% 16%, rgba(74, 128, 178, 0.12), transparent 32%), radial-gradient(circle at 74% 24%, rgba(88, 138, 188, 0.08), transparent 34%), radial-gradient(circle at 52% 72%, rgba(120, 136, 182, 0.06), transparent 40%), linear-gradient(180deg,#0d1b2a 0%,#081221 44%,#020408 100%)";
+
+function topModeAccent(modeKey: string) {
+  return (
+    PRACTICE_TEST_MODES.find((mode) => mode.key === modeKey)?.accentColor ??
+    "rgba(255,255,255,0.74)"
+  );
+}
 
 export default function PracticeTestsPage() {
   const router = useRouter();
@@ -103,6 +115,7 @@ export default function PracticeTestsPage() {
   const [history, setHistory] = useState<
     Array<{
       sessionId: string;
+      modeKey: string;
       title: string;
       shortLabel: string;
       format: "section" | "full";
@@ -125,6 +138,10 @@ export default function PracticeTestsPage() {
     () => PRACTICE_TEST_MODES.find((mode) => mode.key === selectedModeKey) ?? PRACTICE_TEST_MODES[0],
     [selectedModeKey]
   );
+  const selectedPreviewDescription =
+    SECTION_TEST_TOPIC_COPY[selectedMode.key] ??
+    FULL_TEST_TOPIC_COPY[selectedMode.key] ??
+    selectedMode.description;
   const backgroundStars = useMemo(
     () => buildPracticeTestAmbientStars(78),
     []
@@ -386,7 +403,7 @@ export default function PracticeTestsPage() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: "2.8rem",
+              gap: "2.2rem",
               justifySelf: "center",
             }}
           >
@@ -452,6 +469,38 @@ export default function PracticeTestsPage() {
                 }}
               />
               <span style={{ position: "relative", zIndex: 1 }}>practice tests</span>
+            </button>
+            <button
+              onClick={() => router.push("/progress")}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "rgba(255,255,255,0.78)",
+                fontSize: "17px",
+                fontWeight: 500,
+                cursor: "pointer",
+                padding: "6px 4px",
+                position: "relative",
+                textShadow: "0 0 14px rgba(255,255,255,0.18)",
+                fontFamily: "DM Sans,sans-serif",
+              }}
+            >
+              <span
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "50%",
+                  width: "calc(100% + 22px)",
+                  height: "20px",
+                  transform: "translate(-50%, -50%)",
+                  borderRadius: "999px",
+                  background: "radial-gradient(circle, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.045) 58%, transparent 84%)",
+                  filter: "blur(11px)",
+                  zIndex: 0,
+                  pointerEvents: "none",
+                }}
+              />
+              <span style={{ position: "relative", zIndex: 1 }}>progress</span>
             </button>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", justifySelf: "end" }}>
@@ -719,6 +768,22 @@ export default function PracticeTestsPage() {
                           </div>
                         ))}
                       </div>
+                      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "12px" }}>
+                        <button
+                          onClick={() => router.push(`/practice-tests/history/${entry.sessionId}`)}
+                          style={{
+                            border: "none",
+                            background: "transparent",
+                            color: topModeAccent(entry.modeKey ?? entry.shortLabel),
+                            fontSize: "12px",
+                            cursor: "pointer",
+                            padding: 0,
+                            fontFamily: "DM Sans,sans-serif",
+                          }}
+                        >
+                          review missed questions →
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -762,7 +827,7 @@ export default function PracticeTestsPage() {
                 {selectedMode.title}
               </div>
               <div style={{ fontSize: "13px", lineHeight: 1.7, color: "rgba(255,255,255,0.55)", marginBottom: "1rem" }}>
-                {selectedMode.description}
+                {selectedPreviewDescription}
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "10px", marginBottom: "1rem" }}>
@@ -787,41 +852,6 @@ export default function PracticeTestsPage() {
                     <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.32)" }}>{item.label}</div>
                   </div>
                 ))}
-              </div>
-
-              <div
-                style={{
-                  borderRadius: "14px",
-                  background: "rgba(255,255,255,0.03)",
-                  border: `0.5px solid ${selectedMode.accentColor}20`,
-                  padding: "0.95rem 1rem",
-                  marginBottom: "1rem",
-                }}
-              >
-                <div style={{ fontSize: "11px", letterSpacing: ".06em", textTransform: "uppercase", color: "rgba(255,255,255,0.34)", marginBottom: "8px" }}>
-                  section flow
-                </div>
-                <div style={{ display: "grid", gap: "8px" }}>
-                  {selectedMode.sections.map((section, index) => (
-                    <div
-                      key={section.key}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        gap: "12px",
-                        fontSize: "12px",
-                        color: "rgba(255,255,255,0.62)",
-                      }}
-                    >
-                      <span>
-                        {index + 1}. {section.label}
-                      </span>
-                      <span style={{ color: "rgba(255,255,255,0.36)" }}>
-                        {section.questionCount}q · {section.durationMinutes}m
-                      </span>
-                    </div>
-                  ))}
-                </div>
               </div>
 
               <div style={{ display: "flex", gap: "8px" }}>
@@ -865,63 +895,17 @@ export default function PracticeTestsPage() {
 
             <section
               style={{
-                background: "rgba(255,255,255,0.035)",
-                border: `0.5px solid ${selectedMode.accentColor}33`,
-                boxShadow: `0 0 0 1px ${selectedMode.accentColor}14 inset`,
+                background: "rgba(8,14,22,0.72)",
+                border: `0.5px solid ${selectedMode.accentColor}1f`,
                 borderRadius: "20px",
-                padding: "1.05rem 1rem",
+                padding: "1rem",
               }}
             >
-              <div style={{ fontSize: "11px", letterSpacing: ".06em", textTransform: "uppercase", color: selectedMode.accentColor, marginBottom: "8px" }}>
+              <div style={{ fontSize: "10px", letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,0.34)", marginBottom: "6px" }}>
                 ask your AI tutor
               </div>
-              <div style={{ fontSize: "12px", lineHeight: 1.7, color: "rgba(255,255,255,0.54)", marginBottom: "0.9rem" }}>
+              <div style={{ fontSize: "12px", lineHeight: 1.6, color: "rgba(255,255,255,0.46)", marginBottom: "0.85rem" }}>
                 Ask for test-day strategy, section pacing tips, or which stars to focus on next.
-              </div>
-              <div style={{ display: "flex", gap: "8px", alignItems: "stretch", marginBottom: "0.9rem" }}>
-                <textarea
-                  value={aiInput}
-                  onChange={(event) => setAiInput(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" && !event.shiftKey) {
-                      event.preventDefault();
-                      void sendAI();
-                    }
-                  }}
-                  placeholder="ask about pacing, strategy, or next stars..."
-                  rows={2}
-                  style={{
-                    flex: 1,
-                    resize: "none",
-                    borderRadius: "12px",
-                    border: "0.5px solid rgba(255,255,255,0.12)",
-                    background: "rgba(8,16,24,0.76)",
-                    color: "#fff",
-                    padding: "10px 12px",
-                    fontSize: "12px",
-                    fontFamily: "DM Sans,sans-serif",
-                    outline: "none",
-                  }}
-                />
-                <button
-                  onClick={() => void sendAI()}
-                  disabled={aiLoading || !aiInput.trim()}
-                  style={{
-                    alignSelf: "stretch",
-                    padding: "0 14px",
-                    borderRadius: "12px",
-                    border: "none",
-                    background: selectedMode.accentColor,
-                    color: "#081018",
-                    cursor: aiLoading || !aiInput.trim() ? "default" : "pointer",
-                    opacity: aiLoading || !aiInput.trim() ? 0.5 : 0.95,
-                    fontSize: "12px",
-                    fontWeight: 600,
-                    fontFamily: "DM Sans,sans-serif",
-                  }}
-                >
-                  send
-                </button>
               </div>
               <div
                 ref={msgsRef}
@@ -930,6 +914,7 @@ export default function PracticeTestsPage() {
                   gap: "8px",
                   maxHeight: "220px",
                   overflowY: "auto",
+                  marginBottom: "0.9rem",
                   paddingRight: "4px",
                 }}
               >
@@ -939,18 +924,18 @@ export default function PracticeTestsPage() {
                     style={{
                       justifySelf: message.role === "user" ? "end" : "stretch",
                       maxWidth: message.role === "user" ? "86%" : "100%",
-                      borderRadius: "14px",
-                      padding: "10px 12px",
+                      borderRadius: "16px",
+                      padding: "11px 13px",
                       background:
                         message.role === "user"
-                          ? `${selectedMode.accentColor}1a`
-                          : "rgba(255,255,255,0.04)",
+                          ? "rgba(255,255,255,0.07)"
+                          : "rgba(29,158,117,0.08)",
                       border:
                         message.role === "user"
-                          ? `0.5px solid ${selectedMode.accentColor}33`
+                          ? "0.5px solid rgba(255,255,255,0.08)"
                           : "0.5px solid rgba(255,255,255,0.08)",
                       color: message.role === "user" ? "#fff" : "rgba(255,255,255,0.72)",
-                      fontSize: "12px",
+                      fontSize: "13px",
                       lineHeight: 1.65,
                     }}
                   >
@@ -962,15 +947,60 @@ export default function PracticeTestsPage() {
                     style={{
                       borderRadius: "14px",
                       padding: "10px 12px",
-                      background: "rgba(255,255,255,0.04)",
+                      background: "rgba(29,158,117,0.08)",
                       border: "0.5px solid rgba(255,255,255,0.08)",
                       color: "rgba(255,255,255,0.5)",
-                      fontSize: "12px",
+                      fontSize: "13px",
                     }}
                   >
                     Aced is thinking...
                   </div>
                 )}
+              </div>
+              <div style={{ display: "flex", gap: "8px", alignItems: "stretch" }}>
+                <input
+                  value={aiInput}
+                  onChange={(event) => setAiInput(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      void sendAI();
+                    }
+                  }}
+                  placeholder="ask about pacing, strategy, or next stars..."
+                  style={{
+                    flex: 1,
+                    borderRadius: "999px",
+                    border: "0.5px solid rgba(255,255,255,0.12)",
+                    background: "rgba(10,16,24,0.82)",
+                    color: "#fff",
+                    padding: "11px 14px",
+                    fontSize: "13px",
+                    fontFamily: "DM Sans,sans-serif",
+                    outline: "none",
+                  }}
+                />
+                <button
+                  onClick={() => void sendAI()}
+                  disabled={aiLoading || !aiInput.trim()}
+                  style={{
+                    alignSelf: "center",
+                    width: "36px",
+                    height: "36px",
+                    minWidth: "36px",
+                    borderRadius: "999px",
+                    border: "none",
+                    background: selectedMode.accentColor,
+                    color: "#081018",
+                    cursor: aiLoading || !aiInput.trim() ? "default" : "pointer",
+                    opacity: aiLoading || !aiInput.trim() ? 0.5 : 0.95,
+                    fontSize: "16px",
+                    fontWeight: 600,
+                    fontFamily: "DM Sans,sans-serif",
+                  }}
+                >
+                  ↗
+                </button>
               </div>
             </section>
           </aside>

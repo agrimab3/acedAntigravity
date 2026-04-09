@@ -414,6 +414,14 @@ function getStarVisualState({
   };
 }
 
+function formatVisibleEstimateLabel(label: string | null | undefined) {
+  if (!label || label === "baseline estimate") {
+    return "";
+  }
+
+  return label;
+}
+
 type DashboardSummary = {
   compositeEstimatedScore: number;
   confidence: number;
@@ -830,7 +838,9 @@ export default function Dashboard() {
           ? `ESTIMATED ${activeSectionKey.toUpperCase()} SCORE`
           : "ESTIMATED ACT SCORE";
       const centerScoreLabelText =
-        centerSectionSummary?.scoreLabel ?? dashboardSummary?.scoreLabel ?? "baseline estimate";
+        formatVisibleEstimateLabel(
+          centerSectionSummary?.scoreLabel ?? dashboardSummary?.scoreLabel ?? ""
+        );
       const centerSubtitle =
         activeSectionKey !== "all"
           ? `${activeSectionKey} section`
@@ -846,7 +856,7 @@ export default function Dashboard() {
       ctx.globalAlpha = 0.16;
       ctx.font = "14px sans-serif";
       ctx.fillText(centerSubtitle, W / 2, H / 2 + 48);
-      if (dashboardSummary) {
+      if (dashboardSummary && centerScoreLabelText) {
         ctx.globalAlpha = 0.3;
         ctx.font = "12px sans-serif";
         ctx.fillText(
@@ -1039,7 +1049,7 @@ export default function Dashboard() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: "2.8rem",
+              gap: "2.2rem",
               justifySelf: "center",
             }}
           >
@@ -1105,6 +1115,38 @@ export default function Dashboard() {
                 }}
               />
               <span style={{ position: "relative", zIndex: 1 }}>practice tests</span>
+            </button>
+            <button
+              onClick={() => router.push("/progress")}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "rgba(255,255,255,0.78)",
+                fontSize: "17px",
+                fontWeight: 500,
+                cursor: "pointer",
+                padding: "6px 4px",
+                position: "relative",
+                textShadow: "0 0 14px rgba(255,255,255,0.18)",
+                fontFamily: "DM Sans,sans-serif",
+              }}
+            >
+              <span
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "50%",
+                  width: "calc(100% + 22px)",
+                  height: "20px",
+                  transform: "translate(-50%, -50%)",
+                  borderRadius: "999px",
+                  background: "radial-gradient(circle, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.045) 58%, transparent 84%)",
+                  filter: "blur(11px)",
+                  zIndex: 0,
+                  pointerEvents: "none",
+                }}
+              />
+              <span style={{ position: "relative", zIndex: 1 }}>progress</span>
             </button>
           </div>
           <div style={{ display: "flex", gap: "1rem", alignItems: "center", justifySelf: "end" }}>
@@ -1336,9 +1378,15 @@ export default function Dashboard() {
                   >
                     {selectedTopicSummary.estimatedScore}/36
                   </div>
-                  <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>
-                    {selectedTopicSummary.scoreLabel} · confidence {Math.round((selectedTopicSummary.confidence ?? 0) * 100)}%
-                  </div>
+                  {formatVisibleEstimateLabel(selectedTopicSummary.scoreLabel) ? (
+                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>
+                      {formatVisibleEstimateLabel(selectedTopicSummary.scoreLabel)} · estimate improves as you practice
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>
+                      estimate improves as you practice
+                    </div>
+                  )}
                 </div>
                 {selectedSectionSummary && (
                   <div
@@ -1371,9 +1419,15 @@ export default function Dashboard() {
                     >
                       {selectedSectionSummary.estimatedScore}/36
                     </div>
-                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>
-                      {selectedSectionSummary.scoreLabel}
-                    </div>
+                    {formatVisibleEstimateLabel(selectedSectionSummary.scoreLabel) ? (
+                      <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>
+                        {formatVisibleEstimateLabel(selectedSectionSummary.scoreLabel)}
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>
+                        estimate improves as you practice
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -1457,6 +1511,7 @@ export default function Dashboard() {
                   color: "rgba(255,255,255,0.7)",
                   fontFamily: "DM Sans,sans-serif",
                 }}
+                onClick={() => router.push("/progress")}
               >
                 review missed →
               </button>

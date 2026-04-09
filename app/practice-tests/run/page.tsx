@@ -1195,6 +1195,22 @@ function PracticeTestRunContent() {
               </section>
 
               <div style={{ display: "grid", gap: "10px" }}>
+                {report.sessionId ? (
+                  <button
+                    onClick={() => router.push(`/practice-tests/history/${report.sessionId}`)}
+                    style={{
+                      width: "100%",
+                      padding: "12px 14px",
+                      borderRadius: "12px",
+                      border: "0.5px solid rgba(255,255,255,0.12)",
+                      background: "rgba(255,255,255,0.04)",
+                      color: "rgba(255,255,255,0.78)",
+                      cursor: "pointer",
+                    }}
+                  >
+                    open saved review
+                  </button>
+                ) : null}
                 <button
                   onClick={() => router.push("/practice-tests")}
                   style={{
