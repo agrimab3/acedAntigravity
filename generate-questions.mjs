@@ -164,6 +164,54 @@ function normalizeText(value) {
   return value.replace(/\s+/g, " ").trim().toLowerCase();
 }
 
+function parseNumericEquivalent(value) {
+  const normalized = value.replace(/,/g, "").replace(/\s+/g, "").trim();
+
+  if (!normalized) {
+    return null;
+  }
+
+  if (/^-?\d+\/-?\d+$/.test(normalized)) {
+    const [numerator, denominator] = normalized.split("/").map(Number);
+
+    if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) {
+      return null;
+    }
+
+    return numerator / denominator;
+  }
+
+  if (/^-?\d*\.?\d+%$/.test(normalized)) {
+    const numeric = Number(normalized.slice(0, -1));
+    return Number.isFinite(numeric) ? numeric / 100 : null;
+  }
+
+  if (/^-?\d*\.?\d+$/.test(normalized)) {
+    const numeric = Number(normalized);
+    return Number.isFinite(numeric) ? numeric : null;
+  }
+
+  return null;
+}
+
+function areEquivalentChoices(left, right) {
+  const normalizedLeft = normalizeText(left).replace(/[.,;:!?]+$/g, "");
+  const normalizedRight = normalizeText(right).replace(/[.,;:!?]+$/g, "");
+
+  if (normalizedLeft === normalizedRight) {
+    return true;
+  }
+
+  const numericLeft = parseNumericEquivalent(normalizedLeft);
+  const numericRight = parseNumericEquivalent(normalizedRight);
+
+  if (numericLeft === null || numericRight === null) {
+    return false;
+  }
+
+  return Math.abs(numericLeft - numericRight) < 1e-9;
+}
+
 function buildFingerprint({ sectionKey, topicSlug, difficulty, passage, prompt, choices }) {
   const canonicalChoices = ANSWER_CHOICES.map((choice) => `${choice}:${normalizeText(choices[choice])}`)
     .join("|");
@@ -420,10 +468,14 @@ Global rules:
 - Exactly one answer must be correct.
 - Use plain text only. No markdown fences. No LaTeX.
 - Avoid near-duplicate prompts, recycled answer choices, and repeated wording within this batch.
+- Do not make any two answer choices equivalent in value or meaning. For example, never pair 3/4 with 0.75 or 50% with 1/2.
 - Explanations must briefly justify the correct answer and mention why the best distractor(s) fail.
 - Keep the content ACT-authentic and skill-focused, not trivia-like.
 - Vary the tested skill inside the topic so the batch is not repetitive.
 - Match the topic exactly. Do not drift into a different ACT topic just because the section is similar.
+- Medium questions should feel like real ACT core difficulty, not entry-level warmups.
+- Hard questions should require a clear second step, tighter reading, or stronger distractor discrimination than medium.
+- Avoid overly obvious answer sets where one option is clearly different in length, precision, or plausibility from the others.
 
 Section-specific rules:
 ${getSectionSpecificInstructions(sectionKey)}
@@ -676,6 +728,17 @@ function sanitizeQuestion(sectionKey, topic, question) {
     throw new Error("Question contains duplicate answer choices.");
   }
 
+  for (let index = 0; index < ANSWER_CHOICES.length; index += 1) {
+    for (let innerIndex = index + 1; innerIndex < ANSWER_CHOICES.length; innerIndex += 1) {
+      const left = choices[ANSWER_CHOICES[index]];
+      const right = choices[ANSWER_CHOICES[innerIndex]];
+
+      if (areEquivalentChoices(left, right)) {
+        throw new Error("Question contains equivalent answer choices.");
+      }
+    }
+  }
+
   if (sectionKey === "reading" && !passage) {
     throw new Error("Reading question missing passage.");
   }
@@ -730,6 +793,13 @@ function sanitizeQuestion(sectionKey, topic, question) {
     )
   ) {
     throw new Error("Social Science passage does not reflect social-science content.");
+  }
+
+  if (
+    sectionKey === "math" &&
+    /\b(obvious|clearly|simply|just)\b/.test(combinedText)
+  ) {
+    throw new Error("Math item reads too simplistically for ACT style.");
   }
 
   if (

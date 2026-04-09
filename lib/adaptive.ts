@@ -32,7 +32,7 @@ export function normalizeDifficultyBand(value?: string | null): DifficultyBand {
     return value;
   }
 
-  return "easy";
+  return "medium";
 }
 
 export function formatDifficultyBand(value?: string | null) {
@@ -55,31 +55,25 @@ export function formatDifficultyBand(value?: string | null) {
 }
 
 export function getDifficultySweep(target: DifficultyBand): DifficultyBand[] {
-  const index = DIFFICULTY_BANDS.indexOf(target);
-  const seen = new Set<DifficultyBand>([target]);
-  const order: DifficultyBand[] = [target];
-
-  for (let offset = 1; offset < DIFFICULTY_BANDS.length; offset += 1) {
-    const lower = DIFFICULTY_BANDS[index - offset];
-    const upper = DIFFICULTY_BANDS[index + offset];
-
-    if (lower && !seen.has(lower)) {
-      seen.add(lower);
-      order.push(lower);
-    }
-
-    if (upper && !seen.has(upper)) {
-      seen.add(upper);
-      order.push(upper);
-    }
+  switch (target) {
+    case "foundation":
+      return ["foundation", "easy", "medium", "hard", "challenge"];
+    case "easy":
+      return ["easy", "medium", "foundation", "hard", "challenge"];
+    case "medium":
+      return ["medium", "hard", "easy", "challenge", "foundation"];
+    case "hard":
+      return ["hard", "challenge", "medium", "easy", "foundation"];
+    case "challenge":
+      return ["challenge", "hard", "medium", "easy", "foundation"];
+    default:
+      return ["medium", "hard", "easy", "challenge", "foundation"];
   }
-
-  return order;
 }
 
 export function chooseDifficultyBand(snapshot?: SkillSnapshot | null): DifficultyBand {
   if (!snapshot || !snapshot.totalAnswered) {
-    return "easy";
+    return "medium";
   }
 
   const current = normalizeDifficultyBand(snapshot.currentDifficulty);

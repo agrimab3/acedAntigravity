@@ -101,10 +101,10 @@ function PracticeContent() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [questionsLoading, setQuestionsLoading] = useState(true);
   const [practiceSessionId, setPracticeSessionId] = useState<string | null>(null);
-  const [targetDifficulty, setTargetDifficulty] = useState("easy");
+  const [targetDifficulty, setTargetDifficulty] = useState("medium");
   const [adaptiveStatus, setAdaptiveStatus] = useState<AdaptiveStatus>({
     label: "finding your level",
-    description: "Aced is finding your level, so the session is starting in easy mode.",
+    description: "Aced is finding your level, so the session is starting in medium mode.",
     direction: "steady",
   });
   const [qIndex, setQIndex] = useState(0);
@@ -142,10 +142,10 @@ function PracticeContent() {
     setPicked(null);
     setSubmitted(false);
     setPracticeSessionId(null);
-    setTargetDifficulty("easy");
+    setTargetDifficulty("medium");
     setAdaptiveStatus({
       label: "finding your level",
-      description: "Aced is finding your level, so the session is starting in easy mode.",
+      description: "Aced is finding your level, so the session is starting in medium mode.",
       direction: "steady",
     });
     setCorrect(0);
@@ -188,14 +188,14 @@ function PracticeContent() {
         };
 
         if (!active) return;
-        setQuestions(sortQuestionsTowardDifficulty(data.questions ?? [], data.adaptive?.targetDifficulty ?? "easy"));
+        setQuestions(sortQuestionsTowardDifficulty(data.questions ?? [], data.adaptive?.targetDifficulty ?? "medium"));
         setPracticeSessionId(data.sessionId ?? null);
-        setTargetDifficulty(data.adaptive?.targetDifficulty ?? "easy");
+        setTargetDifficulty(data.adaptive?.targetDifficulty ?? "medium");
         setAdaptiveStatus({
           label: data.adaptive?.label ?? "finding your level",
           description:
             data.adaptive?.description ??
-            "Aced is finding your level, so the session is starting in easy mode.",
+            "Aced is finding your level, so the session is starting in medium mode.",
           direction: data.adaptive?.direction ?? "steady",
         });
       } catch (error) {
@@ -203,7 +203,7 @@ function PracticeContent() {
         if (!active) return;
         setQuestions([]);
         setPracticeSessionId(null);
-        setTargetDifficulty("easy");
+        setTargetDifficulty("medium");
       } finally {
         if (active) {
           setQuestionsLoading(false);

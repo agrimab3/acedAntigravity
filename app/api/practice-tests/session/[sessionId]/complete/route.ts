@@ -342,6 +342,7 @@ export async function POST(
       topicName: answer.topicName,
       selectedAnswer: answer.selectedAnswer,
       correctAnswer: answer.correctAnswer,
+      flagged: answer.flagged,
       question: answer.questionSnapshot,
     }));
 

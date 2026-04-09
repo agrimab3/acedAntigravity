@@ -69,6 +69,7 @@ type CompletionReport = {
     topicName: string;
     selectedAnswer: string | null;
     correctAnswer: string;
+    flagged?: boolean;
     question: TestQuestion;
   }>;
 };
@@ -234,6 +235,13 @@ function PracticeTestRunContent() {
   const flaggedCount = flaggedKeys.length;
   const remainingCount = totalQuestionCount - answeredCount;
   const currentTimeRemaining = timeRemainingBySection[currentSectionIndex] ?? 0;
+  const flaggedQuestionIndices = currentSection.questions
+    .map((_, index) => ({
+      index,
+      key: keyFor(currentSectionIndex, index),
+    }))
+    .filter((entry) => flaggedKeys.includes(entry.key))
+    .map((entry) => entry.index);
   const allSectionScores = sections.map((section, sectionIndex) => {
     const correctCount = section.questions.filter(
       (question, questionIndex) =>
@@ -365,6 +373,7 @@ function PracticeTestRunContent() {
               topicName: question.topic,
               selectedAnswer,
               correctAnswer: question.correct_answer,
+              flagged: flaggedKeys.includes(answerKey),
               question,
             };
           })
@@ -863,7 +872,24 @@ function PracticeTestRunContent() {
                         <div style={{ fontSize: "11px", color: topMeta.accentColor, letterSpacing: ".06em", textTransform: "uppercase" }}>
                           {item.sectionTitle} · question {item.questionOrder + 1}
                         </div>
-                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.36)" }}>{item.topicName}</div>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", justifyContent: "flex-end" }}>
+                          {item.flagged ? (
+                            <span
+                              style={{
+                                fontSize: "10px",
+                                color: topMeta.accentColor,
+                                border: `0.5px solid ${topMeta.accentColor}55`,
+                                borderRadius: "999px",
+                                padding: "3px 8px",
+                                letterSpacing: ".04em",
+                                textTransform: "uppercase",
+                              }}
+                            >
+                              marked for review
+                            </span>
+                          ) : null}
+                          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.36)" }}>{item.topicName}</div>
+                        </div>
                       </div>
                       {item.question.passage && (
                         <div style={{ fontSize: "12px", lineHeight: 1.7, color: "rgba(255,255,255,0.5)", marginBottom: "10px" }}>
@@ -1251,6 +1277,54 @@ function PracticeTestRunContent() {
                 </div>
               ))}
             </div>
+
+            {flaggedQuestionIndices.length > 0 && (
+              <div
+                style={{
+                  marginBottom: "1rem",
+                  padding: "0.95rem 1rem",
+                  borderRadius: "14px",
+                  background: "rgba(255,255,255,0.03)",
+                  border: "0.5px solid rgba(255,255,255,0.08)",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: topMeta.accentColor,
+                    letterSpacing: ".06em",
+                    textTransform: "uppercase",
+                    marginBottom: "10px",
+                  }}
+                >
+                  marked for review
+                </div>
+                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                  {flaggedQuestionIndices.map((index) => (
+                    <button
+                      key={`flagged-${index}`}
+                      onClick={() => goToQuestion(index)}
+                      style={{
+                        minWidth: "38px",
+                        padding: "8px 10px",
+                        borderRadius: "999px",
+                        border: `0.5px solid ${topMeta.accentColor}66`,
+                        background:
+                          index === currentQuestionIndex
+                            ? `${topMeta.accentColor}22`
+                            : "rgba(255,255,255,0.03)",
+                        color: index === currentQuestionIndex ? topMeta.accentColor : "#fff",
+                        cursor: "pointer",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {currentSection.sectionKey === "math" && mode.includesDesmos && (
               <div style={{ marginBottom: "1rem" }}>
