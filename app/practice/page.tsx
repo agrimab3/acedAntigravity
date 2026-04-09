@@ -507,12 +507,6 @@ function PracticeContent() {
           <div style={{ fontSize: '14px', lineHeight: 1.7, color: 'rgba(255,255,255,0.45)', marginBottom: '1.5rem' }}>
             you’ll work through {questions.length} questions, get instant explanations, and can move on whenever you’re ready.
           </div>
-          <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', padding: '12px 14px', background: 'rgba(255,255,255,0.04)', borderRadius: '12px', borderLeft: `2px solid ${adaptiveToneColor}`, marginBottom: '1.5rem', textAlign: 'left' }}>
-            <div style={{ fontSize: '10px', letterSpacing: '.06em', textTransform: 'uppercase', color: adaptiveToneColor, marginBottom: '4px' }}>
-              {adaptiveStatus.label}
-            </div>
-            {adaptiveStatus.description}
-          </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '10px', marginBottom: '1.5rem' }}>
             {[{ val: questions.length, lbl: 'questions' }, { val: 'live', lbl: 'stopwatch' }, { val: 'AI', lbl: 'tutor on' }].map((item) => (
               <div key={item.lbl} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '12px', padding: '1rem' }}>
@@ -520,6 +514,12 @@ function PracticeContent() {
                 <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', marginTop: '4px' }}>{item.lbl}</div>
               </div>
             ))}
+          </div>
+          <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', padding: '12px 14px', background: 'rgba(255,255,255,0.04)', borderRadius: '12px', borderLeft: `2px solid ${adaptiveToneColor}`, marginBottom: '1.5rem', textAlign: 'left' }}>
+            <div style={{ fontSize: '10px', letterSpacing: '.06em', textTransform: 'uppercase', color: adaptiveToneColor, marginBottom: '4px' }}>
+              {adaptiveStatus.label}
+            </div>
+            {adaptiveStatus.description}
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button onClick={() => router.push('/dashboard')} style={{ flex: 1, padding: '12px', borderRadius: '10px', fontSize: '13px', cursor: 'pointer', background: 'transparent', border: '0.5px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.7)', fontFamily: 'DM Sans,sans-serif' }}>
