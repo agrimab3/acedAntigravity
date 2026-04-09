@@ -27,11 +27,15 @@ const sections = (args.sections || "english,math,reading,science")
 const targetCount = Math.max(1, Number(args.target || 10));
 const maxPasses = Math.max(1, Number(args["max-passes"] || 5));
 const topicSleepMs = Math.max(0, Number(args["topic-sleep-ms"] || 1500));
-const generationModel =
-  args.model ||
-  process.env.GEMINI_GENERATION_MODEL ||
-  process.env.GEMINI_MODEL ||
-  "gemini-2.5-flash-lite";
+const generationProvider = (
+  args.provider ||
+  process.env.QUESTION_GENERATION_PROVIDER ||
+  process.env.CONTENT_GENERATION_PROVIDER ||
+  (process.env.GROQ_API_KEY ? "groq" : "gemini")
+)
+  .trim()
+  .toLowerCase();
+const generationModel = args.model || resolveGenerationModel(generationProvider);
 
 const client = new Client({
   connectionString: databaseUrl,
@@ -39,6 +43,18 @@ const client = new Client({
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function resolveGenerationModel(provider) {
+  if (provider === "groq") {
+    return (
+      process.env.GROQ_GENERATION_MODEL ||
+      process.env.GROQ_MODEL ||
+      "llama-3.3-70b-versatile"
+    );
+  }
+
+  return process.env.GEMINI_GENERATION_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
 }
 
 function extractJsonSummary(stdout) {
@@ -107,15 +123,14 @@ async function fillTopic(sectionKey, topicSlug) {
         `--topic=${topicSlug}`,
         "--per-difficulty=1",
         "--status=published",
+        `--provider=${generationProvider}`,
+        `--model=${generationModel}`,
         "--delay-ms=0",
         "--json=1",
       ],
       {
         cwd: process.cwd(),
-        env: {
-          ...process.env,
-          GEMINI_MODEL: generationModel,
-        },
+        env: process.env,
         timeout: 240000,
         maxBuffer: 1024 * 1024 * 4,
       }
@@ -154,6 +169,7 @@ async function run() {
     const summary = {
       targetCount,
       model: generationModel,
+      provider: generationProvider,
       topicsProcessed: 0,
       results: [],
       failures: [],

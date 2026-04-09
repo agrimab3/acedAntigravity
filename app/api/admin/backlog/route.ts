@@ -62,6 +62,24 @@ function extractJsonSummary(stdout: string) {
   return JSON.parse(lines.slice(startIndex).join("\n"));
 }
 
+function resolveGenerationProvider() {
+  return (
+    process.env.QUESTION_GENERATION_PROVIDER ||
+    process.env.CONTENT_GENERATION_PROVIDER ||
+    (process.env.GROQ_API_KEY ? "groq" : "gemini")
+  )
+    .trim()
+    .toLowerCase();
+}
+
+function resolveGenerationModel(provider: string) {
+  if (provider === "groq") {
+    return process.env.GROQ_GENERATION_MODEL || process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+  }
+
+  return process.env.GEMINI_GENERATION_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
+}
+
 export async function POST(request: Request) {
   const session = await getAdminSession();
 
@@ -76,6 +94,8 @@ export async function POST(request: Request) {
   }
 
   try {
+    const provider = resolveGenerationProvider();
+    const model = resolveGenerationModel(provider);
     const child = await execFileAsync(
       "node",
       [
@@ -84,18 +104,14 @@ export async function POST(request: Request) {
         `--topic=${parsed.data.topicSlug}`,
         `--per-difficulty=${parsed.data.perDifficulty}`,
         `--status=${parsed.data.status}`,
+        `--provider=${provider}`,
+        `--model=${model}`,
         "--delay-ms=0",
         "--json=1",
       ],
       {
         cwd: process.cwd(),
-        env: {
-          ...process.env,
-          GEMINI_MODEL:
-            process.env.GEMINI_GENERATION_MODEL ||
-            process.env.GEMINI_MODEL ||
-            "gemini-2.5-flash-lite",
-        },
+        env: process.env,
         timeout: 240000,
         maxBuffer: 1024 * 1024 * 4,
       }

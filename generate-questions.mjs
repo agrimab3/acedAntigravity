@@ -6,18 +6,15 @@ const SECTION_KEYS = ["english", "math", "reading", "science"];
 const DIFFICULTIES = ["easy", "medium", "hard"];
 const ANSWER_CHOICES = ["A", "B", "C", "D"];
 const DEFAULT_GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
+const DEFAULT_GROQ_BASE_URL = "https://api.groq.com/openai/v1";
+const SUPPORTED_PROVIDERS = ["gemini", "groq"];
 
 const databaseUrl = process.env.DATABASE_URL;
 const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
-const generationModel =
-  process.env.GEMINI_GENERATION_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
+const groqApiKey = process.env.GROQ_API_KEY || "";
 
 if (!databaseUrl) {
   throw new Error("DATABASE_URL is required.");
-}
-
-if (!geminiApiKey) {
-  throw new Error("GEMINI_API_KEY is required.");
 }
 
 const args = parseArgs(process.argv.slice(2));
@@ -28,6 +25,8 @@ const topicFilter = args.topic?.trim().toLowerCase();
 const topicLimit = args["limit-topics"] ? Math.max(1, Number(args["limit-topics"])) : null;
 const delayMs = Math.max(0, Number(args["delay-ms"] || 800));
 const jsonOnly = args.json === "true" || args.json === "1";
+const generationProvider = resolveGenerationProvider(args.provider);
+const generationModel = resolveGenerationModel(generationProvider, args.model);
 
 if (sectionFilter && !SECTION_KEYS.includes(sectionFilter)) {
   throw new Error(`Invalid --section value: ${sectionFilter}`);
@@ -35,6 +34,14 @@ if (sectionFilter && !SECTION_KEYS.includes(sectionFilter)) {
 
 if (!["draft", "published"].includes(requestedStatus)) {
   throw new Error(`Invalid --status value: ${requestedStatus}`);
+}
+
+if (generationProvider === "gemini" && !geminiApiKey) {
+  throw new Error("GEMINI_API_KEY is required when using the Gemini generation provider.");
+}
+
+if (generationProvider === "groq" && !groqApiKey) {
+  throw new Error("GROQ_API_KEY is required when using the Groq generation provider.");
 }
 
 const generatedQuestionSchema = z.object({
@@ -70,6 +77,38 @@ function parseArgs(argv) {
   );
 }
 
+function resolveGenerationProvider(rawProvider) {
+  const configured =
+    rawProvider ||
+    process.env.QUESTION_GENERATION_PROVIDER ||
+    process.env.CONTENT_GENERATION_PROVIDER ||
+    (groqApiKey ? "groq" : "gemini");
+
+  const normalized = configured.trim().toLowerCase();
+
+  if (!SUPPORTED_PROVIDERS.includes(normalized)) {
+    throw new Error(`Unsupported generation provider: ${normalized}`);
+  }
+
+  return normalized;
+}
+
+function resolveGenerationModel(provider, rawModel) {
+  if (rawModel?.trim()) {
+    return rawModel.trim();
+  }
+
+  if (provider === "groq") {
+    return (
+      process.env.GROQ_GENERATION_MODEL ||
+      process.env.GROQ_MODEL ||
+      "llama-3.3-70b-versatile"
+    );
+  }
+
+  return process.env.GEMINI_GENERATION_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
+}
+
 function resolveGeminiBaseUrl() {
   const configured = process.env.GEMINI_API_BASE_URL || process.env.GEMINI_BASE_URL;
 
@@ -78,6 +117,16 @@ function resolveGeminiBaseUrl() {
   }
 
   return configured.replace(/\/openai\/?$/, "").replace(/\/$/, "");
+}
+
+function resolveGroqBaseUrl() {
+  const configured = process.env.GROQ_BASE_URL || process.env.GROQ_API_BASE_URL;
+
+  if (!configured) {
+    return DEFAULT_GROQ_BASE_URL;
+  }
+
+  return configured.replace(/\/$/, "");
 }
 
 function sleep(ms) {
@@ -96,6 +145,10 @@ function extractRetryDelayMs(message) {
 
 function isRetryableGeminiError(message) {
   return /quota exceeded|retry in|429/i.test(message);
+}
+
+function isRetryableGroqError(message) {
+  return /rate limit|rate_limit|too many requests|429|capacity_exceeded|498/i.test(message);
 }
 
 function normalizeText(value) {
@@ -415,84 +468,25 @@ function buildQuestionBatchSchema(sectionKey) {
 
 async function generateBatchForTopic(topic, attempt = 1) {
   try {
-    const response = await fetch(
-      `${resolveGeminiBaseUrl()}/models/${generationModel}:generateContent`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": geminiApiKey,
-        },
-        body: JSON.stringify({
-          systemInstruction: {
-            parts: [
-              {
-                text:
-                  "You are Anti's ACT content engine. Write original ACT-style questions with precise explanations and no malformed output.",
-              },
-            ],
-          },
-          contents: [
-            {
-              role: "user",
-              parts: [
-                {
-                  text: buildPrompt({
-                    sectionKey: topic.section_key,
-                    topicName: topic.name,
-                    slug: topic.slug,
-                  }),
-                },
-              ],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 8192,
-            responseMimeType: "application/json",
-            responseJsonSchema: buildQuestionBatchSchema(topic.section_key),
-          },
-        }),
-      }
-    );
-
-    const rawBody = await response.text();
-    let payload;
-
-    try {
-      payload = rawBody ? JSON.parse(rawBody) : null;
-    } catch {
-      payload = null;
-    }
-
-    if (!response.ok) {
-      const message =
-        payload?.error?.message ||
-        payload?.promptFeedback?.blockReason ||
-        rawBody ||
-        `HTTP ${response.status}`;
-      throw new Error(`Gemini generation failed: ${message}`);
-    }
-
     const text =
-      payload?.candidates
-        ?.flatMap((candidate) => candidate.content?.parts ?? [])
-        .map((part) => part.text ?? "")
-        .join("")
-        .trim() ?? "";
-
-    if (!text) {
-      throw new Error("Gemini returned an empty generation response.");
-    }
+      generationProvider === "groq"
+        ? await generateGroqBatchText(topic)
+        : await generateGeminiBatchText(topic);
 
     return generatedBatchSchema.parse(JSON.parse(text)).questions;
   } catch (error) {
     const message = error instanceof Error ? error.message : "unknown generation error";
 
-    if (attempt < 5 && isRetryableGeminiError(message)) {
-      const retryDelayMs = extractRetryDelayMs(message) ?? 35000;
+    const isRetryable =
+      generationProvider === "groq"
+        ? isRetryableGroqError(message)
+        : isRetryableGeminiError(message);
+
+    if (attempt < 5 && isRetryable) {
+      const retryDelayMs =
+        extractRetryDelayMs(message) ?? (generationProvider === "groq" ? 20000 : 35000);
       console.warn(
-        `Rate limited for ${topic.section_key}/${topic.slug}; retrying in ${Math.ceil(
+        `${generationProvider} rate limited for ${topic.section_key}/${topic.slug}; retrying in ${Math.ceil(
           retryDelayMs / 1000
         )}s (attempt ${attempt + 1}/5).`
       );
@@ -502,6 +496,137 @@ async function generateBatchForTopic(topic, attempt = 1) {
 
     throw error;
   }
+}
+
+async function generateGeminiBatchText(topic) {
+  const response = await fetch(`${resolveGeminiBaseUrl()}/models/${generationModel}:generateContent`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": geminiApiKey,
+    },
+    body: JSON.stringify({
+      systemInstruction: {
+        parts: [
+          {
+            text:
+              "You are Anti's ACT content engine. Write original ACT-style questions with precise explanations and no malformed output.",
+          },
+        ],
+      },
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: buildPrompt({
+                sectionKey: topic.section_key,
+                topicName: topic.name,
+                slug: topic.slug,
+              }),
+            },
+          ],
+        },
+      ],
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 8192,
+        responseMimeType: "application/json",
+        responseJsonSchema: buildQuestionBatchSchema(topic.section_key),
+      },
+    }),
+  });
+
+  const rawBody = await response.text();
+  let payload;
+
+  try {
+    payload = rawBody ? JSON.parse(rawBody) : null;
+  } catch {
+    payload = null;
+  }
+
+  if (!response.ok) {
+    const message =
+      payload?.error?.message ||
+      payload?.promptFeedback?.blockReason ||
+      rawBody ||
+      `HTTP ${response.status}`;
+    throw new Error(`Gemini generation failed: ${message}`);
+  }
+
+  const text =
+    payload?.candidates
+      ?.flatMap((candidate) => candidate.content?.parts ?? [])
+      .map((part) => part.text ?? "")
+      .join("")
+      .trim() ?? "";
+
+  if (!text) {
+    throw new Error("Gemini returned an empty generation response.");
+  }
+
+  return text;
+}
+
+async function generateGroqBatchText(topic) {
+  const response = await fetch(`${resolveGroqBaseUrl()}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${groqApiKey}`,
+    },
+    body: JSON.stringify({
+      model: generationModel,
+      temperature: 0.7,
+      max_completion_tokens: 4096,
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are Anti's ACT content engine. Write original ACT-style questions with precise explanations and no malformed output.",
+        },
+        {
+          role: "user",
+          content: buildPrompt({
+            sectionKey: topic.section_key,
+            topicName: topic.name,
+            slug: topic.slug,
+          }),
+        },
+      ],
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: `act_${topic.section_key}_${topic.slug}_batch`,
+          strict: true,
+          schema: buildQuestionBatchSchema(topic.section_key),
+        },
+      },
+    }),
+  });
+
+  const rawBody = await response.text();
+  let payload;
+
+  try {
+    payload = rawBody ? JSON.parse(rawBody) : null;
+  } catch {
+    payload = null;
+  }
+
+  if (!response.ok) {
+    const message = payload?.error?.message || rawBody || `HTTP ${response.status}`;
+    throw new Error(`Groq generation failed: ${message}`);
+  }
+
+  const text = payload?.choices?.[0]?.message?.content?.trim() || "";
+
+  if (!text) {
+    throw new Error("Groq returned an empty generation response.");
+  }
+
+  return text;
 }
 
 function sanitizeQuestion(sectionKey, topic, question) {
@@ -633,6 +758,7 @@ function sanitizeQuestion(sectionKey, topic, question) {
     correctAnswer: question.correctAnswer,
     explanation,
     generationModel,
+    generationProvider,
     fingerprint: buildFingerprint({
       sectionKey,
       topicSlug: topic.slug,
@@ -728,7 +854,7 @@ async function insertQuestions(topic, generatedQuestions) {
           generation_model,
           status
         )
-        VALUES ($1, $2, $3, 'multiple_choice', $4, $5, $6, $7::jsonb, $8, $9, 'gemini', $10, $11)
+        VALUES ($1, $2, $3, 'multiple_choice', $4, $5, $6, $7::jsonb, $8, $9, $10, $11, $12)
         ON CONFLICT (fingerprint) DO NOTHING
         RETURNING id
       `,
@@ -742,6 +868,7 @@ async function insertQuestions(topic, generatedQuestions) {
         JSON.stringify(normalizedQuestion.choices),
         normalizedQuestion.correctAnswer,
         normalizedQuestion.explanation,
+        normalizedQuestion.generationProvider,
         normalizedQuestion.generationModel,
         requestedStatus,
       ]
@@ -770,6 +897,8 @@ async function main() {
     }
 
     const summary = {
+      provider: generationProvider,
+      model: generationModel,
       topicsProcessed: 0,
       inserted: 0,
       skipped: 0,

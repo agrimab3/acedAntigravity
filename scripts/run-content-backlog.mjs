@@ -27,11 +27,15 @@ const sections = (args.sections || "reading,science")
 const targetCount = Math.max(3, Number(args.target || 10));
 const topicSleepMs = Math.max(0, Number(args["topic-sleep-ms"] || 75000));
 const status = (args.status || "draft").trim().toLowerCase();
-const generationModel =
-  args.model ||
-  process.env.GEMINI_GENERATION_MODEL ||
-  process.env.GEMINI_MODEL ||
-  "gemini-2.5-flash-lite";
+const generationProvider = (
+  args.provider ||
+  process.env.QUESTION_GENERATION_PROVIDER ||
+  process.env.CONTENT_GENERATION_PROVIDER ||
+  (process.env.GROQ_API_KEY ? "groq" : "gemini")
+)
+  .trim()
+  .toLowerCase();
+const generationModel = args.model || resolveGenerationModel(generationProvider);
 
 if (!["draft", "published"].includes(status)) {
   throw new Error(`Invalid status: ${status}`);
@@ -43,6 +47,18 @@ const client = new Client({
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function resolveGenerationModel(provider) {
+  if (provider === "groq") {
+    return (
+      process.env.GROQ_GENERATION_MODEL ||
+      process.env.GROQ_MODEL ||
+      "llama-3.3-70b-versatile"
+    );
+  }
+
+  return process.env.GEMINI_GENERATION_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
 }
 
 function extractJsonSummary(stdout) {
@@ -85,6 +101,7 @@ async function run() {
     const topics = await getBacklogTopics();
     const summary = {
       model: generationModel,
+      provider: generationProvider,
       targetCount,
       topicsQueued: 0,
       inserted: 0,
@@ -115,15 +132,14 @@ async function run() {
             `--topic=${topic.slug}`,
             `--per-difficulty=${perDifficulty}`,
             `--status=${status}`,
+            `--provider=${generationProvider}`,
+            `--model=${generationModel}`,
             "--delay-ms=0",
             "--json=1",
           ],
           {
             cwd: process.cwd(),
-            env: {
-              ...process.env,
-              GEMINI_MODEL: generationModel,
-            },
+            env: process.env,
             timeout: 240000,
             maxBuffer: 1024 * 1024 * 4,
           }
