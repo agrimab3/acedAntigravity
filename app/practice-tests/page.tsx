@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import {
@@ -40,16 +40,16 @@ function buildPracticeTestAmbientStars(count: number) {
       id: index,
       left: `${clampPercent(leftBase + (seededValue(seed) - 0.5) * 8, 2, 98)}%`,
       top: `${clampPercent(topBase + (seededValue(seed + 20) - 0.5) * 10, 3, 97)}%`,
-      size: 0.9 + seededValue(seed + 40) * 2.8,
-      opacity: 0.1 + seededValue(seed + 60) * 0.42,
-      duration: 4.5 + seededValue(seed + 80) * 7,
+      size: 0.7 + seededValue(seed + 40) * 2.2,
+      opacity: 0.1 + seededValue(seed + 60) * 0.3,
+      duration: 7 + seededValue(seed + 80) * 10,
       delay: seededValue(seed + 100) * 6,
       animationName:
         variant === 0
-          ? "practiceTestStarDriftA"
+          ? "practiceTestStarFloatA"
           : variant === 1
-            ? "practiceTestStarDriftB"
-            : "practiceTestStarDriftC",
+            ? "practiceTestStarFloatB"
+            : "practiceTestStarFloatC",
     };
   });
 }
@@ -73,10 +73,20 @@ function clampPercent(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
 
+const SECTION_TEST_TOPIC_COPY: Record<string, string> = {
+  english:
+    "Organization & Flow, Transitions & Cohesion, Precision & Concision, Style & Tone, Punctuation, Grammar & Usage, and Sentence Structure under official pacing.",
+  math:
+    "Number & Quantity, Algebra, Functions, Geometry, Statistics & Probability, Integrating Essential Skills, and Modeling with calculator support.",
+  reading:
+    "Literary Narrative, Social Science, Humanities, and Natural Science passage work with real ACT-style timing pressure.",
+  science:
+    "Data Representation, Research Summaries, and Conflicting Viewpoints with experiment reading, data comparison, and inference pressure.",
+};
+
 export default function PracticeTestsPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const backgroundCanvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedModeKey, setSelectedModeKey] = useState(PRACTICE_TEST_MODES[0]?.key);
   const [historyLoading, setHistoryLoading] = useState(true);
   const [history, setHistory] = useState<
@@ -117,89 +127,6 @@ export default function PracticeTestsPage() {
       router.replace("/");
     }
   }, [router, status]);
-
-  useEffect(() => {
-    const canvas = backgroundCanvasRef.current;
-    if (!canvas) {
-      return;
-    }
-
-    const context = canvas.getContext("2d");
-    if (!context) {
-      return;
-    }
-
-    const ctx = context;
-    const dpr = window.devicePixelRatio || 1;
-    const stars = backgroundStars.map((star, index) => ({
-      x: ((index % 13) + 0.5) / 13 + (seededValue(index + 1) - 0.5) * 0.035,
-      y: (Math.floor(index / 13) + 0.5) / 6 + (seededValue(index + 20) - 0.5) * 0.05,
-      r: star.size,
-      alpha: star.opacity,
-      speed: 0.18 + seededValue(index + 60) * 0.32,
-      driftX: (seededValue(index + 80) - 0.5) * 10,
-      driftY: -12 - seededValue(index + 100) * 18,
-      phase: seededValue(index + 120) * Math.PI * 2,
-    }));
-
-    const resize = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-
-    resize();
-    window.addEventListener("resize", resize);
-
-    let raf = 0;
-
-    const draw = (timestamp: number) => {
-      const t = timestamp * 0.001;
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      ctx.clearRect(0, 0, width, height);
-
-      stars.forEach((star) => {
-        const driftProgress = (Math.sin(t * star.speed + star.phase) + 1) / 2;
-        const x = star.x * width + star.driftX * driftProgress;
-        const y = star.y * height + star.driftY * driftProgress;
-        const twinkle = 0.45 + 0.55 * Math.sin(t * (1.3 + star.speed) + star.phase);
-        const radius = star.r * (0.92 + twinkle * 0.18);
-        ctx.globalAlpha = star.alpha * (0.42 + twinkle * 0.58);
-        ctx.fillStyle = "#FFFFFF";
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fill();
-
-        if (star.r > 2.2) {
-          ctx.strokeStyle = "rgba(255,255,255,0.24)";
-          ctx.lineWidth = 0.7;
-          ctx.beginPath();
-          ctx.moveTo(x - radius * 3.2, y);
-          ctx.lineTo(x + radius * 3.2, y);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(x, y - radius * 3.2);
-          ctx.lineTo(x, y + radius * 3.2);
-          ctx.stroke();
-        }
-      });
-
-      ctx.globalAlpha = 1;
-      raf = requestAnimationFrame(draw);
-    };
-
-    raf = requestAnimationFrame(draw);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
-    };
-  }, [backgroundStars]);
 
   useEffect(() => {
     if (status !== "authenticated") {
@@ -280,23 +207,20 @@ export default function PracticeTestsPage() {
         rel="stylesheet"
       />
       <style>{`
-        @keyframes practiceTestStarDriftA {
-          0% { transform: translate3d(0, 0, 0) scale(0.88); opacity: 0.18; }
-          35% { transform: translate3d(14px, -10px, 0) scale(1.08); opacity: 0.9; }
-          70% { transform: translate3d(28px, -22px, 0) scale(0.98); opacity: 0.42; }
-          100% { transform: translate3d(0, 0, 0) scale(0.88); opacity: 0.18; }
+        @keyframes practiceTestStarFloatA {
+          0% { transform: translate3d(0, 0, 0) scale(0.92); opacity: 0.12; }
+          50% { transform: translate3d(12px, -10px, 0) scale(1.08); opacity: 0.68; }
+          100% { transform: translate3d(0, 0, 0) scale(0.92); opacity: 0.12; }
         }
-        @keyframes practiceTestStarDriftB {
-          0% { transform: translate3d(0, 0, 0) scale(0.9); opacity: 0.16; }
-          40% { transform: translate3d(-18px, -6px, 0) scale(1.04); opacity: 0.78; }
-          72% { transform: translate3d(-30px, -20px, 0) scale(0.96); opacity: 0.34; }
-          100% { transform: translate3d(0, 0, 0) scale(0.9); opacity: 0.16; }
+        @keyframes practiceTestStarFloatB {
+          0% { transform: translate3d(0, 0, 0) scale(0.94); opacity: 0.1; }
+          50% { transform: translate3d(-10px, -7px, 0) scale(1.04); opacity: 0.6; }
+          100% { transform: translate3d(0, 0, 0) scale(0.94); opacity: 0.1; }
         }
-        @keyframes practiceTestStarDriftC {
-          0% { transform: translate3d(0, 0, 0) scale(0.86); opacity: 0.14; }
-          42% { transform: translate3d(10px, -18px, 0) scale(1.08); opacity: 0.82; }
-          76% { transform: translate3d(22px, -32px, 0) scale(0.94); opacity: 0.3; }
-          100% { transform: translate3d(0, 0, 0) scale(0.86); opacity: 0.14; }
+        @keyframes practiceTestStarFloatC {
+          0% { transform: translate3d(0, 0, 0) scale(0.9); opacity: 0.1; }
+          50% { transform: translate3d(8px, -14px, 0) scale(1.06); opacity: 0.62; }
+          100% { transform: translate3d(0, 0, 0) scale(0.9); opacity: 0.1; }
         }
         @keyframes practiceTestNebulaPulse {
           0% { transform: scale(0.94); opacity: 0.35; }
@@ -304,10 +228,6 @@ export default function PracticeTestsPage() {
           100% { transform: scale(0.94); opacity: 0.35; }
         }
       `}</style>
-      <canvas
-        ref={backgroundCanvasRef}
-        style={{ position: "fixed", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0 }}
-      />
       <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }}>
         {backgroundGlows.map((glow) => (
           <span
@@ -329,6 +249,27 @@ export default function PracticeTestsPage() {
               opacity: glow.opacity,
               filter: "blur(10px)",
               animation: `practiceTestNebulaPulse ${glow.duration}s ease-in-out ${glow.delay}s infinite`,
+              display: "block",
+            }}
+          />
+        ))}
+        {backgroundStars.map((star) => (
+          <span
+            key={`ambient-star-${star.id}`}
+            style={{
+              position: "absolute",
+              left: star.left,
+              top: star.top,
+              width: `${star.size}px`,
+              height: `${star.size}px`,
+              borderRadius: "999px",
+              background: "rgba(255,255,255,0.96)",
+              opacity: star.opacity,
+              boxShadow:
+                star.size > 2
+                  ? "0 0 18px rgba(255,255,255,0.46), 0 0 30px rgba(255,255,255,0.16)"
+                  : "0 0 10px rgba(255,255,255,0.32)",
+              animation: `${star.animationName} ${star.duration}s ease-in-out ${star.delay}s infinite`,
               display: "block",
             }}
           />
@@ -506,7 +447,9 @@ export default function PracticeTestsPage() {
                           <div>{formatDuration(mode.durationMinutes)}</div>
                         </div>
                       </div>
-                      <div style={{ fontSize: "12px", lineHeight: 1.6, color: "rgba(255,255,255,0.5)" }}>{mode.description}</div>
+                      <div style={{ fontSize: "12px", lineHeight: 1.6, color: "rgba(255,255,255,0.5)" }}>
+                        {SECTION_TEST_TOPIC_COPY[mode.key] ?? mode.description}
+                      </div>
                     </button>
                   );
                 })}
@@ -769,22 +712,6 @@ export default function PracticeTestsPage() {
               </div>
             </div>
 
-            <div
-              style={{
-                fontSize: "12px",
-                lineHeight: 1.7,
-                color: "rgba(255,255,255,0.5)",
-                padding: "0.95rem 1rem",
-                background: "rgba(255,255,255,0.03)",
-                borderRadius: "14px",
-                borderLeft: `2px solid ${selectedMode.accentColor}`,
-                marginBottom: "1rem",
-              }}
-            >
-              Timed section runs, full-test orchestration, database persistence, score reports, missed-question review, and
-              Math calculator support are now part of the live practice-test flow.
-            </div>
-
             <div style={{ display: "flex", gap: "8px" }}>
               <button
                 onClick={() => router.push("/dashboard")}
@@ -820,6 +747,24 @@ export default function PracticeTestsPage() {
               >
                 {selectedMode.format === "section" ? "start timed section →" : "start full test →"}
               </button>
+            </div>
+
+            <div
+              style={{
+                marginTop: "1rem",
+                fontSize: "12px",
+                lineHeight: 1.7,
+                color: "rgba(255,255,255,0.54)",
+                padding: "0.95rem 1rem",
+                background: "rgba(255,255,255,0.03)",
+                borderRadius: "14px",
+                borderLeft: `2px solid ${selectedMode.accentColor}`,
+              }}
+            >
+              <div style={{ fontSize: "11px", letterSpacing: ".06em", textTransform: "uppercase", color: selectedMode.accentColor, marginBottom: "8px" }}>
+                ai support
+              </div>
+              Aced can turn the result into star recommendations, recovery drills, and targeted review help after the test if you need a cleaner next step.
             </div>
           </aside>
         </div>

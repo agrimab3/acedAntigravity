@@ -388,7 +388,7 @@ function getStarVisualState({
   const bodyAlpha = interactive ? (0.72 + mastery * 0.28) * twinkle : 0.94 * twinkle;
   const coreRadius = interactive ? 1.15 + mastery * 0.95 : 1.22;
   const coreAlpha = interactive ? 0.76 + mastery * 0.24 : 1;
-  const lineAlpha = 0.42 + mastery * 0.42;
+  const lineAlpha = 0.18 + mastery * 0.24;
   const lineWidth = 1.35 + mastery * 1.2;
   const mastered = masteryPct >= 95;
   const shimmerStrength = mastered ? 0.3 + 0.7 * pulse : 0;
@@ -730,7 +730,7 @@ export default function Dashboard() {
           });
           const pa = pointToCanvas(sec, sec.points[a]);
           const pb = pointToCanvas(sec, sec.points[b]);
-          ctx.globalAlpha = 1;
+          ctx.globalAlpha = active ? lineVisual.lineAlpha : 0.08;
           ctx.strokeStyle = active ? sec.color : toRgba(sec.color, 0.16);
           ctx.lineWidth = lineVisual.lineWidth;
           ctx.shadowColor = active ? sec.color : toRgba(sec.color, 0.18);
@@ -1081,8 +1081,7 @@ export default function Dashboard() {
           padding: "1.5rem 1.5rem 0.9rem",
           position: "relative",
           overflow: "hidden",
-          background:
-            "radial-gradient(circle at 16% 14%, rgba(72, 137, 190, 0.14), transparent 24%), radial-gradient(circle at 80% 18%, rgba(93,202,165,0.1), transparent 24%), linear-gradient(180deg, rgba(13,27,42,0.84) 0%, rgba(13,27,42,0.36) 100%)",
+          background: "transparent",
           zIndex: 2,
         }}
       >
@@ -1171,9 +1170,6 @@ export default function Dashboard() {
         </h1>
         <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)", marginBottom: "1rem" }}>
           your universe is waiting - click any bright star
-        </p>
-        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.24)", marginBottom: "1rem" }}>
-          english stars now drill the exact skills inside the official ACT categories.
         </p>
 
         <div style={{ display: "flex", gap: "6px", marginBottom: "0", flexWrap: "wrap" }}>
