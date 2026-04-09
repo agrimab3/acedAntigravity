@@ -4,6 +4,7 @@ import { Fragment, Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { getTopicByName, type SectionKey } from "@/lib/act-taxonomy";
+import { normalizeDifficultyBand, type DifficultyBand } from "@/lib/adaptive";
 
 type Question = {
   id: string;
@@ -16,6 +17,14 @@ type Question = {
   correct_answer: string;
   explanation: string;
 };
+
+const DIFFICULTY_ORDER: DifficultyBand[] = [
+  "foundation",
+  "easy",
+  "medium",
+  "hard",
+  "challenge",
+];
 
 const SECTION_META: Record<string, { color: string; constellation: string }> = {
   english: { color: '#5DCAA5', constellation: 'Gemini' },
@@ -55,6 +64,18 @@ function getIntroTutorMessage(topic: string, officialCategory?: string) {
   return topic
     ? `i'm here while you work on ${context}. ask for a hint, a simpler explanation, or why a choice is wrong.`
     : "i'm here while you practice. ask for a hint, a simpler explanation, or why an answer choice is wrong.";
+}
+
+function sortQuestionsTowardDifficulty(questions: Question[], target: string) {
+  const normalizedTarget = normalizeDifficultyBand(target);
+  const targetIndex = DIFFICULTY_ORDER.indexOf(normalizedTarget);
+
+  return [...questions].sort((a, b) => {
+    const aIndex = DIFFICULTY_ORDER.indexOf(normalizeDifficultyBand(a.difficulty));
+    const bIndex = DIFFICULTY_ORDER.indexOf(normalizeDifficultyBand(b.difficulty));
+
+    return Math.abs(aIndex - targetIndex) - Math.abs(bIndex - targetIndex);
+  });
 }
 
 function PracticeContent() {
@@ -142,7 +163,7 @@ function PracticeContent() {
         };
 
         if (!active) return;
-        setQuestions(data.questions ?? []);
+        setQuestions(sortQuestionsTowardDifficulty(data.questions ?? [], data.adaptive?.targetDifficulty ?? "easy"));
         setPracticeSessionId(data.sessionId ?? null);
         setTargetDifficulty(data.adaptive?.targetDifficulty ?? "easy");
       } catch (error) {
@@ -256,7 +277,7 @@ function PracticeContent() {
 
     if (practiceSessionId && !q.id.startsWith("mock-")) {
       try {
-        await fetch("/api/practice/answer", {
+        const res = await fetch("/api/practice/answer", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -268,6 +289,20 @@ function PracticeContent() {
             hintCount: questionHintCount,
           }),
         });
+
+        const data = (await res.json()) as {
+          adaptive?: { recommendedDifficulty?: string };
+        };
+
+        if (data.adaptive?.recommendedDifficulty) {
+          const recommendedDifficulty = data.adaptive.recommendedDifficulty;
+          setTargetDifficulty(recommendedDifficulty);
+          setQuestions((prev) => {
+            const answered = prev.slice(0, qIndex + 1);
+            const remaining = prev.slice(qIndex + 1);
+            return [...answered, ...sortQuestionsTowardDifficulty(remaining, recommendedDifficulty)];
+          });
+        }
       } catch (error) {
         console.error("Failed to record answer", error);
       }

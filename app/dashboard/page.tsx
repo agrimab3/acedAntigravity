@@ -222,6 +222,24 @@ export default function Dashboard() {
   const { data: session, status } = useSession();
   const [activeSec, setActiveSec] = useState<SectionKey | "all">("all");
   const [selected, setSelected] = useState<Hit>(null);
+  const [dashboardSummary, setDashboardSummary] = useState<{
+    compositeEstimatedScore: number;
+    confidence: number;
+    sectionSummaries: Array<{
+      sectionKey: string;
+      estimatedScore: number;
+      confidence: number;
+      answeredCount: number;
+      topicsAttempted: number;
+    }>;
+    topicSummaries: Array<{
+      sectionKey: string;
+      topicName: string;
+      masteryPct: number;
+      estimatedScore: number;
+      totalAnswered: number;
+    }>;
+  } | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const detailRef = useRef<HTMLDivElement>(null);
   const stateRef = useRef({
@@ -250,6 +268,38 @@ export default function Dashboard() {
       detailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }, [selected]);
+
+  useEffect(() => {
+    if (status !== "authenticated") return;
+
+    let active = true;
+
+    const loadSummary = async () => {
+      try {
+        const res = await fetch("/api/dashboard/summary", {
+          cache: "no-store",
+        });
+
+        if (!res.ok) {
+          return;
+        }
+
+        const data = await res.json();
+
+        if (active) {
+          setDashboardSummary(data);
+        }
+      } catch (error) {
+        console.error("Failed to load dashboard summary", error);
+      }
+    };
+
+    void loadSummary();
+
+    return () => {
+      active = false;
+    };
+  }, [status]);
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -531,6 +581,7 @@ export default function Dashboard() {
       ctx.beginPath();
       ctx.arc(W / 2, H / 2, 128, 0, Math.PI * 2);
       ctx.stroke();
+      const estimatedScoreLabel = dashboardSummary?.compositeEstimatedScore?.toString() ?? "--";
       ctx.globalAlpha = 0.92;
       ctx.fillStyle = "#FFFFFF";
       ctx.font = "700 16px sans-serif";
@@ -538,10 +589,19 @@ export default function Dashboard() {
       ctx.fillText("ESTIMATED ACT SCORE", W / 2, H / 2 - 32);
       ctx.globalAlpha = 0.88;
       ctx.font = "italic bold 48px serif";
-      ctx.fillText("--", W / 2, H / 2 + 18);
+      ctx.fillText(estimatedScoreLabel, W / 2, H / 2 + 18);
       ctx.globalAlpha = 0.16;
       ctx.font = "13px sans-serif";
       ctx.fillText("out of 36", W / 2, H / 2 + 44);
+      if (dashboardSummary) {
+        ctx.globalAlpha = 0.28;
+        ctx.font = "11px sans-serif";
+        ctx.fillText(
+          `confidence ${Math.round((dashboardSummary.confidence ?? 0) * 100)}%`,
+          W / 2,
+          H / 2 + 66
+        );
+      }
       ctx.globalAlpha = 1;
 
       raf = requestAnimationFrame(draw);
@@ -553,7 +613,7 @@ export default function Dashboard() {
       canvasEl.removeEventListener("mousemove", onMove);
       canvasEl.removeEventListener("click", onClick);
     };
-  }, [status]);
+  }, [dashboardSummary, status]);
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: "/" });
@@ -562,6 +622,15 @@ export default function Dashboard() {
   const selSec = selected ? SECS[selected.si] : null;
   const selTopic = selected ? getPointTopic(SECS[selected.si], selected.pi) : null;
   const selTopicContext = selSec && selTopic ? getTopicContext(selSec.key, selTopic) : null;
+  const selectedTopicSummary =
+    selSec && selTopic
+      ? dashboardSummary?.topicSummaries.find(
+          (summary) => summary.sectionKey === selSec.key && summary.topicName === selTopic
+        )
+      : null;
+  const selectedSectionSummary = selSec
+    ? dashboardSummary?.sectionSummaries.find((summary) => summary.sectionKey === selSec.key)
+    : null;
 
   if (status === "loading") {
     return (
@@ -771,7 +840,7 @@ export default function Dashboard() {
                     lineHeight: 1,
                   }}
                 >
-                  0%
+                  {selectedTopicSummary?.masteryPct ?? 0}%
                 </div>
                 <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>mastery</div>
               </div>
@@ -784,7 +853,14 @@ export default function Dashboard() {
                 marginBottom: "1rem",
               }}
             >
-              <div style={{ height: "100%", width: "0%", background: selSec.color, borderRadius: "2px" }} />
+              <div
+                style={{
+                  height: "100%",
+                  width: `${selectedTopicSummary?.masteryPct ?? 0}%`,
+                  background: selSec.color,
+                  borderRadius: "2px",
+                }}
+              />
             </div>
             <div
               style={{
@@ -797,10 +873,23 @@ export default function Dashboard() {
                 marginBottom: "1rem",
               }}
             >
-              {selTopicContext
-                ? `no practice yet - start here to light up this ${selTopicContext.toLowerCase()} skill star ✦`
-                : "no practice yet - start here to light this star up ✦"}
+              {selectedTopicSummary && selectedTopicSummary.totalAnswered > 0
+                ? `you've answered ${selectedTopicSummary.totalAnswered} question${selectedTopicSummary.totalAnswered === 1 ? "" : "s"} here. keep going to strengthen this star ✦`
+                : selTopicContext
+                  ? `no practice yet - start here to light up this ${selTopicContext.toLowerCase()} skill star ✦`
+                  : "no practice yet - start here to light this star up ✦"}
             </div>
+            {selectedSectionSummary && (
+              <div
+                style={{
+                  fontSize: "12px",
+                  color: "rgba(255,255,255,0.48)",
+                  marginBottom: "1rem",
+                }}
+              >
+                estimated {selSec.name.toLowerCase()} score: {selectedSectionSummary.estimatedScore}/36
+              </div>
+            )}
             <div style={{ display: "flex", gap: "8px" }}>
               <button
                 onClick={() => router.push(`/practice?section=${selSec.key}&topic=${encodeURIComponent(selTopic)}`)}
