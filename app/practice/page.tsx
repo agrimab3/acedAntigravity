@@ -94,6 +94,7 @@ function PracticeContent() {
   const { status } = useSession();
   const section = searchParams.get("section") || "english";
   const topic = searchParams.get("topic") || "";
+  const difficulty = searchParams.get("difficulty") || "";
   const meta = SECTION_META[section] || SECTION_META.english;
   const topicDefinition = getTopicByName(section as SectionKey, topic);
   const officialCategory = topicDefinition?.officialCategory;
@@ -173,6 +174,10 @@ function PracticeContent() {
           params.set("topic", topic);
         }
 
+        if (difficulty) {
+          params.set("difficulty", difficulty);
+        }
+
         const res = await fetch(`/api/questions?${params.toString()}`, {
           cache: "no-store",
         });
@@ -216,7 +221,7 @@ function PracticeContent() {
     return () => {
       active = false;
     };
-  }, [officialCategory, section, topic]);
+  }, [difficulty, officialCategory, section, topic]);
 
   // star canvas
   useEffect(() => {

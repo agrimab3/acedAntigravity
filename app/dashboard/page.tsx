@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { getTopicByName } from "@/lib/act-taxonomy";
@@ -219,6 +219,60 @@ function getTopicContext(sectionKey: SectionKey, topic: string) {
   return getTopicByName(sectionKey, topic)?.officialCategory ?? null;
 }
 
+function seededValue(seed: number) {
+  const value = Math.sin(seed * 999.913) * 10000;
+  return value - Math.floor(value);
+}
+
+function buildDashboardAmbientStars(count: number) {
+  const columns = 11;
+  const rows = Math.ceil(count / columns);
+
+  return Array.from({ length: count }, (_, index) => {
+    const seed = index + 1;
+    const variant = index % 3;
+    const column = index % columns;
+    const row = Math.floor(index / columns);
+    const leftBase = ((column + 0.5) / columns) * 100;
+    const topBase = ((row + 0.5) / rows) * 100;
+
+    return {
+      id: index,
+      left: `${clampPercent(leftBase + (seededValue(seed) - 0.5) * 8, 2, 98)}%`,
+      top: `${clampPercent(topBase + (seededValue(seed + 20) - 0.5) * 10, 2, 98)}%`,
+      size: 0.7 + seededValue(seed + 40) * 2.2,
+      opacity: 0.08 + seededValue(seed + 60) * 0.34,
+      duration: 7 + seededValue(seed + 80) * 10,
+      delay: seededValue(seed + 100) * 6,
+      animationName:
+        variant === 0
+          ? "dashboardStarFloatA"
+          : variant === 1
+            ? "dashboardStarFloatB"
+            : "dashboardStarFloatC",
+    };
+  });
+}
+
+function buildDashboardAmbientGlows(count: number) {
+  return Array.from({ length: count }, (_, index) => {
+    const seed = index + 201;
+    return {
+      id: index,
+      left: `${8 + seededValue(seed) * 84}%`,
+      top: `${6 + seededValue(seed + 20) * 88}%`,
+      size: 120 + seededValue(seed + 40) * 220,
+      opacity: 0.04 + seededValue(seed + 60) * 0.08,
+      duration: 16 + seededValue(seed + 80) * 16,
+      delay: seededValue(seed + 100) * 5,
+    };
+  });
+}
+
+function clampPercent(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value));
+}
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
@@ -317,22 +371,25 @@ function getStarVisualState({
 }) {
   const mastery = clamp(masteryPct, 0, 100) / 100;
   const bodyColor = interactive
-    ? mixColor(BASE_STAR_COLOR, "#FFFFFF", 0.08 + mastery * 0.18)
-    : mixColor(BASE_STAR_COLOR, sectionColor, 0.02);
+    ? mixColor(BASE_STAR_COLOR, "#FFFFFF", 0.18 + mastery * 0.2)
+    : hexToRgb(sectionColor);
   const coreColor = interactive
-    ? mixColor(BASE_CORE_COLOR, "#FFFFFF", 0.2 + mastery * 0.2)
-    : mixColor(BASE_CORE_COLOR, sectionColor, 0.08);
-  const baseRadius = interactive ? 5.2 + mastery * 2.8 : 3.1;
+    ? mixColor(BASE_CORE_COLOR, "#FFFFFF", 0.24 + mastery * 0.18)
+    : hexToRgb(sectionColor);
+  const haloColor = interactive
+    ? mixColor("#FFFFFF", sectionColor, 0.16 + mastery * 0.16)
+    : hexToRgb(sectionColor);
+  const baseRadius = interactive ? 5.2 + mastery * 2.8 : 3.45;
   const radiusBoost = hovered ? 1.5 : selected ? 1.1 : 0;
   const radius = baseRadius + radiusBoost + (interactive ? pulse * 0.35 : 0);
-  const haloRadius = interactive ? 16 + mastery * 18 + pulse * 3 + (hovered || selected ? 7 : 0) : 0;
+  const haloRadius = interactive ? 16 + mastery * 18 + pulse * 3 + (hovered || selected ? 7 : 0) : 7;
   const haloAlpha = interactive ? 0.16 + mastery * 0.42 + (hovered || selected ? 0.12 : 0) : 0;
   const ringAlpha = interactive ? 0.18 + mastery * 0.4 + (hovered || selected ? 0.16 : 0) : 0;
-  const bodyAlpha = interactive ? (0.72 + mastery * 0.28) * twinkle : 0.38 * twinkle;
-  const coreRadius = interactive ? 1.15 + mastery * 0.95 : 1.05;
-  const coreAlpha = interactive ? 0.76 + mastery * 0.24 : 0.42;
-  const lineAlpha = 0.08 + mastery * 0.44;
-  const lineWidth = 0.6 + mastery * 0.9;
+  const bodyAlpha = interactive ? (0.72 + mastery * 0.28) * twinkle : 0.94 * twinkle;
+  const coreRadius = interactive ? 1.15 + mastery * 0.95 : 1.22;
+  const coreAlpha = interactive ? 0.76 + mastery * 0.24 : 1;
+  const lineAlpha = 0.42 + mastery * 0.42;
+  const lineWidth = 1.35 + mastery * 1.2;
   const mastered = masteryPct >= 95;
   const shimmerStrength = mastered ? 0.3 + 0.7 * pulse : 0;
 
@@ -340,6 +397,7 @@ function getStarVisualState({
     mastery,
     bodyColor,
     coreColor,
+    haloColor,
     radius,
     haloRadius,
     haloAlpha,
@@ -399,6 +457,14 @@ export default function Dashboard() {
     selected: null as Hit,
     hovered: null as Hit,
   });
+  const ambientStars = useMemo(
+    () => buildDashboardAmbientStars(92),
+    []
+  );
+  const ambientGlows = useMemo(
+    () => buildDashboardAmbientGlows(12),
+    []
+  );
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -664,11 +730,11 @@ export default function Dashboard() {
           });
           const pa = pointToCanvas(sec, sec.points[a]);
           const pb = pointToCanvas(sec, sec.points[b]);
-          ctx.globalAlpha = alpha * lineVisual.lineAlpha;
-          ctx.strokeStyle = toRgba(sec.color, 1);
+          ctx.globalAlpha = 1;
+          ctx.strokeStyle = active ? sec.color : toRgba(sec.color, 0.16);
           ctx.lineWidth = lineVisual.lineWidth;
-          ctx.shadowColor = toRgba(sec.color, 0.5);
-          ctx.shadowBlur = 3 + lineVisual.mastery * 7;
+          ctx.shadowColor = active ? sec.color : toRgba(sec.color, 0.18);
+          ctx.shadowBlur = active ? 10 + lineVisual.mastery * 12 : 0;
           ctx.beginPath();
           ctx.moveTo(pa.x + dx, pa.y + dy);
           ctx.lineTo(pb.x + dx, pb.y + dy);
@@ -706,9 +772,9 @@ export default function Dashboard() {
               resolved.y + dy,
               visual.haloRadius
             );
-            halo.addColorStop(0, toRgba(visual.bodyColor, 0.85));
-            halo.addColorStop(0.38, toRgba(visual.bodyColor, 0.2 + visual.mastery * 0.18));
-            halo.addColorStop(1, toRgba(visual.bodyColor, 0));
+            halo.addColorStop(0, toRgba(visual.haloColor, 0.72));
+            halo.addColorStop(0.38, toRgba(visual.haloColor, 0.16 + visual.mastery * 0.16));
+            halo.addColorStop(1, toRgba(visual.haloColor, 0));
             ctx.globalAlpha = alpha * visual.haloAlpha;
             ctx.fillStyle = halo;
             ctx.beginPath();
@@ -716,7 +782,7 @@ export default function Dashboard() {
             ctx.fill();
 
             ctx.globalAlpha = alpha * visual.ringAlpha;
-            ctx.strokeStyle = toRgba(visual.bodyColor, 0.95);
+            ctx.strokeStyle = toRgba(visual.haloColor, 0.95);
             ctx.lineWidth = isHover || isSelected ? 1.5 : 1;
             ctx.beginPath();
             ctx.arc(
@@ -727,11 +793,27 @@ export default function Dashboard() {
               Math.PI * 2
             );
             ctx.stroke();
+          } else {
+            const supportGlow = ctx.createRadialGradient(
+              resolved.x + dx,
+              resolved.y + dy,
+              0,
+              resolved.x + dx,
+              resolved.y + dy,
+              visual.haloRadius
+            );
+            supportGlow.addColorStop(0, toRgba(visual.haloColor, 0.56));
+            supportGlow.addColorStop(1, toRgba(visual.haloColor, 0));
+            ctx.globalAlpha = alpha * 0.34;
+            ctx.fillStyle = supportGlow;
+            ctx.beginPath();
+            ctx.arc(resolved.x + dx, resolved.y + dy, visual.haloRadius, 0, Math.PI * 2);
+            ctx.fill();
           }
 
           ctx.globalAlpha = alpha * visual.bodyAlpha;
-          ctx.shadowColor = toRgba(visual.bodyColor, 0.95);
-          ctx.shadowBlur = isHover || isSelected ? 34 : isInteractive ? 10 + visual.mastery * 20 : 4;
+          ctx.shadowColor = isInteractive ? toRgba(visual.bodyColor, 0.95) : toRgba(sec.color, 0.9);
+          ctx.shadowBlur = isHover || isSelected ? 34 : isInteractive ? 10 + visual.mastery * 20 : 11;
           ctx.fillStyle = toRgba(visual.bodyColor, 1);
           ctx.beginPath();
           ctx.arc(resolved.x + dx, resolved.y + dy, visual.radius, 0, Math.PI * 2);
@@ -913,31 +995,95 @@ export default function Dashboard() {
         minHeight: "100vh",
         color: "#fff",
         fontFamily: "DM Sans,sans-serif",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
       <link
         href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap"
         rel="stylesheet"
       />
+      <style>{`
+        @keyframes dashboardStarFloatA {
+          0% { transform: translate3d(0, 0, 0) scale(0.92); opacity: 0.12; }
+          50% { transform: translate3d(12px, -10px, 0) scale(1.08); opacity: 0.68; }
+          100% { transform: translate3d(0, 0, 0) scale(0.92); opacity: 0.12; }
+        }
+        @keyframes dashboardStarFloatB {
+          0% { transform: translate3d(0, 0, 0) scale(0.94); opacity: 0.1; }
+          50% { transform: translate3d(-10px, -7px, 0) scale(1.04); opacity: 0.6; }
+          100% { transform: translate3d(0, 0, 0) scale(0.94); opacity: 0.1; }
+        }
+        @keyframes dashboardStarFloatC {
+          0% { transform: translate3d(0, 0, 0) scale(0.9); opacity: 0.1; }
+          50% { transform: translate3d(8px, -14px, 0) scale(1.06); opacity: 0.62; }
+          100% { transform: translate3d(0, 0, 0) scale(0.9); opacity: 0.1; }
+        }
+        @keyframes dashboardNebulaFloat {
+          0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.38; }
+          50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.72; }
+          100% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.38; }
+        }
+      `}</style>
+
+      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }}>
+        {ambientGlows.map((glow) => (
+          <span
+            key={`ambient-glow-${glow.id}`}
+            style={{
+              position: "absolute",
+              left: glow.left,
+              top: glow.top,
+              width: `${glow.size}px`,
+              height: `${glow.size}px`,
+              borderRadius: "999px",
+              transform: "translate(-50%, -50%)",
+              background:
+                glow.id % 4 === 0
+                  ? "radial-gradient(circle, rgba(93,202,165,0.24) 0%, rgba(93,202,165,0.04) 44%, transparent 74%)"
+                  : glow.id % 4 === 1
+                    ? "radial-gradient(circle, rgba(175,169,236,0.2) 0%, rgba(175,169,236,0.04) 45%, transparent 74%)"
+                    : glow.id % 4 === 2
+                      ? "radial-gradient(circle, rgba(240,153,123,0.2) 0%, rgba(240,153,123,0.04) 42%, transparent 72%)"
+                      : "radial-gradient(circle, rgba(239,159,39,0.18) 0%, rgba(239,159,39,0.03) 46%, transparent 74%)",
+              opacity: glow.opacity,
+              filter: "blur(16px)",
+              animation: `dashboardNebulaFloat ${glow.duration}s ease-in-out ${glow.delay}s infinite`,
+              display: "block",
+            }}
+          />
+        ))}
+        {ambientStars.map((star) => (
+          <span
+            key={`ambient-star-${star.id}`}
+            style={{
+              position: "absolute",
+              left: star.left,
+              top: star.top,
+              width: `${star.size}px`,
+              height: `${star.size}px`,
+              borderRadius: "999px",
+              background: "rgba(255,255,255,0.96)",
+              opacity: star.opacity,
+              boxShadow:
+                star.size > 2
+                  ? "0 0 18px rgba(255,255,255,0.46), 0 0 30px rgba(255,255,255,0.16)"
+                  : "0 0 10px rgba(255,255,255,0.32)",
+              animation: `${star.animationName} ${star.duration}s ease-in-out ${star.delay}s infinite`,
+              display: "block",
+            }}
+          />
+        ))}
+      </div>
 
       <div
         style={{
           padding: "1.5rem 1.5rem 0.9rem",
           position: "relative",
           overflow: "hidden",
-          backgroundColor: "#0d1b2a",
-          backgroundImage: `
-            radial-gradient(circle at 8% 18%, rgba(255,255,255,0.9) 0 1.5px, transparent 2.5px),
-            radial-gradient(circle at 21% 34%, rgba(255,255,255,0.55) 0 1px, transparent 2px),
-            radial-gradient(circle at 34% 12%, rgba(255,255,255,0.75) 0 1.2px, transparent 2.2px),
-            radial-gradient(circle at 48% 28%, rgba(255,255,255,0.45) 0 1px, transparent 2px),
-            radial-gradient(circle at 63% 16%, rgba(255,255,255,0.8) 0 1.4px, transparent 2.4px),
-            radial-gradient(circle at 77% 32%, rgba(255,255,255,0.5) 0 1px, transparent 2px),
-            radial-gradient(circle at 92% 20%, rgba(255,255,255,0.85) 0 1.3px, transparent 2.3px),
-            radial-gradient(circle at 15% 62%, rgba(255,255,255,0.45) 0 1px, transparent 2px),
-            radial-gradient(circle at 58% 68%, rgba(255,255,255,0.55) 0 1px, transparent 2px),
-            radial-gradient(circle at 88% 58%, rgba(255,255,255,0.4) 0 1px, transparent 2px)
-          `,
+          background:
+            "radial-gradient(circle at 16% 14%, rgba(72, 137, 190, 0.14), transparent 24%), radial-gradient(circle at 80% 18%, rgba(93,202,165,0.1), transparent 24%), linear-gradient(180deg, rgba(13,27,42,0.84) 0%, rgba(13,27,42,0.36) 100%)",
+          zIndex: 2,
         }}
       >
         <nav
@@ -1059,7 +1205,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div style={{ position: "relative" }}>
+      <div style={{ position: "relative", zIndex: 2 }}>
         <canvas ref={canvasRef} style={{ width: "100%", display: "block", border: "none", outline: "none" }} />
         {hoverTooltip && (
           <div
@@ -1087,7 +1233,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      <div ref={detailRef} style={{ padding: "1rem 1.5rem 2rem", minHeight: "80px" }}>
+      <div ref={detailRef} style={{ padding: "1rem 1.5rem 2rem", minHeight: "80px", position: "relative", zIndex: 2 }}>
         {!selected && (
           <div
             style={{

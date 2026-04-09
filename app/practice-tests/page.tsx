@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import {
   FULL_TESTS,
   PRACTICE_TEST_MODES,
   SECTION_TESTS,
-  type PracticeTestMode,
 } from "@/lib/practice-tests";
 
 function formatDuration(minutes: number) {
@@ -20,9 +19,64 @@ function formatDuration(minutes: number) {
   return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
 }
 
+function seededValue(seed: number) {
+  const value = Math.sin(seed * 999.913) * 10000;
+  return value - Math.floor(value);
+}
+
+function buildPracticeTestAmbientStars(count: number) {
+  const columns = 10;
+  const rows = Math.ceil(count / columns);
+
+  return Array.from({ length: count }, (_, index) => {
+    const seed = index + 1;
+    const variant = index % 3;
+    const column = index % columns;
+    const row = Math.floor(index / columns);
+    const leftBase = ((column + 0.5) / columns) * 100;
+    const topBase = ((row + 0.5) / rows) * 100;
+
+    return {
+      id: index,
+      left: `${clampPercent(leftBase + (seededValue(seed) - 0.5) * 8, 2, 98)}%`,
+      top: `${clampPercent(topBase + (seededValue(seed + 20) - 0.5) * 10, 3, 97)}%`,
+      size: 0.9 + seededValue(seed + 40) * 2.8,
+      opacity: 0.1 + seededValue(seed + 60) * 0.42,
+      duration: 4.5 + seededValue(seed + 80) * 7,
+      delay: seededValue(seed + 100) * 6,
+      animationName:
+        variant === 0
+          ? "practiceTestStarDriftA"
+          : variant === 1
+            ? "practiceTestStarDriftB"
+            : "practiceTestStarDriftC",
+    };
+  });
+}
+
+function buildPracticeTestAmbientGlows(count: number) {
+  return Array.from({ length: count }, (_, index) => {
+    const seed = index + 101;
+    return {
+      id: index,
+      left: `${6 + seededValue(seed) * 88}%`,
+      top: `${8 + seededValue(seed + 20) * 82}%`,
+      size: 80 + seededValue(seed + 40) * 180,
+      opacity: 0.04 + seededValue(seed + 60) * 0.08,
+      duration: 14 + seededValue(seed + 80) * 14,
+      delay: seededValue(seed + 100) * 5,
+    };
+  });
+}
+
+function clampPercent(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value));
+}
+
 export default function PracticeTestsPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
+  const backgroundCanvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedModeKey, setSelectedModeKey] = useState(PRACTICE_TEST_MODES[0]?.key);
   const [historyLoading, setHistoryLoading] = useState(true);
   const [history, setHistory] = useState<
@@ -50,16 +104,11 @@ export default function PracticeTestsPage() {
     [selectedModeKey]
   );
   const backgroundStars = useMemo(
-    () =>
-      Array.from({ length: 28 }, (_, index) => ({
-        id: index,
-        left: `${4 + Math.random() * 92}%`,
-        top: `${4 + Math.random() * 88}%`,
-        size: 1 + Math.random() * 2.4,
-        opacity: 0.22 + Math.random() * 0.6,
-        duration: 7 + Math.random() * 9,
-        delay: Math.random() * 5,
-      })),
+    () => buildPracticeTestAmbientStars(78),
+    []
+  );
+  const backgroundGlows = useMemo(
+    () => buildPracticeTestAmbientGlows(16),
     []
   );
 
@@ -68,6 +117,89 @@ export default function PracticeTestsPage() {
       router.replace("/");
     }
   }, [router, status]);
+
+  useEffect(() => {
+    const canvas = backgroundCanvasRef.current;
+    if (!canvas) {
+      return;
+    }
+
+    const context = canvas.getContext("2d");
+    if (!context) {
+      return;
+    }
+
+    const ctx = context;
+    const dpr = window.devicePixelRatio || 1;
+    const stars = backgroundStars.map((star, index) => ({
+      x: ((index % 13) + 0.5) / 13 + (seededValue(index + 1) - 0.5) * 0.035,
+      y: (Math.floor(index / 13) + 0.5) / 6 + (seededValue(index + 20) - 0.5) * 0.05,
+      r: star.size,
+      alpha: star.opacity,
+      speed: 0.18 + seededValue(index + 60) * 0.32,
+      driftX: (seededValue(index + 80) - 0.5) * 10,
+      driftY: -12 - seededValue(index + 100) * 18,
+      phase: seededValue(index + 120) * Math.PI * 2,
+    }));
+
+    const resize = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
+
+    let raf = 0;
+
+    const draw = (timestamp: number) => {
+      const t = timestamp * 0.001;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      ctx.clearRect(0, 0, width, height);
+
+      stars.forEach((star) => {
+        const driftProgress = (Math.sin(t * star.speed + star.phase) + 1) / 2;
+        const x = star.x * width + star.driftX * driftProgress;
+        const y = star.y * height + star.driftY * driftProgress;
+        const twinkle = 0.45 + 0.55 * Math.sin(t * (1.3 + star.speed) + star.phase);
+        const radius = star.r * (0.92 + twinkle * 0.18);
+        ctx.globalAlpha = star.alpha * (0.42 + twinkle * 0.58);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (star.r > 2.2) {
+          ctx.strokeStyle = "rgba(255,255,255,0.24)";
+          ctx.lineWidth = 0.7;
+          ctx.beginPath();
+          ctx.moveTo(x - radius * 3.2, y);
+          ctx.lineTo(x + radius * 3.2, y);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(x, y - radius * 3.2);
+          ctx.lineTo(x, y + radius * 3.2);
+          ctx.stroke();
+        }
+      });
+
+      ctx.globalAlpha = 1;
+      raf = requestAnimationFrame(draw);
+    };
+
+    raf = requestAnimationFrame(draw);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+    };
+  }, [backgroundStars]);
 
   useEffect(() => {
     if (status !== "authenticated") {
@@ -148,33 +280,72 @@ export default function PracticeTestsPage() {
         rel="stylesheet"
       />
       <style>{`
-        @keyframes practiceTestStarDrift {
-          0% { transform: translate3d(0, 0, 0) scale(0.96); opacity: 0.28; }
-          50% { transform: translate3d(0, -10px, 0) scale(1.08); opacity: 0.78; }
-          100% { transform: translate3d(0, 0, 0) scale(0.96); opacity: 0.28; }
+        @keyframes practiceTestStarDriftA {
+          0% { transform: translate3d(0, 0, 0) scale(0.88); opacity: 0.18; }
+          35% { transform: translate3d(14px, -10px, 0) scale(1.08); opacity: 0.9; }
+          70% { transform: translate3d(28px, -22px, 0) scale(0.98); opacity: 0.42; }
+          100% { transform: translate3d(0, 0, 0) scale(0.88); opacity: 0.18; }
+        }
+        @keyframes practiceTestStarDriftB {
+          0% { transform: translate3d(0, 0, 0) scale(0.9); opacity: 0.16; }
+          40% { transform: translate3d(-18px, -6px, 0) scale(1.04); opacity: 0.78; }
+          72% { transform: translate3d(-30px, -20px, 0) scale(0.96); opacity: 0.34; }
+          100% { transform: translate3d(0, 0, 0) scale(0.9); opacity: 0.16; }
+        }
+        @keyframes practiceTestStarDriftC {
+          0% { transform: translate3d(0, 0, 0) scale(0.86); opacity: 0.14; }
+          42% { transform: translate3d(10px, -18px, 0) scale(1.08); opacity: 0.82; }
+          76% { transform: translate3d(22px, -32px, 0) scale(0.94); opacity: 0.3; }
+          100% { transform: translate3d(0, 0, 0) scale(0.86); opacity: 0.14; }
+        }
+        @keyframes practiceTestNebulaPulse {
+          0% { transform: scale(0.94); opacity: 0.35; }
+          50% { transform: scale(1.05); opacity: 0.7; }
+          100% { transform: scale(0.94); opacity: 0.35; }
         }
       `}</style>
-      <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
-        {backgroundStars.map((star) => (
+      <canvas
+        ref={backgroundCanvasRef}
+        style={{ position: "fixed", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0 }}
+      />
+      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }}>
+        {backgroundGlows.map((glow) => (
           <span
-            key={star.id}
+            key={`glow-${glow.id}`}
             style={{
               position: "absolute",
-              left: star.left,
-              top: star.top,
-              width: `${star.size}px`,
-              height: `${star.size}px`,
+              left: glow.left,
+              top: glow.top,
+              width: `${glow.size}px`,
+              height: `${glow.size}px`,
+              transform: "translate(-50%, -50%)",
               borderRadius: "999px",
-              background: "rgba(255,255,255,0.95)",
-              boxShadow: "0 0 10px rgba(255,255,255,0.4)",
-              opacity: star.opacity,
-              animation: `practiceTestStarDrift ${star.duration}s ease-in-out ${star.delay}s infinite`,
+              background:
+                glow.id % 3 === 0
+                  ? "radial-gradient(circle, rgba(93,202,165,0.28) 0%, rgba(93,202,165,0.05) 42%, transparent 72%)"
+                  : glow.id % 3 === 1
+                    ? "radial-gradient(circle, rgba(116,139,255,0.22) 0%, rgba(116,139,255,0.04) 44%, transparent 74%)"
+                    : "radial-gradient(circle, rgba(239,159,39,0.18) 0%, rgba(239,159,39,0.03) 46%, transparent 74%)",
+              opacity: glow.opacity,
+              filter: "blur(10px)",
+              animation: `practiceTestNebulaPulse ${glow.duration}s ease-in-out ${glow.delay}s infinite`,
+              display: "block",
             }}
           />
         ))}
       </div>
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          pointerEvents: "none",
+          zIndex: 1,
+          background:
+            "radial-gradient(circle at 50% 26%, rgba(5, 12, 24, 0.16), transparent 18%), linear-gradient(180deg, rgba(5,12,24,0.34) 0%, rgba(5,12,24,0.24) 18%, rgba(5,12,24,0.18) 38%, rgba(5,12,24,0.22) 60%, rgba(5,12,24,0.3) 100%)",
+        }}
+      />
 
-      <div style={{ padding: "1.5rem 1.5rem 2.5rem", maxWidth: "1240px", margin: "0 auto", position: "relative", zIndex: 1 }}>
+      <div style={{ padding: "1.5rem 1.5rem 2.5rem", maxWidth: "1240px", margin: "0 auto", position: "relative", zIndex: 2 }}>
         <nav
           style={{
             display: "grid",

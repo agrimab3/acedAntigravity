@@ -4,6 +4,7 @@ import { z } from "zod";
 import { actTopics, questions } from "@/db/schema";
 import { getAdminSession } from "@/lib/admin";
 import { getDb } from "@/lib/db";
+import { reviewQuestionQuality } from "@/lib/question-utils";
 
 const listSchema = z.object({
   status: z.enum(["draft", "published", "rejected"]).optional(),
@@ -77,7 +78,22 @@ export async function GET(request: Request) {
     .orderBy(desc(questions.createdAt))
     .limit(parsed.data.limit);
 
-  return NextResponse.json({ questions: rows });
+  return NextResponse.json({
+    questions: rows.map((row) => ({
+      ...row,
+      qualityReview: reviewQuestionQuality({
+        id: row.id,
+        section: row.sectionKey,
+        topic: row.topicName,
+        difficulty: row.difficulty,
+        passage: row.passage,
+        question_text: row.prompt,
+        choices: row.choices,
+        correct_answer: row.correctAnswer,
+        explanation: row.explanation,
+      }),
+    })),
+  });
 }
 
 export async function PATCH(request: Request) {

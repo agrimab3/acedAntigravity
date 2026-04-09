@@ -13,6 +13,7 @@ import type { ChoiceMap } from "@/db/schema";
 import {
   buildAdaptiveFeedback,
   chooseDifficultyBand,
+  formatDifficultyBand,
   getDifficultySweep,
   normalizeDifficultyBand,
 } from "@/lib/adaptive";
@@ -29,6 +30,7 @@ const sectionSchema = z.enum(["english", "math", "reading", "science"]);
 const searchSchema = z.object({
   section: sectionSchema,
   topic: z.string().trim().optional(),
+  difficulty: z.enum(["foundation", "easy", "medium", "hard", "challenge"]).optional(),
   limit: z.coerce.number().int().min(1).max(10).default(10),
 });
 
@@ -37,6 +39,7 @@ export async function GET(request: Request) {
   const parsed = searchSchema.safeParse({
     section: url.searchParams.get("section"),
     topic: url.searchParams.get("topic") ?? undefined,
+    difficulty: url.searchParams.get("difficulty") ?? undefined,
     limit: url.searchParams.get("limit") ?? 10,
   });
 
@@ -47,7 +50,7 @@ export async function GET(request: Request) {
     );
   }
 
-  const { section, topic, limit } = parsed.data;
+  const { section, topic, difficulty, limit } = parsed.data;
   const db = getDb();
   const session = await getAuthSession();
   const userId = session?.user?.id || null;
@@ -81,7 +84,14 @@ export async function GET(request: Request) {
       topicId = topicRow?.id ?? null;
     }
 
-    if (userId && topicId) {
+    if (difficulty) {
+      targetDifficulty = normalizeDifficultyBand(difficulty);
+      adaptiveFeedback = {
+        direction: "steady",
+        label: "recovery drill",
+        description: `Aced is starting this session at ${formatDifficultyBand(targetDifficulty)} so you can rebuild the pattern from your timed-test report.`,
+      };
+    } else if (userId && topicId) {
       const skillStateRows = await db
         .select({
           topicName: actTopics.name,

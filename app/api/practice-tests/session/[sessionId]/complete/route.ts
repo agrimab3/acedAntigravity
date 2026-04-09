@@ -2,12 +2,14 @@ import { and, eq, inArray, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
+  actTopics,
   practiceTestAnswers,
   practiceTestSections,
   practiceTestSessions,
   questionExposures,
   questions,
   topicMastery,
+  topicSkillState,
 } from "@/db/schema";
 import { getAuthSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
@@ -17,6 +19,7 @@ import {
   summarizeCompositePacing,
   summarizePracticeTestPacing,
 } from "@/lib/practice-test-score";
+import { buildPracticeTestRemediationPlan } from "@/lib/practice-test-remediation";
 
 const completeSchema = z.object({
   durationSeconds: z.coerce.number().int().min(0).default(0),
@@ -350,6 +353,45 @@ export async function POST(
     .innerJoin(practiceTestSections, eq(practiceTestAnswers.sectionRunId, practiceTestSections.id))
     .where(eq(practiceTestAnswers.sessionId, sessionId));
 
+  const remediationTopicBaseSignals = Array.from(
+    storedAnswerRows.reduce((map, answer) => {
+      const key = `${answer.sectionKey}:${answer.topicName}`;
+      const current = map.get(key) ?? {
+        sectionKey: answer.sectionKey as "english" | "math" | "reading" | "science",
+        sectionTitle: answer.title,
+        topicName: answer.topicName,
+        misses: 0,
+        attempts: 0,
+        unansweredCount: 0,
+        flaggedCount: 0,
+      };
+
+      if (answer.selectedAnswer === null) {
+        current.unansweredCount += 1;
+      } else {
+        current.attempts += 1;
+        if (answer.isCorrect === false) {
+          current.misses += 1;
+        }
+      }
+
+      if (answer.flagged) {
+        current.flaggedCount += 1;
+      }
+
+      map.set(key, current);
+      return map;
+    }, new Map<string, {
+      sectionKey: "english" | "math" | "reading" | "science";
+      sectionTitle: string;
+      topicName: string;
+      misses: number;
+      attempts: number;
+      unansweredCount: number;
+      flaggedCount: number;
+    }>())
+  ).map(([, value]) => value);
+
   const missedQuestions = storedAnswerRows
     .filter((answer) => answer.selectedAnswer && answer.isCorrect === false)
     .map((answer) => ({
@@ -376,6 +418,104 @@ export async function POST(
     missedTopicMap.set(key, current);
   });
 
+  const missedTopicKeys = new Set(
+    Array.from(missedTopicMap.values()).map((item) => `${item.sectionKey}:${item.topicName}`)
+  );
+  const remediationTopicSignals =
+    missedTopicKeys.size > 0
+      ? remediationTopicBaseSignals.filter((signal) =>
+          missedTopicKeys.has(`${signal.sectionKey}:${signal.topicName}`)
+        )
+      : [];
+
+  const activeTopics = remediationTopicSignals.length
+    ? await db
+        .select({
+          id: actTopics.id,
+          sectionKey: actTopics.sectionKey,
+          name: actTopics.name,
+        })
+        .from(actTopics)
+        .where(eq(actTopics.isActive, true))
+    : [];
+
+  const topicIdByKey = new Map(
+    activeTopics.map((topic) => [`${topic.sectionKey}:${topic.name}`, topic.id] as const)
+  );
+  const remediationTopicIds = remediationTopicSignals
+    .map((signal) => topicIdByKey.get(`${signal.sectionKey}:${signal.topicName}`))
+    .filter((value): value is string => Boolean(value));
+
+  const masteryRows = remediationTopicIds.length
+    ? await db
+        .select({
+          topicId: topicMastery.topicId,
+          masteryPct: topicMastery.masteryPct,
+          attemptCount: topicMastery.attemptCount,
+        })
+        .from(topicMastery)
+        .where(and(eq(topicMastery.userId, userId), inArray(topicMastery.topicId, remediationTopicIds)))
+    : [];
+
+  const masteryByTopicId = new Map(
+    masteryRows.map((row) => [
+      row.topicId,
+      {
+        masteryPct: row.masteryPct,
+        attemptCount: row.attemptCount,
+      },
+    ] as const)
+  );
+
+  const skillRows = remediationTopicIds.length
+    ? await db
+        .select({
+          topicId: topicSkillState.topicId,
+          rollingAccuracyPct: topicSkillState.rollingAccuracyPct,
+          currentDifficulty: topicSkillState.currentDifficulty,
+          totalAnswered: topicSkillState.totalAnswered,
+        })
+        .from(topicSkillState)
+        .where(
+          and(eq(topicSkillState.userId, userId), inArray(topicSkillState.topicId, remediationTopicIds))
+        )
+    : [];
+
+  const skillByTopicId = new Map(
+    skillRows.map((row) => [
+      row.topicId,
+      {
+        rollingAccuracyPct: row.rollingAccuracyPct,
+        currentDifficulty: row.currentDifficulty,
+        totalAnswered: row.totalAnswered,
+      },
+    ] as const)
+  );
+
+  const remediationPlan = buildPracticeTestRemediationPlan({
+    topicSignals: remediationTopicSignals.map((signal) => {
+      const topicId = topicIdByKey.get(`${signal.sectionKey}:${signal.topicName}`) ?? null;
+      const mastery = topicId ? masteryByTopicId.get(topicId) : null;
+      const skill = topicId ? skillByTopicId.get(topicId) : null;
+
+      return {
+        ...signal,
+        masteryPct: mastery?.masteryPct ?? null,
+        rollingAccuracyPct: skill?.rollingAccuracyPct ?? null,
+        currentDifficulty: skill?.currentDifficulty ?? null,
+        totalAnswered: Math.max(skill?.totalAnswered ?? 0, mastery?.attemptCount ?? 0),
+      };
+    }),
+    sectionSignals: sectionReports.map((section) => ({
+      sectionKey: section.sectionKey as "english" | "math" | "reading" | "science",
+      title: section.title,
+      accuracyPct: section.accuracyPct,
+      answeredCount: section.answeredCount,
+      questionCount: section.questionCount,
+      pacingTone: section.pacingSummary.tone,
+    })),
+  });
+
   return NextResponse.json({
     persisted: true,
     sessionId,
@@ -392,6 +532,7 @@ export async function POST(
         (sectionOrderById.get(a.sectionRunId) ?? Number.MAX_SAFE_INTEGER) -
         (sectionOrderById.get(b.sectionRunId) ?? Number.MAX_SAFE_INTEGER)
     ),
+    remediationPlan,
     missedAnalysis: Array.from(missedTopicMap.values()).sort((a, b) => b.misses - a.misses),
     missedQuestions,
   });

@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, Suspense, useEffect, useMemo, useState } from "react";
+import { Fragment, Suspense, useEffect, useEffectEvent, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
@@ -14,6 +14,10 @@ import {
   summarizeCompositePacing,
   summarizePracticeTestPacing,
 } from "@/lib/practice-test-score";
+import {
+  buildPracticeTestRemediationPlan,
+  type PracticeTestRemediationPlan,
+} from "@/lib/practice-test-remediation";
 
 type TestQuestion = {
   id: string;
@@ -73,6 +77,7 @@ type CompletionReport = {
     tone: "ahead" | "steady" | "behind";
     description: string;
   };
+  remediationPlan: PracticeTestRemediationPlan;
   missedAnalysis: Array<{
     sectionKey: string;
     topicName: string;
@@ -258,6 +263,9 @@ function PracticeTestRunContent() {
     }))
     .filter((entry) => flaggedKeys.includes(entry.key))
     .map((entry) => entry.index);
+  const handleSectionAdvanceEvent = useEffectEvent(() => {
+    void handleSectionAdvance();
+  });
   const allSectionScores = sections.map((section, sectionIndex) => {
     const correctCount = section.questions.filter(
       (question, questionIndex) =>
@@ -317,7 +325,7 @@ function PracticeTestRunContent() {
 
   useEffect(() => {
     if (phase === "running" && currentTimeRemaining === 0 && sections.length > 0) {
-      void handleSectionAdvance(true);
+      handleSectionAdvanceEvent();
     }
   }, [currentTimeRemaining, phase, sections.length]);
 
@@ -396,6 +404,10 @@ function PracticeTestRunContent() {
           })
         )
       ),
+      remediationPlan: buildPracticeTestRemediationPlan({
+        topicSignals: [],
+        sectionSignals: [],
+      }),
       missedAnalysis: [],
       missedQuestions: sections.flatMap((section, sectionIndex) =>
         section.questions
@@ -436,6 +448,67 @@ function PracticeTestRunContent() {
       .map(([, value]) => value)
       .sort((a, b) => b.misses - a.misses);
 
+    localReport.remediationPlan = buildPracticeTestRemediationPlan({
+      topicSignals: Array.from(
+        sections.reduce((map, section, sectionIndex) => {
+          section.questions.forEach((question, questionIndex) => {
+            const answerKey = keyFor(sectionIndex, questionIndex);
+            const selectedAnswer = selectedAnswers[answerKey] ?? null;
+            const signalKey = `${section.sectionKey}:${question.topic}`;
+            const current = map.get(signalKey) ?? {
+              sectionKey: section.sectionKey,
+              sectionTitle: section.title,
+              topicName: question.topic,
+              misses: 0,
+              attempts: 0,
+              unansweredCount: 0,
+              flaggedCount: 0,
+            };
+
+            if (selectedAnswer === null) {
+              current.unansweredCount += 1;
+            } else {
+              current.attempts += 1;
+              if (selectedAnswer !== question.correct_answer) {
+                current.misses += 1;
+              }
+            }
+
+            if (flaggedKeys.includes(answerKey)) {
+              current.flaggedCount += 1;
+            }
+
+            map.set(signalKey, current);
+          });
+
+          return map;
+        }, new Map<string, {
+          sectionKey: PracticeTestSectionKey;
+          sectionTitle: string;
+          topicName: string;
+          misses: number;
+          attempts: number;
+          unansweredCount: number;
+          flaggedCount: number;
+        }>())
+      ).map(([, value]) => value),
+      sectionSignals: sections.map((section, sectionIndex) => ({
+        sectionKey: section.sectionKey,
+        title: section.title,
+        accuracyPct: allSectionScores[sectionIndex]?.accuracyPct ?? 0,
+        answeredCount: allSectionScores[sectionIndex]?.answeredCount ?? 0,
+        questionCount: section.questions.length,
+        pacingTone: summarizePracticeTestPacing({
+          sectionKey: section.sectionKey,
+          questionCount: section.questions.length,
+          answeredCount: allSectionScores[sectionIndex]?.answeredCount ?? 0,
+          durationSeconds:
+            section.durationMinutes * 60 - (timeRemainingBySection[sectionIndex] ?? 0),
+          timeLimitSeconds: section.durationMinutes * 60,
+        }).tone,
+      })),
+    });
+
     if (persistedSession && sessionId) {
       try {
         const res = await fetch(`/api/practice-tests/session/${sessionId}/complete`, {
@@ -471,7 +544,7 @@ function PracticeTestRunContent() {
     setPhase("report");
   }
 
-  async function handleSectionAdvance(fromTimer = false) {
+  async function handleSectionAdvance() {
     if (phase !== "running") {
       return;
     }
@@ -993,42 +1066,131 @@ function PracticeTestRunContent() {
               </section>
 
               <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.035)", border: "0.5px solid rgba(255,255,255,0.08)", padding: "1.1rem" }}>
-                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", marginBottom: "10px" }}>missed-skill analysis</div>
-                <div style={{ display: "grid", gap: "8px" }}>
-                  {report.missedAnalysis.length === 0 && (
-                    <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.54)" }}>
-                      No obvious weak stars from this run.
+                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", marginBottom: "10px" }}>
+                  recovery plan
+                </div>
+                <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "26px", lineHeight: 1.15, marginBottom: "8px" }}>
+                  {report.remediationPlan.headline}
+                </div>
+                <div style={{ fontSize: "13px", lineHeight: 1.75, color: "rgba(255,255,255,0.56)", marginBottom: "12px" }}>
+                  {report.remediationPlan.summary}
+                </div>
+                <div style={{ display: "grid", gap: "10px" }}>
+                  {report.remediationPlan.steps.length === 0 && (
+                    <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.54)", lineHeight: 1.7 }}>
+                      No star drill is being forced from this run. If you want to keep building, head back to your universe and choose the dimmest star.
                     </div>
                   )}
-                  {report.missedAnalysis.map((item) => (
+                  {report.remediationPlan.steps.map((step) => (
                     <div
-                      key={`${item.sectionKey}-${item.topicName}`}
+                      key={`${step.sectionKey}-${step.topicName}`}
                       style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        gap: "10px",
-                        padding: "10px 12px",
-                        borderRadius: "12px",
+                        borderRadius: "14px",
                         background: "rgba(255,255,255,0.03)",
+                        border: `0.5px solid ${step.sectionColor}33`,
+                        padding: "0.95rem",
                       }}
                     >
-                      <div>
-                        <div style={{ fontSize: "13px", color: "#fff" }}>{item.topicName}</div>
-                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>{item.sectionKey}</div>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          gap: "10px",
+                          alignItems: "flex-start",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        <div>
+                          <div
+                            style={{
+                              fontSize: "10px",
+                              letterSpacing: ".08em",
+                              textTransform: "uppercase",
+                              color: step.sectionColor,
+                              marginBottom: "5px",
+                            }}
+                          >
+                            drill {step.order} · {step.sectionTitle} · {step.constellation}
+                          </div>
+                          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px", lineHeight: 1.15 }}>
+                            {step.topicName}
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "10px",
+                            letterSpacing: ".04em",
+                            textTransform: "uppercase",
+                            color: step.sectionColor,
+                            border: `0.5px solid ${step.sectionColor}55`,
+                            borderRadius: "999px",
+                            padding: "4px 8px",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {step.drillLabel}
+                        </div>
                       </div>
-                      <div style={{ color: topMeta.accentColor, fontFamily: "DM Serif Display,serif", fontSize: "24px" }}>
-                        {item.misses}
+
+                      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "10px" }}>
+                        <span
+                          style={{
+                            fontSize: "11px",
+                            color: "rgba(255,255,255,0.66)",
+                            background: "rgba(255,255,255,0.04)",
+                            borderRadius: "999px",
+                            padding: "4px 8px",
+                          }}
+                        >
+                          {step.misses} miss{step.misses === 1 ? "" : "es"}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: "11px",
+                            color: "rgba(255,255,255,0.66)",
+                            background: "rgba(255,255,255,0.04)",
+                            borderRadius: "999px",
+                            padding: "4px 8px",
+                          }}
+                        >
+                          {step.accuracyPct}% timed accuracy
+                        </span>
+                        {step.masteryPct !== null ? (
+                          <span
+                            style={{
+                              fontSize: "11px",
+                              color: "rgba(255,255,255,0.66)",
+                              background: "rgba(255,255,255,0.04)",
+                              borderRadius: "999px",
+                              padding: "4px 8px",
+                            }}
+                          >
+                            {step.masteryPct}% mastery
+                          </span>
+                        ) : null}
                       </div>
+
+                      <div style={{ fontSize: "12px", lineHeight: 1.7, color: "rgba(255,255,255,0.56)", marginBottom: "12px" }}>
+                        {step.reason}
+                      </div>
+
+                      <button
+                        onClick={() => router.push(step.drillHref)}
+                        style={{
+                          width: "100%",
+                          padding: "11px 12px",
+                          borderRadius: "12px",
+                          border: "none",
+                          background: step.sectionColor,
+                          color: "#081018",
+                          cursor: "pointer",
+                          fontWeight: 600,
+                        }}
+                      >
+                        start {step.topicName} drill
+                      </button>
                     </div>
                   ))}
-                </div>
-              </section>
-
-              <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.035)", border: "0.5px solid rgba(255,255,255,0.08)", padding: "1.1rem" }}>
-                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", marginBottom: "10px" }}>what this means</div>
-                <div style={{ fontSize: "13px", lineHeight: 1.75, color: "rgba(255,255,255,0.56)" }}>
-                  Aced now syncs this run into your saved practice-test history and uses the section results as a more test-shaped score signal
-                  than a normal skill drill session.
                 </div>
               </section>
 
@@ -1112,7 +1274,7 @@ function PracticeTestRunContent() {
               {formatCountdown(currentTimeRemaining)}
             </div>
             <button
-              onClick={() => void handleSectionAdvance(false)}
+              onClick={() => void handleSectionAdvance()}
               disabled={submitting}
               style={{
                 padding: "8px 14px",

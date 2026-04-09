@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useEffectEvent, useMemo, useState } from "react";
 
 type BacklogTopic = {
   sectionKey: string;
@@ -30,6 +30,20 @@ type ReviewQuestion = {
   reviewNotes: string | null;
   reviewedAt: string | null;
   createdAt: string;
+  qualityReview: {
+    shouldServe: boolean;
+    riskScore: number;
+    blockingFlags: Array<{
+      severity: "reject" | "warn";
+      code: string;
+      message: string;
+    }>;
+    warningFlags: Array<{
+      severity: "reject" | "warn";
+      code: string;
+      message: string;
+    }>;
+  };
 };
 
 const sectionOptions = ["all", "english", "math", "reading", "science"] as const;
@@ -123,8 +137,12 @@ export default function ReviewConsole() {
     void loadBacklog();
   }, []);
 
-  useEffect(() => {
+  const handleLoadQuestions = useEffectEvent(() => {
     void loadQuestions();
+  });
+
+  useEffect(() => {
+    handleLoadQuestions();
   }, [activeSection, activeStatus, activeTopic]);
 
   async function generateDraftBatch(topic: BacklogTopic) {
@@ -427,12 +445,73 @@ export default function ReviewConsole() {
                     <Badge text={`${question.sectionKey} · ${question.topicName}`} />
                     <Badge text={question.difficulty} />
                     <Badge text={question.status} subtle />
+                    <Badge
+                      text={
+                        question.qualityReview.blockingFlags.length > 0
+                          ? "serve blocked"
+                          : question.qualityReview.warningFlags.length > 0
+                            ? `risk ${question.qualityReview.riskScore}`
+                            : "clean read"
+                      }
+                      tone={
+                        question.qualityReview.blockingFlags.length > 0
+                          ? "danger"
+                          : question.qualityReview.warningFlags.length > 0
+                            ? "warning"
+                            : "success"
+                      }
+                    />
                     {question.generationModel ? <Badge text={question.generationModel} subtle /> : null}
                   </div>
                   <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.34)" }}>
                     {new Date(question.createdAt).toLocaleString()}
                   </div>
                 </div>
+
+                {(question.qualityReview.blockingFlags.length > 0 ||
+                  question.qualityReview.warningFlags.length > 0) && (
+                  <div
+                    style={{
+                      borderRadius: "12px",
+                      padding: "12px 13px",
+                      background:
+                        question.qualityReview.blockingFlags.length > 0
+                          ? "rgba(240,153,123,0.11)"
+                          : "rgba(239,159,39,0.1)",
+                      border:
+                        question.qualityReview.blockingFlags.length > 0
+                          ? "1px solid rgba(240,153,123,0.22)"
+                          : "1px solid rgba(239,159,39,0.2)",
+                      marginBottom: "12px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "11px",
+                        letterSpacing: ".06em",
+                        color:
+                          question.qualityReview.blockingFlags.length > 0
+                            ? "#F0997B"
+                            : "#EF9F27",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      QUALITY READ
+                    </div>
+                    <div style={{ display: "grid", gap: "8px" }}>
+                      {question.qualityReview.blockingFlags.map((flag) => (
+                        <div key={`${question.id}-${flag.code}`} style={{ fontSize: "12px", lineHeight: 1.6, color: "rgba(255,255,255,0.82)" }}>
+                          <strong style={{ color: "#F0997B" }}>block:</strong> {flag.message}
+                        </div>
+                      ))}
+                      {question.qualityReview.warningFlags.map((flag) => (
+                        <div key={`${question.id}-${flag.code}`} style={{ fontSize: "12px", lineHeight: 1.6, color: "rgba(255,255,255,0.76)" }}>
+                          <strong style={{ color: "#EF9F27" }}>watch:</strong> {flag.message}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {question.passage ? (
                   <div style={passageStyle}>
@@ -564,7 +643,40 @@ function Metric({ label, value }: { label: string; value: number }) {
   );
 }
 
-function Badge({ text, subtle = false }: { text: string; subtle?: boolean }) {
+function Badge({
+  text,
+  subtle = false,
+  tone = "default",
+}: {
+  text: string;
+  subtle?: boolean;
+  tone?: "default" | "success" | "warning" | "danger";
+}) {
+  const palette = subtle
+    ? {
+        background: "rgba(255,255,255,0.06)",
+        color: "rgba(255,255,255,0.62)",
+      }
+    : tone === "danger"
+      ? {
+          background: "rgba(240,153,123,0.14)",
+          color: "#F0997B",
+        }
+      : tone === "warning"
+        ? {
+            background: "rgba(239,159,39,0.14)",
+            color: "#EF9F27",
+          }
+        : tone === "success"
+          ? {
+              background: "rgba(93,202,165,0.14)",
+              color: "#5DCAA5",
+            }
+          : {
+              background: "rgba(93,202,165,0.14)",
+              color: "#5DCAA5",
+            };
+
   return (
     <span
       style={{
@@ -573,8 +685,8 @@ function Badge({ text, subtle = false }: { text: string; subtle?: boolean }) {
         borderRadius: "999px",
         padding: "4px 9px",
         fontSize: "11px",
-        background: subtle ? "rgba(255,255,255,0.06)" : "rgba(93,202,165,0.14)",
-        color: subtle ? "rgba(255,255,255,0.62)" : "#5DCAA5",
+        background: palette.background,
+        color: palette.color,
       }}
     >
       {text}
