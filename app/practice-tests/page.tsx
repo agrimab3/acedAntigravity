@@ -41,7 +41,7 @@ function buildPracticeTestAmbientStars(count: number) {
       left: `${clampPercent(leftBase + (seededValue(seed) - 0.5) * 8, 2, 98)}%`,
       top: `${clampPercent(topBase + (seededValue(seed + 20) - 0.5) * 10, 3, 97)}%`,
       size: 0.7 + seededValue(seed + 40) * 2.2,
-      opacity: 0.1 + seededValue(seed + 60) * 0.3,
+      opacity: 0.08 + seededValue(seed + 60) * 0.34,
       duration: 7 + seededValue(seed + 80) * 10,
       delay: seededValue(seed + 100) * 6,
       animationName:
@@ -61,9 +61,9 @@ function buildPracticeTestAmbientGlows(count: number) {
       id: index,
       left: `${6 + seededValue(seed) * 88}%`,
       top: `${8 + seededValue(seed + 20) * 82}%`,
-      size: 80 + seededValue(seed + 40) * 180,
+      size: 120 + seededValue(seed + 40) * 220,
       opacity: 0.04 + seededValue(seed + 60) * 0.08,
-      duration: 14 + seededValue(seed + 80) * 14,
+      duration: 16 + seededValue(seed + 80) * 16,
       delay: seededValue(seed + 100) * 5,
     };
   });
@@ -83,6 +83,9 @@ const SECTION_TEST_TOPIC_COPY: Record<string, string> = {
   science:
     "Data Representation, Research Summaries, and Conflicting Viewpoints with experiment reading, data comparison, and inference pressure.",
 };
+
+const PRACTICE_TEST_GALAXY_BACKGROUND =
+  "radial-gradient(circle at 15% 18%, rgba(38, 95, 143, 0.22), transparent 24%), radial-gradient(circle at 76% 20%, rgba(29, 158, 117, 0.16), transparent 24%), radial-gradient(circle at 50% 78%, rgba(118, 63, 143, 0.18), transparent 30%), linear-gradient(180deg,#0d1b2a 0%,#060d1e 48%,#020408 100%)";
 
 export default function PracticeTestsPage() {
   const router = useRouter();
@@ -172,7 +175,7 @@ export default function PracticeTestsPage() {
     return (
       <div
         style={{
-          background: "linear-gradient(180deg,#0d1b2a 0%,#060d1e 48%,#020408 100%)",
+          background: PRACTICE_TEST_GALAXY_BACKGROUND,
           minHeight: "100vh",
           color: "rgba(255,255,255,0.45)",
           display: "flex",
@@ -197,9 +200,8 @@ export default function PracticeTestsPage() {
         color: "#fff",
         fontFamily: "DM Sans,sans-serif",
         position: "relative",
-        overflow: "hidden",
-        background:
-          "radial-gradient(circle at 15% 18%, rgba(38, 95, 143, 0.22), transparent 24%), radial-gradient(circle at 76% 20%, rgba(29, 158, 117, 0.16), transparent 24%), radial-gradient(circle at 50% 78%, rgba(118, 63, 143, 0.18), transparent 30%), linear-gradient(180deg,#0d1b2a 0%,#060d1e 48%,#020408 100%)",
+        overflowX: "hidden",
+        background: PRACTICE_TEST_GALAXY_BACKGROUND,
       }}
     >
       <link
@@ -241,11 +243,13 @@ export default function PracticeTestsPage() {
               transform: "translate(-50%, -50%)",
               borderRadius: "999px",
               background:
-                glow.id % 3 === 0
-                  ? "radial-gradient(circle, rgba(93,202,165,0.28) 0%, rgba(93,202,165,0.05) 42%, transparent 72%)"
-                  : glow.id % 3 === 1
-                    ? "radial-gradient(circle, rgba(116,139,255,0.22) 0%, rgba(116,139,255,0.04) 44%, transparent 74%)"
-                    : "radial-gradient(circle, rgba(239,159,39,0.18) 0%, rgba(239,159,39,0.03) 46%, transparent 74%)",
+                glow.id % 4 === 0
+                  ? "radial-gradient(circle, rgba(93,202,165,0.24) 0%, rgba(93,202,165,0.04) 44%, transparent 74%)"
+                  : glow.id % 4 === 1
+                    ? "radial-gradient(circle, rgba(175,169,236,0.2) 0%, rgba(175,169,236,0.04) 45%, transparent 74%)"
+                    : glow.id % 4 === 2
+                      ? "radial-gradient(circle, rgba(240,153,123,0.2) 0%, rgba(240,153,123,0.04) 42%, transparent 72%)"
+                      : "radial-gradient(circle, rgba(239,159,39,0.18) 0%, rgba(239,159,39,0.03) 46%, transparent 74%)",
               opacity: glow.opacity,
               filter: "blur(10px)",
               animation: `practiceTestNebulaPulse ${glow.duration}s ease-in-out ${glow.delay}s infinite`,
@@ -270,6 +274,7 @@ export default function PracticeTestsPage() {
                   ? "0 0 18px rgba(255,255,255,0.46), 0 0 30px rgba(255,255,255,0.16)"
                   : "0 0 10px rgba(255,255,255,0.32)",
               animation: `${star.animationName} ${star.duration}s ease-in-out ${star.delay}s infinite`,
+              willChange: "transform, opacity",
               display: "block",
             }}
           />
@@ -360,17 +365,6 @@ export default function PracticeTestsPage() {
         </nav>
 
         <div style={{ marginBottom: "2rem", maxWidth: "760px" }}>
-          <div
-            style={{
-              fontSize: "11px",
-              letterSpacing: ".08em",
-              textTransform: "uppercase",
-              color: "rgba(255,255,255,0.42)",
-              marginBottom: "10px",
-            }}
-          >
-            Phase 3B
-          </div>
           <h1
             style={{
               fontFamily: "DM Serif Display,serif",
@@ -749,23 +743,22 @@ export default function PracticeTestsPage() {
               </button>
             </div>
 
-            <div
+            <section
               style={{
                 marginTop: "1rem",
-                fontSize: "12px",
-                lineHeight: 1.7,
-                color: "rgba(255,255,255,0.54)",
-                padding: "0.95rem 1rem",
-                background: "rgba(255,255,255,0.03)",
                 borderRadius: "14px",
-                borderLeft: `2px solid ${selectedMode.accentColor}`,
+                background: "rgba(255,255,255,0.03)",
+                border: "0.5px solid rgba(255,255,255,0.08)",
+                padding: "0.95rem 1rem",
               }}
             >
               <div style={{ fontSize: "11px", letterSpacing: ".06em", textTransform: "uppercase", color: selectedMode.accentColor, marginBottom: "8px" }}>
-                ai support
+                ai chatbot
               </div>
-              Aced can turn the result into star recommendations, recovery drills, and targeted review help after the test if you need a cleaner next step.
-            </div>
+              <div style={{ fontSize: "12px", lineHeight: 1.7, color: "rgba(255,255,255,0.54)" }}>
+                Ask Aced for test-day strategy, section pacing help, star recommendations, and post-run recovery suggestions if you want a cleaner next step.
+              </div>
+            </section>
           </aside>
         </div>
       </div>

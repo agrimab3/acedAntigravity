@@ -37,6 +37,8 @@ const W = 1400;
 const H = 700;
 const BASE_STAR_COLOR = "#F4F0E8";
 const BASE_CORE_COLOR = "#FFFDF8";
+const DASHBOARD_GALAXY_BACKGROUND =
+  "radial-gradient(circle at 15% 18%, rgba(38, 95, 143, 0.22), transparent 24%), radial-gradient(circle at 76% 20%, rgba(29, 158, 117, 0.16), transparent 24%), radial-gradient(circle at 50% 78%, rgba(118, 63, 143, 0.18), transparent 30%), linear-gradient(180deg,#0d1b2a 0%,#060d1e 48%,#020408 100%)";
 
 const SECS: Section[] = [
   {
@@ -388,7 +390,7 @@ function getStarVisualState({
   const bodyAlpha = interactive ? (0.72 + mastery * 0.28) * twinkle : 0.94 * twinkle;
   const coreRadius = interactive ? 1.15 + mastery * 0.95 : 1.22;
   const coreAlpha = interactive ? 0.76 + mastery * 0.24 : 1;
-  const lineAlpha = 0.18 + mastery * 0.24;
+  const lineAlpha = 0.2 + mastery * 0.25;
   const lineWidth = 1.35 + mastery * 1.2;
   const mastered = masteryPct >= 95;
   const shimmerStrength = mastered ? 0.3 + 0.7 * pulse : 0;
@@ -540,7 +542,7 @@ export default function Dashboard() {
     canvasEl.style.outline = "none";
     ctx.scale(dpr, dpr);
 
-    const dust = Array.from({ length: 350 }, () => ({
+    const dust = Array.from({ length: 280 }, () => ({
       x: Math.random() * W,
       y: Math.random() * H,
       r: 0.3 + Math.random() * 1.4,
@@ -551,7 +553,7 @@ export default function Dashboard() {
       dy: (Math.random() - 0.5) * 0.08,
     }));
 
-    const skyStars = Array.from({ length: 110 }, () => ({
+    const skyStars = Array.from({ length: 92 }, () => ({
       x: Math.random() * W,
       y: Math.random() * H,
       r: 0.8 + Math.random() * 2.2,
@@ -638,27 +640,31 @@ export default function Dashboard() {
 
       const bg = ctx.createLinearGradient(0, 0, 0, H);
       bg.addColorStop(0, "#0d1b2a");
-      bg.addColorStop(0.45, "#060d1e");
+      bg.addColorStop(0.48, "#060d1e");
       bg.addColorStop(1, "#020408");
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, W, H);
 
-      const shadowPockets = [
-        { x: 250, y: 410, r: 240, alpha: 0.2 },
-        { x: 705, y: 360, r: 290, alpha: 0.16 },
-        { x: 1130, y: 520, r: 250, alpha: 0.22 },
-      ];
-
-      shadowPockets.forEach((pocket) => {
-        const vignette = ctx.createRadialGradient(pocket.x, pocket.y, 0, pocket.x, pocket.y, pocket.r);
-        vignette.addColorStop(0, `rgba(1, 4, 10, ${pocket.alpha})`);
-        vignette.addColorStop(0.55, `rgba(1, 4, 10, ${pocket.alpha * 0.5})`);
-        vignette.addColorStop(1, "rgba(1, 4, 10, 0)");
-        ctx.fillStyle = vignette;
-        ctx.beginPath();
-        ctx.arc(pocket.x, pocket.y, pocket.r, 0, Math.PI * 2);
-        ctx.fill();
+      [
+        { x: W * 0.15, y: H * 0.18, radius: 240, color: "rgba(38, 95, 143, 0.2)" },
+        { x: W * 0.76, y: H * 0.2, radius: 240, color: "rgba(29, 158, 117, 0.14)" },
+        { x: W * 0.5, y: H * 0.78, radius: 280, color: "rgba(118, 63, 143, 0.16)" },
+      ].forEach((glow) => {
+        const radial = ctx.createRadialGradient(glow.x, glow.y, 0, glow.x, glow.y, glow.radius);
+        radial.addColorStop(0, glow.color);
+        radial.addColorStop(0.45, glow.color.replace(/0\.\d+\)$/, "0.05)"));
+        radial.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = radial;
+        ctx.fillRect(0, 0, W, H);
       });
+
+      const shadowVeil = ctx.createLinearGradient(0, 0, 0, H);
+      shadowVeil.addColorStop(0, "rgba(5,12,24,0.18)");
+      shadowVeil.addColorStop(0.28, "rgba(5,12,24,0.12)");
+      shadowVeil.addColorStop(0.58, "rgba(5,12,24,0.1)");
+      shadowVeil.addColorStop(1, "rgba(5,12,24,0.2)");
+      ctx.fillStyle = shadowVeil;
+      ctx.fillRect(0, 0, W, H);
 
       dust.forEach((s) => {
         s.x += s.dx;
@@ -972,7 +978,7 @@ export default function Dashboard() {
     return (
       <div
         style={{
-          background: "linear-gradient(180deg,#0d1b2a 0%,#060d1e 45%,#020408 100%)",
+          background: DASHBOARD_GALAXY_BACKGROUND,
           minHeight: "100vh",
           color: "rgba(255,255,255,0.5)",
           display: "flex",
@@ -991,12 +997,12 @@ export default function Dashboard() {
   return (
     <div
       style={{
-        background: "linear-gradient(180deg,#0d1b2a 0%,#060d1e 45%,#020408 100%)",
+        background: DASHBOARD_GALAXY_BACKGROUND,
         minHeight: "100vh",
         color: "#fff",
         fontFamily: "DM Sans,sans-serif",
         position: "relative",
-        overflow: "hidden",
+        overflowX: "hidden",
       }}
     >
       <link
@@ -1070,11 +1076,23 @@ export default function Dashboard() {
                   ? "0 0 18px rgba(255,255,255,0.46), 0 0 30px rgba(255,255,255,0.16)"
                   : "0 0 10px rgba(255,255,255,0.32)",
               animation: `${star.animationName} ${star.duration}s ease-in-out ${star.delay}s infinite`,
+              willChange: "transform, opacity",
               display: "block",
             }}
           />
         ))}
       </div>
+
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          pointerEvents: "none",
+          zIndex: 1,
+          background:
+            "radial-gradient(circle at 50% 24%, rgba(5, 12, 24, 0.14), transparent 18%), linear-gradient(180deg, rgba(5,12,24,0.3) 0%, rgba(5,12,24,0.18) 20%, rgba(5,12,24,0.12) 42%, rgba(5,12,24,0.16) 66%, rgba(5,12,24,0.24) 100%)",
+        }}
+      />
 
       <div
         style={{
