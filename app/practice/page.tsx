@@ -670,22 +670,13 @@ function PracticeContent() {
           </div>
 
           <div style={{ flex: '0 0 340px', width: '340px', maxWidth: '100%', position: 'sticky', top: '1.25rem', alignSelf: 'flex-start' }}>
-            <div style={{ borderRadius: '16px', border: '0.5px solid rgba(255,255,255,0.16)', background: 'rgba(255,255,255,0.03)', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.18), 0 0 28px rgba(255,255,255,0.08)' }}>
+            <div style={{ borderRadius: '16px', border: '0.5px solid rgba(255,255,255,0.16)', background: 'rgba(255,255,255,0.03)', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.18), 0 0 28px rgba(255,255,255,0.08)', marginBottom: '12px' }}>
               <div style={{ padding: '12px 14px', borderBottom: '0.5px solid rgba(255,255,255,0.07)', fontSize: '11px', color: 'rgba(255,255,255,0.42)', letterSpacing: '.05em', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: meta.color }} />
                   AI tutor
                 </div>
                 <span style={{ color: 'rgba(255,255,255,0.28)' }}>{topic || 'practice'}</span>
-              </div>
-
-              <div style={{ padding: '12px 14px 0' }}>
-                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.66)', padding: '10px 12px', background: 'rgba(255,255,255,0.04)', borderRadius: '12px', borderLeft: `2px solid ${adaptiveToneColor}` }}>
-                  <div style={{ fontSize: '10px', letterSpacing: '.06em', textTransform: 'uppercase', color: adaptiveToneColor, marginBottom: '4px' }}>
-                    {adaptiveStatus.label}
-                  </div>
-                  {adaptiveStatus.description}
-                </div>
               </div>
 
               <div ref={msgsRef} style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '8px', minHeight: '360px', maxHeight: '520px', overflowY: 'auto' }}>
@@ -712,6 +703,12 @@ function PracticeContent() {
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6h10M6 1l5 5-5 5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </button>
               </div>
+            </div>
+            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.66)', padding: '10px 12px', background: 'rgba(255,255,255,0.04)', borderRadius: '12px', borderLeft: `2px solid ${adaptiveToneColor}` }}>
+              <div style={{ fontSize: '10px', letterSpacing: '.06em', textTransform: 'uppercase', color: adaptiveToneColor, marginBottom: '4px' }}>
+                {adaptiveStatus.label}
+              </div>
+              {adaptiveStatus.description}
             </div>
           </div>
         </div>
