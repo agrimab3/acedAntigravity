@@ -63,6 +63,12 @@
   - shared official ACT section/full-test definitions
   - separate `Practice Tests` page scaffold
   - dashboard entry point for practice-test mode
+- Added the first functional Phase 3B section-test runner:
+  - dedicated section-test launch API
+  - timed `/practice-tests/run` shell
+  - question nav and flagging
+  - auto-submit on timer expiry
+  - post-section raw-score summary
 
 ## Decisions Made
 
@@ -126,6 +132,7 @@
 - Turn generation into a draft-first review flow for new content
 - Backfill remaining Reading and Science topics in controlled batches
 - Build the timed section-test shell for the new `Practice Tests` area
+- Add persistence and reporting for practice-test sessions
 
 ## Planned Next Phase
 

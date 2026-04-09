@@ -23,6 +23,7 @@ import {
 import { getAuthSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { buildMockQuestions } from "@/lib/mock-questions";
+import { normalizeQuestionRow } from "@/lib/question-utils";
 
 const sectionSchema = z.enum(["english", "math", "reading", "science"]);
 const searchSchema = z.object({
@@ -30,89 +31,6 @@ const searchSchema = z.object({
   topic: z.string().trim().optional(),
   limit: z.coerce.number().int().min(1).max(10).default(10),
 });
-
-function normalizeCorrectAnswer(answer: string): keyof ChoiceMap | null {
-  const normalized = answer.trim().toUpperCase();
-  return ["A", "B", "C", "D"].includes(normalized) ? (normalized as keyof ChoiceMap) : null;
-}
-
-function normalizeChoices(choices: unknown): ChoiceMap | null {
-  if (!choices || typeof choices !== "object") {
-    return null;
-  }
-
-  const normalized = {} as ChoiceMap;
-
-  for (const choice of ["A", "B", "C", "D"] as const) {
-    const value = (choices as Record<string, unknown>)[choice];
-
-    if (typeof value !== "string" || value.trim().length === 0) {
-      return null;
-    }
-
-    normalized[choice] = value.trim();
-  }
-
-  return normalized;
-}
-
-function hasUnderlineMarkup(value: string | null | undefined) {
-  if (!value) {
-    return false;
-  }
-
-  return /\[underline\].*?\[\/underline\]|__(.*?)__|<u>.*?<\/u>/i.test(value);
-}
-
-function normalizeQuestionRow(row: {
-  id: string;
-  section: string;
-  topic: string;
-  difficulty: string;
-  passage: string | null;
-  question_text: string;
-  choices: unknown;
-  correct_answer: string;
-  explanation: string;
-}) {
-  const correctAnswer = normalizeCorrectAnswer(row.correct_answer);
-  const choices = normalizeChoices(row.choices);
-
-  if (!correctAnswer || !choices || !choices[correctAnswer]) {
-    return null;
-  }
-
-  const combinedText = `${row.question_text} ${row.passage ?? ""}`.toLowerCase();
-
-  if (row.section === "english" && (!row.passage || row.passage.trim().length === 0)) {
-    return null;
-  }
-
-  if (
-    row.section === "english" &&
-    /\b(identify|what is the function|which punctuation mark|what is the subject|define|part of speech|best synonym)\b/.test(
-      combinedText
-    )
-  ) {
-    return null;
-  }
-
-  if (combinedText.includes("underlin") && !hasUnderlineMarkup(row.question_text) && !hasUnderlineMarkup(row.passage)) {
-    return null;
-  }
-
-  return {
-    id: row.id,
-    section: row.section,
-    topic: row.topic,
-    difficulty: row.difficulty,
-    passage: row.passage,
-    question_text: row.question_text,
-    choices,
-    correct_answer: correctAnswer,
-    explanation: row.explanation,
-  };
-}
 
 export async function GET(request: Request) {
   const url = new URL(request.url);

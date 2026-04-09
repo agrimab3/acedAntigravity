@@ -414,21 +414,25 @@ export default function PracticeTestsPage() {
                 back to universe
               </button>
               <button
-                disabled
+                onClick={() => {
+                  if (selectedMode.format === "section") {
+                    router.push(`/practice-tests/run?mode=${selectedMode.key}`);
+                  }
+                }}
                 style={{
                   flex: 1.4,
                   padding: "11px 12px",
                   borderRadius: "12px",
-                  background: selectedMode.accentColor,
+                  background: selectedMode.format === "section" ? selectedMode.accentColor : "rgba(255,255,255,0.08)",
                   border: "none",
-                  color: "#081018",
-                  cursor: "not-allowed",
+                  color: selectedMode.format === "section" ? "#081018" : "rgba(255,255,255,0.42)",
+                  cursor: selectedMode.format === "section" ? "pointer" : "not-allowed",
                   fontSize: "13px",
                   fontWeight: 600,
                   opacity: 0.92,
                 }}
               >
-                timed runner next →
+                {selectedMode.format === "section" ? "start timed section →" : "full runner next →"}
               </button>
             </div>
           </aside>
