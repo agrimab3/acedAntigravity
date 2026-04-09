@@ -73,7 +73,7 @@ export default function Home() {
           fontWeight: 400,
         }}
       >
-        the ACT app that <em style={{ color: "#1D9E75" }}>actually</em> gets it
+        are you ready to <em style={{ color: "#1D9E75" }}>ace it</em>?
       </h1>
 
       <p
