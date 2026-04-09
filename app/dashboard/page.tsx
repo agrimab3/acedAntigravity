@@ -542,27 +542,6 @@ export default function Dashboard() {
     canvasEl.style.outline = "none";
     ctx.scale(dpr, dpr);
 
-    const dust = Array.from({ length: 280 }, () => ({
-      x: Math.random() * W,
-      y: Math.random() * H,
-      r: 0.3 + Math.random() * 1.4,
-      o: 0.12 + Math.random() * 0.55,
-      sp: 0.3 + Math.random() * 2,
-      ph: Math.random() * Math.PI * 2,
-      dx: (Math.random() - 0.5) * 0.12,
-      dy: (Math.random() - 0.5) * 0.08,
-    }));
-
-    const skyStars = Array.from({ length: 92 }, () => ({
-      x: Math.random() * W,
-      y: Math.random() * H,
-      r: 0.8 + Math.random() * 2.2,
-      alpha: 0.18 + Math.random() * 0.45,
-      speed: 0.35 + Math.random() * 1.4,
-      phase: Math.random() * Math.PI * 2,
-      flare: Math.random() > 0.72,
-    }));
-
     function getCoords(e: MouseEvent) {
       const rect = canvasEl.getBoundingClientRect();
       return {
@@ -637,56 +616,6 @@ export default function Dashboard() {
     function draw(ts: number) {
       const t = ts * 0.001;
       ctx.clearRect(0, 0, W, H);
-
-      [
-        { x: W * 0.18, y: H * 0.18, radius: 260, color: "rgba(74, 128, 178, 0.1)" },
-        { x: W * 0.76, y: H * 0.24, radius: 250, color: "rgba(88, 138, 188, 0.07)" },
-        { x: W * 0.52, y: H * 0.76, radius: 300, color: "rgba(120, 136, 182, 0.05)" },
-      ].forEach((glow) => {
-        const radial = ctx.createRadialGradient(glow.x, glow.y, 0, glow.x, glow.y, glow.radius);
-        radial.addColorStop(0, glow.color);
-        radial.addColorStop(0.45, glow.color.replace(/0\.\d+\)$/, "0.05)"));
-        radial.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = radial;
-        ctx.fillRect(0, 0, W, H);
-      });
-
-      dust.forEach((s) => {
-        s.x += s.dx;
-        s.y += s.dy;
-        if (s.x < 0) s.x = W;
-        if (s.x > W) s.x = 0;
-        if (s.y < 0) s.y = H;
-        if (s.y > H) s.y = 0;
-        ctx.globalAlpha = s.o * (0.5 + 0.5 * Math.sin(t * s.sp + s.ph));
-        ctx.fillStyle = "#fff";
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      skyStars.forEach((star) => {
-        const sparkle = 0.55 + 0.45 * Math.sin(t * star.speed + star.phase);
-        const alpha = star.alpha * sparkle;
-        ctx.globalAlpha = alpha;
-        ctx.fillStyle = "#dfe8ff";
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
-        ctx.fill();
-
-        if (star.flare) {
-          ctx.strokeStyle = "rgba(255,255,255,0.28)";
-          ctx.lineWidth = 0.7;
-          ctx.beginPath();
-          ctx.moveTo(star.x - star.r * 3.2, star.y);
-          ctx.lineTo(star.x + star.r * 3.2, star.y);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(star.x, star.y - star.r * 3.2);
-          ctx.lineTo(star.x, star.y + star.r * 3.2);
-          ctx.stroke();
-        }
-      });
       ctx.globalAlpha = 1;
 
       const sectionFilter = stateRef.current.activeSec;
@@ -1117,7 +1046,7 @@ export default function Dashboard() {
             <button
               style={{
                 background: "rgba(29,158,117,0.12)",
-                border: "0.5px solid rgba(29,158,117,0.32)",
+                border: "none",
                 color: "#fff",
                 fontSize: "17px",
                 fontWeight: 500,
@@ -1134,7 +1063,7 @@ export default function Dashboard() {
               onClick={() => router.push("/practice-tests")}
               style={{
                 background: "rgba(255,255,255,0.04)",
-                border: "0.5px solid rgba(255,255,255,0.08)",
+                border: "none",
                 color: "rgba(255,255,255,0.78)",
                 fontSize: "17px",
                 fontWeight: 500,

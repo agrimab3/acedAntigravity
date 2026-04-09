@@ -394,7 +394,7 @@ export default function PracticeTestsPage() {
               onClick={() => router.push("/dashboard")}
               style={{
                 background: "rgba(255,255,255,0.04)",
-                border: "0.5px solid rgba(255,255,255,0.08)",
+                border: "none",
                 color: "rgba(255,255,255,0.78)",
                 fontSize: "17px",
                 fontWeight: 500,
@@ -410,7 +410,7 @@ export default function PracticeTestsPage() {
             <button
               style={{
                 background: "rgba(29,158,117,0.12)",
-                border: "0.5px solid rgba(29,158,117,0.32)",
+                border: "none",
                 color: "#fff",
                 fontSize: "17px",
                 fontWeight: 500,
