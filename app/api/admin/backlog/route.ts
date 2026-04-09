@@ -45,7 +45,7 @@ export async function GET() {
     draftCount: Number(row.draftCount ?? 0),
     publishedCount: Number(row.publishedCount ?? 0),
     rejectedCount: Number(row.rejectedCount ?? 0),
-    targetCount: 9,
+    targetCount: 10,
   }));
 
   return NextResponse.json({ topics });

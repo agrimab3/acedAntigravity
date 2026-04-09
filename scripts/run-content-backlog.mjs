@@ -24,7 +24,7 @@ const sections = (args.sections || "reading,science")
   .split(",")
   .map((value) => value.trim().toLowerCase())
   .filter(Boolean);
-const targetCount = Math.max(3, Number(args.target || 9));
+const targetCount = Math.max(3, Number(args.target || 10));
 const topicSleepMs = Math.max(0, Number(args["topic-sleep-ms"] || 75000));
 const status = (args.status || "draft").trim().toLowerCase();
 const generationModel =

@@ -87,6 +87,9 @@ function PracticeContent() {
   const [sessionFinalized, setSessionFinalized] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [questionStartedAtMs, setQuestionStartedAtMs] = useState<number>(Date.now());
+  const [questionElapsedSeconds, setQuestionElapsedSeconds] = useState(0);
+  const [questionHintCount, setQuestionHintCount] = useState(0);
+  const [questionTimings, setQuestionTimings] = useState<number[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const msgsRef = useRef<HTMLDivElement>(null);
 
@@ -112,6 +115,9 @@ function PracticeContent() {
     setSessionFinalized(false);
     setElapsedSeconds(0);
     setQuestionStartedAtMs(Date.now());
+    setQuestionElapsedSeconds(0);
+    setQuestionHintCount(0);
+    setQuestionTimings([]);
     setAiMessages([{ role: "bot", text: getIntroTutorMessage(topic, officialCategory) }]);
     setQuestionsLoading(true);
 
@@ -200,9 +206,10 @@ function PracticeContent() {
     if (!sessionStarted || done) return;
     const interval = setInterval(() => {
       setElapsedSeconds((t) => t + 1);
+      setQuestionElapsedSeconds(Math.max(1, Math.round((Date.now() - questionStartedAtMs) / 1000)));
     }, 1000);
     return () => clearInterval(interval);
-  }, [sessionStarted, done]);
+  }, [done, questionStartedAtMs, sessionStarted]);
 
   const formatTime = (s: number) =>
     `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
@@ -242,6 +249,7 @@ function PracticeContent() {
     const timeSpentSeconds = Math.max(1, Math.round((Date.now() - questionStartedAtMs) / 1000));
     const newAnswered = answered + 1;
     const newCorrect = isCorrect ? correct + 1 : correct;
+    setQuestionTimings((prev) => [...prev, timeSpentSeconds]);
     setAnswered(newAnswered);
     if (isCorrect) setCorrect(newCorrect);
     else setMissed(prev => [...prev, q]);
@@ -257,7 +265,7 @@ function PracticeContent() {
             selectedAnswer: picked,
             isCorrect,
             timeSpentSeconds,
-            hintCount: 0,
+            hintCount: questionHintCount,
           }),
         });
       } catch (error) {
@@ -283,6 +291,8 @@ function PracticeContent() {
       setPicked(null);
       setSubmitted(false);
       setQuestionStartedAtMs(Date.now());
+      setQuestionElapsedSeconds(0);
+      setQuestionHintCount(0);
       setAiMessages([{ role: "bot", text: getIntroTutorMessage(topic, officialCategory) }]);
     }
   };
@@ -293,6 +303,7 @@ function PracticeContent() {
     setAiInput('');
     setAiMessages(prev => [...prev, { role: 'user', text: msg }]);
     setAiLoading(true);
+    setQuestionHintCount((count) => count + 1);
     try {
       const res = await fetch('/api/tutor', {
         method: 'POST',
@@ -321,6 +332,10 @@ function PracticeContent() {
 
   const pct = questions.length > 0 ? Math.round((qIndex / questions.length) * 100) : 0;
   const accuracy = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+  const averageQuestionTimeSeconds =
+    questionTimings.length > 0
+      ? Math.round(questionTimings.reduce((sum, value) => sum + value, 0) / questionTimings.length)
+      : 0;
 
   if (status === "loading" || questionsLoading) {
     return (
@@ -368,6 +383,9 @@ function PracticeContent() {
                 <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', marginTop: '4px' }}>{s.lbl}</div>
               </div>
             ))}
+          </div>
+          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.42)', marginBottom: '1rem' }}>
+            average logged time per question: {averageQuestionTimeSeconds > 0 ? formatTime(averageQuestionTimeSeconds) : "0:00"}
           </div>
           <div style={{ height: '4px', background: 'rgba(255,255,255,0.07)', borderRadius: '2px', marginBottom: '1.5rem', overflow: 'hidden' }}>
             <div style={{ height: '100%', width: accuracy + '%', background: meta.color, borderRadius: '2px', transition: 'width 1s ease' }} />
@@ -454,9 +472,11 @@ function PracticeContent() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '.875rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '.875rem', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '10px', fontWeight: 500, padding: '3px 10px', borderRadius: '20px', background: meta.color + '20', border: `0.5px solid ${meta.color}44`, color: meta.color }}>{section} · {meta.constellation}</span>
               <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', padding: '3px 8px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }}>{q.difficulty} · target {targetDifficulty}</span>
+              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.55)', padding: '3px 8px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }}>question timer {formatTime(questionElapsedSeconds)}</span>
+              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.55)', padding: '3px 8px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }}>ai hints {questionHintCount}</span>
               {officialCategory && <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.55)', padding: '3px 8px', borderRadius: '20px', background: 'rgba(255,255,255,0.05)' }}>{officialCategory}</span>}
             </div>
 
@@ -512,8 +532,8 @@ function PracticeContent() {
 
             {submitted && (
               <div style={{ borderRadius: '12px', padding: '12px 14px', marginBottom: '1rem', borderLeft: `2px solid ${picked === q.correct_answer ? '#5DCAA5' : '#F0997B'}`, background: picked === q.correct_answer ? 'rgba(93,202,165,0.08)' : 'rgba(240,153,123,0.08)', color: 'rgba(255,255,255,0.7)', fontSize: '13px', lineHeight: 1.65 }}>
-                <div style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '.06em', marginBottom: '5px', color: picked === q.correct_answer ? '#5DCAA5' : '#F0997B' }}>
-                  {picked === q.correct_answer ? `why ${q.correct_answer} is correct` : 'not quite — here\'s why'}
+              <div style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '.06em', marginBottom: '5px', color: picked === q.correct_answer ? '#5DCAA5' : '#F0997B' }}>
+                  {picked === q.correct_answer ? `why ${q.correct_answer} is correct` : 'almost there — here\'s the key fix'}
                 </div>
                 {q.explanation}
               </div>

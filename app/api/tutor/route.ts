@@ -36,33 +36,33 @@ function buildFallbackTutorReply({
 
   if (lowerMessage.includes("hint")) {
     if (lowerExplanation.includes("parallel")) {
-      return "Hint: check whether the two ideas being paired use the same grammatical form. After \"not only,\" the pattern should still match after \"but also.\"";
+      return "Let's look at the pattern first: check whether the two ideas being paired use the same grammatical form. After \"not only,\" the structure should still match after \"but also.\"";
     }
 
     if (lowerExplanation.includes("data") || lowerExplanation.includes("graph")) {
-      return "Hint: do not interpret yet. First identify the exact numbers or relationship the chart gives you, then choose the answer that states only what the data supports.";
+      return "Let's slow it down: first identify the exact numbers or relationship the chart gives you. Then choose the answer that says only what the data supports.";
     }
 
     if (section === "math") {
-      return "Hint: before calculating, decide which formula or algebra move the question is really testing. Set that up first, then compute carefully.";
+      return "Try this first: decide which formula or algebra move the question is really testing before you calculate. Set that up, then compute carefully.";
     }
 
     if (section === "reading") {
-      return "Hint: go back to the exact sentence or detail the question points to. The best ACT Reading answer is usually the one most directly supported by the passage.";
+      return "Let's go back to the exact sentence or detail the question points to. The best ACT Reading answer is usually the one most directly supported by the passage.";
     }
 
-    return `Hint: focus on the core pattern this ${topic || section} question is testing, not just the surface wording.`;
+    return `Let's focus on the core pattern this ${topic || section} question is testing, not just the surface wording.`;
   }
 
   if (lowerMessage.includes("why") || lowerMessage.includes("wrong")) {
-    return `Quick coaching take: ${explanation} On ACT questions, wrong choices often break the rule, add something unsupported, or sound close without fully matching the evidence.`;
+    return `Here’s the coaching take: ${explanation} On ACT questions, wrong choices often break the rule, add something unsupported, or sound close without fully matching the evidence.`;
   }
 
   if (lowerMessage.includes("simple") || lowerMessage.includes("simpler")) {
-    return `In simpler terms: ${explanation}`;
+    return `In simpler terms, here's the idea: ${explanation}`;
   }
 
-  return `Here’s the key idea to focus on: ${explanation}`;
+  return `Here’s the key idea to focus on next: ${explanation}`;
 }
 
 function normalizeTutorReply(reply: string) {
