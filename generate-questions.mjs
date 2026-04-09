@@ -649,7 +649,8 @@ async function getTopics() {
     filters.push(`(lower(t.slug) = $${values.length} OR lower(t.name) = $${values.length})`);
   }
 
-  const whereClause = filters.length > 0 ? `WHERE ${filters.join(" AND ")}` : "";
+  filters.unshift("t.is_active = true");
+  const whereClause = `WHERE ${filters.join(" AND ")}`;
   const limitClause = topicLimit ? `LIMIT ${topicLimit}` : "";
 
   const result = await client.query(
