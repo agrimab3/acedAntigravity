@@ -269,6 +269,8 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
       "Always mark the exact revisable words in the passage with [underline]...[/underline], and make the answer choices direct replacements for that text.",
       "Make exactly one answer grammatically correct in context; avoid cases where two answers could reasonably work.",
       "Keep the scenario plain and passage-driven; avoid answer choices that differ only by one barely visible stylistic nuance.",
+      "Prefer everyday school, community, or activity contexts so the grammar skill is obvious and the topic content never distracts from the sentence correction.",
+      "Do not write prompt wording that asks students to identify or name a grammar concept; always ask for the best revision in context.",
     ],
     "english:sentence-structure": [
       "Focus on clause relationships, fragments, run-ons, parallel structure, and logical sentence combination.",
@@ -338,6 +340,8 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
       "Use a nonfiction passage about history, civics, economics, psychology, anthropology, or society.",
       "Questions should target claims, evidence, author perspective, or implications of a social-science idea.",
       "Make the passage explicitly social-science in content, using recognizable themes like public policy, communities, voting, labor, markets, behavior, culture, or historical change.",
+      "Anchor the passage in a concrete social-science setting such as a voter study, workplace trend, city policy debate, classroom behavior study, migration pattern, or economic change.",
+      "Avoid natural science language, lab experiments, and generic informational passages that could fit any section.",
     ],
     "reading:humanities": [
       "Use a nonfiction passage about art, music, literature, philosophy, architecture, or cultural criticism.",
@@ -375,6 +379,8 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
       "Use at least two named viewpoints such as Scientist 1 and Scientist 2 or Student 1 and Student 2.",
       "Questions should compare positions, assumptions, points of agreement, or how each viewpoint would respond to evidence.",
       "The passage must clearly label the viewpoints in a way the validator can detect, such as Scientist 1/Scientist 2, Student 1/Student 2, Researcher 1/Researcher 2, or Viewpoint 1/Viewpoint 2.",
+      "Format the setup so each viewpoint gets its own clearly separated claim or paragraph, making the disagreement unmistakable.",
+      "Favor question stems that ask which viewpoint agrees, disagrees, or would most likely predict a result, rather than general science trivia.",
     ],
     "science:charts-and-graphs": [
       "Focus tightly on reading plotted values, graph direction, axis interpretation, or comparing chart elements.",

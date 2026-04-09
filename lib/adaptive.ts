@@ -139,8 +139,8 @@ export function buildAdaptiveFeedback({
       label: "difficulty rising",
       description:
         recentAccuracy >= 80 || correctStreak
-          ? `You're handling this well, so Anti is moving you toward ${formatDifficultyBand(next)} ACT questions.`
-          : `Anti is nudging you toward ${formatDifficultyBand(next)} questions to keep you growing.`,
+          ? `You're handling this well, so Aced is moving you toward ${formatDifficultyBand(next)} ACT questions.`
+          : `Aced is nudging you toward ${formatDifficultyBand(next)} questions to keep you growing.`,
     };
   }
 
@@ -150,8 +150,8 @@ export function buildAdaptiveFeedback({
       label: "rebuilding fundamentals",
       description:
         incorrectStreak && incorrectStreak >= 2
-          ? `Anti is dialing the difficulty back to ${formatDifficultyBand(next)} so you can lock in the core skill first.`
-          : `Anti is easing you back to ${formatDifficultyBand(next)} to rebuild the pattern cleanly.`,
+          ? `Aced is dialing the difficulty back to ${formatDifficultyBand(next)} so you can lock in the core skill first.`
+          : `Aced is easing you back to ${formatDifficultyBand(next)} to rebuild the pattern cleanly.`,
     };
   }
 
@@ -159,7 +159,7 @@ export function buildAdaptiveFeedback({
     return {
       direction: "steady",
       label: "finding your level",
-      description: `Anti is still calibrating this star, so the session is staying at ${formatDifficultyBand(next)} for now.`,
+      description: `Aced is finding your level, so this session is staying at ${formatDifficultyBand(next)} for now.`,
     };
   }
 
@@ -167,13 +167,13 @@ export function buildAdaptiveFeedback({
     return {
       direction: "steady",
       label: "holding strong",
-      description: `You’re performing steadily at ${formatDifficultyBand(next)}, so Anti is keeping the pressure right here.`,
+      description: `You’re performing steadily at ${formatDifficultyBand(next)}, so Aced is keeping the pressure right here.`,
     };
   }
 
   return {
     direction: "steady",
     label: "staying targeted",
-    description: `Anti is keeping this at ${formatDifficultyBand(next)} while it learns what support you need most.`,
+    description: `Aced is keeping this at ${formatDifficultyBand(next)} while it learns what support you need most.`,
   };
 }

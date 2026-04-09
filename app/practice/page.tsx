@@ -104,7 +104,7 @@ function PracticeContent() {
   const [targetDifficulty, setTargetDifficulty] = useState("easy");
   const [adaptiveStatus, setAdaptiveStatus] = useState<AdaptiveStatus>({
     label: "finding your level",
-    description: "Anti is still calibrating this star, so the session is starting in easy mode.",
+    description: "Aced is finding your level, so the session is starting in easy mode.",
     direction: "steady",
   });
   const [qIndex, setQIndex] = useState(0);
@@ -145,7 +145,7 @@ function PracticeContent() {
     setTargetDifficulty("easy");
     setAdaptiveStatus({
       label: "finding your level",
-      description: "Anti is still calibrating this star, so the session is starting in easy mode.",
+      description: "Aced is finding your level, so the session is starting in easy mode.",
       direction: "steady",
     });
     setCorrect(0);
@@ -195,7 +195,7 @@ function PracticeContent() {
           label: data.adaptive?.label ?? "finding your level",
           description:
             data.adaptive?.description ??
-            "Anti is still calibrating this star, so the session is starting in easy mode.",
+            "Aced is finding your level, so the session is starting in easy mode.",
           direction: data.adaptive?.direction ?? "steady",
         });
       } catch (error) {
@@ -338,7 +338,7 @@ function PracticeContent() {
             label: data.adaptive.label ?? "staying targeted",
             description:
               data.adaptive.description ??
-              `Anti is keeping you at ${formatDifficultyBand(recommendedDifficulty)} difficulty for now.`,
+              `Aced is keeping you at ${formatDifficultyBand(recommendedDifficulty)} difficulty for now.`,
             direction: data.adaptive.direction ?? "steady",
           });
           setQuestions((prev) => {
@@ -588,7 +588,40 @@ function PracticeContent() {
               </div>
             )}
 
-            <div style={{ fontFamily: 'DM Serif Display,serif', fontSize: '17px', lineHeight: 1.55, marginBottom: '1.25rem', color: 'rgba(255,255,255,0.92)' }}>{renderFormattedText(q.question_text)}</div>
+            <div
+              style={{
+                marginBottom: '1.25rem',
+                padding: '18px 18px 16px',
+                borderRadius: '16px',
+                background: 'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))',
+                border: `1px solid ${meta.color}45`,
+                boxShadow: `0 16px 40px ${meta.color}14`,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: '10px',
+                  fontWeight: 600,
+                  letterSpacing: '.08em',
+                  color: meta.color,
+                  marginBottom: '10px',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Question
+              </div>
+              <div
+                style={{
+                  fontFamily: 'DM Serif Display,serif',
+                  fontSize: '21px',
+                  lineHeight: 1.6,
+                  color: '#ffffff',
+                  textWrap: 'pretty',
+                }}
+              >
+                {renderFormattedText(q.question_text)}
+              </div>
+            </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '1rem' }}>
               {(['A', 'B', 'C', 'D'] as const).map(letter => {
