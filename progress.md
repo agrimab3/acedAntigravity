@@ -11,6 +11,7 @@
 
 - Phase 1: architecture lock-in and production foundation
 - Phase 2: adaptive ACT intelligence foundation in progress
+- Phase 3: practice test foundation started
 
 ## Completed So Far
 
@@ -58,6 +59,10 @@
 - Added admin-only APIs for reviewing questions and triggering draft generation by topic
 - Added a backlog runner script for controlled Reading/Science inventory generation
 - Added review metadata fields for questions so content can be published or rejected intentionally
+- Added the first Phase 3 practice-test foundation:
+  - shared official ACT section/full-test definitions
+  - separate `Practice Tests` page scaffold
+  - dashboard entry point for practice-test mode
 
 ## Decisions Made
 
@@ -86,6 +91,12 @@
   - foundational adaptive tracking is now implemented
   - native Gemini tutor transport is now implemented
   - the first database-backed ACT inventory pipeline is now implemented
+- Phase 3 will cover:
+  - section practice tests
+  - full ACT mode
+  - timed test runner UX
+  - section/full-test scoring reports
+  - Math calculator integration
 
 ## Open Questions
 
@@ -114,11 +125,14 @@
 - Seed the first real published ACT inventory for all active topics
 - Turn generation into a draft-first review flow for new content
 - Backfill remaining Reading and Science topics in controlled batches
+- Build the timed section-test shell for the new `Practice Tests` area
 
 ## Planned Next Phase
 
 - Phase 2: adaptive ACT intelligence
 - Reference doc: `phase-two-plan.md`
+- Phase 3: ACT practice tests
+- Reference doc: `phase-three-plan.md`
 
 ## Phase 1 Deliverables
 

@@ -917,6 +917,20 @@ export default function Dashboard() {
             Aced<em style={{ color: "#1D9E75" }}>.</em>
           </div>
           <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+            <button
+              onClick={() => router.push("/practice-tests")}
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                border: "0.5px solid rgba(255,255,255,0.14)",
+                color: "rgba(255,255,255,0.72)",
+                padding: "7px 16px",
+                borderRadius: "20px",
+                fontSize: "12px",
+                cursor: "pointer",
+              }}
+            >
+              practice tests
+            </button>
             <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)" }}>
               {session?.user?.email}
             </span>
