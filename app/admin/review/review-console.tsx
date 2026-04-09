@@ -8,9 +8,34 @@ type BacklogTopic = {
   topicSlug: string;
   topicName: string;
   draftCount: number;
-  publishedCount: number;
+  rawPublishedCount: number;
   rejectedCount: number;
   targetCount: number;
+  targetPerDifficulty: number;
+  serveablePublishedCount: number;
+  serveableDraftCount: number;
+  blockedPublishedCount: number;
+  blockedDraftCount: number;
+  warningPublishedCount: number;
+  warningDraftCount: number;
+  publishedGapCount: number;
+  needsWork: boolean;
+  reviewPriority: "critical" | "rebuild" | "watch" | "healthy";
+  focusDifficulty: "easy" | "medium" | "hard" | "balanced";
+  recommendedPerDifficulty: number;
+  priorityScore: number;
+  difficultyBreakdown: Array<{
+    difficulty: "easy" | "medium" | "hard";
+    publishedCount: number;
+    serveablePublishedCount: number;
+    blockedPublishedCount: number;
+    warningPublishedCount: number;
+    draftCount: number;
+    serveableDraftCount: number;
+    blockedDraftCount: number;
+    warningDraftCount: number;
+    publishedGapCount: number;
+  }>;
 };
 
 type ReviewQuestion = {
@@ -48,6 +73,38 @@ type ReviewQuestion = {
 
 const sectionOptions = ["all", "english", "math", "reading", "science"] as const;
 const statusOptions = ["draft", "published", "rejected"] as const;
+
+function getBacklogPriorityBadge(topic: BacklogTopic) {
+  if (topic.reviewPriority === "critical") {
+    return {
+      label: "critical rebuild",
+      tone: "danger" as const,
+    };
+  }
+
+  if (topic.reviewPriority === "rebuild") {
+    return {
+      label: "rebuild next",
+      tone: "warning" as const,
+    };
+  }
+
+  if (topic.reviewPriority === "watch") {
+    return {
+      label: "watch warnings",
+      tone: "warning" as const,
+    };
+  }
+
+  return {
+    label: "healthy live pool",
+    tone: "success" as const,
+  };
+}
+
+function formatFocusDifficulty(topic: BacklogTopic) {
+  return topic.focusDifficulty === "balanced" ? "balanced mix" : `${topic.focusDifficulty} gap`;
+}
 
 function renderFormattedText(text: string) {
   const normalized = text
@@ -90,6 +147,20 @@ export default function ReviewConsole() {
   const availableTopics = useMemo(() => {
     return backlog.filter((topic) => activeSection === "all" || topic.sectionKey === activeSection);
   }, [activeSection, backlog]);
+
+  const prioritizedBacklog = useMemo(() => {
+    return [...availableTopics].sort((left, right) => {
+      if (left.needsWork !== right.needsWork) {
+        return left.needsWork ? -1 : 1;
+      }
+
+      if (left.priorityScore !== right.priorityScore) {
+        return right.priorityScore - left.priorityScore;
+      }
+
+      return left.topicName.localeCompare(right.topicName);
+    });
+  }, [availableTopics]);
 
   async function loadBacklog() {
     setLoadingBacklog(true);
@@ -149,6 +220,8 @@ export default function ReviewConsole() {
     setRunningTopic(topic.topicSlug);
     setFlashMessage(null);
 
+    const batchSize = topic.recommendedPerDifficulty * 3;
+
     try {
       const res = await fetch("/api/admin/backlog", {
         method: "POST",
@@ -156,7 +229,7 @@ export default function ReviewConsole() {
         body: JSON.stringify({
           sectionKey: topic.sectionKey,
           topicSlug: topic.topicSlug,
-          perDifficulty: 1,
+          perDifficulty: topic.recommendedPerDifficulty,
           status: "draft",
         }),
       });
@@ -168,7 +241,7 @@ export default function ReviewConsole() {
       }
 
       setFlashMessage(
-        `Generated ${data.summary?.inserted ?? 0} draft question(s) for ${topic.topicName}.`
+        `Generated ${data.summary?.inserted ?? 0} of ${batchSize} requested draft question(s) for ${topic.topicName}.`
       );
       await Promise.all([loadBacklog(), loadQuestions()]);
     } catch (error) {
@@ -283,7 +356,7 @@ export default function ReviewConsole() {
                 BACKLOG
               </div>
               <div style={{ marginTop: "4px", color: "rgba(255,255,255,0.66)", fontSize: "13px" }}>
-                controlled draft generation by topic
+                prioritize true serveable inventory gaps by topic
               </div>
             </div>
             <button onClick={() => void loadBacklog()} style={ghostButtonStyle}>
@@ -295,10 +368,9 @@ export default function ReviewConsole() {
             {loadingBacklog ? (
               <div style={mutedTextStyle}>loading backlog…</div>
             ) : (
-              backlog
-                .filter((topic) => activeSection === "all" || topic.sectionKey === activeSection)
-                .map((topic) => {
-                  const needsWork = topic.publishedCount < topic.targetCount;
+              prioritizedBacklog.map((topic) => {
+                  const priorityBadge = getBacklogPriorityBadge(topic);
+                  const batchSize = topic.recommendedPerDifficulty * 3;
                   return (
                     <div
                       key={`${topic.sectionKey}:${topic.topicSlug}`}
@@ -315,32 +387,44 @@ export default function ReviewConsole() {
                             {topic.sectionKey}
                           </div>
                           <div style={{ marginTop: "4px", fontWeight: 600 }}>{topic.topicName}</div>
+                          <div style={{ marginTop: "6px", fontSize: "12px", color: "rgba(255,255,255,0.54)", lineHeight: 1.5 }}>
+                            live pool {topic.serveablePublishedCount}/{topic.targetCount}
+                            {topic.publishedGapCount > 0 ? ` · gap ${topic.publishedGapCount}` : " · target met"}
+                            {" · "}
+                            focus {formatFocusDifficulty(topic)}
+                          </div>
                         </div>
-                        <div
-                          style={{
-                            fontSize: "11px",
-                            alignSelf: "flex-start",
-                            padding: "4px 8px",
-                            borderRadius: "999px",
-                            background: needsWork ? "rgba(240,153,123,0.14)" : "rgba(93,202,165,0.14)",
-                            color: needsWork ? "#F0997B" : "#5DCAA5",
-                          }}
-                        >
-                          {needsWork ? "needs more content" : "healthy"}
-                        </div>
+                        <Badge text={priorityBadge.label} tone={priorityBadge.tone} />
                       </div>
 
                       <div
                         style={{
                           display: "grid",
-                          gridTemplateColumns: "repeat(3,1fr)",
+                          gridTemplateColumns: "repeat(2,minmax(0,1fr))",
                           gap: "8px",
                           marginTop: "10px",
                         }}
                       >
-                        <Metric label="published" value={topic.publishedCount} />
-                        <Metric label="draft" value={topic.draftCount} />
+                        <Metric label="serveable live" value={topic.serveablePublishedCount} />
+                        <Metric label="blocked live" value={topic.blockedPublishedCount} />
+                        <Metric label="serveable drafts" value={topic.serveableDraftCount} />
                         <Metric label="rejected" value={topic.rejectedCount} />
+                      </div>
+
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "7px", marginTop: "12px" }}>
+                        {topic.difficultyBreakdown.map((difficulty) => (
+                          <Badge
+                            key={`${topic.topicSlug}-${difficulty.difficulty}`}
+                            text={`${difficulty.difficulty} ${difficulty.serveablePublishedCount}/${topic.targetPerDifficulty}`}
+                            tone={difficulty.publishedGapCount > 0 ? "warning" : "success"}
+                          />
+                        ))}
+                        {topic.warningPublishedCount > 0 ? (
+                          <Badge text={`${topic.warningPublishedCount} live warning${topic.warningPublishedCount === 1 ? "" : "s"}`} tone="warning" />
+                        ) : null}
+                        {topic.blockedDraftCount > 0 ? (
+                          <Badge text={`${topic.blockedDraftCount} blocked draft${topic.blockedDraftCount === 1 ? "" : "s"}`} tone="danger" />
+                        ) : null}
                       </div>
 
                       <button
@@ -359,7 +443,9 @@ export default function ReviewConsole() {
                           fontSize: "13px",
                         }}
                       >
-                        {runningTopic === topic.topicSlug ? "generating draft batch…" : "generate 3 new draft questions"}
+                        {runningTopic === topic.topicSlug
+                          ? "generating draft batch…"
+                          : `generate ${batchSize} draft question${batchSize === 1 ? "" : "s"}`}
                       </button>
                     </div>
                   );

@@ -1,10 +1,12 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { asc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { actTopics, questions } from "@/db/schema";
 import { getAdminSession } from "@/lib/admin";
+import { auditTopicInventory } from "@/lib/content-audit";
 import { getDb } from "@/lib/db";
-import { sql } from "drizzle-orm";
 
 const execFileAsync = promisify(execFile);
 
@@ -23,30 +25,66 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
-  const result = await db.execute(sql`
-    select
-      t.section_key as "sectionKey",
-      t.slug as "topicSlug",
-      t.name as "topicName",
-      coalesce(sum(case when q.status = 'draft' then 1 else 0 end), 0)::int as "draftCount",
-      coalesce(sum(case when q.status = 'published' then 1 else 0 end), 0)::int as "publishedCount",
-      coalesce(sum(case when q.status = 'rejected' then 1 else 0 end), 0)::int as "rejectedCount"
-    from act_topics t
-    left join questions q on q.topic_id = t.id
-    where t.is_active = true
-    group by t.section_key, t.slug, t.name, t.display_order
-    order by t.section_key, t.display_order
-  `);
+  const [topicRows, questionRows] = await Promise.all([
+    db
+      .select({
+        id: actTopics.id,
+        sectionKey: actTopics.sectionKey,
+        topicSlug: actTopics.slug,
+        topicName: actTopics.name,
+        displayOrder: actTopics.displayOrder,
+      })
+      .from(actTopics)
+      .where(eq(actTopics.isActive, true))
+      .orderBy(asc(actTopics.sectionKey), asc(actTopics.displayOrder)),
+    db
+      .select({
+        sectionKey: questions.sectionKey,
+        topicId: questions.topicId,
+        topicSlug: actTopics.slug,
+        topicName: actTopics.name,
+        difficulty: questions.difficulty,
+        status: questions.status,
+        prompt: questions.prompt,
+        passage: questions.passage,
+        choices: questions.choices,
+        correctAnswer: questions.correctAnswer,
+        explanation: questions.explanation,
+      })
+      .from(questions)
+      .innerJoin(actTopics, eq(questions.topicId, actTopics.id))
+      .where(eq(actTopics.isActive, true)),
+  ]);
 
-  const topics = result.rows.map((row) => ({
-    sectionKey: String(row.sectionKey),
-    topicSlug: String(row.topicSlug),
-    topicName: String(row.topicName),
-    draftCount: Number(row.draftCount ?? 0),
-    publishedCount: Number(row.publishedCount ?? 0),
-    rejectedCount: Number(row.rejectedCount ?? 0),
-    targetCount: 10,
-  }));
+  const questionsByTopicId = questionRows.reduce(
+    (map, row) => {
+      const currentRows = map.get(row.topicId) ?? [];
+      currentRows.push(row);
+      map.set(row.topicId, currentRows);
+      return map;
+    },
+    new Map<typeof topicRows[number]["id"], typeof questionRows>()
+  );
+
+  const topics = topicRows
+    .map((topic) =>
+      auditTopicInventory(topic, questionsByTopicId.get(topic.id) ?? [])
+    )
+    .sort((left, right) => {
+      if (left.needsWork !== right.needsWork) {
+        return left.needsWork ? -1 : 1;
+      }
+
+      if (left.priorityScore !== right.priorityScore) {
+        return right.priorityScore - left.priorityScore;
+      }
+
+      if (left.sectionKey !== right.sectionKey) {
+        return left.sectionKey.localeCompare(right.sectionKey);
+      }
+
+      return left.topicName.localeCompare(right.topicName);
+    });
 
   return NextResponse.json({ topics });
 }
