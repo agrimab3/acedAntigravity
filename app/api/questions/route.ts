@@ -82,6 +82,20 @@ function normalizeQuestionRow(row: {
   }
 
   const combinedText = `${row.question_text} ${row.passage ?? ""}`.toLowerCase();
+
+  if (row.section === "english" && (!row.passage || row.passage.trim().length === 0)) {
+    return null;
+  }
+
+  if (
+    row.section === "english" &&
+    /\b(identify|what is the function|which punctuation mark|what is the subject|define|part of speech|best synonym)\b/.test(
+      combinedText
+    )
+  ) {
+    return null;
+  }
+
   if (combinedText.includes("underlin") && !hasUnderlineMarkup(row.question_text) && !hasUnderlineMarkup(row.passage)) {
     return null;
   }
