@@ -6,6 +6,7 @@ import {
   practiceTestSessions,
   topicMastery,
   topicSkillState,
+  users,
 } from "@/db/schema";
 import {
   estimateCompositeScore,
@@ -117,6 +118,18 @@ export async function GET() {
   }
 
   const userId = session.user.id;
+  const [userProfile] = await db
+    .select({
+      previousActScore: users.previousActScore,
+    })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  const priorCompositeScore =
+    userProfile?.previousActScore && userProfile.previousActScore >= 1 && userProfile.previousActScore <= 36
+      ? userProfile.previousActScore
+      : null;
   const topics = await db
     .select({
       sectionKey: actTopics.sectionKey,
@@ -210,9 +223,26 @@ export async function GET() {
     timedSectionScores.set(row.sectionKey, current);
   });
 
-  const blendedSectionSummaries = sectionSummaries.map((summary) =>
-    blendSectionWithPracticeTest(summary, timedSectionScores.get(summary.sectionKey) ?? [])
-  );
+  const blendedSectionSummaries = sectionSummaries.map((summary) => {
+    const timedSignals = timedSectionScores.get(summary.sectionKey) ?? [];
+    const blendedSummary = blendSectionWithPracticeTest(summary, timedSignals);
+
+    if (
+      priorCompositeScore !== null &&
+      timedSignals.length === 0 &&
+      blendedSummary.answeredCount === 0 &&
+      blendedSummary.scoreLabel === "baseline estimate"
+    ) {
+      return {
+        ...blendedSummary,
+        estimatedScore: priorCompositeScore,
+        scoreExplanation:
+          "This section is starting from your previous ACT composite score until Aced collects section-specific practice data.",
+      };
+    }
+
+    return blendedSummary;
+  });
 
   const composite = estimateCompositeScore(blendedSectionSummaries);
   const completedFullTests = await db
@@ -293,11 +323,24 @@ export async function GET() {
         })()
       : composite;
 
+  const seededComposite =
+    priorCompositeScore !== null &&
+    timedCompositeScores.length === 0 &&
+    blendedSectionSummaries.reduce((sum, section) => sum + section.answeredCount, 0) < 8 &&
+    blendedComposite.scoreLabel === "baseline estimate"
+      ? {
+          ...blendedComposite,
+          estimatedScore: priorCompositeScore,
+          scoreExplanation:
+            "This overall estimate is starting from your previous ACT composite score and will update as Aced gathers more timed and practice data.",
+        }
+      : blendedComposite;
+
   return NextResponse.json({
-    compositeEstimatedScore: blendedComposite.estimatedScore,
-    confidence: blendedComposite.confidence,
-    scoreLabel: blendedComposite.scoreLabel,
-    scoreExplanation: blendedComposite.scoreExplanation,
+    compositeEstimatedScore: seededComposite.estimatedScore,
+    confidence: seededComposite.confidence,
+    scoreLabel: seededComposite.scoreLabel,
+    scoreExplanation: seededComposite.scoreExplanation,
     sectionSummaries: blendedSectionSummaries,
     topicSummaries,
     practiceTestSignal: {

@@ -114,8 +114,8 @@ export default function OnboardingPage() {
       return;
     }
 
-    const hydratedName =
-      data.profile.preferredName?.trim() || data.profile.googleName?.split(/\s+/)[0] || "";
+    const savedPreferredName = data.profile.preferredName?.trim() || "";
+    const hydratedName = savedPreferredName || data.profile.googleName?.split(/\s+/)[0] || "";
     const hydratedGrade = data.profile.gradeLevel ?? "";
     const hydratedDate = data.profile.actTestDate ?? "";
     const hydratedScore =
@@ -127,9 +127,9 @@ export default function OnboardingPage() {
     setPreviousActScore(hydratedScore);
 
     let nextStep: StepIndex = 0;
-    if (hydratedName) nextStep = 1;
-    if (hydratedName && hydratedGrade) nextStep = 2;
-    if (hydratedName && hydratedGrade && hydratedDate) nextStep = 3;
+    if (savedPreferredName) nextStep = 1;
+    if (savedPreferredName && hydratedGrade) nextStep = 2;
+    if (savedPreferredName && hydratedGrade && hydratedDate) nextStep = 3;
 
     setStep(nextStep);
     setTransitionKey(nextStep);
