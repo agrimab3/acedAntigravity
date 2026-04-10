@@ -455,6 +455,10 @@ function getSectionSpecificInstructions(sectionKey) {
         "Use passage = null unless a short real-world setup is needed.",
         "Avoid tiny stems with purely numeric answer choices unless the reasoning burden is genuinely ACT-level.",
         "Distractors should reflect realistic mathematical mistakes, not random numbers.",
+        "After solving a math item, verify that the keyed answer is exactly supported by the algebra, arithmetic, or function reasoning in the explanation.",
+        "If the computed answer is not one of the listed choices, discard the item and rewrite it instead of rescuing it.",
+        "For any math item involving equations, roots, or function inputs and outputs, test the keyed answer directly before finalizing the item.",
+        "Never write an explanation that says the answer should have been different, that no listed choice matches, or that one option is merely the closest.",
       ].join("\n");
     case "english":
       return [
@@ -564,6 +568,9 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
       "Avoid direct one-step evaluation such as What is f(4).",
       "Avoid direct composition drills unless there is meaningful additional reasoning.",
       "Medium and hard items should involve function meaning, piecewise interpretation, constraints, comparison of outputs, or symbolic structure.",
+      "If a function item requires solving for x, substitute the keyed x-value back into the function relationship before finalizing the choices or explanation.",
+      "If a function item asks for a value, compute that value exactly and make sure the matching choice appears verbatim in the answer set.",
+      "Do not output a function question if the explanation discovers a contradiction, an extraneous solution, two valid answers, or no valid listed answer.",
     ],
     "math:geometry": [
       "Avoid simple area, perimeter, angle-sum, or radius-from-diameter recall as medium or hard.",
@@ -734,12 +741,15 @@ Global quality rules:
 - Each item must have exactly 4 answer choices: A, B, C, D.
 - Exactly one answer must be correct.
 - The explanation must justify the correct answer and briefly explain why the strongest distractor(s) fail.
+- For math, the explanation must reproduce a valid solution path that lands exactly on the keyed answer choice.
+- For math, silently verify the keyed answer by substitution or direct evaluation before including the item.
 - Do not create near-duplicate stems, passages, explanations, or answer-choice patterns.
 - Do not create an item that a human editor would likely reject as too easy, too generic, too short, too direct, or too arguable.
 - Do not output placeholder-quality items.
 - If an item feels weak, rewrite it before including it.
 - Do not create answer choices that are equivalent in meaning or value.
 - Do not create explanations that mention a different answer letter than the keyed correct answer.
+- Do not create any item whose explanation says the correct answer is missing from the choices, that the options contain a mistake, or that the closest choice should be used instead.
 
 Batch diversity rules:
 - Vary the tested subskill within the topic.
@@ -1320,6 +1330,14 @@ function sanitizeQuestion(sectionKey, topic, question) {
     )
   ) {
     throw new Error("Explanation sounds like a broken or rescued item.");
+  }
+
+  if (
+    /\b(not among the choices|not one of the choices|none of the choices|no listed answer|missing from the choices|missing from the answer choices)\b/i.test(
+      explanation
+    )
+  ) {
+    throw new Error("Explanation admits the correct answer is missing from the choices.");
   }
 
   if (
