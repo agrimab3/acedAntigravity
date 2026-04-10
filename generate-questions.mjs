@@ -1211,6 +1211,7 @@ async function generateBatchForDifficulty(
 
 async function generateBatchForTopic(topic) {
   const generatedQuestions = [];
+  const failures = [];
 
   for (const difficulty of DIFFICULTIES) {
     const requestedCount = perDifficulty;
@@ -1218,11 +1219,23 @@ async function generateBatchForTopic(topic) {
       6,
       Math.max(requestedCount, requestedCount + (requestedCount === 1 ? 2 : 1))
     );
-    const batch = await generateBatchForDifficulty(topic, difficulty, candidateCount);
-    generatedQuestions.push(...batch);
+
+    try {
+      const batch = await generateBatchForDifficulty(topic, difficulty, candidateCount);
+      generatedQuestions.push(...batch);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "unknown generation error";
+      failures.push({
+        topic: `${topic.section_key}/${topic.slug}/${difficulty}`,
+        error: message,
+      });
+      console.warn(
+        `Skipping ${topic.section_key}/${topic.slug}/${difficulty} after generation failure: ${message}`
+      );
+    }
   }
 
-  return generatedQuestions;
+  return { generatedQuestions, failures };
 }
 
 async function reviewGeneratedQuestion(
@@ -1789,7 +1802,7 @@ async function main() {
       console.log(`\nGenerating ${topic.section_key}/${topic.slug}...`);
 
       try {
-        const generatedQuestions = await generateBatchForTopic(topic);
+        const { generatedQuestions, failures } = await generateBatchForTopic(topic);
         const {
           inserted,
           skipped,
@@ -1805,6 +1818,7 @@ async function main() {
         summary.reviewRevised += reviewRevised;
         summary.reviewRejected += reviewRejected;
         summary.reviewErrors += reviewErrors;
+        summary.failures.push(...failures);
 
         console.log(
           `Inserted ${inserted} question(s); reviewer kept ${reviewKept}, revised ${reviewRevised}, rejected ${reviewRejected}, errored ${reviewErrors}; skipped ${skipped} total for ${topic.section_key}/${topic.slug}.`
