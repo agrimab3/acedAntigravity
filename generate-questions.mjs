@@ -330,12 +330,48 @@ function extractRetryDelayMs(message) {
   return Math.ceil(Number(match[1]) * 1000);
 }
 
+function isRetryableStructuredOutputError(message) {
+  return /unterminated string in json|unexpected end of json input|malformed json response|json at position/i.test(
+    message
+  );
+}
+
 function isRetryableGeminiError(message) {
-  return /quota exceeded|retry in|429/i.test(message);
+  return /quota exceeded|retry in|429/i.test(message) || isRetryableStructuredOutputError(message);
 }
 
 function isRetryableGroqError(message) {
-  return /rate limit|rate_limit|too many requests|429|capacity_exceeded|498/i.test(message);
+  return (
+    /rate limit|rate_limit|too many requests|429|capacity_exceeded|498/i.test(message) ||
+    isRetryableStructuredOutputError(message)
+  );
+}
+
+function parseModelJson(text) {
+  const trimmed = text.trim();
+  const withoutFence = trimmed.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+
+  const parseCandidates = [withoutFence];
+  const firstBrace = withoutFence.indexOf("{");
+  const lastBrace = withoutFence.lastIndexOf("}");
+
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    parseCandidates.push(withoutFence.slice(firstBrace, lastBrace + 1));
+  }
+
+  let lastError = null;
+
+  for (const candidate of parseCandidates) {
+    try {
+      return JSON.parse(candidate);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  const message =
+    lastError instanceof Error ? lastError.message : "Unknown JSON parse failure.";
+  throw new Error(`Malformed JSON response: ${message}`);
 }
 
 function normalizeText(value) {
@@ -1026,11 +1062,12 @@ async function generateBatchForDifficulty(
       schema,
       temperature: 0.7,
     });
+    const parsedPayload = parseModelJson(text);
 
     return buildGeneratedBatchSchema({
       requestedCount,
       requestedDifficulty,
-    }).parse(JSON.parse(text)).questions;
+    }).parse(parsedPayload).questions;
   } catch (error) {
     const message = error instanceof Error ? error.message : "unknown generation error";
 
@@ -1177,8 +1214,9 @@ async function reviewGeneratedQuestion(
       schema,
       temperature: 0.2,
     });
+    const parsedPayload = parseModelJson(text);
 
-    return reviewedQuestionSchema.parse(JSON.parse(text));
+    return reviewedQuestionSchema.parse(parsedPayload);
   } catch (error) {
     const message = error instanceof Error ? error.message : "unknown review error";
     const isRetryable =
