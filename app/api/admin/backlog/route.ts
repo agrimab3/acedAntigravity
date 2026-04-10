@@ -16,6 +16,7 @@ const execFileAsync = promisify(execFile);
 const sectionKeySchema = z.enum(["english", "math", "reading", "science"]);
 const difficultyKeySchema = z.enum(["easy", "medium", "hard"]);
 const prioritySchema = z.enum(["critical", "rebuild", "watch", "healthy"]);
+const adminInteractivePerDifficulty = 1;
 
 const singleGenerateSchema = z.object({
   mode: z.literal("single").optional(),
@@ -108,10 +109,26 @@ function extractJsonSummary(stdout: string) {
 }
 
 function resolveGenerationProvider() {
+  const configuredProvider =
+    process.env.QUESTION_GENERATION_PROVIDER || process.env.CONTENT_GENERATION_PROVIDER;
+
+  if (configuredProvider) {
+    return configuredProvider.trim().toLowerCase();
+  }
+
+  const hasGeminiKey = Boolean(process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY);
+  const hasGroqKey = Boolean(process.env.GROQ_API_KEY);
+
+  if (hasGeminiKey) {
+    return "gemini";
+  }
+
+  if (hasGroqKey) {
+    return "groq";
+  }
+
   return (
-    process.env.QUESTION_GENERATION_PROVIDER ||
-    process.env.CONTENT_GENERATION_PROVIDER ||
-    (process.env.GROQ_API_KEY ? "groq" : "gemini")
+    hasGroqKey ? "groq" : "gemini"
   )
     .trim()
     .toLowerCase();
@@ -198,7 +215,7 @@ export async function POST(request: Request) {
         const generation = await runGeneration({
           sectionKey: topic.sectionKey,
           topicSlug: topic.topicSlug,
-          perDifficulty: topic.recommendedPerDifficulty,
+          perDifficulty: Math.min(topic.recommendedPerDifficulty, adminInteractivePerDifficulty),
           status: parsed.data.status,
         });
 
@@ -206,7 +223,7 @@ export async function POST(request: Request) {
           sectionKey: topic.sectionKey,
           topicSlug: topic.topicSlug,
           topicName: topic.topicName,
-          perDifficulty: topic.recommendedPerDifficulty,
+          perDifficulty: Math.min(topic.recommendedPerDifficulty, adminInteractivePerDifficulty),
           reviewPriority: topic.reviewPriority,
           focusDifficulty: topic.focusDifficulty,
           publishedGapCount: topic.publishedGapCount,
@@ -230,7 +247,7 @@ export async function POST(request: Request) {
     const generation = await runGeneration({
       sectionKey: parsed.data.sectionKey,
       topicSlug: parsed.data.topicSlug,
-      perDifficulty: parsed.data.perDifficulty,
+      perDifficulty: Math.min(parsed.data.perDifficulty, adminInteractivePerDifficulty),
       status: parsed.data.status,
     });
 

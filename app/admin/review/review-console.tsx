@@ -97,6 +97,7 @@ const reviewQualityOptions = ["all", "blocked", "warning", "clean"] as const;
 const reviewSortOptions = ["blocked-first", "highest-risk", "newest"] as const;
 const bulkScopeOptions = ["math-reading", "current-filter", "all-sections"] as const;
 const bulkCountOptions = [3, 6, 9] as const;
+const adminInteractivePerDifficulty = 1;
 
 function getBacklogPriorityBadge(topic: BacklogTopic) {
   if (topic.reviewPriority === "critical") {
@@ -366,7 +367,7 @@ export default function ReviewConsole() {
     setFlashMessage(null);
     setGenerationDebug(null);
 
-    const batchSize = topic.recommendedPerDifficulty * 3;
+    const batchSize = adminInteractivePerDifficulty * 3;
 
     try {
       const res = await fetch("/api/admin/backlog", {
@@ -375,7 +376,7 @@ export default function ReviewConsole() {
         body: JSON.stringify({
           sectionKey: topic.sectionKey,
           topicSlug: topic.topicSlug,
-          perDifficulty: topic.recommendedPerDifficulty,
+          perDifficulty: adminInteractivePerDifficulty,
           status: "draft",
         }),
       });
@@ -676,7 +677,7 @@ export default function ReviewConsole() {
             ) : (
               prioritizedBacklog.map((topic) => {
                   const priorityBadge = getBacklogPriorityBadge(topic);
-                  const batchSize = topic.recommendedPerDifficulty * 3;
+                  const batchSize = adminInteractivePerDifficulty * 3;
                   return (
                     <div
                       key={`${topic.sectionKey}:${topic.topicSlug}`}
