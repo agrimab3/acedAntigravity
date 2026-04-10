@@ -265,6 +265,28 @@ function resolveReviewModel(provider, rawModel, fallbackModel) {
   );
 }
 
+function resolveFallbackProvider(primaryProvider) {
+  if (primaryProvider === "groq" && geminiApiKey) {
+    return "gemini";
+  }
+
+  return null;
+}
+
+function resolveFallbackModel(primaryProvider, mode, fallbackModel) {
+  const fallbackProvider = resolveFallbackProvider(primaryProvider);
+
+  if (!fallbackProvider) {
+    return null;
+  }
+
+  if (mode === "review") {
+    return resolveReviewModel(fallbackProvider, null, fallbackModel);
+  }
+
+  return resolveGenerationModel(fallbackProvider, null);
+}
+
 function resolveGeminiBaseUrl() {
   const configured = process.env.GEMINI_API_BASE_URL || process.env.GEMINI_BASE_URL;
 
@@ -947,7 +969,42 @@ async function requestGroqJson({ model, systemPrompt, userPrompt, schema, temper
   return text;
 }
 
-async function generateBatchForDifficulty(topic, requestedDifficulty, requestedCount, attempt = 1) {
+async function requestStructuredJson({
+  provider,
+  model,
+  systemPrompt,
+  userPrompt,
+  schema,
+  temperature,
+}) {
+  if (provider === "groq") {
+    return requestGroqJson({
+      model,
+      systemPrompt,
+      userPrompt,
+      schema,
+      temperature,
+    });
+  }
+
+  return requestGeminiJson({
+    model,
+    systemPrompt,
+    userPrompt,
+    schema,
+    temperature,
+  });
+}
+
+async function generateBatchForDifficulty(
+  topic,
+  requestedDifficulty,
+  requestedCount,
+  attempt = 1,
+  provider = generationProvider,
+  model = generationModel,
+  hasFallenBack = false
+) {
   try {
     const schema = buildQuestionBatchSchema(
       topic.section_key,
@@ -961,22 +1018,14 @@ async function generateBatchForDifficulty(topic, requestedDifficulty, requestedC
       requestedDifficulty,
       requestedCount,
     });
-    const text =
-      generationProvider === "groq"
-        ? await requestGroqJson({
-            model: generationModel,
-            systemPrompt: GENERATION_SYSTEM_PROMPT,
-            userPrompt: prompt,
-            schema,
-            temperature: 0.7,
-          })
-        : await requestGeminiJson({
-            model: generationModel,
-            systemPrompt: GENERATION_SYSTEM_PROMPT,
-            userPrompt: prompt,
-            schema,
-            temperature: 0.7,
-          });
+    const text = await requestStructuredJson({
+      provider,
+      model,
+      systemPrompt: GENERATION_SYSTEM_PROMPT,
+      userPrompt: prompt,
+      schema,
+      temperature: 0.7,
+    });
 
     return buildGeneratedBatchSchema({
       requestedCount,
@@ -986,20 +1035,46 @@ async function generateBatchForDifficulty(topic, requestedDifficulty, requestedC
     const message = error instanceof Error ? error.message : "unknown generation error";
 
     const isRetryable =
-      generationProvider === "groq"
+      provider === "groq"
         ? isRetryableGroqError(message)
         : isRetryableGeminiError(message);
 
-    if (attempt < 5 && isRetryable) {
+    if (attempt < 3 && isRetryable) {
       const retryDelayMs =
-        extractRetryDelayMs(message) ?? (generationProvider === "groq" ? 20000 : 35000);
+        extractRetryDelayMs(message) ?? (provider === "groq" ? 20000 : 35000);
       console.warn(
-        `${generationProvider} rate limited for ${topic.section_key}/${topic.slug}/${requestedDifficulty}; retrying in ${Math.ceil(
+        `${provider} rate limited for ${topic.section_key}/${topic.slug}/${requestedDifficulty}; retrying in ${Math.ceil(
           retryDelayMs / 1000
-        )}s (attempt ${attempt + 1}/5).`
+        )}s (attempt ${attempt + 1}/3).`
       );
       await sleep(retryDelayMs + 1000);
-      return generateBatchForDifficulty(topic, requestedDifficulty, requestedCount, attempt + 1);
+      return generateBatchForDifficulty(
+        topic,
+        requestedDifficulty,
+        requestedCount,
+        attempt + 1,
+        provider,
+        model,
+        hasFallenBack
+      );
+    }
+
+    const fallbackProvider = resolveFallbackProvider(provider);
+    const fallbackModel = resolveFallbackModel(provider, "generation", model);
+
+    if (isRetryable && fallbackProvider && fallbackModel && !hasFallenBack) {
+      console.warn(
+        `${provider} stayed rate limited for ${topic.section_key}/${topic.slug}/${requestedDifficulty}; falling back to ${fallbackProvider}/${fallbackModel}.`
+      );
+      return generateBatchForDifficulty(
+        topic,
+        requestedDifficulty,
+        requestedCount,
+        1,
+        fallbackProvider,
+        fallbackModel,
+        true
+      );
     }
 
     throw error;
@@ -1017,7 +1092,14 @@ async function generateBatchForTopic(topic) {
   return generatedQuestions;
 }
 
-async function reviewGeneratedQuestion(topic, question, attempt = 1) {
+async function reviewGeneratedQuestion(
+  topic,
+  question,
+  attempt = 1,
+  provider = reviewProvider,
+  model = reviewModel,
+  hasFallenBack = false
+) {
   try {
     const schema = {
       type: "object",
@@ -1087,41 +1169,50 @@ async function reviewGeneratedQuestion(topic, question, attempt = 1) {
       additionalProperties: false,
     };
     const prompt = buildReviewPrompt(topic, question);
-    const text =
-      reviewProvider === "groq"
-        ? await requestGroqJson({
-            model: reviewModel,
-            systemPrompt: REVIEW_SYSTEM_PROMPT,
-            userPrompt: prompt,
-            schema,
-            temperature: 0.2,
-          })
-        : await requestGeminiJson({
-            model: reviewModel,
-            systemPrompt: REVIEW_SYSTEM_PROMPT,
-            userPrompt: prompt,
-            schema,
-            temperature: 0.2,
-          });
+    const text = await requestStructuredJson({
+      provider,
+      model,
+      systemPrompt: REVIEW_SYSTEM_PROMPT,
+      userPrompt: prompt,
+      schema,
+      temperature: 0.2,
+    });
 
     return reviewedQuestionSchema.parse(JSON.parse(text));
   } catch (error) {
     const message = error instanceof Error ? error.message : "unknown review error";
     const isRetryable =
-      reviewProvider === "groq"
+      provider === "groq"
         ? isRetryableGroqError(message)
         : isRetryableGeminiError(message);
 
-    if (attempt < 4 && isRetryable) {
+    if (attempt < 2 && isRetryable) {
       const retryDelayMs =
-        extractRetryDelayMs(message) ?? (reviewProvider === "groq" ? 12000 : 20000);
+        extractRetryDelayMs(message) ?? (provider === "groq" ? 12000 : 20000);
       console.warn(
-        `${reviewProvider} review rate limited for ${topic.section_key}/${topic.slug}; retrying in ${Math.ceil(
+        `${provider} review rate limited for ${topic.section_key}/${topic.slug}; retrying in ${Math.ceil(
           retryDelayMs / 1000
-        )}s (attempt ${attempt + 1}/4).`
+        )}s (attempt ${attempt + 1}/2).`
       );
       await sleep(retryDelayMs + 1000);
-      return reviewGeneratedQuestion(topic, question, attempt + 1);
+      return reviewGeneratedQuestion(topic, question, attempt + 1, provider, model, hasFallenBack);
+    }
+
+    const fallbackProvider = resolveFallbackProvider(provider);
+    const fallbackModel = resolveFallbackModel(provider, "review", model);
+
+    if (isRetryable && fallbackProvider && fallbackModel && !hasFallenBack) {
+      console.warn(
+        `${provider} review stayed rate limited for ${topic.section_key}/${topic.slug}; falling back to ${fallbackProvider}/${fallbackModel}.`
+      );
+      return reviewGeneratedQuestion(
+        topic,
+        question,
+        1,
+        fallbackProvider,
+        fallbackModel,
+        true
+      );
     }
 
     throw error;
