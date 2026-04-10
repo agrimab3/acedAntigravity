@@ -71,6 +71,26 @@ type ReviewQuestion = {
   };
 };
 
+type GenerationSummary = {
+  inserted?: number;
+  skipped?: number;
+  reviewKept?: number;
+  reviewRevised?: number;
+  reviewRejected?: number;
+  reviewErrors?: number;
+  failures?: Array<{
+    topic?: string;
+    error?: string;
+  }>;
+};
+
+type GenerationDebugEntry = {
+  label: string;
+  summary: GenerationSummary | null;
+  stdout?: string | null;
+  stderr?: string | null;
+};
+
 const sectionOptions = ["all", "english", "math", "reading", "science"] as const;
 const statusOptions = ["draft", "published", "rejected"] as const;
 const reviewQualityOptions = ["all", "blocked", "warning", "clean"] as const;
@@ -154,6 +174,7 @@ export default function ReviewConsole() {
   const [notesByQuestionId, setNotesByQuestionId] = useState<Record<string, string>>({});
   const [selectedQuestionIds, setSelectedQuestionIds] = useState<Record<string, boolean>>({});
   const [flashMessage, setFlashMessage] = useState<string | null>(null);
+  const [generationDebug, setGenerationDebug] = useState<GenerationDebugEntry[] | null>(null);
 
   const availableTopics = useMemo(() => {
     return backlog.filter((topic) => activeSection === "all" || topic.sectionKey === activeSection);
@@ -264,6 +285,7 @@ export default function ReviewConsole() {
   async function bulkFillCriticalTopics() {
     setRunningBulkFill(true);
     setFlashMessage(null);
+    setGenerationDebug(null);
 
     const sectionKeys =
       bulkScope === "math-reading"
@@ -295,12 +317,41 @@ export default function ReviewConsole() {
       }
 
       const inserted = (data.results ?? []).reduce(
-        (sum: number, result: { summary?: { inserted?: number } }) => sum + Number(result.summary?.inserted ?? 0),
+        (sum: number, result: { summary?: GenerationSummary }) => sum + Number(result.summary?.inserted ?? 0),
+        0
+      );
+      const kept = (data.results ?? []).reduce(
+        (sum: number, result: { summary?: GenerationSummary }) => sum + Number(result.summary?.reviewKept ?? 0),
+        0
+      );
+      const revised = (data.results ?? []).reduce(
+        (sum: number, result: { summary?: GenerationSummary }) => sum + Number(result.summary?.reviewRevised ?? 0),
+        0
+      );
+      const rejected = (data.results ?? []).reduce(
+        (sum: number, result: { summary?: GenerationSummary }) => sum + Number(result.summary?.reviewRejected ?? 0),
+        0
+      );
+      const reviewErrors = (data.results ?? []).reduce(
+        (sum: number, result: { summary?: GenerationSummary }) => sum + Number(result.summary?.reviewErrors ?? 0),
         0
       );
 
       setFlashMessage(
-        `Filled ${data.selection?.selectedTopicCount ?? 0} critical topic batch${data.selection?.selectedTopicCount === 1 ? "" : "es"} and inserted ${inserted} draft question${inserted === 1 ? "" : "s"}.`
+        `Filled ${data.selection?.selectedTopicCount ?? 0} critical topic batch${data.selection?.selectedTopicCount === 1 ? "" : "es"}: inserted ${inserted}, reviewer kept ${kept}, revised ${revised}, rejected ${rejected}, errors ${reviewErrors}.`
+      );
+      setGenerationDebug(
+        (data.results ?? []).map(
+          (result: {
+            sectionKey: string;
+            topicName: string;
+            topicSlug: string;
+            summary?: GenerationSummary;
+          }) => ({
+            label: `${result.sectionKey}/${result.topicSlug} · ${result.topicName}`,
+            summary: result.summary ?? null,
+          })
+        )
       );
       await Promise.all([loadBacklog(), loadQuestions()]);
     } catch (error) {
@@ -313,6 +364,7 @@ export default function ReviewConsole() {
   async function generateDraftBatch(topic: BacklogTopic) {
     setRunningTopic(topic.topicSlug);
     setFlashMessage(null);
+    setGenerationDebug(null);
 
     const batchSize = topic.recommendedPerDifficulty * 3;
 
@@ -334,9 +386,21 @@ export default function ReviewConsole() {
         throw new Error(data.error || "Generation failed.");
       }
 
+      const summary = (data.summary ?? null) as GenerationSummary | null;
+      const failureText =
+        summary?.failures?.map((failure) => failure.error).filter(Boolean).join(" | ") ?? "";
+
       setFlashMessage(
-        `Generated ${data.summary?.inserted ?? 0} of ${batchSize} requested draft question(s) for ${topic.topicName}.`
+        `Generated ${summary?.inserted ?? 0} of ${batchSize} requested draft question(s) for ${topic.topicName}. Reviewer kept ${summary?.reviewKept ?? 0}, revised ${summary?.reviewRevised ?? 0}, rejected ${summary?.reviewRejected ?? 0}, errors ${summary?.reviewErrors ?? 0}${failureText ? ` · ${failureText}` : ""}.`
       );
+      setGenerationDebug([
+        {
+          label: `${topic.sectionKey}/${topic.topicSlug} · ${topic.topicName}`,
+          summary,
+          stdout: typeof data.stdout === "string" ? data.stdout : null,
+          stderr: typeof data.stderr === "string" ? data.stderr : null,
+        },
+      ]);
       await Promise.all([loadBacklog(), loadQuestions()]);
     } catch (error) {
       setFlashMessage(error instanceof Error ? error.message : "Generation failed.");
@@ -746,6 +810,90 @@ export default function ReviewConsole() {
             }}
           >
             {flashMessage}
+          </div>
+        )}
+
+        {generationDebug && generationDebug.length > 0 && (
+          <div
+            style={{
+              marginBottom: "14px",
+              padding: "13px",
+              borderRadius: "12px",
+              background: "rgba(255,255,255,0.035)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              display: "grid",
+              gap: "12px",
+            }}
+          >
+            <div style={{ fontSize: "11px", letterSpacing: ".06em", color: "rgba(255,255,255,0.42)" }}>
+              GENERATION DEBUG
+            </div>
+
+            {generationDebug.map((entry) => {
+              const failures = entry.summary?.failures ?? [];
+
+              return (
+                <div
+                  key={entry.label}
+                  style={{
+                    padding: "12px",
+                    borderRadius: "12px",
+                    background: "rgba(255,255,255,0.025)",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                    display: "grid",
+                    gap: "8px",
+                  }}
+                >
+                  <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.86)", fontWeight: 600 }}>
+                    {entry.label}
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "7px" }}>
+                    <Badge text={`inserted ${entry.summary?.inserted ?? 0}`} tone="success" />
+                    <Badge text={`kept ${entry.summary?.reviewKept ?? 0}`} tone="success" subtle />
+                    <Badge text={`revised ${entry.summary?.reviewRevised ?? 0}`} tone="warning" />
+                    <Badge text={`rejected ${entry.summary?.reviewRejected ?? 0}`} tone="danger" />
+                    <Badge text={`review errors ${entry.summary?.reviewErrors ?? 0}`} tone="danger" subtle />
+                    <Badge text={`skipped ${entry.summary?.skipped ?? 0}`} subtle />
+                  </div>
+
+                  {failures.length > 0 && (
+                    <div style={{ display: "grid", gap: "6px" }}>
+                      {failures.map((failure, index) => (
+                        <div
+                          key={`${entry.label}-failure-${index}`}
+                          style={{
+                            fontSize: "12px",
+                            lineHeight: 1.6,
+                            color: "#FFD7CB",
+                          }}
+                        >
+                          {failure.topic ? `${failure.topic}: ` : ""}
+                          {failure.error || "unknown failure"}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {entry.stderr?.trim() ? (
+                    <pre
+                      style={{
+                        margin: 0,
+                        whiteSpace: "pre-wrap",
+                        wordBreak: "break-word",
+                        fontSize: "11px",
+                        lineHeight: 1.5,
+                        color: "rgba(255,255,255,0.58)",
+                        background: "rgba(0,0,0,0.18)",
+                        borderRadius: "10px",
+                        padding: "10px",
+                      }}
+                    >
+                      {entry.stderr.trim()}
+                    </pre>
+                  ) : null}
+                </div>
+              );
+            })}
           </div>
         )}
 
