@@ -10,67 +10,74 @@ const DEFAULT_GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1bet
 const DEFAULT_GROQ_BASE_URL = "https://api.groq.com/openai/v1";
 const SUPPORTED_PROVIDERS = ["gemini", "groq"];
 const GENERATION_SYSTEM_PROMPT = `
-You are Aced's ACT item writer and quality gate.
+You are Aced's ACT item writer.
 
-Your job is to generate original, ACT-authentic multiple-choice questions that could survive editorial review for correctness, difficulty accuracy, topic fidelity, and distractor quality.
+Your task is to generate original, ACT-authentic multiple-choice questions that are publishable without manual rescue.
 
-You must behave like both:
-1. a professional ACT-style item writer, and
-2. a strict reviewer who rejects weak items before outputting them.
+You must write like a professional standardized-test item writer, not like a worksheet generator or content farm.
 
-Non-negotiable requirements:
-- Output valid JSON only.
+Core quality standard:
+Every item must feel like a serious ACT-prep product could publish it without embarrassment.
+
+Originality and benchmarking:
+Match the authenticity, polish, and difficulty control of top-tier ACT prep materials, but write fully original items.
+Do not copy, paraphrase, mirror, or closely imitate any published ACT or commercial-prep question, passage, explanation, numeric setup, or answer structure.
+Use external prep only as a quality benchmark, never as source material.
+
+Output rules:
+- Return valid JSON only.
 - No markdown.
-- No commentary outside the JSON schema.
-- Use plain text only. No LaTeX.
-- Each item must have exactly 4 choices: A, B, C, D.
-- Exactly one choice must be correct.
-- The explanation must match the keyed correct answer exactly.
-- Never output an item if two answer choices could both reasonably be defended.
-- Never output an item if the explanation relies on approximation, "closest," or vague wording unless the question explicitly asks for an approximate value.
-- Never output an item that is mislabeled in difficulty.
-- Never output an item that matches the requested topic only loosely.
+- No commentary outside the JSON.
+- Use plain text only.
+- No LaTeX.
+- Exactly 4 answer choices: A, B, C, D.
+- Exactly 1 answer must be correct.
+- The explanation must match the keyed answer exactly.
+- Do not mention internal reasoning.
 
-Before finalizing each item, internally verify all of the following:
-- ACT authenticity: Would this feel plausible on a real ACT-style test?
-- Topic fidelity: Does it truly test the requested topic, not a neighboring one?
-- Difficulty accuracy: Does easy/medium/hard match the actual reasoning load?
-- Single-best-answer integrity: Is exactly one option unambiguously correct?
-- Distractor quality: Are wrong answers plausible but clearly wrong?
-- Explanation integrity: Does the explanation justify the correct answer and identify why key distractor(s) fail?
-- Batch diversity: Is this item meaningfully different from the others in setup, tested skill, wording, and answer pattern?
+Before finalizing each item, silently verify:
+- It matches the requested section and topic exactly.
+- Its difficulty label is accurate.
+- Exactly one answer is unambiguously correct.
+- The distractors are plausible but clearly wrong.
+- The explanation supports the keyed answer and does not contradict it.
+- The item feels ACT-authentic, not like a classroom drill.
+- The item is meaningfully different from others in the batch.
 
-If any check fails, silently revise or regenerate the item before output.
+If any check fails, rewrite the item before outputting it.
 
-Important writing principle:
-Do not generate questions that are merely technically answerable. Generate questions that feel intentionally designed, authentic, and editorially publishable.
+Automatic rejection standards:
+Do not output any item that:
+- is a one-step plug-in or direct recall item labeled medium or hard
+- has a passage that nearly states the answer verbatim
+- contains two answer choices that could both reasonably be defended
+- has a weak, generic, or self-contradictory explanation
+- is mismatched to the topic label
+- is structurally repetitive with another item in the same batch
+- has answer choices that differ in obvious plausibility, tone, or length
+- uses "closest" or approximation logic without explicitly asking for it
+- would likely be flagged by a human editor as too easy, too generic, too short, too direct, or too sloppy
 
-Difficulty standards:
-- Easy: official ACT warm-up difficulty; still credible, still skill-based, never childish or giveaway.
-- Medium: standard ACT difficulty; requires some reasoning, discrimination, or context use beyond direct recall.
-- Hard: upper-range ACT; requires tighter reasoning, stronger distractor filtering, or a meaningful second step. Hard must not be a dressed-up easy item.
+Difficulty standard:
+- Easy: credible ACT warm-up, never childish, trivial, or elementary.
+- Medium: standard ACT difficulty, usually requiring at least one non-obvious reasoning step, closer passage discrimination, or stronger distractor filtering.
+- Hard: upper-range ACT, requiring tighter reasoning, stronger distractors, or more complex setup without becoming artificial.
 
-Automatic rejection rules:
-- Reject and regenerate any item with any of these problems:
-  - one-step plug-in or direct recall disguised as medium/hard
-  - generic reading question with a passage that merely states the answer
-  - English item with two grammatically plausible revisions
-  - literary narrative topic using expository or informational writing
-  - science item that is just a vocabulary check rather than data or reasoning
-  - math item with all-numeric choices and a tiny stem that reads like a worksheet drill
-  - explanation that contradicts the keyed answer
-  - answer choices that are equivalent in meaning or value
-  - passage-topic mismatch
-  - difficulty inflation
+Do not lower the quality bar just to satisfy requested counts.
+If a requested difficulty is harder to write well, spend more effort improving the item before outputting it.
 
-Write with the restraint and precision of a test-prep editor, not a content farm.
+Write fewer strong items rather than many weak ones.
+Quality is more important than quantity.
 `.trim();
 const REVIEW_SYSTEM_PROMPT = `
-You are Aced's ACT item reviewer.
+You are Aced's ACT content reviewer.
 
-You are not writing new questions. You are evaluating whether each item is publishable.
+You are not writing new questions. You are evaluating generated ACT questions for publication quality.
 
-Judge each item on:
+Your standard is strict:
+Only approve items that feel publishable without manual rescue.
+
+For each item, judge:
 - correctness
 - single-best-answer integrity
 - ACT authenticity
@@ -79,20 +86,30 @@ Judge each item on:
 - distractor quality
 - explanation consistency
 - passage quality and relevance
+- originality
+- overall publishability
+
+Benchmark quality against top-tier ACT prep materials for authenticity, difficulty control, clarity, and polish.
+Also flag any item that feels derivative, too similar to a common published pattern, or insufficiently original.
 
 Reject any item that is:
 - too easy for its label
 - generic or textbook-like
-- not truly ACT-style
-- mismatched to topic
+- passage-answer paraphrase
+- not truly ACT-authentic
+- weakly matched to the topic
 - ambiguous
 - explanation/key inconsistent
-- weak in distractor design
-- too isolated for English
-- paraphrase-only for Reading
-- a direct classroom drill for Math
+- poorly constructed
+- not strong enough for publication
+- derivative in setup, wording, passage logic, or answer structure
 
-Be strict. If an item would need editorial rescue, do not keep it.
+Do not repair the item unless explicitly asked.
+Evaluate it as submitted.
+
+Return valid JSON only.
+No markdown.
+No commentary outside the JSON.
 `.trim();
 
 const databaseUrl = process.env.DATABASE_URL;
@@ -133,16 +150,18 @@ if (generationProvider === "groq" && !groqApiKey) {
 }
 
 const generatedQuestionSchema = z.object({
+  section: z.string().min(1),
+  topic: z.string().min(1),
   difficulty: z.enum(DIFFICULTIES),
   passage: z.string().nullable().optional(),
-  prompt: z.string().min(20),
+  question_text: z.string().min(20),
   choices: z.object({
     A: z.string().min(1),
     B: z.string().min(1),
     C: z.string().min(1),
     D: z.string().min(1),
   }),
-  correctAnswer: z.enum(ANSWER_CHOICES),
+  correct_answer: z.enum(ANSWER_CHOICES),
   explanation: z.string().min(30),
 });
 
@@ -150,10 +169,18 @@ const generatedBatchSchema = z.object({
   questions: z.array(generatedQuestionSchema).min(perDifficulty * DIFFICULTIES.length),
 });
 const reviewedQuestionSchema = z.object({
+  item_index: z.number().int().nonnegative(),
   verdict: z.enum(["keep", "revise", "reject"]),
-  mainIssues: z.array(z.string().min(1)).max(6),
-  difficultyRelabel: z.enum([...DIFFICULTIES, "none"]).default("none"),
-  editorialNote: z.string().min(1),
+  confidence: z.enum(["high", "medium", "low"]),
+  correctness: z.enum(["correct", "incorrect", "unclear"]),
+  topic_fidelity: z.enum(["strong", "partial", "weak"]),
+  difficulty_accuracy: z.enum(["accurate", "too_easy", "too_hard", "unclear"]),
+  single_best_answer: z.enum(["yes", "no", "unclear"]),
+  explanation_consistency: z.enum(["consistent", "inconsistent", "unclear"]),
+  originality: z.enum(["strong", "borderline", "weak"]),
+  main_issues: z.array(z.string().min(1)).max(6),
+  suggested_difficulty: z.union([z.enum(DIFFICULTIES), z.null()]),
+  editorial_note: z.string().min(1),
 });
 
 const client = new Client({
@@ -364,50 +391,45 @@ function buildFingerprint({ sectionKey, topicSlug, difficulty, passage, prompt, 
 
 function getSectionSpecificInstructions(sectionKey) {
   switch (sectionKey) {
-    case "english":
-      return [
-        "Every English item must be revision-in-context, not an isolated grammar quiz.",
-        "Include a short passage or excerpt in the passage field.",
-        "Mark the exact revisable text with [underline]...[/underline].",
-        "The question must ask for the best revision, placement, transition, wording, or structural improvement in context.",
-        "Medium and hard English items must create a real editorial decision, not just spot-the-error trivia.",
-        "Exactly one answer must be clearly best in context.",
-        "Reject any item where two choices are both grammatically acceptable unless only one clearly fits the rhetorical goal.",
-        "Test the interaction of grammar, clarity, logic, tone, cohesion, and sentence flow the way ACT English does.",
-        "Keep answer choices parallel in form whenever possible.",
-      ].join("\n");
     case "math":
       return [
-        "Write ACT Math items, not classroom drills.",
-        "Use plain text math. Do not use LaTeX.",
-        "Medium and hard math items must usually require at least 2 reasoning moves, or one non-obvious setup plus execution.",
-        "Do not write medium or hard items that are just direct substitution, direct formula recall, simple angle-sum, direct evaluation of a function at one point, routine exponent solving, or immediate nth-term plug-ins.",
-        "Prefer setups involving interpretation, structure, constraints, modeling, comparison, or multi-step reasoning.",
-        "If the item can be solved almost instantly by pattern recognition alone, it is not medium or hard.",
-        "Avoid tiny stems with four numeric answers unless the reasoning burden is genuinely ACT-level.",
-        "Use a brief setup when needed to make the problem feel test-authentic.",
-        "Set passage to null unless a brief word-problem setup is necessary.",
+        "Write ACT Math items, not worksheet drills.",
+        "Medium and hard items must require more than direct substitution, direct evaluation, routine formula recall, or immediate solving.",
+        "Prefer items involving structure, interpretation, comparison, constraints, modeling, composition, piecewise reasoning, or multi-step setup.",
+        "If the item can be solved instantly by plugging into one formula or one expression, it is not medium or hard.",
+        "Use passage = null unless a short real-world setup is needed.",
+        "Avoid tiny stems with purely numeric answer choices unless the reasoning burden is genuinely ACT-level.",
+        "Distractors should reflect realistic mathematical mistakes, not random numbers.",
+      ].join("\n");
+    case "english":
+      return [
+        "Every English item must be revision-in-context.",
+        "Include a short passage in the passage field.",
+        "Mark the revisable text using [underline]...[/underline].",
+        "The question must ask for the best revision, transition, placement, wording, or structural improvement in context.",
+        "Exactly one answer must be clearly best in context.",
+        "Do not create isolated grammar drills dressed up as ACT questions.",
+        "Medium and hard items must involve a real editorial decision, not just obvious error spotting.",
+        "Grammar, clarity, logic, tone, and cohesion should interact the way they do on ACT English.",
       ].join("\n");
     case "reading":
       return [
-        "Every Reading item must include a passage that genuinely supports inference, tone, meaning, organization, or evidence-based interpretation.",
-        "The passage must not simply state the answer in nearly identical wording.",
-        "Medium and hard reading questions must require real discrimination, not basic paraphrase matching.",
-        "Literary Narrative must use narrative prose with a speaker or character, scene, action, memory, mood, or interpersonal tension.",
-        "Social Science must feel like a social-science excerpt, not a dictionary entry.",
-        "Humanities must feel interpretive, cultural, historical, artistic, or philosophical.",
-        "Natural Science must feel explanatory and scientific, but still passage-based rather than trivia-based.",
-        "Do not use expository textbook blurbs for Literary Narrative.",
-        "Do not ask generic main-idea questions unless the passage has enough texture to support real inference.",
+        "Every Reading item must include a passage.",
+        "The passage must be rich enough to support inference, tone, evidence, organization, or meaning questions.",
+        "Do not write passages that simply define a concept and then ask what the concept means.",
+        "Do not write questions whose answer is almost directly paraphrased from one sentence in the passage.",
+        "Literary Narrative must be actual narrative prose with a speaker, character, scene, memory, or interaction.",
+        "Social Science must feel like a real social-science, civic, historical, or cultural passage, not a dictionary entry.",
+        "Humanities must feel interpretive, artistic, historical, philosophical, or cultural.",
+        "Natural Science must feel explanatory and passage-based, not trivia-based.",
       ].join("\n");
     case "science":
       return [
-        "Every Science item must include an ACT-style setup: experiment summary, data summary, or conflicting viewpoints.",
-        "The question must test interpretation, comparison, inference, variable relationships, or conclusion strength.",
-        "Avoid pure vocabulary checks and pure common-sense questions.",
-        "Hard science items should require comparing conditions, tracing a variable change, or ruling out a tempting but unsupported conclusion.",
+        "Every Science item must include an experiment summary, data summary, or conflicting-viewpoints setup.",
+        "The question must require interpretation of the setup, not outside trivia.",
+        "Hard items should require comparison, variable tracking, inference, or ruling out tempting but unsupported conclusions.",
+        "If the student could answer without using the setup, reject and rewrite the item.",
         "Use concise but information-rich setups.",
-        "If a student can answer without using the setup, reject the item.",
       ].join("\n");
     default:
       return "";
@@ -458,56 +480,54 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
       "Avoid making the unchanged original wording obviously correct just because the other options are exaggerated or silly.",
     ],
     "english:punctuation": [
-      "Focus on commas, semicolons, colons, dashes, apostrophes, and punctuation-driven sentence meaning.",
-      "Use ACT-style sentence revision prompts rather than generic grammar trivia.",
-      "Mark the revisable text with [underline]...[/underline] in the passage when the prompt refers to the underlined portion.",
+      "Test punctuation through revision in context, not isolated punctuation drills.",
+      "Use commas, semicolons, colons, dashes, apostrophes, and end punctuation only where context creates one clearly best answer.",
+      "Avoid choices where more than one punctuation option could reasonably work in context.",
     ],
     "english:grammar-and-usage": [
       "Focus on subject-verb agreement, pronoun agreement, verb tense, modifier placement, idiomatic usage, and sentence clarity in context.",
       "Every item must be a revision item with [underline] tags in the passage.",
       "Make the wrong choices realistic and grammatically tempting when possible.",
-      "Do not create choices that are obviously wrong by surface inspection alone.",
       "If more than one answer is acceptable English, reject and rewrite the item.",
-      "Do not drift into geometry, history, or general knowledge contexts that overshadow the grammar skill.",
     ],
     "english:sentence-structure": [
-      "Focus on clause relationships, fragments, run-ons, parallel structure, and logical sentence combination.",
-      "Keep the student's job centered on fixing structure, not only punctuation.",
-      "Use passage-based choices that revise the underlined sentence or clause instead of asking students to label sentence parts.",
-      "Always mark the exact clause or sentence to revise with [underline]...[/underline] in the passage.",
-      "Avoid answer sets where more than one option would be grammatically acceptable; there must be one clearly best structural revision.",
+      "Focus on clause relationships, modifiers, subordination, coordination, sentence boundaries, and structural clarity.",
+      "Medium and hard items should require understanding the logic of the sentence, not just spotting a surface error.",
+      "Ensure exactly one revision is best in both grammar and meaning.",
     ],
     "math:number-and-quantity": [
       "Focus on integers, rational and irrational numbers, ratios, units, magnitude, exponents, and numeric properties.",
       "Do not substitute pure geometry questions here.",
     ],
     "math:algebra": [
-      "Focus on solving equations, expressions, inequalities, linear relationships, and algebraic manipulation.",
-      "Do not generate geometry-only questions about circles, triangles, or angle sums unless algebra is central to solving.",
+      "Avoid plain solve for x drills for medium and hard.",
+      "Prefer systems, structure, equivalent forms, quadratic reasoning, constraints, or interpretation of algebraic relationships.",
+      "Distractors should reflect realistic algebra mistakes.",
     ],
     "math:functions": [
-      "Focus on interpreting, combining, comparing, transforming, or reasoning about functions.",
-      "Avoid direct one-step evaluation such as what is g(-2).",
-      "Avoid simple composition plug-ins unless the setup adds genuine reasoning.",
-      "Medium and hard items should involve structure, comparison, constraints, meaning of outputs, or multi-step interpretation.",
+      "Focus on interpreting, comparing, transforming, composing, or reasoning about functions.",
+      "Avoid direct one-step evaluation such as What is f(4).",
+      "Avoid direct composition drills unless there is meaningful additional reasoning.",
+      "Medium and hard items should involve function meaning, piecewise interpretation, constraints, comparison of outputs, or symbolic structure.",
     ],
     "math:geometry": [
-      "Focus on coordinate geometry, area, perimeter, volume, angles, triangles, circles, and geometric reasoning.",
       "Avoid simple area, perimeter, angle-sum, or radius-from-diameter recall as medium or hard.",
-      "Prefer coordinate reasoning, geometric relationships, similar figures, composite figures, transformations, or multi-step constraints.",
-      "Do not publish any geometry item whose solution is a single formula substitution unless labeled easy and still ACT-authentic.",
+      "Prefer geometric relationships, coordinate geometry, similar figures, composite figures, transformations, or multi-step constraints.",
+      "Do not rely on a single obvious formula substitution for medium or hard.",
     ],
     "math:statistics-and-probability": [
       "Focus on averages, distributions, percent, counting, probability, and interpreting summary statistics or data tables.",
       "Do not generate pure algebra drills here.",
     ],
     "math:integrating-essential-skills": [
-      "Mix algebra, arithmetic, proportional reasoning, data interpretation, and multi-step applied problem solving.",
-      "These should feel like ACT integrated word problems rather than a single isolated skill drill.",
+      "Mix algebra, arithmetic, proportional reasoning, estimation, expressions, and interpretation.",
+      "Easy items may be direct but should still feel test-ready.",
+      "Medium and hard items must combine skills or require structure, not just one isolated operation.",
+      "Avoid plain two-step equations as medium or hard.",
     ],
     "math:modeling": [
       "The central task must be choosing, building, or interpreting the model.",
-      "The setup should require translating a verbal scenario into an equation, function, inequality, table, or rate relationship.",
+      "The setup should require translating a verbal scenario into an equation, function, inequality, rate relationship, or representation.",
       "Avoid items where the model is already essentially written in the prompt.",
       "Strong distractors should reflect realistic modeling mistakes.",
     ],
@@ -536,25 +556,24 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
       "These should feel like ACT problems where the challenge is setting up the right path through the situation.",
     ],
     "reading:literary-narrative": [
-      "Use a short scene, reflection, or memory with a narrator or character.",
-      "Include concrete details, voice, and emotional texture.",
-      "Questions should test tone, implication, character motivation, effect of a detail, narrative perspective, or relationship dynamics.",
-      "Do not use informational or scientific exposition.",
-      "Do not let the passage define a concept and then ask for that concept.",
+      "Use a narrator or character in a specific moment, memory, or interaction.",
+      "Include sensory detail, emotional texture, or subtle relationship cues.",
+      "Ask about tone, implication, motivation, effect of a detail, or narrative perspective.",
+      "Do not use abstract exposition pretending to be literary.",
     ],
     "reading:social-science": [
       "Use a passage about social behavior, institutions, policy, culture, economics, education, or civic life.",
-      "Questions should test argument, implication, evidence, framing, or interpretation of social patterns.",
-      "Do not write encyclopedia-style definitions followed by direct paraphrase questions.",
-      "Make the passage explicitly social-science in content, using recognizable themes like public policy, communities, voting, labor, markets, behavior, culture, or historical change.",
+      "Ask about implication, interpretation, framing, evidence, or argument.",
+      "Do not use encyclopedia-style definitions followed by direct recall questions.",
     ],
     "reading:humanities": [
       "Use a nonfiction passage about art, music, literature, philosophy, architecture, or cultural criticism.",
       "Questions should focus on interpretation, author attitude, or the role of specific details in the argument.",
     ],
     "reading:natural-science": [
-      "Use a popular-science reading passage about biology, chemistry, physics, Earth science, or astronomy.",
-      "Keep it as ACT Reading, not ACT Science: focus on understanding what the author says, not computing data.",
+      "Use explanatory science prose with clear relationships, mechanisms, or findings.",
+      "Ask about evidence, inference, organization, or meaning in context.",
+      "Do not turn the passage into a trivia fact card.",
     ],
     "reading:main-idea-and-purpose": [
       "Use any ACT Reading passage type, but make the question target the passage's central claim, purpose, or overall direction.",
@@ -615,67 +634,60 @@ Generate ${perDifficulty * DIFFICULTIES.length} original ACT-style multiple-choi
 Section: ${sectionKey}
 Topic: ${topicName}
 
-Required difficulty distribution:
+Required difficulty mix:
 - easy: ${perDifficulty}
 - medium: ${perDifficulty}
 - hard: ${perDifficulty}
 
-Output requirements:
-- Return JSON only, matching the required schema exactly.
-- Each question must be original within this batch.
-- Each question must have exactly 4 choices: A, B, C, D.
+Return a JSON object only with a single "questions" array matching the required schema.
+
+Each item inside "questions" must contain exactly these fields:
+- section
+- topic
+- difficulty
+- passage
+- question_text
+- choices
+- correct_answer
+- explanation
+
+Schema rules:
+- section must equal the requested section
+- topic must equal the requested topic
+- difficulty must be one of: easy, medium, hard
+- passage must be a string or null
+- choices must be an object with exactly four keys: A, B, C, D
+- correct_answer must be exactly one of: A, B, C, D
+
+Global quality rules:
+- Each item must be original within this batch.
+- Each item must have exactly 4 answer choices: A, B, C, D.
 - Exactly one answer must be correct.
-- Use plain text only.
-- No markdown.
-- No LaTeX.
-- No duplicate stems, recycled setups, repeated choice patterns, or repeated explanation wording.
-- Do not include any item that feels weak, generic, or editorially questionable.
+- The explanation must justify the correct answer and briefly explain why the strongest distractor(s) fail.
+- Do not create near-duplicate stems, passages, explanations, or answer-choice patterns.
+- Do not create an item that a human editor would likely reject as too easy, too generic, too short, too direct, or too arguable.
+- Do not output placeholder-quality items.
+- If an item feels weak, rewrite it before including it.
+- Do not create answer choices that are equivalent in meaning or value.
+- Do not create explanations that mention a different answer letter than the keyed correct answer.
 
-Editorial quality bar:
-Every item must feel like it could be published on a serious ACT prep product without manual rescue.
-If an item feels too direct, too short, too classroom-like, too generic, too obvious, or too arguable, do not output it.
-
-Batch diversity requirements:
-- Vary skill subtype within the topic.
-- Vary stem structure.
-- Vary distractor logic.
-- Vary answer-position distribution across A, B, C, and D.
-- Avoid repeated numeric patterns, repeated story setups, and repeated passage cadence.
-
-Hard constraints:
-- Do not create any item where the explanation and keyed answer disagree.
-- Do not create any item where more than one answer could be defended.
-- Do not create any item where the correct answer is obtained by a single obvious pattern if the label is medium or hard.
-- Do not create any item that tests only terminology or trivia.
-- Do not create any item whose passage simply hands the answer to the student.
+Batch diversity rules:
+- Vary the tested subskill within the topic.
+- Vary passage style, stem wording, distractor logic, and answer placement.
+- Avoid repeating the same numeric structure, the same rhetorical move, or the same explanation template.
 
 Section-specific rules:
 ${getSectionSpecificInstructions(sectionKey)}
 
 Topic-specific rules:
 ${getTopicSpecificInstructions(sectionKey, slug)}
-
-Final internal quality gate before output:
-For each item, confirm internally:
-1. exact topic match
-2. exact difficulty match
-3. one unambiguous correct answer
-4. strong distractors
-5. explanation consistent with answer key
-6. ACT-authentic style
-If any item fails, regenerate it before returning the batch.
-
-Do not fill the batch mechanically.
-It is better to output fewer items than to output weak, broken, generic, or mislabeled items.
-If necessary, spend more effort making each item editorially sound before returning the JSON.
 `.trim();
 }
 
 function buildQuestionBatchSchema(sectionKey) {
-  const passageSchema =
-    sectionKey === "reading" || sectionKey === "science"
-      ? { type: "string" }
-      : { type: ["string", "null"] };
+  const passageSchema = sectionKey === "reading" || sectionKey === "science"
+    ? { type: "string" }
+    : { type: ["string", "null"] };
 
   return {
     type: "object",
@@ -687,12 +699,19 @@ function buildQuestionBatchSchema(sectionKey) {
         items: {
           type: "object",
           properties: {
+            section: {
+              type: "string",
+              const: sectionKey,
+            },
+            topic: {
+              type: "string",
+            },
             difficulty: {
               type: "string",
               enum: DIFFICULTIES,
             },
             passage: passageSchema,
-            prompt: {
+            question_text: {
               type: "string",
             },
             choices: {
@@ -706,7 +725,7 @@ function buildQuestionBatchSchema(sectionKey) {
               required: ANSWER_CHOICES,
               additionalProperties: false,
             },
-            correctAnswer: {
+            correct_answer: {
               type: "string",
               enum: ANSWER_CHOICES,
             },
@@ -714,7 +733,16 @@ function buildQuestionBatchSchema(sectionKey) {
               type: "string",
             },
           },
-          required: ["difficulty", "passage", "prompt", "choices", "correctAnswer", "explanation"],
+          required: [
+            "section",
+            "topic",
+            "difficulty",
+            "passage",
+            "question_text",
+            "choices",
+            "correct_answer",
+            "explanation",
+          ],
           additionalProperties: false,
         },
       },
@@ -726,35 +754,62 @@ function buildQuestionBatchSchema(sectionKey) {
 
 function buildReviewPrompt(topic, question) {
   return `
-Review this ACT-style multiple-choice item.
+Review the following ACT-style items for publication quality.
 
-Section: ${topic.section_key}
-Topic: ${topic.name}
-Difficulty label: ${question.difficulty}
+Requested section: ${topic.section_key}
+Requested topic: ${topic.name}
 
-Passage:
-${question.passage || "null"}
+For each item, return an object with exactly these fields:
+- item_index
+- verdict
+- confidence
+- correctness
+- topic_fidelity
+- difficulty_accuracy
+- single_best_answer
+- explanation_consistency
+- originality
+- main_issues
+- suggested_difficulty
+- editorial_note
 
-Prompt:
-${question.prompt}
+Allowed values:
+- verdict: keep, revise, reject
+- confidence: high, medium, low
+- correctness: correct, incorrect, unclear
+- topic_fidelity: strong, partial, weak
+- difficulty_accuracy: accurate, too_easy, too_hard, unclear
+- single_best_answer: yes, no, unclear
+- explanation_consistency: consistent, inconsistent, unclear
+- originality: strong, borderline, weak
+- suggested_difficulty: easy, medium, hard, null
 
-Choices:
-A. ${question.choices.A}
-B. ${question.choices.B}
-C. ${question.choices.C}
-D. ${question.choices.D}
+Rules:
+- Be strict.
+- Reject items that are weak even if technically answerable.
+- Reject items that feel like worksheet drills rather than ACT items.
+- Reject items whose passage simply gives away the answer.
+- Reject medium or hard math items that are just direct substitution, direct evaluation, formula recall, or routine solving.
+- Reject English items with more than one reasonably defensible revision.
+- Reject Reading items whose passage does not genuinely support inference, tone, organization, or evidence-based interpretation.
+- Reject any item with a broken explanation or missing correct option.
+- Use main_issues as a concise array of the biggest problems only.
+- Keep editorial_note to one sentence.
+- There is exactly 1 item in this request, so return a single JSON object for item_index 0.
 
-Keyed correct answer: ${question.correctAnswer}
-Explanation:
-${question.explanation}
-
-Return structured JSON only with:
-- verdict: keep / revise / reject
-- mainIssues: concise issue list
-- difficultyRelabel: easy / medium / hard / none
-- editorialNote: short editorial judgment
-
-If the item is only acceptable after changing the difficulty label, treat it as revise rather than keep.
+Items to review:
+${JSON.stringify([
+  {
+    section: topic.section_key,
+    topic: topic.name,
+    difficulty: question.difficulty,
+    passage: question.passage,
+    question_text: question.question_text,
+    choices: question.choices,
+    correct_answer: question.correct_answer,
+    explanation: question.explanation,
+  },
+])}
 `.trim();
 }
 
@@ -935,23 +990,68 @@ async function reviewGeneratedQuestion(topic, question, attempt = 1) {
     const schema = {
       type: "object",
       properties: {
+        item_index: {
+          type: "integer",
+          minimum: 0,
+        },
         verdict: {
           type: "string",
           enum: ["keep", "revise", "reject"],
         },
-        mainIssues: {
+        confidence: {
+          type: "string",
+          enum: ["high", "medium", "low"],
+        },
+        correctness: {
+          type: "string",
+          enum: ["correct", "incorrect", "unclear"],
+        },
+        topic_fidelity: {
+          type: "string",
+          enum: ["strong", "partial", "weak"],
+        },
+        difficulty_accuracy: {
+          type: "string",
+          enum: ["accurate", "too_easy", "too_hard", "unclear"],
+        },
+        single_best_answer: {
+          type: "string",
+          enum: ["yes", "no", "unclear"],
+        },
+        explanation_consistency: {
+          type: "string",
+          enum: ["consistent", "inconsistent", "unclear"],
+        },
+        originality: {
+          type: "string",
+          enum: ["strong", "borderline", "weak"],
+        },
+        main_issues: {
           type: "array",
           items: { type: "string" },
         },
-        difficultyRelabel: {
-          type: "string",
-          enum: [...DIFFICULTIES, "none"],
+        suggested_difficulty: {
+          type: ["string", "null"],
+          enum: [...DIFFICULTIES, null],
         },
-        editorialNote: {
+        editorial_note: {
           type: "string",
         },
       },
-      required: ["verdict", "mainIssues", "difficultyRelabel", "editorialNote"],
+      required: [
+        "item_index",
+        "verdict",
+        "confidence",
+        "correctness",
+        "topic_fidelity",
+        "difficulty_accuracy",
+        "single_best_answer",
+        "explanation_consistency",
+        "originality",
+        "main_issues",
+        "suggested_difficulty",
+        "editorial_note",
+      ],
       additionalProperties: false,
     };
     const prompt = buildReviewPrompt(topic, question);
@@ -997,7 +1097,15 @@ async function reviewGeneratedQuestion(topic, question, attempt = 1) {
 }
 
 function sanitizeQuestion(sectionKey, topic, question) {
-  const prompt = question.prompt.trim();
+  if (question.section.trim().toLowerCase() !== sectionKey) {
+    throw new Error("Generated section does not match the requested section.");
+  }
+
+  if (question.topic.trim() !== topic.name) {
+    throw new Error("Generated topic does not match the requested topic.");
+  }
+
+  const prompt = question.question_text.trim();
   const passage = question.passage?.trim() || null;
   const explanation = question.explanation.trim();
   const choices = Object.fromEntries(
@@ -1036,6 +1144,24 @@ function sanitizeQuestion(sectionKey, topic, question) {
   }
 
   const combinedText = `${passage || ""} ${prompt} ${explanation}`.toLowerCase();
+  const explicitApproximationPrompt = /\b(closest|nearest|approximately|approximate|about|round)\b/i.test(
+    prompt
+  );
+
+  if (
+    /\b(however, given the options|it seems there was a mistake|considering the provided options)\b/i.test(
+      explanation
+    )
+  ) {
+    throw new Error("Explanation sounds like a broken or rescued item.");
+  }
+
+  if (
+    /\b(closest|approximately|approximate)\b/i.test(explanation) &&
+    !explicitApproximationPrompt
+  ) {
+    throw new Error("Explanation relies on unsignaled approximation language.");
+  }
 
   if (
     sectionKey === "english" &&
@@ -1172,7 +1298,7 @@ function sanitizeQuestion(sectionKey, topic, question) {
     prompt,
     passage,
     choices,
-    correctAnswer: question.correctAnswer,
+    correctAnswer: question.correct_answer,
     explanation,
     generationModel,
     generationProvider,
@@ -1264,9 +1390,9 @@ async function insertQuestions(topic, generatedQuestions) {
       reviewerResult = await reviewGeneratedQuestion(topic, {
         difficulty: normalizedQuestion.difficulty,
         passage: normalizedQuestion.passage,
-        prompt: normalizedQuestion.prompt,
+        question_text: normalizedQuestion.prompt,
         choices: normalizedQuestion.choices,
-        correctAnswer: normalizedQuestion.correctAnswer,
+        correct_answer: normalizedQuestion.correctAnswer,
         explanation: normalizedQuestion.explanation,
       });
     } catch (error) {
@@ -1280,10 +1406,10 @@ async function insertQuestions(topic, generatedQuestions) {
       continue;
     }
 
-    if (reviewerResult.verdict !== "keep" || reviewerResult.difficultyRelabel !== "none") {
+    if (reviewerResult.verdict !== "keep" || reviewerResult.suggested_difficulty !== null) {
       skipped += 1;
 
-      if (reviewerResult.verdict === "revise" || reviewerResult.difficultyRelabel !== "none") {
+      if (reviewerResult.verdict === "revise" || reviewerResult.suggested_difficulty !== null) {
         reviewRevised += 1;
       } else if (reviewerResult.verdict === "reject") {
         reviewRejected += 1;
@@ -1291,10 +1417,10 @@ async function insertQuestions(topic, generatedQuestions) {
 
       console.warn(
         `Skipping ${topic.section_key}/${topic.slug} question after AI review: ${reviewerResult.verdict} (${[
-          reviewerResult.difficultyRelabel !== "none"
-            ? `difficulty:${reviewerResult.difficultyRelabel}`
+          reviewerResult.suggested_difficulty !== null
+            ? `difficulty:${reviewerResult.suggested_difficulty}`
             : null,
-          ...reviewerResult.mainIssues,
+          ...reviewerResult.main_issues,
         ]
           .filter(Boolean)
           .join(", ")})`
@@ -1339,7 +1465,7 @@ async function insertQuestions(topic, generatedQuestions) {
         normalizedQuestion.generationProvider,
         normalizedQuestion.generationModel,
         requestedStatus,
-        `AI pre-review: keep. ${reviewerResult.editorialNote}`,
+        `AI pre-review: keep. ${reviewerResult.editorial_note}`,
       ]
     );
 
