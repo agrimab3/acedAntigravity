@@ -27,8 +27,13 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   name: text("name"),
   image: text("image"),
+  preferredName: text("preferred_name"),
   gradeLevel: text("grade_level"),
+  actTestDate: text("act_test_date"),
+  previousActScore: integer("previous_act_score"),
+  hasRecommendations: boolean("has_recommendations"),
   targetActScore: integer("target_act_score"),
+  onboardingCompletedAt: timestamp("onboarding_completed_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

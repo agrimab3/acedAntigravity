@@ -18,6 +18,7 @@ import {
   buildPracticeTestRemediationPlan,
   type PracticeTestRemediationPlan,
 } from "@/lib/practice-test-remediation";
+import { useOnboardingState } from "@/lib/use-onboarding-state";
 
 type TestQuestion = {
   id: string;
@@ -156,6 +157,9 @@ function PracticeTestRunContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { status } = useSession();
+  const { loading: onboardingLoading } = useOnboardingState(status, {
+    redirectIfIncomplete: "/onboarding",
+  });
   const modeKey = searchParams.get("mode");
   const mode = useMemo(
     () => PRACTICE_TEST_MODES.find((entry) => entry.key === modeKey) ?? null,
@@ -579,7 +583,7 @@ function PracticeTestRunContent() {
     );
   }
 
-  if (status === "loading" || loading) {
+  if (status === "loading" || onboardingLoading || loading) {
     return (
       <div
         style={{

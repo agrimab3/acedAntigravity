@@ -13,7 +13,7 @@ export default function Home() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace("/dashboard");
+      router.replace("/onboarding");
     }
   }, [router, status]);
 
@@ -89,7 +89,7 @@ export default function Home() {
     try {
       setAuthError(null);
       setIsSigningIn(true);
-      await signIn("google", { callbackUrl: "/dashboard" });
+      await signIn("google", { callbackUrl: "/onboarding" });
     } catch (error) {
       console.error("Google sign-in failed", error);
       setAuthError(

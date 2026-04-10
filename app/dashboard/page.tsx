@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { getTopicByName } from "@/lib/act-taxonomy";
+import { getDisplayFirstName } from "@/lib/onboarding";
+import { useOnboardingState } from "@/lib/use-onboarding-state";
 
 type SectionKey = "english" | "math" | "reading" | "science";
 
@@ -451,6 +453,9 @@ type DashboardSummary = {
 export default function Dashboard() {
   const router = useRouter();
   const { data: session, status } = useSession();
+  const { data: onboardingData, loading: onboardingLoading } = useOnboardingState(status, {
+    redirectIfIncomplete: "/onboarding",
+  });
   const [activeSec, setActiveSec] = useState<SectionKey | "all">("all");
   const [selected, setSelected] = useState<Hit>(null);
   const [dashboardSummary, setDashboardSummary] = useState<DashboardSummary | null>(null);
@@ -896,7 +901,7 @@ export default function Dashboard() {
     ? dashboardSummary?.sectionSummaries.find((summary) => summary.sectionKey === selSec.key)
     : null;
 
-  if (status === "loading") {
+  if (status === "loading" || onboardingLoading) {
     return (
       <div
         style={{
@@ -914,7 +919,10 @@ export default function Dashboard() {
     );
   }
 
-  const firstName = session?.user?.name?.split(" ")[0] ?? "there";
+  const firstName = getDisplayFirstName({
+    preferredName: onboardingData?.profile.preferredName,
+    googleName: session?.user?.name ?? onboardingData?.profile.googleName,
+  });
 
   return (
     <div

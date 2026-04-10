@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
+import { useOnboardingState } from "@/lib/use-onboarding-state";
 
 const PROGRESS_GALAXY_BACKGROUND =
   "radial-gradient(circle at 18% 16%, rgba(74, 128, 178, 0.12), transparent 32%), radial-gradient(circle at 74% 24%, rgba(88, 138, 188, 0.08), transparent 34%), radial-gradient(circle at 52% 72%, rgba(120, 136, 182, 0.06), transparent 40%), linear-gradient(180deg,#0d1b2a 0%,#081221 44%,#020408 100%)";
@@ -27,6 +28,9 @@ function formatDuration(minutes: number) {
 export default function ProgressPage() {
   const router = useRouter();
   const { status, data: session } = useSession();
+  const { loading: onboardingLoading } = useOnboardingState(status, {
+    redirectIfIncomplete: "/onboarding",
+  });
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState<{
     totals: {
@@ -107,7 +111,7 @@ export default function ProgressPage() {
     };
   }, [status]);
 
-  if (status === "loading" || loading) {
+  if (status === "loading" || onboardingLoading || loading) {
     return (
       <div
         style={{

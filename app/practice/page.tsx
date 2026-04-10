@@ -4,6 +4,7 @@ import { Fragment, Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { getTopicByName, type SectionKey } from "@/lib/act-taxonomy";
+import { useOnboardingState } from "@/lib/use-onboarding-state";
 import {
   formatDifficultyBand,
   normalizeDifficultyBand,
@@ -92,6 +93,9 @@ function PracticeContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { status } = useSession();
+  const { loading: onboardingLoading } = useOnboardingState(status, {
+    redirectIfIncomplete: "/onboarding",
+  });
   const section = searchParams.get("section") || "english";
   const topic = searchParams.get("topic") || "";
   const difficulty = searchParams.get("difficulty") || "";
@@ -427,7 +431,7 @@ function PracticeContent() {
         ? "#F0997B"
         : "#AFA9EC";
 
-  if (status === "loading" || questionsLoading) {
+  if (status === "loading" || onboardingLoading || questionsLoading) {
     return (
       <div style={{ background: '#060d1e', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.4)', fontFamily: 'DM Sans,sans-serif' }}>
         loading questions...

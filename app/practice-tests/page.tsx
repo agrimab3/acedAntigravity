@@ -8,6 +8,7 @@ import {
   PRACTICE_TEST_MODES,
   SECTION_TESTS,
 } from "@/lib/practice-tests";
+import { useOnboardingState } from "@/lib/use-onboarding-state";
 
 function formatDuration(minutes: number) {
   if (minutes < 60) {
@@ -102,6 +103,9 @@ function topModeAccent(modeKey: string) {
 export default function PracticeTestsPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
+  const { loading: onboardingLoading } = useOnboardingState(status, {
+    redirectIfIncomplete: "/onboarding",
+  });
   const [selectedModeKey, setSelectedModeKey] = useState(PRACTICE_TEST_MODES[0]?.key);
   const [aiInput, setAiInput] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
@@ -212,7 +216,7 @@ export default function PracticeTestsPage() {
     };
   }, [status]);
 
-  if (status === "loading") {
+  if (status === "loading" || onboardingLoading) {
     return (
       <div
         style={{
