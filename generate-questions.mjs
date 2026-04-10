@@ -1426,7 +1426,7 @@ function sanitizeQuestion(sectionKey, topic, question) {
     passage,
     question_text: prompt,
     choices,
-    correct_answer: question.correctAnswer,
+    correct_answer: question.correct_answer,
     explanation,
   });
 

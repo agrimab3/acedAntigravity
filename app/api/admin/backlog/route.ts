@@ -109,13 +109,6 @@ function extractJsonSummary(stdout: string) {
 }
 
 function resolveGenerationProvider() {
-  const configuredProvider =
-    process.env.QUESTION_GENERATION_PROVIDER || process.env.CONTENT_GENERATION_PROVIDER;
-
-  if (configuredProvider) {
-    return configuredProvider.trim().toLowerCase();
-  }
-
   const hasGeminiKey = Boolean(process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY);
   const hasGroqKey = Boolean(process.env.GROQ_API_KEY);
 
@@ -127,11 +120,7 @@ function resolveGenerationProvider() {
     return "groq";
   }
 
-  return (
-    hasGroqKey ? "groq" : "gemini"
-  )
-    .trim()
-    .toLowerCase();
+  return "gemini";
 }
 
 function resolveGenerationModel(provider: string) {
