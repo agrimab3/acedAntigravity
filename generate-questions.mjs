@@ -270,6 +270,10 @@ function resolveFallbackProvider(primaryProvider) {
     return "gemini";
   }
 
+  if (primaryProvider === "gemini" && groqApiKey) {
+    return "groq";
+  }
+
   return null;
 }
 
@@ -334,6 +338,10 @@ function isRetryableStructuredOutputError(message) {
   return /unterminated string in json|unexpected end of json input|malformed json response|json at position/i.test(
     message
   );
+}
+
+function isQuotaExceededError(message) {
+  return /quota exceeded|billing details|free_tier_requests|resource_exhausted/i.test(message);
 }
 
 function isRetryableGeminiError(message) {
@@ -1081,12 +1089,13 @@ async function generateBatchForDifficulty(
   } catch (error) {
     const message = error instanceof Error ? error.message : "unknown generation error";
 
+    const shouldFallbackImmediately = provider === "gemini" && isQuotaExceededError(message);
     const isRetryable =
       provider === "groq"
         ? isRetryableGroqError(message)
         : isRetryableGeminiError(message);
 
-    if (attempt < 3 && isRetryable) {
+    if (attempt < 3 && isRetryable && !shouldFallbackImmediately) {
       const retryDelayMs =
         extractRetryDelayMs(message) ?? (provider === "groq" ? 20000 : 35000);
       console.warn(
@@ -1234,12 +1243,13 @@ async function reviewGeneratedQuestion(
     return reviewedQuestionSchema.parse(parsedPayload);
   } catch (error) {
     const message = error instanceof Error ? error.message : "unknown review error";
+    const shouldFallbackImmediately = provider === "gemini" && isQuotaExceededError(message);
     const isRetryable =
       provider === "groq"
         ? isRetryableGroqError(message)
         : isRetryableGeminiError(message);
 
-    if (attempt < 2 && isRetryable) {
+    if (attempt < 2 && isRetryable && !shouldFallbackImmediately) {
       const retryDelayMs =
         extractRetryDelayMs(message) ?? (provider === "groq" ? 12000 : 20000);
       console.warn(
