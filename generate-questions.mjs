@@ -165,9 +165,6 @@ const generatedQuestionSchema = z.object({
   explanation: z.string().min(30),
 });
 
-const generatedBatchSchema = z.object({
-  questions: z.array(generatedQuestionSchema).min(perDifficulty * DIFFICULTIES.length),
-});
 const reviewedQuestionSchema = z.object({
   item_index: z.number().int().nonnegative(),
   verdict: z.enum(["keep", "revise", "reject"]),
@@ -627,17 +624,32 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
   return (instructions[topicKey] || []).join("\n");
 }
 
-function buildPrompt({ sectionKey, topicName, slug }) {
+function buildGeneratedBatchSchema({ requestedCount, requestedDifficulty }) {
+  return z.object({
+    questions: z.array(generatedQuestionSchema).min(1).max(requestedCount).superRefine((questions, ctx) => {
+      questions.forEach((question, index) => {
+        if (question.difficulty !== requestedDifficulty) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Question ${index} returned ${question.difficulty} instead of ${requestedDifficulty}.`,
+          });
+        }
+      });
+    }),
+  });
+}
+
+function buildPrompt({ sectionKey, topicName, slug, requestedDifficulty, requestedCount }) {
   return `
-Generate ${perDifficulty * DIFFICULTIES.length} original ACT-style multiple-choice questions.
+Generate ${requestedCount} original ACT-style multiple-choice questions.
 
 Section: ${sectionKey}
 Topic: ${topicName}
 
 Required difficulty mix:
-- easy: ${perDifficulty}
-- medium: ${perDifficulty}
-- hard: ${perDifficulty}
+- easy: ${requestedDifficulty === "easy" ? requestedCount : 0}
+- medium: ${requestedDifficulty === "medium" ? requestedCount : 0}
+- hard: ${requestedDifficulty === "hard" ? requestedCount : 0}
 
 Return a JSON object only with a single "questions" array matching the required schema.
 
@@ -654,7 +666,7 @@ Each item inside "questions" must contain exactly these fields:
 Schema rules:
 - section must equal the requested section
 - topic must equal the requested topic
-- difficulty must be one of: easy, medium, hard
+- difficulty must be exactly: ${requestedDifficulty}
 - passage must be a string or null
 - choices must be an object with exactly four keys: A, B, C, D
 - correct_answer must be exactly one of: A, B, C, D
@@ -684,7 +696,7 @@ ${getTopicSpecificInstructions(sectionKey, slug)}
 `.trim();
 }
 
-function buildQuestionBatchSchema(sectionKey) {
+function buildQuestionBatchSchema(sectionKey, requestedDifficulty, requestedCount) {
   const passageSchema = sectionKey === "reading" || sectionKey === "science"
     ? { type: "string" }
     : { type: ["string", "null"] };
@@ -694,8 +706,8 @@ function buildQuestionBatchSchema(sectionKey) {
     properties: {
       questions: {
         type: "array",
-        minItems: perDifficulty * DIFFICULTIES.length,
-        maxItems: perDifficulty * DIFFICULTIES.length,
+        minItems: 1,
+        maxItems: requestedCount,
         items: {
           type: "object",
           properties: {
@@ -708,7 +720,7 @@ function buildQuestionBatchSchema(sectionKey) {
             },
             difficulty: {
               type: "string",
-              enum: DIFFICULTIES,
+              enum: [requestedDifficulty],
             },
             passage: passageSchema,
             question_text: {
@@ -935,13 +947,19 @@ async function requestGroqJson({ model, systemPrompt, userPrompt, schema, temper
   return text;
 }
 
-async function generateBatchForTopic(topic, attempt = 1) {
+async function generateBatchForDifficulty(topic, requestedDifficulty, requestedCount, attempt = 1) {
   try {
-    const schema = buildQuestionBatchSchema(topic.section_key);
+    const schema = buildQuestionBatchSchema(
+      topic.section_key,
+      requestedDifficulty,
+      requestedCount
+    );
     const prompt = buildPrompt({
       sectionKey: topic.section_key,
       topicName: topic.name,
       slug: topic.slug,
+      requestedDifficulty,
+      requestedCount,
     });
     const text =
       generationProvider === "groq"
@@ -960,7 +978,10 @@ async function generateBatchForTopic(topic, attempt = 1) {
             temperature: 0.7,
           });
 
-    return generatedBatchSchema.parse(JSON.parse(text)).questions;
+    return buildGeneratedBatchSchema({
+      requestedCount,
+      requestedDifficulty,
+    }).parse(JSON.parse(text)).questions;
   } catch (error) {
     const message = error instanceof Error ? error.message : "unknown generation error";
 
@@ -973,16 +994,27 @@ async function generateBatchForTopic(topic, attempt = 1) {
       const retryDelayMs =
         extractRetryDelayMs(message) ?? (generationProvider === "groq" ? 20000 : 35000);
       console.warn(
-        `${generationProvider} rate limited for ${topic.section_key}/${topic.slug}; retrying in ${Math.ceil(
+        `${generationProvider} rate limited for ${topic.section_key}/${topic.slug}/${requestedDifficulty}; retrying in ${Math.ceil(
           retryDelayMs / 1000
         )}s (attempt ${attempt + 1}/5).`
       );
       await sleep(retryDelayMs + 1000);
-      return generateBatchForTopic(topic, attempt + 1);
+      return generateBatchForDifficulty(topic, requestedDifficulty, requestedCount, attempt + 1);
     }
 
     throw error;
   }
+}
+
+async function generateBatchForTopic(topic) {
+  const generatedQuestions = [];
+
+  for (const difficulty of DIFFICULTIES) {
+    const batch = await generateBatchForDifficulty(topic, difficulty, perDifficulty);
+    generatedQuestions.push(...batch);
+  }
+
+  return generatedQuestions;
 }
 
 async function reviewGeneratedQuestion(topic, question, attempt = 1) {
