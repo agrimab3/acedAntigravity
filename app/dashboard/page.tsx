@@ -955,15 +955,16 @@ export default function Dashboard() {
 
       <div
         style={{
-          position: "fixed",
+          position: "absolute",
           inset: 0,
+          minHeight: "100%",
           pointerEvents: "none",
           zIndex: 0,
           background: DASHBOARD_GALAXY_BACKGROUND,
         }}
       />
 
-      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 1 }}>
+      <div style={{ position: "absolute", inset: 0, minHeight: "100%", pointerEvents: "none", zIndex: 1 }}>
         {ambientGlows.map((glow) => (
           <span
             key={`ambient-glow-${glow.id}`}
@@ -1014,8 +1015,9 @@ export default function Dashboard() {
 
       <div
         style={{
-          position: "fixed",
+          position: "absolute",
           inset: 0,
+          minHeight: "100%",
           pointerEvents: "none",
           zIndex: 2,
           background:
