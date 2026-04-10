@@ -1122,7 +1122,12 @@ async function generateBatchForTopic(topic) {
   const generatedQuestions = [];
 
   for (const difficulty of DIFFICULTIES) {
-    const batch = await generateBatchForDifficulty(topic, difficulty, perDifficulty);
+    const requestedCount = perDifficulty;
+    const candidateCount = Math.min(
+      6,
+      Math.max(requestedCount, requestedCount + (requestedCount === 1 ? 2 : 1))
+    );
+    const batch = await generateBatchForDifficulty(topic, difficulty, candidateCount);
     generatedQuestions.push(...batch);
   }
 
@@ -1570,10 +1575,12 @@ async function insertQuestions(topic, generatedQuestions) {
     if (reviewerResult.verdict !== "keep" || reviewerResult.suggested_difficulty !== null) {
       skipped += 1;
 
-      if (reviewerResult.verdict === "revise" || reviewerResult.suggested_difficulty !== null) {
+      if (reviewerResult.verdict === "revise") {
         reviewRevised += 1;
       } else if (reviewerResult.verdict === "reject") {
         reviewRejected += 1;
+      } else if (reviewerResult.suggested_difficulty !== null) {
+        reviewRevised += 1;
       }
 
       console.warn(
