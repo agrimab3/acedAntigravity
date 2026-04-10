@@ -65,6 +65,35 @@ Automatic rejection rules:
 
 Write with the restraint and precision of a test-prep editor, not a content farm.
 `.trim();
+const REVIEW_SYSTEM_PROMPT = `
+You are Aced's ACT item reviewer.
+
+You are not writing new questions. You are evaluating whether each item is publishable.
+
+Judge each item on:
+- correctness
+- single-best-answer integrity
+- ACT authenticity
+- topic fidelity
+- difficulty accuracy
+- distractor quality
+- explanation consistency
+- passage quality and relevance
+
+Reject any item that is:
+- too easy for its label
+- generic or textbook-like
+- not truly ACT-style
+- mismatched to topic
+- ambiguous
+- explanation/key inconsistent
+- weak in distractor design
+- too isolated for English
+- paraphrase-only for Reading
+- a direct classroom drill for Math
+
+Be strict. If an item would need editorial rescue, do not keep it.
+`.trim();
 
 const databaseUrl = process.env.DATABASE_URL;
 const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
@@ -84,6 +113,8 @@ const delayMs = Math.max(0, Number(args["delay-ms"] || 800));
 const jsonOnly = args.json === "true" || args.json === "1";
 const generationProvider = resolveGenerationProvider(args.provider);
 const generationModel = resolveGenerationModel(generationProvider, args.model);
+const reviewProvider = resolveReviewProvider(args["review-provider"], generationProvider);
+const reviewModel = resolveReviewModel(reviewProvider, args["review-model"], generationModel);
 
 if (sectionFilter && !SECTION_KEYS.includes(sectionFilter)) {
   throw new Error(`Invalid --section value: ${sectionFilter}`);
@@ -118,6 +149,12 @@ const generatedQuestionSchema = z.object({
 const generatedBatchSchema = z.object({
   questions: z.array(generatedQuestionSchema).min(perDifficulty * DIFFICULTIES.length),
 });
+const reviewedQuestionSchema = z.object({
+  verdict: z.enum(["keep", "revise", "reject"]),
+  mainIssues: z.array(z.string().min(1)).max(6),
+  difficultyRelabel: z.enum([...DIFFICULTIES, "none"]).default("none"),
+  editorialNote: z.string().min(1),
+});
 
 const client = new Client({
   connectionString: databaseUrl,
@@ -150,6 +187,22 @@ function resolveGenerationProvider(rawProvider) {
   return normalized;
 }
 
+function resolveReviewProvider(rawProvider, fallbackProvider) {
+  const configured =
+    rawProvider ||
+    process.env.QUESTION_REVIEW_PROVIDER ||
+    process.env.CONTENT_REVIEW_PROVIDER ||
+    fallbackProvider;
+
+  const normalized = configured.trim().toLowerCase();
+
+  if (!SUPPORTED_PROVIDERS.includes(normalized)) {
+    throw new Error(`Unsupported review provider: ${normalized}`);
+  }
+
+  return normalized;
+}
+
 function resolveGenerationModel(provider, rawModel) {
   if (rawModel?.trim()) {
     return rawModel.trim();
@@ -164,6 +217,28 @@ function resolveGenerationModel(provider, rawModel) {
   }
 
   return process.env.GEMINI_GENERATION_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
+}
+
+function resolveReviewModel(provider, rawModel, fallbackModel) {
+  if (rawModel?.trim()) {
+    return rawModel.trim();
+  }
+
+  if (provider === "groq") {
+    return (
+      process.env.GROQ_REVIEW_MODEL ||
+      process.env.GROQ_GENERATION_MODEL ||
+      process.env.GROQ_MODEL ||
+      fallbackModel
+    );
+  }
+
+  return (
+    process.env.GEMINI_REVIEW_MODEL ||
+    process.env.GEMINI_GENERATION_MODEL ||
+    process.env.GEMINI_MODEL ||
+    fallbackModel
+  );
 }
 
 function resolveGeminiBaseUrl() {
@@ -649,12 +724,186 @@ function buildQuestionBatchSchema(sectionKey) {
   };
 }
 
+function buildReviewPrompt(topic, question) {
+  return `
+Review this ACT-style multiple-choice item.
+
+Section: ${topic.section_key}
+Topic: ${topic.name}
+Difficulty label: ${question.difficulty}
+
+Passage:
+${question.passage || "null"}
+
+Prompt:
+${question.prompt}
+
+Choices:
+A. ${question.choices.A}
+B. ${question.choices.B}
+C. ${question.choices.C}
+D. ${question.choices.D}
+
+Keyed correct answer: ${question.correctAnswer}
+Explanation:
+${question.explanation}
+
+Return structured JSON only with:
+- verdict: keep / revise / reject
+- mainIssues: concise issue list
+- difficultyRelabel: easy / medium / hard / none
+- editorialNote: short editorial judgment
+
+If the item is only acceptable after changing the difficulty label, treat it as revise rather than keep.
+`.trim();
+}
+
+async function requestGeminiJson({ model, systemPrompt, userPrompt, schema, temperature = 0.35 }) {
+  const response = await fetch(`${resolveGeminiBaseUrl()}/models/${model}:generateContent`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": geminiApiKey,
+    },
+    body: JSON.stringify({
+      systemInstruction: {
+        parts: [{ text: systemPrompt }],
+      },
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: userPrompt }],
+        },
+      ],
+      generationConfig: {
+        temperature,
+        maxOutputTokens: 8192,
+        responseMimeType: "application/json",
+        responseJsonSchema: schema,
+      },
+    }),
+  });
+
+  const rawBody = await response.text();
+  let payload;
+
+  try {
+    payload = rawBody ? JSON.parse(rawBody) : null;
+  } catch {
+    payload = null;
+  }
+
+  if (!response.ok) {
+    const message =
+      payload?.error?.message ||
+      payload?.promptFeedback?.blockReason ||
+      rawBody ||
+      `HTTP ${response.status}`;
+    throw new Error(`Gemini request failed: ${message}`);
+  }
+
+  const text =
+    payload?.candidates
+      ?.flatMap((candidate) => candidate.content?.parts ?? [])
+      .map((part) => part.text ?? "")
+      .join("")
+      .trim() ?? "";
+
+  if (!text) {
+    throw new Error("Gemini returned an empty response.");
+  }
+
+  return text;
+}
+
+async function requestGroqJson({ model, systemPrompt, userPrompt, schema, temperature = 0.35 }) {
+  const groqSupportsJsonSchema = supportsGroqJsonSchema(model);
+  const response = await fetch(`${resolveGroqBaseUrl()}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${groqApiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      temperature,
+      max_completion_tokens: 4096,
+      messages: [
+        {
+          role: "system",
+          content: groqSupportsJsonSchema
+            ? systemPrompt
+            : `${systemPrompt}\n\nReturn one valid JSON object only, with no markdown or commentary, matching this schema exactly: ${JSON.stringify(
+                schema
+              )}`,
+        },
+        {
+          role: "user",
+          content: userPrompt,
+        },
+      ],
+      response_format: groqSupportsJsonSchema
+        ? {
+            type: "json_schema",
+            json_schema: {
+              name: "aced_structured_response",
+              strict: true,
+              schema,
+            },
+          }
+        : {
+            type: "json_object",
+          },
+    }),
+  });
+
+  const rawBody = await response.text();
+  let payload;
+
+  try {
+    payload = rawBody ? JSON.parse(rawBody) : null;
+  } catch {
+    payload = null;
+  }
+
+  if (!response.ok) {
+    const message = payload?.error?.message || rawBody || `HTTP ${response.status}`;
+    throw new Error(`Groq request failed: ${message}`);
+  }
+
+  const text = payload?.choices?.[0]?.message?.content?.trim() || "";
+
+  if (!text) {
+    throw new Error("Groq returned an empty response.");
+  }
+
+  return text;
+}
+
 async function generateBatchForTopic(topic, attempt = 1) {
   try {
+    const schema = buildQuestionBatchSchema(topic.section_key);
+    const prompt = buildPrompt({
+      sectionKey: topic.section_key,
+      topicName: topic.name,
+      slug: topic.slug,
+    });
     const text =
       generationProvider === "groq"
-        ? await generateGroqBatchText(topic)
-        : await generateGeminiBatchText(topic);
+        ? await requestGroqJson({
+            model: generationModel,
+            systemPrompt: GENERATION_SYSTEM_PROMPT,
+            userPrompt: prompt,
+            schema,
+            temperature: 0.7,
+          })
+        : await requestGeminiJson({
+            model: generationModel,
+            systemPrompt: GENERATION_SYSTEM_PROMPT,
+            userPrompt: prompt,
+            schema,
+            temperature: 0.7,
+          });
 
     return generatedBatchSchema.parse(JSON.parse(text)).questions;
   } catch (error) {
@@ -681,146 +930,70 @@ async function generateBatchForTopic(topic, attempt = 1) {
   }
 }
 
-async function generateGeminiBatchText(topic) {
-  const response = await fetch(`${resolveGeminiBaseUrl()}/models/${generationModel}:generateContent`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-goog-api-key": geminiApiKey,
-    },
-    body: JSON.stringify({
-      systemInstruction: {
-        parts: [
-          {
-            text:
-              GENERATION_SYSTEM_PROMPT,
-          },
-        ],
-      },
-      contents: [
-        {
-          role: "user",
-          parts: [
-            {
-              text: buildPrompt({
-                sectionKey: topic.section_key,
-                topicName: topic.name,
-                slug: topic.slug,
-              }),
-            },
-          ],
-        },
-      ],
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 8192,
-        responseMimeType: "application/json",
-        responseJsonSchema: buildQuestionBatchSchema(topic.section_key),
-      },
-    }),
-  });
-
-  const rawBody = await response.text();
-  let payload;
-
+async function reviewGeneratedQuestion(topic, question, attempt = 1) {
   try {
-    payload = rawBody ? JSON.parse(rawBody) : null;
-  } catch {
-    payload = null;
-  }
-
-  if (!response.ok) {
-    const message =
-      payload?.error?.message ||
-      payload?.promptFeedback?.blockReason ||
-      rawBody ||
-      `HTTP ${response.status}`;
-    throw new Error(`Gemini generation failed: ${message}`);
-  }
-
-  const text =
-    payload?.candidates
-      ?.flatMap((candidate) => candidate.content?.parts ?? [])
-      .map((part) => part.text ?? "")
-      .join("")
-      .trim() ?? "";
-
-  if (!text) {
-    throw new Error("Gemini returned an empty generation response.");
-  }
-
-  return text;
-}
-
-async function generateGroqBatchText(topic) {
-  const prompt = buildPrompt({
-    sectionKey: topic.section_key,
-    topicName: topic.name,
-    slug: topic.slug,
-  });
-  const groqSupportsJsonSchema = supportsGroqJsonSchema(generationModel);
-  const schema = buildQuestionBatchSchema(topic.section_key);
-  const response = await fetch(`${resolveGroqBaseUrl()}/chat/completions`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${groqApiKey}`,
-    },
-    body: JSON.stringify({
-      model: generationModel,
-      temperature: 0.7,
-      max_completion_tokens: 4096,
-      messages: [
-        {
-          role: "system",
-          content:
-            groqSupportsJsonSchema
-              ? GENERATION_SYSTEM_PROMPT
-              : `${GENERATION_SYSTEM_PROMPT}\n\nReturn one valid JSON object only, with no markdown or commentary, matching this schema exactly: ${JSON.stringify(
-                  schema
-                )}`,
+    const schema = {
+      type: "object",
+      properties: {
+        verdict: {
+          type: "string",
+          enum: ["keep", "revise", "reject"],
         },
-        {
-          role: "user",
-          content: prompt,
+        mainIssues: {
+          type: "array",
+          items: { type: "string" },
         },
-      ],
-      response_format: groqSupportsJsonSchema
-        ? {
-            type: "json_schema",
-            json_schema: {
-              name: `act_${topic.section_key}_${topic.slug}_batch`,
-              strict: true,
-              schema,
-            },
-          }
-        : {
-            type: "json_object",
-          },
-    }),
-  });
+        difficultyRelabel: {
+          type: "string",
+          enum: [...DIFFICULTIES, "none"],
+        },
+        editorialNote: {
+          type: "string",
+        },
+      },
+      required: ["verdict", "mainIssues", "difficultyRelabel", "editorialNote"],
+      additionalProperties: false,
+    };
+    const prompt = buildReviewPrompt(topic, question);
+    const text =
+      reviewProvider === "groq"
+        ? await requestGroqJson({
+            model: reviewModel,
+            systemPrompt: REVIEW_SYSTEM_PROMPT,
+            userPrompt: prompt,
+            schema,
+            temperature: 0.2,
+          })
+        : await requestGeminiJson({
+            model: reviewModel,
+            systemPrompt: REVIEW_SYSTEM_PROMPT,
+            userPrompt: prompt,
+            schema,
+            temperature: 0.2,
+          });
 
-  const rawBody = await response.text();
-  let payload;
+    return reviewedQuestionSchema.parse(JSON.parse(text));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "unknown review error";
+    const isRetryable =
+      reviewProvider === "groq"
+        ? isRetryableGroqError(message)
+        : isRetryableGeminiError(message);
 
-  try {
-    payload = rawBody ? JSON.parse(rawBody) : null;
-  } catch {
-    payload = null;
+    if (attempt < 4 && isRetryable) {
+      const retryDelayMs =
+        extractRetryDelayMs(message) ?? (reviewProvider === "groq" ? 12000 : 20000);
+      console.warn(
+        `${reviewProvider} review rate limited for ${topic.section_key}/${topic.slug}; retrying in ${Math.ceil(
+          retryDelayMs / 1000
+        )}s (attempt ${attempt + 1}/4).`
+      );
+      await sleep(retryDelayMs + 1000);
+      return reviewGeneratedQuestion(topic, question, attempt + 1);
+    }
+
+    throw error;
   }
-
-  if (!response.ok) {
-    const message = payload?.error?.message || rawBody || `HTTP ${response.status}`;
-    throw new Error(`Groq generation failed: ${message}`);
-  }
-
-  const text = payload?.choices?.[0]?.message?.content?.trim() || "";
-
-  if (!text) {
-    throw new Error("Groq returned an empty generation response.");
-  }
-
-  return text;
 }
 
 function sanitizeQuestion(sectionKey, topic, question) {
@@ -1060,6 +1233,10 @@ async function insertQuestions(topic, generatedQuestions) {
   const knownFingerprints = new Set(existingRows.rows.map((row) => row.fingerprint));
   let inserted = 0;
   let skipped = 0;
+  let reviewKept = 0;
+  let reviewRevised = 0;
+  let reviewRejected = 0;
+  let reviewErrors = 0;
 
   for (const generatedQuestion of generatedQuestions) {
     let normalizedQuestion;
@@ -1081,6 +1258,52 @@ async function insertQuestions(topic, generatedQuestions) {
       continue;
     }
 
+    let reviewerResult;
+
+    try {
+      reviewerResult = await reviewGeneratedQuestion(topic, {
+        difficulty: normalizedQuestion.difficulty,
+        passage: normalizedQuestion.passage,
+        prompt: normalizedQuestion.prompt,
+        choices: normalizedQuestion.choices,
+        correctAnswer: normalizedQuestion.correctAnswer,
+        explanation: normalizedQuestion.explanation,
+      });
+    } catch (error) {
+      reviewErrors += 1;
+      skipped += 1;
+      console.warn(
+        `Skipping ${topic.section_key}/${topic.slug} question after reviewer failure: ${
+          error instanceof Error ? error.message : "unknown reviewer error"
+        }`
+      );
+      continue;
+    }
+
+    if (reviewerResult.verdict !== "keep" || reviewerResult.difficultyRelabel !== "none") {
+      skipped += 1;
+
+      if (reviewerResult.verdict === "revise" || reviewerResult.difficultyRelabel !== "none") {
+        reviewRevised += 1;
+      } else if (reviewerResult.verdict === "reject") {
+        reviewRejected += 1;
+      }
+
+      console.warn(
+        `Skipping ${topic.section_key}/${topic.slug} question after AI review: ${reviewerResult.verdict} (${[
+          reviewerResult.difficultyRelabel !== "none"
+            ? `difficulty:${reviewerResult.difficultyRelabel}`
+            : null,
+          ...reviewerResult.mainIssues,
+        ]
+          .filter(Boolean)
+          .join(", ")})`
+      );
+      continue;
+    }
+
+    reviewKept += 1;
+
     const result = await client.query(
       `
         INSERT INTO questions (
@@ -1096,9 +1319,10 @@ async function insertQuestions(topic, generatedQuestions) {
           explanation,
           source,
           generation_model,
-          status
+          status,
+          review_notes
         )
-        VALUES ($1, $2, $3, 'multiple_choice', $4, $5, $6, $7::jsonb, $8, $9, $10, $11, $12)
+        VALUES ($1, $2, $3, 'multiple_choice', $4, $5, $6, $7::jsonb, $8, $9, $10, $11, $12, $13)
         ON CONFLICT (fingerprint) DO NOTHING
         RETURNING id
       `,
@@ -1115,6 +1339,7 @@ async function insertQuestions(topic, generatedQuestions) {
         normalizedQuestion.generationProvider,
         normalizedQuestion.generationModel,
         requestedStatus,
+        `AI pre-review: keep. ${reviewerResult.editorialNote}`,
       ]
     );
 
@@ -1126,7 +1351,14 @@ async function insertQuestions(topic, generatedQuestions) {
     }
   }
 
-  return { inserted, skipped };
+  return {
+    inserted,
+    skipped,
+    reviewKept,
+    reviewRevised,
+    reviewRejected,
+    reviewErrors,
+  };
 }
 
 async function main() {
@@ -1143,9 +1375,15 @@ async function main() {
     const summary = {
       provider: generationProvider,
       model: generationModel,
+      reviewProvider,
+      reviewModel,
       topicsProcessed: 0,
       inserted: 0,
       skipped: 0,
+      reviewKept: 0,
+      reviewRevised: 0,
+      reviewRejected: 0,
+      reviewErrors: 0,
       failures: [],
     };
 
@@ -1158,13 +1396,24 @@ async function main() {
 
       try {
         const generatedQuestions = await generateBatchForTopic(topic);
-        const { inserted, skipped } = await insertQuestions(topic, generatedQuestions);
+        const {
+          inserted,
+          skipped,
+          reviewKept,
+          reviewRevised,
+          reviewRejected,
+          reviewErrors,
+        } = await insertQuestions(topic, generatedQuestions);
         summary.topicsProcessed += 1;
         summary.inserted += inserted;
         summary.skipped += skipped;
+        summary.reviewKept += reviewKept;
+        summary.reviewRevised += reviewRevised;
+        summary.reviewRejected += reviewRejected;
+        summary.reviewErrors += reviewErrors;
 
         console.log(
-          `Inserted ${inserted} question(s) and skipped ${skipped} duplicate/invalid question(s) for ${topic.section_key}/${topic.slug}.`
+          `Inserted ${inserted} question(s); reviewer kept ${reviewKept}, revised ${reviewRevised}, rejected ${reviewRejected}, errored ${reviewErrors}; skipped ${skipped} total for ${topic.section_key}/${topic.slug}.`
         );
 
         if (delayMs > 0) {
