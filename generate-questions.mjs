@@ -340,18 +340,27 @@ function isRetryableStructuredOutputError(message) {
   );
 }
 
+function isRetryableStructuredSchemaError(message) {
+  return /invalid_value|invalid_type|correct_answer|explanation|question_text|choices/i.test(message);
+}
+
 function isQuotaExceededError(message) {
   return /quota exceeded|billing details|free_tier_requests|resource_exhausted/i.test(message);
 }
 
 function isRetryableGeminiError(message) {
-  return /quota exceeded|retry in|429/i.test(message) || isRetryableStructuredOutputError(message);
+  return (
+    /quota exceeded|retry in|429/i.test(message) ||
+    isRetryableStructuredOutputError(message) ||
+    isRetryableStructuredSchemaError(message)
+  );
 }
 
 function isRetryableGroqError(message) {
   return (
     /rate limit|rate_limit|too many requests|429|capacity_exceeded|498/i.test(message) ||
-    isRetryableStructuredOutputError(message)
+    isRetryableStructuredOutputError(message) ||
+    isRetryableStructuredSchemaError(message)
   );
 }
 
@@ -380,6 +389,69 @@ function parseModelJson(text) {
   const message =
     lastError instanceof Error ? lastError.message : "Unknown JSON parse failure.";
   throw new Error(`Malformed JSON response: ${message}`);
+}
+
+function normalizeChoiceLetter(value) {
+  if (typeof value !== "string") {
+    return value;
+  }
+
+  const trimmed = value.trim();
+  const directMatch = trimmed.match(/^[A-D]$/i);
+
+  if (directMatch) {
+    return directMatch[0].toUpperCase();
+  }
+
+  const labeledMatch = trimmed.match(/\b(?:choice|answer)?\s*([A-D])(?:[).:\s]|$)/i);
+  return labeledMatch?.[1]?.toUpperCase() ?? trimmed;
+}
+
+function normalizeGeneratedQuestionRecord(question) {
+  if (!question || typeof question !== "object") {
+    return question;
+  }
+
+  const record = question;
+  const explanation =
+    typeof record.explanation === "string"
+      ? record.explanation
+      : typeof record.rationale === "string"
+        ? record.rationale
+        : typeof record.solution === "string"
+          ? record.solution
+          : record.explanation;
+
+  return {
+    section: record.section,
+    topic: record.topic,
+    difficulty: record.difficulty,
+    passage: record.passage ?? null,
+    question_text:
+      typeof record.question_text === "string"
+        ? record.question_text
+        : typeof record.prompt === "string"
+          ? record.prompt
+          : typeof record.question === "string"
+            ? record.question
+            : record.question_text,
+    choices: record.choices,
+    correct_answer: normalizeChoiceLetter(
+      record.correct_answer ?? record.correctAnswer ?? record.answer ?? record.answer_letter
+    ),
+    explanation,
+  };
+}
+
+function normalizeGeneratedPayload(payload) {
+  if (!payload || typeof payload !== "object" || !Array.isArray(payload.questions)) {
+    return payload;
+  }
+
+  return {
+    ...payload,
+    questions: payload.questions.map((question) => normalizeGeneratedQuestionRecord(question)),
+  };
 }
 
 function normalizeText(value) {
@@ -1080,7 +1152,7 @@ async function generateBatchForDifficulty(
       schema,
       temperature: 0.7,
     });
-    const parsedPayload = parseModelJson(text);
+    const parsedPayload = normalizeGeneratedPayload(parseModelJson(text));
 
     return buildGeneratedBatchSchema({
       requestedCount,
