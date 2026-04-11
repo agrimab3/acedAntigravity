@@ -8,7 +8,8 @@ const DIFFICULTIES = ["easy", "medium", "hard"];
 const ANSWER_CHOICES = ["A", "B", "C", "D"];
 const DEFAULT_GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
 const DEFAULT_GROQ_BASE_URL = "https://api.groq.com/openai/v1";
-const SUPPORTED_PROVIDERS = ["gemini", "groq"];
+const DEFAULT_OLLAMA_BASE_URL = "http://127.0.0.1:11434";
+const SUPPORTED_PROVIDERS = ["gemini", "groq", "ollama"];
 const GENERATION_SYSTEM_PROMPT = `
 You are Aced's ACT item writer.
 
@@ -115,6 +116,8 @@ No commentary outside the JSON.
 const databaseUrl = process.env.DATABASE_URL;
 const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 const groqApiKey = process.env.GROQ_API_KEY || "";
+const ollamaBaseUrl =
+  process.env.OLLAMA_API_BASE_URL || process.env.OLLAMA_BASE_URL || DEFAULT_OLLAMA_BASE_URL;
 
 if (!databaseUrl) {
   throw new Error("DATABASE_URL is required.");
@@ -201,7 +204,7 @@ function resolveGenerationProvider(rawProvider) {
     rawProvider ||
     process.env.QUESTION_GENERATION_PROVIDER ||
     process.env.CONTENT_GENERATION_PROVIDER ||
-    (groqApiKey ? "groq" : "gemini");
+    (hasConfiguredOllama() ? "ollama" : groqApiKey ? "groq" : "gemini");
 
   const normalized = configured.trim().toLowerCase();
 
@@ -233,6 +236,14 @@ function resolveGenerationModel(provider, rawModel) {
     return rawModel.trim();
   }
 
+  if (provider === "ollama") {
+    return (
+      process.env.OLLAMA_GENERATION_MODEL ||
+      process.env.OLLAMA_MODEL ||
+      "gemma3:4b"
+    );
+  }
+
   if (provider === "groq") {
     return (
       process.env.GROQ_GENERATION_MODEL ||
@@ -247,6 +258,15 @@ function resolveGenerationModel(provider, rawModel) {
 function resolveReviewModel(provider, rawModel, fallbackModel) {
   if (rawModel?.trim()) {
     return rawModel.trim();
+  }
+
+  if (provider === "ollama") {
+    return (
+      process.env.OLLAMA_REVIEW_MODEL ||
+      process.env.OLLAMA_GENERATION_MODEL ||
+      process.env.OLLAMA_MODEL ||
+      fallbackModel
+    );
   }
 
   if (provider === "groq") {
@@ -267,6 +287,22 @@ function resolveReviewModel(provider, rawModel, fallbackModel) {
 }
 
 function resolveFallbackProvider(primaryProvider) {
+  if (primaryProvider === "ollama") {
+    if (geminiApiKey) {
+      return "gemini";
+    }
+
+    if (groqApiKey) {
+      return "groq";
+    }
+
+    return null;
+  }
+
+  if (hasConfiguredOllama()) {
+    return "ollama";
+  }
+
   if (primaryProvider === "groq" && geminiApiKey) {
     return "gemini";
   }
@@ -310,6 +346,20 @@ function resolveGroqBaseUrl() {
   }
 
   return configured.replace(/\/$/, "");
+}
+
+function resolveOllamaBaseUrl() {
+  return ollamaBaseUrl.replace(/\/$/, "");
+}
+
+function hasConfiguredOllama() {
+  return Boolean(
+    process.env.OLLAMA_GENERATION_MODEL ||
+      process.env.OLLAMA_REVIEW_MODEL ||
+      process.env.OLLAMA_MODEL ||
+      process.env.OLLAMA_API_BASE_URL ||
+      process.env.OLLAMA_BASE_URL
+  );
 }
 
 function supportsGroqJsonSchema(model) {
@@ -363,6 +413,10 @@ function isRetryableGroqError(message) {
     isRetryableStructuredOutputError(message) ||
     isRetryableStructuredSchemaError(message)
   );
+}
+
+function isRetryableOllamaError(message) {
+  return /timed out|timeout|econnreset|socket hang up/i.test(message) || isRetryableStructuredOutputError(message);
 }
 
 function parseModelJson(text) {
@@ -1096,6 +1150,55 @@ async function requestGroqJson({ model, systemPrompt, userPrompt, schema, temper
   return text;
 }
 
+async function requestOllamaJson({ model, systemPrompt, userPrompt, schema, temperature = 0.35 }) {
+  const response = await fetch(`${resolveOllamaBaseUrl()}/api/chat`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model,
+      stream: false,
+      format: schema,
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        {
+          role: "user",
+          content: userPrompt,
+        },
+      ],
+      options: {
+        temperature,
+      },
+    }),
+  });
+
+  const rawBody = await response.text();
+  let payload;
+
+  try {
+    payload = rawBody ? JSON.parse(rawBody) : null;
+  } catch {
+    payload = null;
+  }
+
+  if (!response.ok) {
+    const message = payload?.error || rawBody || `HTTP ${response.status}`;
+    throw new Error(`Ollama request failed: ${message}`);
+  }
+
+  const text = payload?.message?.content?.trim() || "";
+
+  if (!text) {
+    throw new Error("Ollama returned an empty response.");
+  }
+
+  return text;
+}
+
 async function requestStructuredJson({
   provider,
   model,
@@ -1104,6 +1207,16 @@ async function requestStructuredJson({
   schema,
   temperature,
 }) {
+  if (provider === "ollama") {
+    return requestOllamaJson({
+      model,
+      systemPrompt,
+      userPrompt,
+      schema,
+      temperature,
+    });
+  }
+
   if (provider === "groq") {
     return requestGroqJson({
       model,
@@ -1167,7 +1280,9 @@ async function generateBatchForDifficulty(
     const isRetryable =
       provider === "groq"
         ? isRetryableGroqError(message)
-        : isRetryableGeminiError(message);
+        : provider === "ollama"
+          ? isRetryableOllamaError(message)
+          : isRetryableGeminiError(message);
 
     if (attempt < generationRetryLimit && isRetryable && !shouldFallbackImmediately) {
       const retryDelayMs =
@@ -1335,7 +1450,9 @@ async function reviewGeneratedQuestion(
     const isRetryable =
       provider === "groq"
         ? isRetryableGroqError(message)
-        : isRetryableGeminiError(message);
+        : provider === "ollama"
+          ? isRetryableOllamaError(message)
+          : isRetryableGeminiError(message);
 
     if (attempt < reviewRetryLimit && isRetryable && !shouldFallbackImmediately) {
       const retryDelayMs =

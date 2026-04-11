@@ -109,8 +109,25 @@ function extractJsonSummary(stdout: string) {
 }
 
 function resolveGenerationProvider() {
+  const configuredProvider =
+    process.env.QUESTION_GENERATION_PROVIDER || process.env.CONTENT_GENERATION_PROVIDER;
+  const hasOllamaConfig = Boolean(
+    process.env.OLLAMA_GENERATION_MODEL ||
+      process.env.OLLAMA_REVIEW_MODEL ||
+      process.env.OLLAMA_MODEL ||
+      process.env.OLLAMA_API_BASE_URL ||
+      process.env.OLLAMA_BASE_URL
+  );
   const hasGeminiKey = Boolean(process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY);
   const hasGroqKey = Boolean(process.env.GROQ_API_KEY);
+
+  if (configuredProvider?.trim()) {
+    return configuredProvider.trim().toLowerCase();
+  }
+
+  if (hasOllamaConfig) {
+    return "ollama";
+  }
 
   if (hasGeminiKey) {
     return "gemini";
@@ -124,6 +141,10 @@ function resolveGenerationProvider() {
 }
 
 function resolveGenerationModel(provider: string) {
+  if (provider === "ollama") {
+    return process.env.OLLAMA_GENERATION_MODEL || process.env.OLLAMA_MODEL || "gemma3:4b";
+  }
+
   if (provider === "groq") {
     return process.env.GROQ_GENERATION_MODEL || process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
   }
