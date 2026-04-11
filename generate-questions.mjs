@@ -128,6 +128,7 @@ const topicFilter = args.topic?.trim().toLowerCase();
 const topicLimit = args["limit-topics"] ? Math.max(1, Number(args["limit-topics"])) : null;
 const delayMs = Math.max(0, Number(args["delay-ms"] || 800));
 const jsonOnly = args.json === "true" || args.json === "1";
+const fastRetryMode = args["fast-retry"] === "true" || args["fast-retry"] === "1";
 const generationProvider = resolveGenerationProvider(args.provider);
 const generationModel = resolveGenerationModel(generationProvider, args.model);
 const reviewProvider = resolveReviewProvider(args["review-provider"], generationProvider);
@@ -1160,6 +1161,7 @@ async function generateBatchForDifficulty(
     }).parse(parsedPayload).questions;
   } catch (error) {
     const message = error instanceof Error ? error.message : "unknown generation error";
+    const generationRetryLimit = fastRetryMode ? 1 : 3;
 
     const shouldFallbackImmediately = provider === "gemini" && isQuotaExceededError(message);
     const isRetryable =
@@ -1167,13 +1169,13 @@ async function generateBatchForDifficulty(
         ? isRetryableGroqError(message)
         : isRetryableGeminiError(message);
 
-    if (attempt < 3 && isRetryable && !shouldFallbackImmediately) {
+    if (attempt < generationRetryLimit && isRetryable && !shouldFallbackImmediately) {
       const retryDelayMs =
         extractRetryDelayMs(message) ?? (provider === "groq" ? 20000 : 35000);
       console.warn(
         `${provider} rate limited for ${topic.section_key}/${topic.slug}/${requestedDifficulty}; retrying in ${Math.ceil(
           retryDelayMs / 1000
-        )}s (attempt ${attempt + 1}/3).`
+        )}s (attempt ${attempt + 1}/${generationRetryLimit}).`
       );
       await sleep(retryDelayMs + 1000);
       return generateBatchForDifficulty(
@@ -1328,19 +1330,20 @@ async function reviewGeneratedQuestion(
     return reviewedQuestionSchema.parse(parsedPayload);
   } catch (error) {
     const message = error instanceof Error ? error.message : "unknown review error";
+    const reviewRetryLimit = fastRetryMode ? 1 : 2;
     const shouldFallbackImmediately = provider === "gemini" && isQuotaExceededError(message);
     const isRetryable =
       provider === "groq"
         ? isRetryableGroqError(message)
         : isRetryableGeminiError(message);
 
-    if (attempt < 2 && isRetryable && !shouldFallbackImmediately) {
+    if (attempt < reviewRetryLimit && isRetryable && !shouldFallbackImmediately) {
       const retryDelayMs =
         extractRetryDelayMs(message) ?? (provider === "groq" ? 12000 : 20000);
       console.warn(
         `${provider} review rate limited for ${topic.section_key}/${topic.slug}; retrying in ${Math.ceil(
           retryDelayMs / 1000
-        )}s (attempt ${attempt + 1}/2).`
+        )}s (attempt ${attempt + 1}/${reviewRetryLimit}).`
       );
       await sleep(retryDelayMs + 1000);
       return reviewGeneratedQuestion(topic, question, attempt + 1, provider, model, hasFallenBack);

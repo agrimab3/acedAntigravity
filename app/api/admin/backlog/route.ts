@@ -155,6 +155,7 @@ async function runGeneration({
       `--provider=${provider}`,
       `--model=${model}`,
       "--delay-ms=0",
+      "--fast-retry=1",
       "--json=1",
     ],
     {
