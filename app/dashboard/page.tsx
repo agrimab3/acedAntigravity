@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
+import FirstTimeWalkthrough from "@/app/dashboard/first-time-walkthrough";
 import { getTopicByName } from "@/lib/act-taxonomy";
 import { getDisplayFirstName } from "@/lib/onboarding";
 import { useOnboardingState } from "@/lib/use-onboarding-state";
@@ -467,6 +468,11 @@ export default function Dashboard() {
   } | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const detailRef = useRef<HTMLDivElement>(null);
+  const practiceTestsButtonRef = useRef<HTMLButtonElement>(null);
+  const progressButtonRef = useRef<HTMLButtonElement>(null);
+  const filtersRef = useRef<HTMLDivElement>(null);
+  const universeRef = useRef<HTMLDivElement>(null);
+  const walkthroughInitRef = useRef(false);
   const stateRef = useRef({
     activeSec: "all" as SectionKey | "all",
     selected: null as Hit,
@@ -480,6 +486,8 @@ export default function Dashboard() {
     () => buildDashboardAmbientGlows(7),
     []
   );
+  const [walkthroughOpen, setWalkthroughOpen] = useState(false);
+  const [savingWalkthrough, setSavingWalkthrough] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -884,8 +892,51 @@ export default function Dashboard() {
     };
   }, [dashboardSummary, status]);
 
+  useEffect(() => {
+    if (status !== "authenticated" || onboardingLoading || !onboardingData?.isComplete) {
+      return;
+    }
+
+    if (walkthroughInitRef.current) {
+      return;
+    }
+
+    walkthroughInitRef.current = true;
+
+    if (onboardingData.profile.walkthroughCompletedAt) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setWalkthroughOpen(true);
+    }, 420);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [onboardingData, onboardingLoading, status]);
+
   const handleSignOut = async () => {
     await signOut({ callbackUrl: "/" });
+  };
+
+  const handleCloseWalkthrough = async () => {
+    setWalkthroughOpen(false);
+    setSavingWalkthrough(true);
+
+    try {
+      await fetch("/api/onboarding", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          walkthroughCompleted: true,
+        }),
+      });
+    } catch (error) {
+      console.error("Failed to save walkthrough state", error);
+    } finally {
+      setSavingWalkthrough(false);
+    }
   };
 
   const selSec = selected ? SECS[selected.si] : null;
@@ -1095,6 +1146,7 @@ export default function Dashboard() {
               <span style={{ position: "relative", zIndex: 1 }}>your universe</span>
             </button>
             <button
+              ref={practiceTestsButtonRef}
               onClick={() => router.push("/practice-tests")}
               style={{
                 background: "transparent",
@@ -1127,6 +1179,7 @@ export default function Dashboard() {
               <span style={{ position: "relative", zIndex: 1 }}>practice tests</span>
             </button>
             <button
+              ref={progressButtonRef}
               onClick={() => router.push("/progress")}
               style={{
                 background: "transparent",
@@ -1195,7 +1248,7 @@ export default function Dashboard() {
           your universe is waiting - click any bright star
         </p>
 
-        <div style={{ display: "flex", gap: "6px", marginBottom: "0", flexWrap: "wrap" }}>
+        <div ref={filtersRef} style={{ display: "flex", gap: "6px", marginBottom: "0", flexWrap: "wrap" }}>
           {(["all", "english", "math", "reading", "science"] as const).map((section) => (
             <button
               key={section}
@@ -1224,10 +1277,11 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div
-        style={{
-          position: "relative",
-          zIndex: 3,
+        <div
+          ref={universeRef}
+          style={{
+            position: "relative",
+            zIndex: 3,
           marginTop: "-44px",
           paddingTop: "44px",
         }}
@@ -1529,6 +1583,16 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+      <FirstTimeWalkthrough
+        open={walkthroughOpen}
+        saving={savingWalkthrough}
+        onClose={() => void handleCloseWalkthrough()}
+        firstName={firstName}
+        universeRef={universeRef}
+        filtersRef={filtersRef}
+        practiceTestsRef={practiceTestsButtonRef}
+        progressRef={progressButtonRef}
+      />
       <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}`}</style>
     </div>
   );

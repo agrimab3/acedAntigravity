@@ -45,6 +45,7 @@ export type OnboardingProfile = {
   previousActScore: number | null;
   hasRecommendations: boolean | null;
   onboardingCompletedAt: string | null;
+  walkthroughCompletedAt: string | null;
 };
 
 export type OnboardingApiResponse = {
