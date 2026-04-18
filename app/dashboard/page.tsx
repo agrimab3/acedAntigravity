@@ -903,7 +903,7 @@ export default function Dashboard() {
 
     walkthroughInitRef.current = true;
 
-    if (onboardingData.profile.walkthroughCompletedAt) {
+    if (typeof window !== "undefined" && window.localStorage.getItem("aced.walkthrough.completed") === "1") {
       return;
     }
 
@@ -923,6 +923,10 @@ export default function Dashboard() {
     setSavingWalkthrough(true);
 
     try {
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("aced.walkthrough.completed", "1");
+      }
+
       await fetch("/api/onboarding", {
         method: "PATCH",
         headers: {
