@@ -4,7 +4,7 @@ import { Fragment, Suspense, useEffect, useEffectEvent, useMemo, useState } from
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
-  PRACTICE_TEST_MODES,
+  getPracticeTestMode,
   type PracticeTestMode,
   type PracticeTestSectionKey,
 } from "@/lib/practice-tests";
@@ -98,6 +98,11 @@ type CompletionReport = {
 
 type RunnerPhase = "intro" | "running" | "section-break" | "report";
 
+type RunnerLoadError = {
+  message: string;
+  detail?: string;
+};
+
 function formatDurationLabel(minutes: number) {
   if (minutes < 60) {
     return `${minutes} minutes`;
@@ -153,6 +158,107 @@ function keyFor(sectionIndex: number, questionIndex: number) {
   return `${sectionIndex}:${questionIndex}`;
 }
 
+function isAnswerChoice(value: unknown): value is "A" | "B" | "C" | "D" {
+  return value === "A" || value === "B" || value === "C" || value === "D";
+}
+
+function normalizeTestQuestion(value: unknown): TestQuestion | null {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const question = value as Record<string, unknown>;
+  const choices = question.choices as Record<string, unknown> | undefined;
+
+  if (
+    typeof question.id !== "string" ||
+    typeof question.section !== "string" ||
+    typeof question.topic !== "string" ||
+    typeof question.difficulty !== "string" ||
+    (question.passage !== undefined && question.passage !== null && typeof question.passage !== "string") ||
+    typeof question.question_text !== "string" ||
+    !choices ||
+    typeof choices.A !== "string" ||
+    typeof choices.B !== "string" ||
+    typeof choices.C !== "string" ||
+    typeof choices.D !== "string" ||
+    !isAnswerChoice(question.correct_answer) ||
+    typeof question.explanation !== "string"
+  ) {
+    return null;
+  }
+
+  return {
+    id: question.id,
+    section: question.section,
+    topic: question.topic,
+    difficulty: question.difficulty,
+    passage: typeof question.passage === "string" ? question.passage : null,
+    question_text: question.question_text,
+    choices: {
+      A: choices.A,
+      B: choices.B,
+      C: choices.C,
+      D: choices.D,
+    },
+    correct_answer: question.correct_answer,
+    explanation: question.explanation,
+  };
+}
+
+function isSectionKey(value: unknown): value is PracticeTestSectionKey {
+  return value === "english" || value === "math" || value === "reading" || value === "science";
+}
+
+function normalizeRunnerSection(value: unknown): RunnerSection | null {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const section = value as Record<string, unknown>;
+  const questions = Array.isArray(section.questions)
+    ? section.questions
+        .map((question) => normalizeTestQuestion(question))
+        .filter((question): question is TestQuestion => Boolean(question))
+    : [];
+
+  if (
+    !(
+      (section.sectionRunId === undefined ||
+        section.sectionRunId === null ||
+        typeof section.sectionRunId === "string") &&
+      isSectionKey(section.sectionKey) &&
+      typeof section.title === "string" &&
+      typeof section.questionCount === "number" &&
+      typeof section.durationMinutes === "number" &&
+      typeof section.usesMockFill === "boolean" &&
+      typeof section.availableCount === "number"
+    )
+  ) {
+    return null;
+  }
+
+  return {
+    sectionRunId: typeof section.sectionRunId === "string" ? section.sectionRunId : null,
+    sectionKey: section.sectionKey,
+    title: section.title,
+    questionCount: section.questionCount,
+    durationMinutes: section.durationMinutes,
+    questions,
+    usesMockFill: section.usesMockFill,
+    availableCount: section.availableCount,
+  };
+}
+
+function parseApiErrorMessage(payload: unknown) {
+  if (!payload || typeof payload !== "object") {
+    return null;
+  }
+
+  const error = (payload as Record<string, unknown>).error;
+  return typeof error === "string" && error.trim().length > 0 ? error : null;
+}
+
 function PracticeTestRunContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -162,7 +268,7 @@ function PracticeTestRunContent() {
   });
   const modeKey = searchParams.get("mode");
   const mode = useMemo(
-    () => PRACTICE_TEST_MODES.find((entry) => entry.key === modeKey) ?? null,
+    () => getPracticeTestMode(modeKey),
     [modeKey]
   );
 
@@ -183,6 +289,7 @@ function PracticeTestRunContent() {
   const [showCalculator, setShowCalculator] = useState(false);
   const [report, setReport] = useState<CompletionReport | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [loadError, setLoadError] = useState<RunnerLoadError | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -200,6 +307,7 @@ function PracticeTestRunContent() {
 
     const createSession = async () => {
       setLoading(true);
+      setLoadError(null);
 
       try {
         const res = await fetch("/api/practice-tests/session", {
@@ -209,13 +317,35 @@ function PracticeTestRunContent() {
           },
           body: JSON.stringify({ mode: mode.key }),
         });
-        const data = await res.json();
+
+        const raw = await res.text();
+        const data = raw ? (JSON.parse(raw) as unknown) : null;
+        const payload =
+          data && typeof data === "object" ? (data as Record<string, unknown>) : null;
+
+        if (!res.ok) {
+          const detail = parseApiErrorMessage(data) ?? `Session API returned ${res.status}.`;
+          throw new Error(detail);
+        }
 
         if (!active) return;
 
-        const nextSections: RunnerSection[] = data.sections ?? [];
-        setSessionId(data.sessionId ?? null);
-        setPersistedSession(Boolean(data.persisted));
+        const nextSections = Array.isArray(payload?.sections)
+          ? payload.sections
+              .map((section) => normalizeRunnerSection(section))
+              .filter((section): section is RunnerSection => Boolean(section))
+          : [];
+
+        if (nextSections.length === 0) {
+          throw new Error("Session API returned no runnable sections.");
+        }
+
+        if (nextSections.some((section) => section.questions.length === 0)) {
+          throw new Error("Session API returned an empty section.");
+        }
+
+        setSessionId(typeof payload?.sessionId === "string" ? payload.sessionId : null);
+        setPersistedSession(Boolean(payload?.persisted));
         setSections(nextSections);
         setCurrentSectionIndex(0);
         setCurrentQuestionIndices(
@@ -236,6 +366,10 @@ function PracticeTestRunContent() {
       } catch (error) {
         console.error("Failed to create practice test session", error);
         if (!active) return;
+        setLoadError({
+          message: "Unable to load this practice test. Try again.",
+          detail: error instanceof Error ? error.message : "Unknown runner initialization error.",
+        });
         setSections([]);
       } finally {
         if (active) {
@@ -260,13 +394,15 @@ function PracticeTestRunContent() {
   const flaggedCount = flaggedKeys.length;
   const remainingCount = totalQuestionCount - answeredCount;
   const currentTimeRemaining = timeRemainingBySection[currentSectionIndex] ?? 0;
-  const flaggedQuestionIndices = currentSection.questions
-    .map((_, index) => ({
-      index,
-      key: keyFor(currentSectionIndex, index),
-    }))
-    .filter((entry) => flaggedKeys.includes(entry.key))
-    .map((entry) => entry.index);
+  const flaggedQuestionIndices = currentSection
+    ? currentSection.questions
+        .map((_, index) => ({
+          index,
+          key: keyFor(currentSectionIndex, index),
+        }))
+        .filter((entry) => flaggedKeys.includes(entry.key))
+        .map((entry) => entry.index)
+    : [];
   const handleSectionAdvanceEvent = useEffectEvent(() => {
     void handleSectionAdvance();
   });
@@ -597,6 +733,65 @@ function PracticeTestRunContent() {
         }}
       >
         preparing your timed test...
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "linear-gradient(180deg,#0d1b2a 0%,#060d1e 52%,#020408 100%)",
+          color: "#fff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: "DM Sans,sans-serif",
+          padding: "2rem",
+        }}
+      >
+        <div style={{ maxWidth: "560px", textAlign: "center" }}>
+          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "34px", marginBottom: "10px" }}>
+            unable to load test
+          </div>
+          <div style={{ color: "rgba(255,255,255,0.6)", lineHeight: 1.7, marginBottom: "0.75rem" }}>
+            {loadError.message}
+          </div>
+          {loadError.detail ? (
+            <div style={{ color: "rgba(255,255,255,0.4)", lineHeight: 1.6, marginBottom: "1.25rem", fontSize: "12px" }}>
+              {loadError.detail}
+            </div>
+          ) : null}
+          <div style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap" }}>
+            <button
+              onClick={() => router.refresh()}
+              style={{
+                padding: "12px 18px",
+                borderRadius: "12px",
+                border: "none",
+                background: "#1D9E75",
+                color: "#fff",
+                cursor: "pointer",
+              }}
+            >
+              try again
+            </button>
+            <button
+              onClick={() => router.push("/practice-tests")}
+              style={{
+                padding: "12px 18px",
+                borderRadius: "12px",
+                border: "0.5px solid rgba(255,255,255,0.12)",
+                background: "transparent",
+                color: "rgba(255,255,255,0.78)",
+                cursor: "pointer",
+              }}
+            >
+              back to practice tests
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

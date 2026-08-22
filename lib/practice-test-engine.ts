@@ -5,10 +5,14 @@ import type * as schema from "@/db/schema";
 import { buildMockQuestions, type PracticeQuestion } from "@/lib/mock-questions";
 import { normalizeQuestionRow, type NormalizedQuestionRow } from "@/lib/question-utils";
 import {
+  getPracticeTestMode,
+  normalizePracticeTestModeKey,
   PRACTICE_TEST_MODES,
   type PracticeTestMode,
   type PracticeTestSectionKey,
 } from "@/lib/practice-tests";
+
+export { getPracticeTestMode, normalizePracticeTestModeKey };
 
 export type PracticeTestSectionPayload = {
   sectionKey: PracticeTestSectionKey;
@@ -19,10 +23,6 @@ export type PracticeTestSectionPayload = {
   usesMockFill: boolean;
   availableCount: number;
 };
-
-export function getPracticeTestMode(modeKey: string | null | undefined) {
-  return PRACTICE_TEST_MODES.find((mode) => mode.key === modeKey) ?? null;
-}
 
 export function buildSectionMockQuestions(
   section: PracticeTestSectionKey,
@@ -43,11 +43,12 @@ export function buildSectionMockQuestions(
     const topicName = topicRotation[rotationIndex % topicRotation.length] ?? "Core Skills";
     const batchSize = Math.min(10, safeLimit - mocks.length);
     const batch = buildMockQuestions(section, topicName, batchSize, "medium");
+    const startIndex = mocks.length;
 
     batch.forEach((question, batchIndex) => {
       mocks.push({
         ...question,
-        id: `section-${section}-mock-${mocks.length + batchIndex + 1}`,
+        id: `section-${section}-mock-${startIndex + batchIndex + 1}`,
       });
     });
 
@@ -78,7 +79,7 @@ export async function fetchPracticeTestSectionQuestions({
       sectionKey,
       title,
       questionCount: count,
-      durationMinutes: Math.ceil(count),
+      durationMinutes: modeSection?.durationMinutes ?? Math.ceil(count),
       questions: buildSectionMockQuestions(sectionKey, count),
       usesMockFill: true,
       availableCount: 0,
