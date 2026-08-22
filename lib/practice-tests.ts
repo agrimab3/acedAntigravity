@@ -129,3 +129,49 @@ export const FULL_TESTS: PracticeTestMode[] = [
 ];
 
 export const PRACTICE_TEST_MODES = [...SECTION_TESTS, ...FULL_TESTS];
+
+export function normalizePracticeTestModeKey(
+  raw: string | null | undefined
+): PracticeTestModeKey | null {
+  if (!raw) return null;
+  const key = raw.trim().toLowerCase();
+
+  if (
+    key === "full" ||
+    key === "full-act" ||
+    key === "full_act" ||
+    key === "full-sky" ||
+    key === "full_sky" ||
+    key === "full-with-science" ||
+    key === "full_with_science" ||
+    key === "all"
+  ) {
+    return "full-with-science";
+  }
+
+  if (
+    key === "core" ||
+    key === "core-act" ||
+    key === "core_act" ||
+    key === "core-sky" ||
+    key === "core_sky" ||
+    key === "full-core" ||
+    key === "full_core"
+  ) {
+    return "full-core";
+  }
+
+  if (key === "english" || key === "math" || key === "reading" || key === "science") {
+    return key;
+  }
+
+  return (PRACTICE_TEST_MODES.find((m) => m.key === key)?.key as PracticeTestModeKey) ?? null;
+}
+
+export function getPracticeTestMode(
+  raw: string | null | undefined
+): PracticeTestMode | null {
+  const normalizedKey = normalizePracticeTestModeKey(raw);
+  if (!normalizedKey) return null;
+  return PRACTICE_TEST_MODES.find((mode) => mode.key === normalizedKey) ?? null;
+}

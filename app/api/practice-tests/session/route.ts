@@ -8,6 +8,7 @@ import {
 } from "@/db/schema";
 import { getAuthSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import type { PracticeTestMode } from "@/lib/practice-tests";
 import { buildPracticeTestPayload, getPracticeTestMode } from "@/lib/practice-test-engine";
 
 const createSchema = z.object({
@@ -59,7 +60,9 @@ export async function POST(request: Request) {
       modeKey: mode.key,
       format: mode.format,
       status: "in_progress",
-      scienceIncluded: mode.sections.some((section) => section.key === "science"),
+      scienceIncluded: mode.sections.some(
+        (section: PracticeTestMode["sections"][number]) => section.key === "science"
+      ),
       totalQuestionCount,
       startedAt: now,
       updatedAt: now,
