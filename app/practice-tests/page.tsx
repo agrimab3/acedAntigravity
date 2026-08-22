@@ -320,6 +320,14 @@ export default function PracticeTestsPage() {
           50% { transform: scale(1.05); opacity: 0.7; }
           100% { transform: scale(0.94); opacity: 0.35; }
         }
+        @media (max-width: 960px) {
+          .practice-tests-layout {
+            grid-template-columns: 1fr !important;
+          }
+          .practice-tests-aside {
+            position: static !important;
+          }
+        }
       `}</style>
       <div
         style={{
@@ -556,6 +564,7 @@ export default function PracticeTestsPage() {
         </div>
 
         <div
+          className="practice-tests-layout"
           style={{
             display: "grid",
             gridTemplateColumns: "minmax(0, 1.2fr) minmax(320px, 0.95fr)",
@@ -579,9 +588,17 @@ export default function PracticeTestsPage() {
                 {SECTION_TESTS.map((mode) => {
                   const selected = mode.key === selectedMode.key;
                   return (
-                    <button
+                    <div
                       key={mode.key}
+                      role="button"
+                      tabIndex={0}
                       onClick={() => setSelectedModeKey(mode.key)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          setSelectedModeKey(mode.key);
+                        }
+                      }}
                       style={{
                         textAlign: "left",
                         borderRadius: "16px",
@@ -591,24 +608,68 @@ export default function PracticeTestsPage() {
                           : "0.5px solid rgba(255,255,255,0.08)",
                         background: selected ? `${mode.accentColor}14` : "rgba(255,255,255,0.025)",
                         cursor: "pointer",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        outline: "none",
+                        transition: "border-color 0.2s, background-color 0.2s",
                       }}
                     >
-                      <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: "10px" }}>
-                        <div>
-                          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px", color: mode.accentColor }}>
-                            {mode.shortLabel}
+                      <div>
+                        <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: "10px" }}>
+                          <div>
+                            <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px", color: mode.accentColor }}>
+                              {mode.shortLabel}
+                            </div>
+                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>{mode.constellation}</div>
                           </div>
-                          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>{mode.constellation}</div>
+                          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.42)", textAlign: "right" }}>
+                            <div>{mode.questionCount} questions</div>
+                            <div>{formatDuration(mode.durationMinutes)}</div>
+                          </div>
                         </div>
-                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.42)", textAlign: "right" }}>
-                          <div>{mode.questionCount} questions</div>
-                          <div>{formatDuration(mode.durationMinutes)}</div>
+                        <div style={{ fontSize: "12px", lineHeight: 1.6, color: "rgba(255,255,255,0.5)", marginBottom: "12px" }}>
+                          {SECTION_TEST_TOPIC_COPY[mode.key] ?? mode.description}
                         </div>
                       </div>
-                      <div style={{ fontSize: "12px", lineHeight: 1.6, color: "rgba(255,255,255,0.5)" }}>
-                        {SECTION_TEST_TOPIC_COPY[mode.key] ?? mode.description}
+
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          paddingTop: "10px",
+                          borderTop: "0.5px solid rgba(255,255,255,0.06)",
+                        }}
+                      >
+                        <span style={{ fontSize: "11px", color: selected ? mode.accentColor : "rgba(255,255,255,0.36)" }}>
+                          {selected ? "● active" : "select"}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            router.push(`/practice-tests/run?mode=${mode.key}`);
+                          }}
+                          style={{
+                            padding: "6px 14px",
+                            borderRadius: "999px",
+                            border: "none",
+                            background: selected ? mode.accentColor : "rgba(255,255,255,0.1)",
+                            color: selected ? "#081018" : "#fff",
+                            fontSize: "12px",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            fontFamily: "DM Sans,sans-serif",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "4px",
+                          }}
+                        >
+                          start section ✦
+                        </button>
                       </div>
-                    </button>
+                    </div>
                   );
                 })}
               </div>
@@ -629,9 +690,17 @@ export default function PracticeTestsPage() {
                 {FULL_TESTS.map((mode) => {
                   const selected = mode.key === selectedMode.key;
                   return (
-                    <button
+                    <div
                       key={mode.key}
+                      role="button"
+                      tabIndex={0}
                       onClick={() => setSelectedModeKey(mode.key)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          setSelectedModeKey(mode.key);
+                        }
+                      }}
                       style={{
                         textAlign: "left",
                         borderRadius: "16px",
@@ -641,22 +710,68 @@ export default function PracticeTestsPage() {
                           : "0.5px solid rgba(255,255,255,0.08)",
                         background: selected ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.025)",
                         cursor: "pointer",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        outline: "none",
+                        transition: "border-color 0.2s, background-color 0.2s",
                       }}
                     >
-                      <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: "10px" }}>
-                        <div>
-                          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px", color: mode.accentColor }}>
-                            {mode.shortLabel}
+                      <div>
+                        <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: "10px" }}>
+                          <div>
+                            <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px", color: mode.accentColor }}>
+                              {mode.shortLabel}
+                            </div>
+                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>{mode.constellation}</div>
                           </div>
-                          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>{mode.constellation}</div>
+                          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.42)", textAlign: "right" }}>
+                            <div>{mode.questionCount} questions</div>
+                            <div>{formatDuration(mode.durationMinutes)}</div>
+                          </div>
                         </div>
-                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.42)", textAlign: "right" }}>
-                          <div>{mode.questionCount} questions</div>
-                          <div>{formatDuration(mode.durationMinutes)}</div>
+                        <div style={{ fontSize: "12px", lineHeight: 1.6, color: "rgba(255,255,255,0.5)", marginBottom: "12px" }}>
+                          {mode.description}
                         </div>
                       </div>
-                      <div style={{ fontSize: "12px", lineHeight: 1.6, color: "rgba(255,255,255,0.5)" }}>{mode.description}</div>
-                    </button>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          paddingTop: "10px",
+                          borderTop: "0.5px solid rgba(255,255,255,0.06)",
+                        }}
+                      >
+                        <span style={{ fontSize: "11px", color: selected ? mode.accentColor : "rgba(255,255,255,0.36)" }}>
+                          {selected ? "● active" : "select"}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            router.push(`/practice-tests/run?mode=${mode.key}`);
+                          }}
+                          style={{
+                            padding: "6px 14px",
+                            borderRadius: "999px",
+                            border: "none",
+                            background: selected ? mode.accentColor : "rgba(255,255,255,0.1)",
+                            color: selected ? "#081018" : "#fff",
+                            fontSize: "12px",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            fontFamily: "DM Sans,sans-serif",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "4px",
+                          }}
+                        >
+                          start full test ✦
+                        </button>
+                      </div>
+                    </div>
                   );
                 })}
               </div>
@@ -796,6 +911,7 @@ export default function PracticeTestsPage() {
           </div>
 
           <aside
+            className="practice-tests-aside"
             style={{
               display: "grid",
               gap: "16px",

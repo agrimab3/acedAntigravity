@@ -103,6 +103,14 @@ type RunnerLoadError = {
   detail?: string;
 };
 
+type SectionAdvanceReason = "manual" | "timeout";
+
+type SectionTransitionState = {
+  completedSectionTitle: string;
+  nextSectionTitle: string | null;
+  reason: SectionAdvanceReason;
+};
+
 function formatDurationLabel(minutes: number) {
   if (minutes < 60) {
     return `${minutes} minutes`;
@@ -259,6 +267,361 @@ function parseApiErrorMessage(payload: unknown) {
   return typeof error === "string" && error.trim().length > 0 ? error : null;
 }
 
+function FlagIcon({
+  filled,
+  color,
+  size = 16,
+}: {
+  filled: boolean;
+  color: string;
+  size?: number;
+}) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 16 16"
+      width={size}
+      height={size}
+      fill="none"
+      style={{ flexShrink: 0, display: "block" }}
+    >
+      <path
+        d="M4 1.75v12.5M4.5 2.5h6.25l-1.35 2.55L10.75 7.5H4.5"
+        stroke={color}
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill={filled ? color : "none"}
+        opacity={filled ? 0.95 : 1}
+      />
+    </svg>
+  );
+}
+
+function QuestionMapDrawer({
+  open,
+  section,
+  currentQuestionIndex,
+  selectedAnswers,
+  flaggedKeys,
+  sectionIndex,
+  accentColor,
+  onClose,
+  onQuestionSelect,
+}: {
+  open: boolean;
+  section: RunnerSection | null;
+  currentQuestionIndex: number;
+  selectedAnswers: Record<string, "A" | "B" | "C" | "D" | null>;
+  flaggedKeys: string[];
+  sectionIndex: number;
+  accentColor: string;
+  onClose: () => void;
+  onQuestionSelect: (questionIndex: number) => void;
+}) {
+  if (!open || !section) {
+    return null;
+  }
+
+  const answeredCount = section.questions.filter(
+    (_, questionIndex) => selectedAnswers[keyFor(sectionIndex, questionIndex)] !== null
+  ).length;
+  const flaggedCount = section.questions.filter((_, questionIndex) =>
+    flaggedKeys.includes(keyFor(sectionIndex, questionIndex))
+  ).length;
+  const unansweredCount = Math.max(0, section.questions.length - answeredCount);
+
+  return (
+    <>
+      <div
+        onClick={onClose}
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(2, 6, 12, 0.62)",
+          backdropFilter: "blur(10px)",
+          zIndex: 40,
+        }}
+      />
+      <aside
+        className="question-map-drawer"
+        style={{
+          position: "fixed",
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: "min(420px, 100vw)",
+          padding: "1.2rem",
+          background:
+            "linear-gradient(180deg, rgba(9, 24, 37, 0.98) 0%, rgba(5, 13, 22, 0.98) 100%)",
+          borderLeft: "0.5px solid rgba(255,255,255,0.1)",
+          boxShadow: "-18px 0 60px rgba(0,0,0,0.35)",
+          zIndex: 41,
+          overflowY: "auto",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", alignItems: "flex-start", marginBottom: "1rem" }}>
+          <div>
+            <div style={{ fontSize: "11px", color: accentColor, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: "6px" }}>
+              Questions
+            </div>
+            <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "28px", color: "#fff" }}>{section.title}</div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              width: "36px",
+              height: "36px",
+              borderRadius: "999px",
+              border: "0.5px solid rgba(255,255,255,0.12)",
+              background: "rgba(255,255,255,0.04)",
+              color: "rgba(255,255,255,0.72)",
+              cursor: "pointer",
+              fontSize: "18px",
+            }}
+          >
+            ×
+          </button>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "10px", marginBottom: "1rem" }}>
+          {[
+            { label: "answered", value: answeredCount },
+            { label: "flagged", value: flaggedCount },
+            { label: "unanswered", value: unansweredCount },
+          ].map((item) => (
+            <div
+              key={item.label}
+              style={{
+                borderRadius: "14px",
+                padding: "0.9rem 0.85rem",
+                background: "rgba(255,255,255,0.04)",
+                border: "0.5px solid rgba(255,255,255,0.08)",
+              }}
+            >
+              <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px", color: "#fff", marginBottom: "4px" }}>{item.value}</div>
+              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.42)" }}>{item.label}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(52px, 1fr))", gap: "10px" }}>
+          {section.questions.map((question, questionIndex) => {
+            const answerKey = keyFor(sectionIndex, questionIndex);
+            const isCurrent = questionIndex === currentQuestionIndex;
+            const isAnswered = selectedAnswers[answerKey] !== null;
+            const isFlagged = flaggedKeys.includes(answerKey);
+
+            return (
+              <button
+                key={`${question.id}-${questionIndex}`}
+                type="button"
+                onClick={() => {
+                  onQuestionSelect(questionIndex);
+                  onClose();
+                }}
+                style={{
+                  position: "relative",
+                  minHeight: "52px",
+                  borderRadius: "14px",
+                  border: isCurrent
+                    ? `0.5px solid ${accentColor}`
+                    : isFlagged
+                      ? "0.5px solid rgba(84, 211, 191, 0.44)"
+                      : "0.5px solid rgba(255,255,255,0.08)",
+                  background: isCurrent
+                    ? `${accentColor}22`
+                    : isAnswered
+                      ? "rgba(255,255,255,0.1)"
+                      : "rgba(255,255,255,0.035)",
+                  color: isCurrent ? accentColor : isAnswered ? "#fff" : "rgba(255,255,255,0.62)",
+                  cursor: "pointer",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                }}
+              >
+                {questionIndex + 1}
+                {isFlagged ? (
+                  <span style={{ position: "absolute", top: "6px", right: "6px" }}>
+                    <FlagIcon filled color={accentColor} size={12} />
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+      </aside>
+    </>
+  );
+}
+
+function SubmitSectionModal({
+  open,
+  sectionTitle,
+  unansweredCount,
+  flaggedCount,
+  accentColor,
+  onReviewQuestions,
+  onConfirmSubmit,
+}: {
+  open: boolean;
+  sectionTitle: string;
+  unansweredCount: number;
+  flaggedCount: number;
+  accentColor: string;
+  onReviewQuestions: () => void;
+  onConfirmSubmit: () => void;
+}) {
+  if (!open) {
+    return null;
+  }
+
+  return (
+    <>
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(2, 6, 12, 0.68)",
+          backdropFilter: "blur(10px)",
+          zIndex: 50,
+        }}
+      />
+      <div
+        style={{
+          position: "fixed",
+          inset: "auto 1rem 1rem 1rem",
+          margin: "0 auto",
+          maxWidth: "520px",
+          borderRadius: "20px",
+          padding: "1.35rem",
+          background:
+            "linear-gradient(180deg, rgba(12, 28, 40, 0.98) 0%, rgba(6, 14, 23, 0.98) 100%)",
+          border: "0.5px solid rgba(255,255,255,0.1)",
+          boxShadow: "0 22px 60px rgba(0,0,0,0.4)",
+          zIndex: 51,
+        }}
+      >
+        <div style={{ fontSize: "11px", color: accentColor, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: "8px" }}>
+          Submit Section
+        </div>
+        <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "32px", lineHeight: 1.1, color: "#fff", marginBottom: "10px" }}>
+          Ready to submit {sectionTitle}?
+        </div>
+        <div style={{ color: "rgba(255,255,255,0.68)", lineHeight: 1.7, fontSize: "14px", marginBottom: "1rem" }}>
+          You still have unresolved questions in this section. Review them now or submit anyway.
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "10px", marginBottom: "1.1rem" }}>
+          {[
+            { label: "unanswered", value: unansweredCount },
+            { label: "flagged for review", value: flaggedCount },
+          ].map((item) => (
+            <div
+              key={item.label}
+              style={{
+                borderRadius: "14px",
+                padding: "0.95rem",
+                background: "rgba(255,255,255,0.05)",
+                border: "0.5px solid rgba(255,255,255,0.08)",
+              }}
+            >
+              <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "24px", color: "#fff", marginBottom: "4px" }}>{item.value}</div>
+              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.44)" }}>{item.label}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+          <button
+            type="button"
+            onClick={onReviewQuestions}
+            style={{
+              flex: 1,
+              minWidth: "180px",
+              padding: "12px 14px",
+              borderRadius: "12px",
+              border: "0.5px solid rgba(255,255,255,0.12)",
+              background: "transparent",
+              color: "rgba(255,255,255,0.8)",
+              cursor: "pointer",
+            }}
+          >
+            review questions
+          </button>
+          <button
+            type="button"
+            onClick={onConfirmSubmit}
+            style={{
+              flex: 1,
+              minWidth: "180px",
+              padding: "12px 14px",
+              borderRadius: "12px",
+              border: "none",
+              background: accentColor,
+              color: "#081018",
+              cursor: "pointer",
+              fontWeight: 600,
+            }}
+          >
+            submit section anyway
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function ReportSectionCard({
+  section,
+  accentColor,
+}: {
+  section: CompletionReport["sectionReports"][number];
+  accentColor: string;
+}) {
+  return (
+    <div
+      style={{
+        borderRadius: "18px",
+        background: "rgba(255,255,255,0.055)",
+        border: "0.5px solid rgba(255,255,255,0.1)",
+        padding: "1rem",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "baseline", marginBottom: "10px" }}>
+        <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "24px", color: "#fff" }}>{section.title}</div>
+        <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "28px", color: accentColor }}>{section.estimatedScore}/36</div>
+      </div>
+      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "10px" }}>
+        {[
+          `${section.correctCount}/${section.questionCount} correct`,
+          `${section.accuracyPct}% accuracy`,
+          formatCountdown(section.durationSeconds),
+        ].map((value) => (
+          <span
+            key={value}
+            style={{
+              fontSize: "11px",
+              color: "rgba(255,255,255,0.68)",
+              background: "rgba(255,255,255,0.05)",
+              borderRadius: "999px",
+              padding: "5px 8px",
+            }}
+          >
+            {value}
+          </span>
+        ))}
+      </div>
+      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.52)", lineHeight: 1.6 }}>
+        {section.pacingSummary
+          ? `${section.pacingSummary.label} · ${section.pacingSummary.description}`
+          : "Pacing data will appear here once the section is complete."}
+      </div>
+    </div>
+  );
+}
+
 function PracticeTestRunContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -290,6 +653,12 @@ function PracticeTestRunContent() {
   const [report, setReport] = useState<CompletionReport | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [loadError, setLoadError] = useState<RunnerLoadError | null>(null);
+  const [questionMapOpen, setQuestionMapOpen] = useState(false);
+  const [submitWarningOpen, setSubmitWarningOpen] = useState(false);
+  const [transitionState, setTransitionState] = useState<SectionTransitionState | null>(null);
+  const [timeWarningMessage, setTimeWarningMessage] = useState<string | null>(null);
+  const [shownTimeWarnings, setShownTimeWarnings] = useState<string[]>([]);
+  const [showQuestionReview, setShowQuestionReview] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -361,6 +730,12 @@ function PracticeTestRunContent() {
         setTimeSpentByQuestion({});
         setQuestionStartedAtMs(null);
         setShowCalculator(false);
+        setQuestionMapOpen(false);
+        setSubmitWarningOpen(false);
+        setTransitionState(null);
+        setTimeWarningMessage(null);
+        setShownTimeWarnings([]);
+        setShowQuestionReview(false);
         setPhase("intro");
         setReport(null);
       } catch (error) {
@@ -391,8 +766,19 @@ function PracticeTestRunContent() {
   const currentQuestionKey = currentSection ? keyFor(currentSectionIndex, currentQuestionIndex) : null;
   const totalQuestionCount = sections.reduce((sum, section) => sum + section.questions.length, 0);
   const answeredCount = Object.values(selectedAnswers).filter((value) => value !== null).length;
-  const flaggedCount = flaggedKeys.length;
-  const remainingCount = totalQuestionCount - answeredCount;
+  const currentAnsweredCount = currentSection
+    ? currentSection.questions.filter(
+        (_, questionIndex) => selectedAnswers[keyFor(currentSectionIndex, questionIndex)] !== null
+      ).length
+    : 0;
+  const currentFlaggedCount = currentSection
+    ? currentSection.questions.filter((_, questionIndex) =>
+        flaggedKeys.includes(keyFor(currentSectionIndex, questionIndex))
+      ).length
+    : 0;
+  const currentRemainingCount = currentSection
+    ? Math.max(0, currentSection.questions.length - currentAnsweredCount)
+    : 0;
   const currentTimeRemaining = timeRemainingBySection[currentSectionIndex] ?? 0;
   const flaggedQuestionIndices = currentSection
     ? currentSection.questions
@@ -403,8 +789,16 @@ function PracticeTestRunContent() {
         .filter((entry) => flaggedKeys.includes(entry.key))
         .map((entry) => entry.index)
     : [];
+  const unresolvedQuestionIndices = currentSection
+    ? currentSection.questions
+        .map((_, index) => index)
+        .filter((index) => {
+          const answerKey = keyFor(currentSectionIndex, index);
+          return selectedAnswers[answerKey] === null || flaggedKeys.includes(answerKey);
+        })
+    : [];
   const handleSectionAdvanceEvent = useEffectEvent(() => {
-    void handleSectionAdvance();
+    void handleSectionAdvance("timeout", true);
   });
   const allSectionScores = sections.map((section, sectionIndex) => {
     const correctCount = section.questions.filter(
@@ -468,6 +862,47 @@ function PracticeTestRunContent() {
       handleSectionAdvanceEvent();
     }
   }, [currentTimeRemaining, phase, sections.length]);
+
+  useEffect(() => {
+    if (phase !== "running" || !currentSection) {
+      return;
+    }
+
+    const nextThreshold =
+      currentTimeRemaining <= 60
+        ? 60
+        : currentTimeRemaining <= 300
+          ? 300
+          : null;
+
+    if (!nextThreshold) {
+      return;
+    }
+
+    const warningKey = `${currentSectionIndex}:${nextThreshold}`;
+    if (shownTimeWarnings.includes(warningKey)) {
+      return;
+    }
+
+    setShownTimeWarnings((current) => [...current, warningKey]);
+    setTimeWarningMessage(
+      nextThreshold === 60
+        ? `1 minute remaining in ${currentSection.title}.`
+        : `5 minutes remaining in ${currentSection.title}.`
+    );
+  }, [currentSection, currentSectionIndex, currentTimeRemaining, phase, shownTimeWarnings]);
+
+  useEffect(() => {
+    if (!timeWarningMessage) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setTimeWarningMessage(null);
+    }, 3600);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [timeWarningMessage]);
 
   async function handleFinalizeTest() {
     if (!mode) return;
@@ -684,12 +1119,31 @@ function PracticeTestRunContent() {
     setPhase("report");
   }
 
-  async function handleSectionAdvance() {
+  async function handleSectionAdvance(
+    reason: SectionAdvanceReason = "manual",
+    forceSubmission = false
+  ) {
     if (phase !== "running") {
       return;
     }
 
+    if (!currentSection) {
+      return;
+    }
+
+    if (
+      !forceSubmission &&
+      reason === "manual" &&
+      (currentRemainingCount > 0 || currentFlaggedCount > 0)
+    ) {
+      setSubmitWarningOpen(true);
+      return;
+    }
+
     flushCurrentQuestionTime();
+    setSubmitWarningOpen(false);
+    setQuestionMapOpen(false);
+    setTimeWarningMessage(null);
     setShowCalculator(false);
 
     if (currentSectionIndex >= sections.length - 1) {
@@ -697,6 +1151,11 @@ function PracticeTestRunContent() {
       return;
     }
 
+    setTransitionState({
+      completedSectionTitle: currentSection.title,
+      nextSectionTitle: sections[currentSectionIndex + 1]?.title ?? null,
+      reason,
+    });
     setPhase("section-break");
   }
 
@@ -843,7 +1302,7 @@ function PracticeTestRunContent() {
         style={{
           minHeight: "100vh",
           background:
-            "radial-gradient(circle at 15% 18%, rgba(38, 95, 143, 0.2), transparent 24%), radial-gradient(circle at 76% 20%, rgba(29, 158, 117, 0.14), transparent 22%), linear-gradient(180deg,#0d1b2a 0%,#060d1e 52%,#020408 100%)",
+            "radial-gradient(circle at 16% 14%, rgba(61, 192, 182, 0.16), transparent 24%), radial-gradient(circle at 48% 0%, rgba(25, 124, 153, 0.2), transparent 30%), radial-gradient(circle at 78% 18%, rgba(17, 113, 127, 0.14), transparent 22%), linear-gradient(180deg,#0d1b2a 0%,#081726 52%,#020408 100%)",
           color: "#fff",
           fontFamily: "DM Sans,sans-serif",
           padding: "1.5rem",
@@ -925,11 +1384,12 @@ function PracticeTestRunContent() {
             style={{
               fontSize: "13px",
               lineHeight: 1.7,
-              color: "rgba(255,255,255,0.58)",
-              background: "rgba(255,255,255,0.035)",
+              color: "rgba(255,255,255,0.74)",
+              background: "rgba(255,255,255,0.05)",
               borderRadius: "16px",
-              padding: "1rem 1.05rem",
+              padding: "1.05rem 1.1rem",
               borderLeft: `2px solid ${topMeta.accentColor}`,
+              border: "0.5px solid rgba(255,255,255,0.08)",
               marginBottom: "1.25rem",
             }}
           >
@@ -945,18 +1405,19 @@ function PracticeTestRunContent() {
                   display: "flex",
                   justifyContent: "space-between",
                   gap: "12px",
-                  padding: "10px 12px",
+                  padding: "12px 14px",
                   borderRadius: "12px",
-                  background: "rgba(255,255,255,0.03)",
-                  border: "0.5px solid rgba(255,255,255,0.07)",
-                  color: "rgba(255,255,255,0.64)",
+                  background: "rgba(255,255,255,0.05)",
+                  border: "0.5px solid rgba(255,255,255,0.1)",
+                  color: "rgba(255,255,255,0.74)",
                   fontSize: "13px",
+                  alignItems: "center",
                 }}
               >
-                <span>
+                <span style={{ fontWeight: 600, color: "#f5f7fa" }}>
                   {index + 1}. {section.title}
                 </span>
-                <span style={{ color: "rgba(255,255,255,0.38)" }}>
+                <span style={{ color: "rgba(255,255,255,0.68)" }}>
                   {section.questionCount}q · {section.durationMinutes}m
                 </span>
               </div>
@@ -1003,15 +1464,17 @@ function PracticeTestRunContent() {
   }
 
   if (phase === "section-break") {
-    const completedSection = sections[currentSectionIndex];
-    const completedStats = allSectionScores[currentSectionIndex];
     const nextSection = sections[currentSectionIndex + 1];
+    const completedSectionTitle = transitionState?.completedSectionTitle ?? sections[currentSectionIndex]?.title ?? "Section";
+    const nextSectionTitle = transitionState?.nextSectionTitle ?? nextSection?.title ?? "Next section";
+    const timedOut = transitionState?.reason === "timeout";
 
     return (
       <div
         style={{
           minHeight: "100vh",
-          background: "linear-gradient(180deg,#0d1b2a 0%,#060d1e 56%,#020408 100%)",
+          background:
+            "radial-gradient(circle at 20% 12%, rgba(60, 196, 180, 0.14), transparent 26%), radial-gradient(circle at 60% 0%, rgba(18, 118, 139, 0.18), transparent 30%), linear-gradient(180deg,#0d1b2a 0%,#081726 56%,#020408 100%)",
           color: "#fff",
           fontFamily: "DM Sans,sans-serif",
           display: "flex",
@@ -1025,32 +1488,40 @@ function PracticeTestRunContent() {
             section complete
           </div>
           <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "38px", marginBottom: "10px" }}>
-            {completedSection.title}
+            {completedSectionTitle}
             <br />
             <em style={{ color: topMeta.accentColor }}>is locked in</em>
           </div>
-          <div style={{ fontSize: "14px", lineHeight: 1.75, color: "rgba(255,255,255,0.54)", marginBottom: "1rem" }}>
-            Aced has saved your answers for this section. Next up: {nextSection?.title}.
+          <div style={{ fontSize: "14px", lineHeight: 1.8, color: "rgba(255,255,255,0.68)", marginBottom: "1.2rem" }}>
+            {timedOut
+              ? `Time's up — ${completedSectionTitle} has been submitted.`
+              : "Your answers have been saved."}{" "}
+            Next up: {nextSectionTitle}.
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "10px", marginBottom: "1rem" }}>
-            {[
-              { value: `${completedStats.correctCount}/${completedSection.questionCount}`, label: "raw" },
-              { value: `${completedStats.accuracyPct}%`, label: "accuracy" },
-              { value: `${completedStats.estimatedScore}/36`, label: "estimate" },
-            ].map((item) => (
-              <div key={item.label} style={{ borderRadius: "14px", background: "rgba(255,255,255,0.04)", padding: "0.95rem 0.9rem" }}>
-                <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "26px", color: topMeta.accentColor, marginBottom: "4px" }}>
-                  {item.value}
-                </div>
-                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>{item.label}</div>
-              </div>
-            ))}
+          <div
+            style={{
+              borderRadius: "18px",
+              background: "rgba(255,255,255,0.05)",
+              border: "0.5px solid rgba(255,255,255,0.1)",
+              padding: "1.05rem 1.1rem",
+              marginBottom: "1rem",
+              color: "rgba(255,255,255,0.72)",
+              lineHeight: 1.7,
+              fontSize: "13px",
+            }}
+          >
+            No scores or answer feedback appear between sections. You’ll get the full report once the entire test is complete.
           </div>
 
           <button
             onClick={() => {
               setCurrentSectionIndex((current) => current + 1);
+              setCurrentQuestionIndices((current) => ({
+                ...current,
+                [currentSectionIndex + 1]: current[currentSectionIndex + 1] ?? 0,
+              }));
+              setTransitionState(null);
               setPhase("running");
               setQuestionStartedAtMs(Date.now());
             }}
@@ -1065,7 +1536,7 @@ function PracticeTestRunContent() {
               fontWeight: 600,
             }}
           >
-            start {nextSection?.title.toLowerCase()} →
+            start {nextSectionTitle.toLowerCase()} →
           </button>
         </div>
       </div>
@@ -1077,7 +1548,8 @@ function PracticeTestRunContent() {
       <div
         style={{
           minHeight: "100vh",
-          background: "linear-gradient(180deg,#0d1b2a 0%,#060d1e 56%,#020408 100%)",
+          background:
+            "radial-gradient(circle at 18% 10%, rgba(62, 196, 183, 0.14), transparent 24%), radial-gradient(circle at 56% 0%, rgba(22, 121, 145, 0.16), transparent 28%), linear-gradient(180deg,#0d1b2a 0%,#081726 56%,#020408 100%)",
           color: "#fff",
           fontFamily: "DM Sans,sans-serif",
           padding: "1.5rem",
@@ -1133,314 +1605,287 @@ function PracticeTestRunContent() {
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: "12px", marginBottom: "1.2rem" }}>
-            {[
-              { value: `${report.correctCount}/${report.totalQuestionCount}`, label: "raw score" },
-              { value: `${report.accuracyPct}%`, label: "accuracy" },
-              { value: report.compositeEstimatedScore ? `${report.compositeEstimatedScore}/36` : "--", label: mode.format === "full" ? "composite estimate" : "section estimate" },
-              { value: `${report.answeredCount}`, label: "answered" },
-              { value: report.overallPacing?.label ?? "on pace", label: "pace read" },
-            ].map((item) => (
-              <div key={item.label} style={{ borderRadius: "16px", background: "rgba(255,255,255,0.04)", padding: "1rem" }}>
-                <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "30px", color: topMeta.accentColor, marginBottom: "4px" }}>
-                  {item.value}
+          <section
+            style={{
+              borderRadius: "24px",
+              background: "rgba(255,255,255,0.06)",
+              border: "0.5px solid rgba(255,255,255,0.11)",
+              padding: "1.4rem",
+              marginBottom: "1.25rem",
+              boxShadow: "0 18px 48px rgba(0,0,0,0.24)",
+            }}
+          >
+            <div style={{ fontSize: "11px", letterSpacing: ".08em", textTransform: "uppercase", color: topMeta.accentColor, marginBottom: "8px" }}>
+              Overall ACT Score Hero
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: "18px", flexWrap: "wrap", alignItems: "flex-end" }}>
+              <div>
+                <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "clamp(3.4rem,9vw,5.4rem)", lineHeight: 0.95, color: "#fff" }}>
+                  {report.compositeEstimatedScore ? `${report.compositeEstimatedScore}` : "--"}
                 </div>
-                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>{item.label}</div>
+                <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.72)", marginTop: "6px" }}>
+                  {mode.format === "full" ? "Composite ACT estimate" : "Timed section estimate"}
+                </div>
               </div>
-            ))}
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 380px", gap: "18px", alignItems: "start" }}>
-            <div style={{ display: "grid", gap: "14px" }}>
-              <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.035)", border: "0.5px solid rgba(255,255,255,0.08)", padding: "1.1rem" }}>
-                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", marginBottom: "10px" }}>section breakdown</div>
-                <div style={{ display: "grid", gap: "10px" }}>
-                  {report.sectionReports.map((section) => (
-                    <div key={section.sectionRunId} style={{ borderRadius: "14px", background: "rgba(255,255,255,0.03)", padding: "0.95rem 1rem" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: "6px" }}>
-                        <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px" }}>{section.title}</div>
-                        <div style={{ color: topMeta.accentColor, fontFamily: "DM Serif Display,serif", fontSize: "24px" }}>
-                          {section.estimatedScore}/36
-                        </div>
-                      </div>
-                      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.52)", marginBottom: "6px" }}>
-                        {section.correctCount}/{section.questionCount} correct · {section.accuracyPct}% accuracy · {formatCountdown(section.durationSeconds)}
-                      </div>
-                      {section.pacingSummary && (
-                        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>
-                          {section.pacingSummary.label} · {section.pacingSummary.description}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.035)", border: "0.5px solid rgba(255,255,255,0.08)", padding: "1.1rem" }}>
-                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", marginBottom: "10px" }}>missed-question review</div>
-                <div style={{ display: "grid", gap: "12px" }}>
-                  {report.missedQuestions.length === 0 && (
-                    <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.54)", lineHeight: 1.7 }}>
-                      Clean run. No missed questions to review here.
-                    </div>
-                  )}
-                  {report.missedQuestions.map((item) => (
-                    <div key={`${item.sectionKey}-${item.questionOrder}`} style={{ borderRadius: "14px", background: "rgba(255,255,255,0.03)", padding: "0.95rem 1rem" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", marginBottom: "8px" }}>
-                        <div style={{ fontSize: "11px", color: topMeta.accentColor, letterSpacing: ".06em", textTransform: "uppercase" }}>
-                          {item.sectionTitle} · question {item.questionOrder + 1}
-                        </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", justifyContent: "flex-end" }}>
-                          {item.flagged ? (
-                            <span
-                              style={{
-                                fontSize: "10px",
-                                color: topMeta.accentColor,
-                                border: `0.5px solid ${topMeta.accentColor}55`,
-                                borderRadius: "999px",
-                                padding: "3px 8px",
-                                letterSpacing: ".04em",
-                                textTransform: "uppercase",
-                              }}
-                            >
-                              marked for review
-                            </span>
-                          ) : null}
-                          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.36)" }}>{item.topicName}</div>
-                        </div>
-                      </div>
-                      {item.question.passage && (
-                        <div style={{ fontSize: "12px", lineHeight: 1.7, color: "rgba(255,255,255,0.5)", marginBottom: "10px" }}>
-                          {renderFormattedText(item.question.passage)}
-                        </div>
-                      )}
-                      <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "20px", lineHeight: 1.55, marginBottom: "10px" }}>
-                        {renderFormattedText(item.question.question_text)}
-                      </div>
-                      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.54)", marginBottom: "8px" }}>
-                        You chose {item.selectedAnswer}. Correct answer: {item.correctAnswer}.
-                      </div>
-                      <div style={{ fontSize: "12px", lineHeight: 1.7, color: "rgba(255,255,255,0.7)" }}>
-                        {item.question.explanation}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
+              <div style={{ maxWidth: "440px", color: "rgba(255,255,255,0.7)", lineHeight: 1.75, fontSize: "14px" }}>
+                {report.overallPacing?.description ??
+                  "This score reflects your fully timed performance across the test sections you just completed."}
+              </div>
             </div>
 
-            <aside style={{ display: "grid", gap: "14px" }}>
-              <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.035)", border: "0.5px solid rgba(255,255,255,0.08)", padding: "1.1rem" }}>
-                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", marginBottom: "10px" }}>pacing analytics</div>
-                <div style={{ fontSize: "13px", lineHeight: 1.75, color: "rgba(255,255,255,0.56)", marginBottom: "10px" }}>
-                  {report.overallPacing?.description ?? "Your timing read will show up here after the run."}
-                </div>
-                <div style={{ display: "grid", gap: "8px" }}>
-                  {report.sectionReports.map((section) => (
-                    <div
-                      key={`${section.sectionRunId}-pace`}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        gap: "10px",
-                        padding: "10px 12px",
-                        borderRadius: "12px",
-                        background: "rgba(255,255,255,0.03)",
-                      }}
-                    >
-                      <div>
-                        <div style={{ fontSize: "13px", color: "#fff" }}>{section.title}</div>
-                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>
-                          {section.pacingSummary
-                            ? `${section.pacingSummary.avgSecondsPerAnswered}s per answered question vs ${section.pacingSummary.targetSecondsPerQuestion}s target`
-                            : "no pacing data"}
-                        </div>
-                      </div>
-                      <div style={{ color: topMeta.accentColor, fontFamily: "DM Serif Display,serif", fontSize: "22px" }}>
-                        {section.pacingSummary?.label ?? "--"}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "1rem" }}>
+              {[
+                `${report.correctCount}/${report.totalQuestionCount} correct`,
+                `${report.accuracyPct}% accuracy`,
+                `${report.answeredCount} answered`,
+                report.overallPacing?.label ?? "pace read pending",
+              ].map((value) => (
+                <span
+                  key={value}
+                  style={{
+                    fontSize: "11px",
+                    color: "rgba(255,255,255,0.72)",
+                    background: "rgba(255,255,255,0.06)",
+                    borderRadius: "999px",
+                    padding: "6px 9px",
+                  }}
+                >
+                  {value}
+                </span>
+              ))}
+            </div>
+          </section>
 
-              <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.035)", border: "0.5px solid rgba(255,255,255,0.08)", padding: "1.1rem" }}>
-                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", marginBottom: "10px" }}>
-                  recovery plan
-                </div>
-                <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "26px", lineHeight: 1.15, marginBottom: "8px" }}>
-                  {report.remediationPlan.headline}
-                </div>
-                <div style={{ fontSize: "13px", lineHeight: 1.75, color: "rgba(255,255,255,0.56)", marginBottom: "12px" }}>
-                  {report.remediationPlan.summary}
-                </div>
-                <div style={{ display: "grid", gap: "10px" }}>
-                  {report.remediationPlan.steps.length === 0 && (
-                    <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.54)", lineHeight: 1.7 }}>
-                      No star drill is being forced from this run. If you want to keep building, head back to your universe and choose the dimmest star.
-                    </div>
-                  )}
-                  {report.remediationPlan.steps.map((step) => (
-                    <div
-                      key={`${step.sectionKey}-${step.topicName}`}
-                      style={{
-                        borderRadius: "14px",
-                        background: "rgba(255,255,255,0.03)",
-                        border: `0.5px solid ${step.sectionColor}33`,
-                        padding: "0.95rem",
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          gap: "10px",
-                          alignItems: "flex-start",
-                          marginBottom: "10px",
-                        }}
-                      >
-                        <div>
-                          <div
-                            style={{
-                              fontSize: "10px",
-                              letterSpacing: ".08em",
-                              textTransform: "uppercase",
-                              color: step.sectionColor,
-                              marginBottom: "5px",
-                            }}
-                          >
-                            drill {step.order} · {step.sectionTitle} · {step.constellation}
-                          </div>
-                          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px", lineHeight: 1.15 }}>
-                            {step.topicName}
-                          </div>
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "10px",
-                            letterSpacing: ".04em",
-                            textTransform: "uppercase",
-                            color: step.sectionColor,
-                            border: `0.5px solid ${step.sectionColor}55`,
-                            borderRadius: "999px",
-                            padding: "4px 8px",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {step.drillLabel}
-                        </div>
-                      </div>
+          <section style={{ marginBottom: "1.25rem" }}>
+            <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.48)", marginBottom: "10px" }}>section score cards</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "12px" }}>
+              {report.sectionReports.map((section) => (
+                <ReportSectionCard key={section.sectionRunId} section={section} accentColor={topMeta.accentColor} />
+              ))}
+            </div>
+          </section>
 
-                      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "10px" }}>
-                        <span
-                          style={{
-                            fontSize: "11px",
-                            color: "rgba(255,255,255,0.66)",
-                            background: "rgba(255,255,255,0.04)",
-                            borderRadius: "999px",
-                            padding: "4px 8px",
-                          }}
-                        >
-                          {step.misses} miss{step.misses === 1 ? "" : "es"}
-                        </span>
-                        <span
-                          style={{
-                            fontSize: "11px",
-                            color: "rgba(255,255,255,0.66)",
-                            background: "rgba(255,255,255,0.04)",
-                            borderRadius: "999px",
-                            padding: "4px 8px",
-                          }}
-                        >
-                          {step.accuracyPct}% timed accuracy
-                        </span>
-                        {step.masteryPct !== null ? (
-                          <span
-                            style={{
-                              fontSize: "11px",
-                              color: "rgba(255,255,255,0.66)",
-                              background: "rgba(255,255,255,0.04)",
-                              borderRadius: "999px",
-                              padding: "4px 8px",
-                            }}
-                          >
-                            {step.masteryPct}% mastery
-                          </span>
-                        ) : null}
-                      </div>
-
-                      <div style={{ fontSize: "12px", lineHeight: 1.7, color: "rgba(255,255,255,0.56)", marginBottom: "12px" }}>
-                        {step.reason}
-                      </div>
-
-                      <button
-                        onClick={() => router.push(step.drillHref)}
-                        style={{
-                          width: "100%",
-                          padding: "11px 12px",
-                          borderRadius: "12px",
-                          border: "none",
-                          background: step.sectionColor,
-                          color: "#081018",
-                          cursor: "pointer",
-                          fontWeight: 600,
-                        }}
-                      >
-                        start {step.topicName} drill
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
+          <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(320px, 420px)", gap: "18px", alignItems: "start", marginBottom: "1.25rem" }}>
+            <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.045)", border: "0.5px solid rgba(255,255,255,0.09)", padding: "1.1rem" }}>
+              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.48)", marginBottom: "10px" }}>pacing overview</div>
+              <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.72)", lineHeight: 1.75, marginBottom: "1rem" }}>
+                {report.overallPacing?.description ?? "Pacing details will appear once the run is complete."}
+              </div>
               <div style={{ display: "grid", gap: "10px" }}>
-                {report.sessionId ? (
-                  <button
-                    onClick={() => router.push(`/practice-tests/history/${report.sessionId}`)}
+                {report.sectionReports.map((section) => (
+                  <div
+                    key={`${section.sectionRunId}-pace`}
                     style={{
-                      width: "100%",
-                      padding: "12px 14px",
-                      borderRadius: "12px",
-                      border: "0.5px solid rgba(255,255,255,0.12)",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      gap: "12px",
+                      padding: "0.9rem 1rem",
+                      borderRadius: "14px",
                       background: "rgba(255,255,255,0.04)",
-                      color: "rgba(255,255,255,0.78)",
-                      cursor: "pointer",
                     }}
                   >
-                    open saved review
-                  </button>
-                ) : null}
-                <button
-                  onClick={() => router.push("/practice-tests")}
-                  style={{
-                    width: "100%",
-                    padding: "12px 14px",
-                    borderRadius: "12px",
-                    border: "none",
-                    background: topMeta.accentColor,
-                    color: "#081018",
-                    cursor: "pointer",
-                    fontWeight: 600,
-                  }}
-                >
-                  back to practice tests
-                </button>
-                <button
-                  onClick={() => router.push("/dashboard")}
-                  style={{
-                    width: "100%",
-                    padding: "12px 14px",
-                    borderRadius: "12px",
-                    border: "0.5px solid rgba(255,255,255,0.12)",
-                    background: "transparent",
-                    color: "rgba(255,255,255,0.72)",
-                    cursor: "pointer",
-                  }}
-                >
-                  return to your universe
-                </button>
+                    <div>
+                      <div style={{ fontSize: "14px", color: "#fff", marginBottom: "4px" }}>{section.title}</div>
+                      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.48)", lineHeight: 1.6 }}>
+                        {section.pacingSummary
+                          ? `${section.pacingSummary.avgSecondsPerAnswered}s per answered question vs ${section.pacingSummary.targetSecondsPerQuestion}s target`
+                          : "No pacing data"}
+                      </div>
+                    </div>
+                    <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "24px", color: topMeta.accentColor }}>
+                      {section.pacingSummary?.label ?? "--"}
+                    </div>
+                  </div>
+                ))}
               </div>
-            </aside>
+            </section>
+
+            <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.045)", border: "0.5px solid rgba(255,255,255,0.09)", padding: "1.1rem" }}>
+              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.48)", marginBottom: "10px" }}>what to work on next</div>
+              <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "28px", lineHeight: 1.1, marginBottom: "10px" }}>
+                {report.remediationPlan.headline}
+              </div>
+              <div style={{ fontSize: "13px", lineHeight: 1.75, color: "rgba(255,255,255,0.62)", marginBottom: "12px" }}>
+                {report.remediationPlan.summary}
+              </div>
+              <div style={{ display: "grid", gap: "10px" }}>
+                {report.remediationPlan.steps.length === 0 && (
+                  <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.58)", lineHeight: 1.7 }}>
+                    No priority drill is being forced from this run. Head back to your universe and rebuild the dimmest star next.
+                  </div>
+                )}
+                {report.remediationPlan.steps.map((step) => (
+                  <div
+                    key={`${step.sectionKey}-${step.topicName}`}
+                    style={{
+                      borderRadius: "14px",
+                      padding: "0.95rem",
+                      background: "rgba(255,255,255,0.04)",
+                      border: `0.5px solid ${step.sectionColor}36`,
+                    }}
+                  >
+                    <div style={{ fontSize: "10px", color: step.sectionColor, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: "6px" }}>
+                      {step.sectionTitle} · {step.constellation}
+                    </div>
+                    <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px", marginBottom: "8px" }}>{step.topicName}</div>
+                    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "8px" }}>
+                      <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.66)", background: "rgba(255,255,255,0.04)", borderRadius: "999px", padding: "4px 8px" }}>
+                        {step.misses} miss{step.misses === 1 ? "" : "es"}
+                      </span>
+                      <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.66)", background: "rgba(255,255,255,0.04)", borderRadius: "999px", padding: "4px 8px" }}>
+                        {step.accuracyPct}% timed accuracy
+                      </span>
+                    </div>
+                    <div style={{ fontSize: "12px", lineHeight: 1.7, color: "rgba(255,255,255,0.58)", marginBottom: "10px" }}>
+                      {step.reason}
+                    </div>
+                    <button
+                      onClick={() => router.push(step.drillHref)}
+                      style={{
+                        width: "100%",
+                        padding: "11px 12px",
+                        borderRadius: "12px",
+                        border: "none",
+                        background: step.sectionColor,
+                        color: "#081018",
+                        cursor: "pointer",
+                        fontWeight: 600,
+                      }}
+                    >
+                      start {step.topicName} drill
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+
+          <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.04)", border: "0.5px solid rgba(255,255,255,0.08)", padding: "1.1rem", marginBottom: "1.25rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "center", flexWrap: "wrap", marginBottom: showQuestionReview ? "1rem" : 0 }}>
+              <div>
+                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.48)", marginBottom: "6px" }}>question review</div>
+                <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.64)", lineHeight: 1.7 }}>
+                  Review missed questions only when you’re ready to drill into the details.
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowQuestionReview((current) => !current)}
+                style={{
+                  padding: "11px 14px",
+                  borderRadius: "12px",
+                  border: "0.5px solid rgba(255,255,255,0.12)",
+                  background: showQuestionReview ? "rgba(255,255,255,0.08)" : "transparent",
+                  color: showQuestionReview ? "#fff" : "rgba(255,255,255,0.78)",
+                  cursor: "pointer",
+                }}
+              >
+                {showQuestionReview ? "hide question review" : `open question review (${report.missedQuestions.length})`}
+              </button>
+            </div>
+
+            {showQuestionReview ? (
+              <div style={{ display: "grid", gap: "12px" }}>
+                {report.missedQuestions.length === 0 && (
+                  <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.58)", lineHeight: 1.7 }}>
+                    Clean run. No missed questions to review here.
+                  </div>
+                )}
+                {report.missedQuestions.map((item) => (
+                  <div key={`${item.sectionKey}-${item.questionOrder}`} style={{ borderRadius: "14px", background: "rgba(255,255,255,0.03)", padding: "0.95rem 1rem" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", marginBottom: "8px", flexWrap: "wrap" }}>
+                      <div style={{ fontSize: "11px", color: topMeta.accentColor, letterSpacing: ".06em", textTransform: "uppercase" }}>
+                        {item.sectionTitle} · question {item.questionOrder + 1}
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", justifyContent: "flex-end" }}>
+                        {item.flagged ? (
+                          <span
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "4px",
+                              fontSize: "10px",
+                              color: topMeta.accentColor,
+                              border: `0.5px solid ${topMeta.accentColor}55`,
+                              borderRadius: "999px",
+                              padding: "3px 8px",
+                              letterSpacing: ".04em",
+                              textTransform: "uppercase",
+                            }}
+                          >
+                            <FlagIcon filled color={topMeta.accentColor} size={11} />
+                            flagged
+                          </span>
+                        ) : null}
+                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>{item.topicName}</div>
+                      </div>
+                    </div>
+                    {item.question.passage && (
+                      <div style={{ fontSize: "12px", lineHeight: 1.7, color: "rgba(255,255,255,0.54)", marginBottom: "10px" }}>
+                        {renderFormattedText(item.question.passage)}
+                      </div>
+                    )}
+                    <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "20px", lineHeight: 1.55, marginBottom: "10px" }}>
+                      {renderFormattedText(item.question.question_text)}
+                    </div>
+                    <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.62)", marginBottom: "8px" }}>
+                      You chose {item.selectedAnswer}. Correct answer: {item.correctAnswer}.
+                    </div>
+                    <div style={{ fontSize: "12px", lineHeight: 1.7, color: "rgba(255,255,255,0.74)" }}>
+                      {item.question.explanation}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </section>
+
+          <div style={{ display: "grid", gap: "10px", maxWidth: "380px" }}>
+            {report.sessionId ? (
+              <button
+                onClick={() => router.push(`/practice-tests/history/${report.sessionId}`)}
+                style={{
+                  width: "100%",
+                  padding: "12px 14px",
+                  borderRadius: "12px",
+                  border: "0.5px solid rgba(255,255,255,0.12)",
+                  background: "rgba(255,255,255,0.04)",
+                  color: "rgba(255,255,255,0.78)",
+                  cursor: "pointer",
+                }}
+              >
+                open saved review
+              </button>
+            ) : null}
+            <button
+              onClick={() => router.push("/practice-tests")}
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                borderRadius: "12px",
+                border: "none",
+                background: topMeta.accentColor,
+                color: "#081018",
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+            >
+              back to practice tests
+            </button>
+            <button
+              onClick={() => router.push("/dashboard")}
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                borderRadius: "12px",
+                border: "0.5px solid rgba(255,255,255,0.12)",
+                background: "transparent",
+                color: "rgba(255,255,255,0.72)",
+                cursor: "pointer",
+              }}
+            >
+              return to your universe
+            </button>
           </div>
         </div>
       </div>
@@ -1455,7 +1900,8 @@ function PracticeTestRunContent() {
     <div
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(180deg,#0d1b2a 0%,#060d1e 56%,#020408 100%)",
+        background:
+          "radial-gradient(circle at 16% 12%, rgba(61, 192, 182, 0.12), transparent 24%), radial-gradient(circle at 72% 18%, rgba(18, 118, 139, 0.12), transparent 24%), linear-gradient(180deg,#0d1b2a 0%,#081726 56%,#020408 100%)",
         color: "#fff",
         fontFamily: "DM Sans,sans-serif",
         padding: "1.5rem",
@@ -1474,6 +1920,26 @@ function PracticeTestRunContent() {
             <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>
               {currentSection.title} · section {currentSectionIndex + 1}/{sections.length}
             </span>
+            <button
+              type="button"
+              onClick={() => setQuestionMapOpen(true)}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "8px 12px",
+                borderRadius: "999px",
+                border: "0.5px solid rgba(255,255,255,0.12)",
+                background: "rgba(255,255,255,0.04)",
+                color: "rgba(255,255,255,0.76)",
+                cursor: "pointer",
+              }}
+            >
+              <span>Questions</span>
+              <span style={{ color: topMeta.accentColor, fontWeight: 600 }}>
+                {currentAnsweredCount}/{currentSection.questions.length}
+              </span>
+            </button>
             <div
               style={{
                 padding: "8px 14px",
@@ -1513,7 +1979,8 @@ function PracticeTestRunContent() {
                   {currentSection.title} · question {currentQuestionIndex + 1} of {currentSection.questions.length}
                 </span>
                 <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>
-                  {answeredCount} answered · {flaggedCount} flagged · {remainingCount} remaining
+                  {currentAnsweredCount} answered · {currentFlaggedCount} flagged ·{" "}
+                  {currentRemainingCount} remaining
                 </span>
               </div>
               <div style={{ height: "4px", borderRadius: "999px", background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
@@ -1619,19 +2086,44 @@ function PracticeTestRunContent() {
 
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
               <button
+                type="button"
                 onClick={toggleFlag}
                 style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
                   padding: "10px 14px",
                   borderRadius: "12px",
-                  border: "0.5px solid rgba(255,255,255,0.12)",
-                  background: currentQuestionKey && flaggedKeys.includes(currentQuestionKey) ? `${topMeta.accentColor}16` : "transparent",
-                  color: currentQuestionKey && flaggedKeys.includes(currentQuestionKey) ? topMeta.accentColor : "rgba(255,255,255,0.68)",
+                  border:
+                    currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
+                      ? `0.5px solid ${topMeta.accentColor}55`
+                      : "0.5px solid rgba(255,255,255,0.12)",
+                  background:
+                    currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
+                      ? `${topMeta.accentColor}16`
+                      : "transparent",
+                  color:
+                    currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
+                      ? topMeta.accentColor
+                      : "rgba(255,255,255,0.68)",
                   cursor: "pointer",
                 }}
               >
-                {currentQuestionKey && flaggedKeys.includes(currentQuestionKey) ? "flagged" : "flag for review"}
+                <FlagIcon
+                  filled={Boolean(currentQuestionKey && flaggedKeys.includes(currentQuestionKey))}
+                  color={
+                    currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
+                      ? topMeta.accentColor
+                      : "rgba(255,255,255,0.68)"
+                  }
+                  size={14}
+                />
+                {currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
+                  ? "flagged for review"
+                  : "flag for review"}
               </button>
               <button
+                type="button"
                 onClick={() => goToQuestion(Math.max(0, currentQuestionIndex - 1))}
                 disabled={currentQuestionIndex === 0}
                 style={{
@@ -1646,6 +2138,7 @@ function PracticeTestRunContent() {
                 previous
               </button>
               <button
+                type="button"
                 onClick={() => goToQuestion(Math.min(currentSection.questions.length - 1, currentQuestionIndex + 1))}
                 disabled={currentQuestionIndex >= currentSection.questions.length - 1}
                 style={{
@@ -1665,57 +2158,39 @@ function PracticeTestRunContent() {
           <aside
             style={{
               borderRadius: "18px",
-              background: "rgba(255,255,255,0.035)",
-              border: "0.5px solid rgba(255,255,255,0.08)",
+              background: "rgba(255,255,255,0.045)",
+              border: "0.5px solid rgba(255,255,255,0.09)",
               padding: "1rem",
               position: "sticky",
               top: "1.25rem",
             }}
           >
+            {timeWarningMessage ? (
+              <div
+                style={{
+                  marginBottom: "0.9rem",
+                  padding: "0.85rem 0.95rem",
+                  borderRadius: "14px",
+                  background: `${topMeta.accentColor}14`,
+                  border: `0.5px solid ${topMeta.accentColor}36`,
+                  color: "rgba(255,255,255,0.78)",
+                  fontSize: "12px",
+                  lineHeight: 1.6,
+                }}
+              >
+                {timeWarningMessage}
+              </div>
+            ) : null}
             <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: "10px" }}>
-              section map
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: "8px", marginBottom: "1rem" }}>
-              {currentSection.questions.map((question, index) => {
-                const answerKey = keyFor(currentSectionIndex, index);
-                const isCurrent = index === currentQuestionIndex;
-                const isAnswered = Boolean(selectedAnswers[answerKey]);
-                const isFlagged = flaggedKeys.includes(answerKey);
-                return (
-                  <button
-                    key={question.id}
-                    onClick={() => goToQuestion(index)}
-                    style={{
-                      width: "100%",
-                      aspectRatio: "1 / 1",
-                      borderRadius: "12px",
-                      border: isCurrent
-                        ? `0.5px solid ${topMeta.accentColor}`
-                        : isFlagged
-                          ? "0.5px solid rgba(240,153,123,0.7)"
-                          : "0.5px solid rgba(255,255,255,0.1)",
-                      background: isCurrent
-                        ? `${topMeta.accentColor}20`
-                        : isAnswered
-                          ? "rgba(255,255,255,0.08)"
-                          : "rgba(255,255,255,0.03)",
-                      color: isCurrent ? topMeta.accentColor : isAnswered ? "#fff" : "rgba(255,255,255,0.45)",
-                      cursor: "pointer",
-                      fontSize: "12px",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {index + 1}
-                  </button>
-                );
-              })}
+              section controls
             </div>
 
             <div style={{ display: "grid", gap: "8px", marginBottom: "1rem" }}>
               {[
-                { value: answeredCount, label: "answered" },
-                { value: flaggedCount, label: "flagged" },
-                { value: remainingCount, label: "remaining" },
+                { value: currentQuestionIndex + 1, label: "current" },
+                { value: currentAnsweredCount, label: "answered" },
+                { value: currentFlaggedCount, label: "flagged" },
+                { value: currentRemainingCount, label: "remaining" },
               ].map((item) => (
                 <div
                   key={item.label}
@@ -1733,6 +2208,45 @@ function PracticeTestRunContent() {
                   <span style={{ color: topMeta.accentColor, fontWeight: 600 }}>{item.value}</span>
                 </div>
               ))}
+            </div>
+
+            <div style={{ display: "grid", gap: "8px", marginBottom: "1rem" }}>
+              <button
+                type="button"
+                onClick={() => setQuestionMapOpen(true)}
+                style={{
+                  width: "100%",
+                  padding: "11px 12px",
+                  borderRadius: "12px",
+                  border: "0.5px solid rgba(255,255,255,0.12)",
+                  background: "rgba(255,255,255,0.04)",
+                  color: "rgba(255,255,255,0.82)",
+                  cursor: "pointer",
+                }}
+              >
+                open questions drawer
+              </button>
+              {unresolvedQuestionIndices.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSubmitWarningOpen(false);
+                    setQuestionMapOpen(true);
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "11px 12px",
+                    borderRadius: "12px",
+                    border: `0.5px solid ${topMeta.accentColor}36`,
+                    background: `${topMeta.accentColor}12`,
+                    color: topMeta.accentColor,
+                    cursor: "pointer",
+                  }}
+                >
+                  review {unresolvedQuestionIndices.length} unresolved question
+                  {unresolvedQuestionIndices.length === 1 ? "" : "s"}
+                </button>
+              ) : null}
             </div>
 
             {flaggedQuestionIndices.length > 0 && (
@@ -1760,8 +2274,12 @@ function PracticeTestRunContent() {
                   {flaggedQuestionIndices.map((index) => (
                     <button
                       key={`flagged-${index}`}
+                      type="button"
                       onClick={() => goToQuestion(index)}
                       style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
                         minWidth: "38px",
                         padding: "8px 10px",
                         borderRadius: "999px",
@@ -1776,6 +2294,11 @@ function PracticeTestRunContent() {
                         fontWeight: 600,
                       }}
                     >
+                      <FlagIcon
+                        filled
+                        color={index === currentQuestionIndex ? topMeta.accentColor : "#fff"}
+                        size={11}
+                      />
                       {index + 1}
                     </button>
                   ))}
@@ -1818,7 +2341,7 @@ function PracticeTestRunContent() {
             <div
               style={{
                 borderRadius: "14px",
-                background: "rgba(255,255,255,0.03)",
+                background: "rgba(255,255,255,0.04)",
                 borderLeft: `2px solid ${topMeta.accentColor}`,
                 padding: "0.95rem 1rem",
                 fontSize: "12px",
@@ -1831,6 +2354,31 @@ function PracticeTestRunContent() {
           </aside>
         </div>
       </div>
+      <QuestionMapDrawer
+        open={questionMapOpen}
+        section={currentSection}
+        currentQuestionIndex={currentQuestionIndex}
+        selectedAnswers={selectedAnswers}
+        flaggedKeys={flaggedKeys}
+        sectionIndex={currentSectionIndex}
+        accentColor={topMeta.accentColor}
+        onClose={() => setQuestionMapOpen(false)}
+        onQuestionSelect={goToQuestion}
+      />
+      <SubmitSectionModal
+        open={submitWarningOpen}
+        sectionTitle={currentSection.title}
+        unansweredCount={currentRemainingCount}
+        flaggedCount={currentFlaggedCount}
+        accentColor={topMeta.accentColor}
+        onReviewQuestions={() => {
+          setSubmitWarningOpen(false);
+          setQuestionMapOpen(true);
+        }}
+        onConfirmSubmit={() => {
+          void handleSectionAdvance("manual", true);
+        }}
+      />
     </div>
   );
 }
