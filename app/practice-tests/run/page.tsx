@@ -298,6 +298,101 @@ function FlagIcon({
   );
 }
 
+function CalculatorPanel({
+  open,
+  accentColor,
+  onClose,
+}: {
+  open: boolean;
+  accentColor: string;
+  onClose: () => void;
+}) {
+  if (!open) {
+    return null;
+  }
+
+  return (
+    <>
+      <div
+        onClick={onClose}
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(2, 6, 12, 0.68)",
+          backdropFilter: "blur(8px)",
+          zIndex: 44,
+        }}
+      />
+      <div
+        style={{
+          position: "fixed",
+          inset: "4vh 3vw",
+          maxWidth: "1180px",
+          margin: "0 auto",
+          borderRadius: "22px",
+          overflow: "hidden",
+          background:
+            "linear-gradient(180deg, rgba(10, 24, 35, 0.98) 0%, rgba(6, 14, 23, 0.98) 100%)",
+          border: "0.5px solid rgba(255,255,255,0.12)",
+          boxShadow: "0 28px 80px rgba(0,0,0,0.42)",
+          zIndex: 45,
+          display: "grid",
+          gridTemplateRows: "auto 1fr",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "12px",
+            padding: "0.95rem 1rem",
+            borderBottom: "0.5px solid rgba(255,255,255,0.08)",
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontSize: "11px",
+                color: accentColor,
+                letterSpacing: ".08em",
+                textTransform: "uppercase",
+                marginBottom: "6px",
+              }}
+            >
+              Calculator
+            </div>
+            <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "28px", color: "#fff" }}>
+              Desmos Graphing Calculator
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              width: "38px",
+              height: "38px",
+              borderRadius: "999px",
+              border: "0.5px solid rgba(255,255,255,0.12)",
+              background: "rgba(255,255,255,0.05)",
+              color: "rgba(255,255,255,0.76)",
+              cursor: "pointer",
+              fontSize: "18px",
+            }}
+          >
+            ×
+          </button>
+        </div>
+        <iframe
+          title="Desmos Graphing Calculator"
+          src="https://www.desmos.com/calculator"
+          style={{ width: "100%", height: "100%", minHeight: "540px", border: "none", display: "block" }}
+        />
+      </div>
+    </>
+  );
+}
+
 function QuestionMapDrawer({
   open,
   section,
@@ -766,18 +861,21 @@ function PracticeTestRunContent() {
   const currentQuestionKey = currentSection ? keyFor(currentSectionIndex, currentQuestionIndex) : null;
   const totalQuestionCount = sections.reduce((sum, section) => sum + section.questions.length, 0);
   const answeredCount = Object.values(selectedAnswers).filter((value) => value !== null).length;
+  const currentSectionQuestionKeys = currentSection
+    ? currentSection.questions.map((_, questionIndex) => keyFor(currentSectionIndex, questionIndex))
+    : [];
   const currentAnsweredCount = currentSection
-    ? currentSection.questions.filter(
-        (_, questionIndex) => selectedAnswers[keyFor(currentSectionIndex, questionIndex)] !== null
-      ).length
+    ? currentSectionQuestionKeys.filter((answerKey) => isAnswerChoice(selectedAnswers[answerKey]))
+        .length
     : 0;
   const currentFlaggedCount = currentSection
-    ? currentSection.questions.filter((_, questionIndex) =>
-        flaggedKeys.includes(keyFor(currentSectionIndex, questionIndex))
-      ).length
+    ? currentSectionQuestionKeys.filter((answerKey) => flaggedKeys.includes(answerKey)).length
+    : 0;
+  const currentUnansweredCount = currentSection
+    ? Math.max(0, currentSection.questions.length - currentAnsweredCount)
     : 0;
   const currentRemainingCount = currentSection
-    ? Math.max(0, currentSection.questions.length - currentAnsweredCount)
+    ? currentUnansweredCount
     : 0;
   const currentTimeRemaining = timeRemainingBySection[currentSectionIndex] ?? 0;
   const flaggedQuestionIndices = currentSection
@@ -794,7 +892,7 @@ function PracticeTestRunContent() {
         .map((_, index) => index)
         .filter((index) => {
           const answerKey = keyFor(currentSectionIndex, index);
-          return selectedAnswers[answerKey] === null || flaggedKeys.includes(answerKey);
+          return !isAnswerChoice(selectedAnswers[answerKey]) || flaggedKeys.includes(answerKey);
         })
     : [];
   const handleSectionAdvanceEvent = useEffectEvent(() => {
@@ -810,7 +908,7 @@ function PracticeTestRunContent() {
       sectionKey: section.sectionKey,
       correctCount,
       answeredCount: section.questions.filter(
-        (_, questionIndex) => selectedAnswers[keyFor(sectionIndex, questionIndex)] !== null
+        (_, questionIndex) => isAnswerChoice(selectedAnswers[keyFor(sectionIndex, questionIndex)])
       ).length,
       accuracyPct:
         section.questions.length > 0
@@ -1040,7 +1138,7 @@ function PracticeTestRunContent() {
               flaggedCount: 0,
             };
 
-            if (selectedAnswer === null) {
+            if (!isAnswerChoice(selectedAnswer)) {
               current.unansweredCount += 1;
             } else {
               current.attempts += 1;
@@ -1996,14 +2094,17 @@ function PracticeTestRunContent() {
             </div>
 
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "0.9rem" }}>
-              <span style={{ fontSize: "10px", padding: "4px 10px", borderRadius: "999px", background: `${topMeta.accentColor}16`, border: `0.5px solid ${topMeta.accentColor}44`, color: topMeta.accentColor }}>
-                {currentSection.sectionKey} · {topMeta.constellation}
-              </span>
-              <span style={{ fontSize: "10px", padding: "4px 10px", borderRadius: "999px", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.52)" }}>
-                {currentQuestion.topic}
-              </span>
-              <span style={{ fontSize: "10px", padding: "4px 10px", borderRadius: "999px", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.52)" }}>
-                {currentQuestion.difficulty}
+              <span
+                style={{
+                  fontSize: "10px",
+                  padding: "4px 10px",
+                  borderRadius: "999px",
+                  background: `${topMeta.accentColor}16`,
+                  border: `0.5px solid ${topMeta.accentColor}44`,
+                  color: topMeta.accentColor,
+                }}
+              >
+                timed section
               </span>
             </div>
 
@@ -2249,6 +2350,26 @@ function PracticeTestRunContent() {
               ) : null}
             </div>
 
+            {currentSection.sectionKey === "math" && mode.includesDesmos && (
+              <div style={{ marginBottom: "1rem" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowCalculator(true)}
+                  style={{
+                    width: "100%",
+                    padding: "11px 12px",
+                    borderRadius: "12px",
+                    border: `0.5px solid ${topMeta.accentColor}36`,
+                    background: showCalculator ? `${topMeta.accentColor}16` : "rgba(255,255,255,0.04)",
+                    color: showCalculator ? topMeta.accentColor : "rgba(255,255,255,0.82)",
+                    cursor: "pointer",
+                  }}
+                >
+                  open calculator
+                </button>
+              </div>
+            )}
+
             {flaggedQuestionIndices.length > 0 && (
               <div
                 style={{
@@ -2306,38 +2427,6 @@ function PracticeTestRunContent() {
               </div>
             )}
 
-            {currentSection.sectionKey === "math" && mode.includesDesmos && (
-              <div style={{ marginBottom: "1rem" }}>
-                <button
-                  onClick={() => setShowCalculator((current) => !current)}
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    borderRadius: "12px",
-                    border: "0.5px solid rgba(255,255,255,0.12)",
-                    background: showCalculator ? `${topMeta.accentColor}16` : "transparent",
-                    color: showCalculator ? topMeta.accentColor : "rgba(255,255,255,0.72)",
-                    cursor: "pointer",
-                    marginBottom: showCalculator ? "10px" : 0,
-                  }}
-                >
-                  {showCalculator ? "hide calculator" : "open calculator"}
-                </button>
-                {showCalculator && (
-                  <div style={{ borderRadius: "14px", overflow: "hidden", border: "0.5px solid rgba(255,255,255,0.08)", background: "rgba(0,0,0,0.2)" }}>
-                    <div style={{ padding: "8px 10px", fontSize: "11px", color: "rgba(255,255,255,0.46)", borderBottom: "0.5px solid rgba(255,255,255,0.08)" }}>
-                      Desmos Graphing Calculator
-                    </div>
-                    <iframe
-                      title="Desmos Graphing Calculator"
-                      src="https://www.desmos.com/calculator"
-                      style={{ width: "100%", height: "360px", border: "none", display: "block" }}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-
             <div
               style={{
                 borderRadius: "14px",
@@ -2368,7 +2457,7 @@ function PracticeTestRunContent() {
       <SubmitSectionModal
         open={submitWarningOpen}
         sectionTitle={currentSection.title}
-        unansweredCount={currentRemainingCount}
+        unansweredCount={currentUnansweredCount}
         flaggedCount={currentFlaggedCount}
         accentColor={topMeta.accentColor}
         onReviewQuestions={() => {
@@ -2378,6 +2467,11 @@ function PracticeTestRunContent() {
         onConfirmSubmit={() => {
           void handleSectionAdvance("manual", true);
         }}
+      />
+      <CalculatorPanel
+        open={currentSection.sectionKey === "math" && mode.includesDesmos && showCalculator}
+        accentColor={topMeta.accentColor}
+        onClose={() => setShowCalculator(false)}
       />
     </div>
   );
