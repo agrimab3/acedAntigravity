@@ -103,6 +103,9 @@ type GenerationSummary = {
 
 type GenerationDebugEntry = {
   label: string;
+  requestedChildCount?: number;
+  plannedSetCount?: number;
+  requestedDifficultyCounts?: Partial<Record<"easy" | "medium" | "hard", number>>;
   summary: GenerationSummary | null;
   stdout?: string | null;
   stderr?: string | null;
@@ -114,7 +117,8 @@ const reviewQualityOptions = ["all", "blocked", "warning", "clean"] as const;
 const reviewSortOptions = ["blocked-first", "highest-risk", "newest"] as const;
 const bulkScopeOptions = ["math-reading", "current-filter", "all-sections"] as const;
 const bulkCountOptions = [3, 6, 9] as const;
-const adminInteractivePerDifficulty = 1;
+const topicBatchSizeOptions = [3, 6, 12, 18] as const;
+const bulkChildCountOptions = [6, 12, 18] as const;
 
 function getBacklogPriorityBadge(topic: BacklogTopic) {
   if (topic.reviewPriority === "critical") {
@@ -173,6 +177,50 @@ function renderFormattedText(text: string) {
   });
 }
 
+function formatDifficultyMix(
+  counts: Partial<Record<"easy" | "medium" | "hard", number>> | undefined
+) {
+  if (!counts) {
+    return null;
+  }
+
+  return ["easy", "medium", "hard"]
+    .map((difficulty) => `${difficulty} ${counts[difficulty as "easy" | "medium" | "hard"] ?? 0}`)
+    .join(" · ");
+}
+
+function summarizeGenerationResults(
+  results: Array<{
+    summary?: GenerationSummary;
+    requestedChildCount?: number;
+    plannedSetCount?: number;
+  }>
+) {
+  return results.reduce(
+    (summary, result) => {
+      summary.requested += Number(result.requestedChildCount ?? 0);
+      summary.inserted += Number(result.summary?.inserted ?? 0);
+      summary.plannedSets += Number(result.plannedSetCount ?? 0);
+      summary.insertedSets += Number(result.summary?.setsInserted ?? 0);
+      summary.kept += Number(result.summary?.reviewKept ?? 0);
+      summary.revised += Number(result.summary?.reviewRevised ?? 0);
+      summary.rejected += Number(result.summary?.reviewRejected ?? 0);
+      summary.reviewErrors += Number(result.summary?.reviewErrors ?? 0);
+      return summary;
+    },
+    {
+      requested: 0,
+      inserted: 0,
+      plannedSets: 0,
+      insertedSets: 0,
+      kept: 0,
+      revised: 0,
+      rejected: 0,
+      reviewErrors: 0,
+    }
+  );
+}
+
 export default function ReviewConsole() {
   const [backlog, setBacklog] = useState<BacklogTopic[]>([]);
   const [questions, setQuestions] = useState<ReviewQuestion[]>([]);
@@ -183,14 +231,18 @@ export default function ReviewConsole() {
   const [reviewSort, setReviewSort] = useState<(typeof reviewSortOptions)[number]>("blocked-first");
   const [bulkScope, setBulkScope] = useState<(typeof bulkScopeOptions)[number]>("math-reading");
   const [bulkTopicCount, setBulkTopicCount] = useState<(typeof bulkCountOptions)[number]>(6);
+  const [bulkRequestedChildCount, setBulkRequestedChildCount] =
+    useState<(typeof bulkChildCountOptions)[number]>(6);
   const [loadingBacklog, setLoadingBacklog] = useState(true);
   const [loadingQuestions, setLoadingQuestions] = useState(true);
   const [runningTopic, setRunningTopic] = useState<string | null>(null);
   const [runningBulkFill, setRunningBulkFill] = useState(false);
+  const [runningLaunchSprint, setRunningLaunchSprint] = useState<"critical-gaps" | "launch-minimum" | null>(null);
   const [savingQuestionId, setSavingQuestionId] = useState<string | null>(null);
   const [bulkSaving, setBulkSaving] = useState(false);
   const [notesByQuestionId, setNotesByQuestionId] = useState<Record<string, string>>({});
   const [selectedQuestionIds, setSelectedQuestionIds] = useState<Record<string, boolean>>({});
+  const [topicBatchSizes, setTopicBatchSizes] = useState<Record<string, (typeof topicBatchSizeOptions)[number]>>({});
   const [flashMessage, setFlashMessage] = useState<string | null>(null);
   const [generationDebug, setGenerationDebug] = useState<GenerationDebugEntry[] | null>(null);
 
@@ -266,6 +318,36 @@ export default function ReviewConsole() {
   const allVisibleQuestionsSelected =
     questions.length > 0 && questions.every((question) => selectedQuestionIds[question.id]);
 
+  function getTopicBatchKey(topic: BacklogTopic) {
+    return `${topic.sectionKey}:${topic.topicSlug}`;
+  }
+
+  function getRequestedChildCount(topic: BacklogTopic) {
+    return topicBatchSizes[getTopicBatchKey(topic)] ?? 3;
+  }
+
+  function setRequestedChildCount(
+    topic: BacklogTopic,
+    requestedChildCount: (typeof topicBatchSizeOptions)[number]
+  ) {
+    setTopicBatchSizes((current) => ({
+      ...current,
+      [getTopicBatchKey(topic)]: requestedChildCount,
+    }));
+  }
+
+  function confirmGeneration(approxRequestedChildCount: number, label: string) {
+    if (approxRequestedChildCount <= 18) {
+      return true;
+    }
+
+    return window.confirm(
+      `${label} may request about ${approxRequestedChildCount} draft child question${
+        approxRequestedChildCount === 1 ? "" : "s"
+      }. Continue?`
+    );
+  }
+
   async function loadBacklog() {
     setLoadingBacklog(true);
     try {
@@ -330,6 +412,12 @@ export default function ReviewConsole() {
   }, [activeSection, activeStatus, activeTopic, reviewQualityFilter, reviewSort]);
 
   async function bulkFillCriticalTopics() {
+    const approxRequestedChildCount = bulkRequestedChildCount * bulkTopicCount;
+
+    if (!confirmGeneration(approxRequestedChildCount, "This bulk fill")) {
+      return;
+    }
+
     setRunningBulkFill(true);
     setFlashMessage(null);
     setGenerationDebug(null);
@@ -353,6 +441,7 @@ export default function ReviewConsole() {
           priorities: ["critical"],
           preferredDifficulties: ["hard", "medium"],
           maxTopics: bulkTopicCount,
+          requestedChildCount: bulkRequestedChildCount,
           status: "draft",
         }),
       });
@@ -363,29 +452,14 @@ export default function ReviewConsole() {
         throw new Error(data.error || "Bulk generation failed.");
       }
 
-      const inserted = (data.results ?? []).reduce(
-        (sum: number, result: { summary?: GenerationSummary }) => sum + Number(result.summary?.inserted ?? 0),
-        0
-      );
-      const kept = (data.results ?? []).reduce(
-        (sum: number, result: { summary?: GenerationSummary }) => sum + Number(result.summary?.reviewKept ?? 0),
-        0
-      );
-      const revised = (data.results ?? []).reduce(
-        (sum: number, result: { summary?: GenerationSummary }) => sum + Number(result.summary?.reviewRevised ?? 0),
-        0
-      );
-      const rejected = (data.results ?? []).reduce(
-        (sum: number, result: { summary?: GenerationSummary }) => sum + Number(result.summary?.reviewRejected ?? 0),
-        0
-      );
-      const reviewErrors = (data.results ?? []).reduce(
-        (sum: number, result: { summary?: GenerationSummary }) => sum + Number(result.summary?.reviewErrors ?? 0),
-        0
-      );
+      const totals = summarizeGenerationResults(data.results ?? []);
 
       setFlashMessage(
-        `Filled ${data.selection?.selectedTopicCount ?? 0} critical topic batch${data.selection?.selectedTopicCount === 1 ? "" : "es"}: inserted ${inserted}, reviewer kept ${kept}, revised ${revised}, rejected ${rejected}, errors ${reviewErrors}.`
+        `Filled ${data.selection?.selectedTopicCount ?? 0} critical topic batch${
+          data.selection?.selectedTopicCount === 1 ? "" : "es"
+        }: requested ${totals.requested}, inserted ${totals.inserted}${
+          totals.insertedSets > 0 ? ` across ${totals.insertedSets} set${totals.insertedSets === 1 ? "" : "s"}` : ""
+        }, reviewer kept ${totals.kept}, revised ${totals.revised}, rejected ${totals.rejected}, errors ${totals.reviewErrors}.`
       );
       setGenerationDebug(
         (data.results ?? []).map(
@@ -393,9 +467,15 @@ export default function ReviewConsole() {
             sectionKey: string;
             topicName: string;
             topicSlug: string;
+            requestedChildCount?: number;
+            plannedSetCount?: number;
+            requestedDifficultyCounts?: Partial<Record<"easy" | "medium" | "hard", number>>;
             summary?: GenerationSummary;
           }) => ({
             label: `${result.sectionKey}/${result.topicSlug} · ${result.topicName}`,
+            requestedChildCount: result.requestedChildCount,
+            plannedSetCount: result.plannedSetCount,
+            requestedDifficultyCounts: result.requestedDifficultyCounts,
             summary: result.summary ?? null,
           })
         )
@@ -409,6 +489,8 @@ export default function ReviewConsole() {
   }
 
   async function generateDraftBatch(topic: BacklogTopic) {
+    const requestedChildCount = getRequestedChildCount(topic);
+
     setRunningTopic(topic.topicSlug);
     setFlashMessage(null);
     setGenerationDebug(null);
@@ -420,7 +502,7 @@ export default function ReviewConsole() {
         body: JSON.stringify({
           sectionKey: topic.sectionKey,
           topicSlug: topic.topicSlug,
-          perDifficulty: adminInteractivePerDifficulty,
+          requestedChildCount,
           status: "draft",
         }),
       });
@@ -440,11 +522,23 @@ export default function ReviewConsole() {
           : "";
 
       setFlashMessage(
-        `Generated ${summary?.inserted ?? 0} draft question(s)${setText} for ${topic.topicName}. Reviewer kept ${summary?.reviewKept ?? 0}, revised ${summary?.reviewRevised ?? 0}, rejected ${summary?.reviewRejected ?? 0}, errors ${summary?.reviewErrors ?? 0}${failureText ? ` · ${failureText}` : ""}.`
+        `Requested ${requestedChildCount} draft child questions for ${topic.topicName}. Inserted ${
+          summary?.inserted ?? 0
+        }${setText}. Reviewer kept ${summary?.reviewKept ?? 0}, revised ${
+          summary?.reviewRevised ?? 0
+        }, rejected ${summary?.reviewRejected ?? 0}, errors ${summary?.reviewErrors ?? 0}${
+          failureText ? ` · ${failureText}` : ""
+        }.`
       );
       setGenerationDebug([
         {
           label: `${topic.sectionKey}/${topic.topicSlug} · ${topic.topicName}`,
+          requestedChildCount,
+          plannedSetCount: typeof data.plannedSetCount === "number" ? data.plannedSetCount : undefined,
+          requestedDifficultyCounts:
+            typeof data.requestedDifficultyCounts === "object" && data.requestedDifficultyCounts
+              ? data.requestedDifficultyCounts
+              : undefined,
           summary,
           stdout: typeof data.stdout === "string" ? data.stdout : null,
           stderr: typeof data.stderr === "string" ? data.stderr : null,
@@ -455,6 +549,66 @@ export default function ReviewConsole() {
       setFlashMessage(error instanceof Error ? error.message : "Generation failed.");
     } finally {
       setRunningTopic(null);
+    }
+  }
+
+  async function runLaunchSprint(preset: "critical-gaps" | "launch-minimum") {
+    if (!confirmGeneration(72, preset === "critical-gaps" ? "Critical gaps sprint" : "Launch minimum sprint")) {
+      return;
+    }
+
+    setRunningLaunchSprint(preset);
+    setFlashMessage(null);
+    setGenerationDebug(null);
+
+    try {
+      const res = await fetch("/api/admin/backlog", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode: "launch-sprint",
+          preset,
+          status: "draft",
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Launch sprint failed.");
+      }
+
+      const totals = summarizeGenerationResults(data.results ?? []);
+      setFlashMessage(
+        `${
+          preset === "critical-gaps" ? "Critical gaps sprint" : "Toward launch minimum"
+        }: requested ${totals.requested}, inserted ${totals.inserted}${
+          totals.insertedSets > 0 ? ` across ${totals.insertedSets} set${totals.insertedSets === 1 ? "" : "s"}` : ""
+        }, reviewer kept ${totals.kept}, revised ${totals.revised}, rejected ${totals.rejected}, errors ${totals.reviewErrors}.`
+      );
+      setGenerationDebug(
+        (data.results ?? []).map(
+          (result: {
+            sectionKey: string;
+            topicName: string;
+            topicSlug: string;
+            requestedChildCount?: number;
+            plannedSetCount?: number;
+            requestedDifficultyCounts?: Partial<Record<"easy" | "medium" | "hard", number>>;
+            summary?: GenerationSummary;
+          }) => ({
+            label: `${result.sectionKey}/${result.topicSlug} · ${result.topicName}`,
+            requestedChildCount: result.requestedChildCount,
+            plannedSetCount: result.plannedSetCount,
+            requestedDifficultyCounts: result.requestedDifficultyCounts,
+            summary: result.summary ?? null,
+          })
+        )
+      );
+      await Promise.all([loadBacklog(), loadQuestions()]);
+    } catch (error) {
+      setFlashMessage(error instanceof Error ? error.message : "Launch sprint failed.");
+    } finally {
+      setRunningLaunchSprint(null);
     }
   }
 
@@ -697,6 +851,20 @@ export default function ReviewConsole() {
                   </option>
                 ))}
               </select>
+
+              <select
+                value={String(bulkRequestedChildCount)}
+                onChange={(event) =>
+                  setBulkRequestedChildCount(Number(event.target.value) as (typeof bulkChildCountOptions)[number])
+                }
+                style={selectStyle}
+              >
+                {bulkChildCountOptions.map((count) => (
+                  <option key={count} value={count}>
+                    about {count} child questions per topic
+                  </option>
+                ))}
+              </select>
             </div>
 
             <button
@@ -719,13 +887,49 @@ export default function ReviewConsole() {
             </button>
           </div>
 
+          <div
+            style={{
+              borderRadius: "14px",
+              border: "1px solid rgba(255,255,255,0.08)",
+              background: "rgba(255,255,255,0.03)",
+              padding: "12px",
+              marginBottom: "12px",
+            }}
+          >
+            <div style={{ fontSize: "11px", letterSpacing: ".06em", color: "rgba(255,255,255,0.38)" }}>
+              LAUNCH SPRINT
+            </div>
+            <div style={{ marginTop: "6px", fontSize: "13px", color: "rgba(255,255,255,0.68)", lineHeight: 1.55 }}>
+              one-click draft generation presets using live backlog counts with hard server-side caps
+            </div>
+
+            <div style={{ display: "grid", gap: "8px", marginTop: "12px" }}>
+              <button
+                onClick={() => void runLaunchSprint("critical-gaps")}
+                disabled={runningLaunchSprint !== null}
+                style={secondaryButtonStyle}
+              >
+                {runningLaunchSprint === "critical-gaps" ? "filling critical gaps…" : "fill critical gaps"}
+              </button>
+              <button
+                onClick={() => void runLaunchSprint("launch-minimum")}
+                disabled={runningLaunchSprint !== null}
+                style={primaryButtonStyle}
+              >
+                {runningLaunchSprint === "launch-minimum"
+                  ? "moving toward launch minimum…"
+                  : "move toward launch minimum"}
+              </button>
+            </div>
+          </div>
+
           <div style={{ display: "flex", flexDirection: "column", gap: "10px", maxHeight: "70vh", overflowY: "auto" }}>
             {loadingBacklog ? (
               <div style={mutedTextStyle}>loading backlog…</div>
             ) : (
               prioritizedBacklog.map((topic) => {
                   const priorityBadge = getBacklogPriorityBadge(topic);
-                  const batchSize = adminInteractivePerDifficulty * 3;
+                  const batchSize = getRequestedChildCount(topic);
                   return (
                     <div
                       key={`${topic.sectionKey}:${topic.topicSlug}`}
@@ -782,6 +986,35 @@ export default function ReviewConsole() {
                         ) : null}
                       </div>
 
+                      <div style={{ marginTop: "12px" }}>
+                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "8px" }}>
+                          batch size
+                        </div>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                          {topicBatchSizeOptions.map((count) => {
+                            const selected = batchSize === count;
+                            return (
+                              <button
+                                key={`${topic.sectionKey}:${topic.topicSlug}:${count}`}
+                                type="button"
+                                onClick={() => setRequestedChildCount(topic, count)}
+                                style={{
+                                  padding: "6px 10px",
+                                  borderRadius: "999px",
+                                  border: selected ? "1px solid rgba(29,158,117,0.8)" : "1px solid rgba(255,255,255,0.12)",
+                                  background: selected ? "rgba(29,158,117,0.18)" : "rgba(255,255,255,0.03)",
+                                  color: selected ? "#D8FFF1" : "rgba(255,255,255,0.72)",
+                                  fontSize: "12px",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                {count}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
                       <button
                         onClick={() => void generateDraftBatch(topic)}
                         disabled={runningTopic === topic.topicSlug}
@@ -800,7 +1033,7 @@ export default function ReviewConsole() {
                       >
                         {runningTopic === topic.topicSlug
                           ? "generating draft batch…"
-                          : `generate ${batchSize} draft question${batchSize === 1 ? "" : "s"}`}
+                          : `generate ${batchSize} draft questions`}
                       </button>
                     </div>
                   );
@@ -897,6 +1130,12 @@ export default function ReviewConsole() {
                     {entry.label}
                   </div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "7px" }}>
+                    {typeof entry.requestedChildCount === "number" ? (
+                      <Badge text={`requested ${entry.requestedChildCount}`} tone="success" subtle />
+                    ) : null}
+                    {typeof entry.plannedSetCount === "number" && entry.plannedSetCount > 0 ? (
+                      <Badge text={`planned sets ${entry.plannedSetCount}`} tone="warning" subtle />
+                    ) : null}
                     <Badge text={`inserted ${entry.summary?.inserted ?? 0}`} tone="success" />
                     <Badge text={`kept ${entry.summary?.reviewKept ?? 0}`} tone="success" subtle />
                     <Badge text={`revised ${entry.summary?.reviewRevised ?? 0}`} tone="warning" />
@@ -904,6 +1143,12 @@ export default function ReviewConsole() {
                     <Badge text={`review errors ${entry.summary?.reviewErrors ?? 0}`} tone="danger" subtle />
                     <Badge text={`skipped ${entry.summary?.skipped ?? 0}`} subtle />
                   </div>
+
+                  {formatDifficultyMix(entry.requestedDifficultyCounts) ? (
+                    <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.56)" }}>
+                      difficulty mix · {formatDifficultyMix(entry.requestedDifficultyCounts)}
+                    </div>
+                  ) : null}
 
                   {failures.length > 0 && (
                     <div style={{ display: "grid", gap: "6px" }}>

@@ -139,6 +139,11 @@ if (!databaseUrl) {
 
 const args = parseArgs(process.argv.slice(2));
 const perDifficulty = Math.max(1, Number(args["per-difficulty"] || 3));
+const requestedDifficultyCounts = parseRequestedDifficultyCounts(args["difficulty-plan"]) || {
+  easy: perDifficulty,
+  medium: perDifficulty,
+  hard: perDifficulty,
+};
 const requestedStatus = (args.status || "draft").trim().toLowerCase();
 const sectionFilter = args.section?.trim().toLowerCase();
 const topicFilter = args.topic?.trim().toLowerCase();
@@ -237,6 +242,41 @@ function parseArgs(argv) {
         return [rawKey, rest.join("=") || "true"];
       })
   );
+}
+
+function parseRequestedDifficultyCounts(rawPlan) {
+  if (!rawPlan) {
+    return null;
+  }
+
+  const counts = {
+    easy: 0,
+    medium: 0,
+    hard: 0,
+  };
+
+  for (const entry of String(rawPlan)
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean)) {
+    const [rawDifficulty, rawCount] = entry.split(":");
+    const difficulty = rawDifficulty?.trim().toLowerCase();
+    const count = Number(rawCount);
+
+    if (!DIFFICULTIES.includes(difficulty) || !Number.isInteger(count) || count < 0) {
+      throw new Error(`Invalid --difficulty-plan value: ${rawPlan}`);
+    }
+
+    counts[difficulty] = count;
+  }
+
+  const totalRequested = DIFFICULTIES.reduce((sum, difficulty) => sum + counts[difficulty], 0);
+
+  if (totalRequested < 1) {
+    throw new Error("The --difficulty-plan must request at least one question.");
+  }
+
+  return counts;
 }
 
 function resolveGenerationProvider(rawProvider) {
@@ -1927,9 +1967,9 @@ async function generateBatchForTopic(topic) {
 
   if (topic.section_key === "reading" || topic.section_key === "science") {
     const setDifficultyPlans = planQuestionSetDifficultyCounts(topic.section_key, {
-      easy: perDifficulty,
-      medium: perDifficulty,
-      hard: perDifficulty,
+      easy: requestedDifficultyCounts.easy,
+      medium: requestedDifficultyCounts.medium,
+      hard: requestedDifficultyCounts.hard,
     });
 
     for (const difficultyCounts of setDifficultyPlans) {
@@ -1952,7 +1992,12 @@ async function generateBatchForTopic(topic) {
   }
 
   for (const difficulty of DIFFICULTIES) {
-    const requestedCount = perDifficulty;
+    const requestedCount = requestedDifficultyCounts[difficulty];
+
+    if (requestedCount < 1) {
+      continue;
+    }
+
     const candidateCount = Math.min(
       6,
       Math.max(requestedCount, requestedCount + (requestedCount === 1 ? 2 : 1))
@@ -2821,7 +2866,7 @@ async function main() {
     };
 
     console.log(
-      `Generating ACT inventory for ${topics.length} topic(s) with ${perDifficulty} question(s) per difficulty.`
+      `Generating ACT inventory for ${topics.length} topic(s) with difficulty plan easy:${requestedDifficultyCounts.easy}, medium:${requestedDifficultyCounts.medium}, hard:${requestedDifficultyCounts.hard}.`
     );
 
     for (const topic of topics) {
