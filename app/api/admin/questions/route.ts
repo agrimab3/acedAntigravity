@@ -1,9 +1,10 @@
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { actTopics, questions } from "@/db/schema";
+import { actTopics, questions, questionSets } from "@/db/schema";
 import { getAdminSession } from "@/lib/admin";
 import { getDb } from "@/lib/db";
+import { resolveEffectivePassage } from "@/lib/question-sets";
 import { reviewQuestionQuality } from "@/lib/question-utils";
 
 const listSchema = z.object({
@@ -78,6 +79,10 @@ export async function GET(request: Request) {
       difficulty: questions.difficulty,
       prompt: questions.prompt,
       passage: questions.passage,
+      questionSetId: questions.questionSetId,
+      questionSetKind: questionSets.kind,
+      questionSetTitle: questionSets.title,
+      questionSetContent: questionSets.content,
       choices: questions.choices,
       correctAnswer: questions.correctAnswer,
       explanation: questions.explanation,
@@ -90,18 +95,26 @@ export async function GET(request: Request) {
     })
     .from(questions)
     .innerJoin(actTopics, eq(questions.topicId, actTopics.id))
+    .leftJoin(questionSets, eq(questions.questionSetId, questionSets.id))
     .where(filters.length > 0 ? and(...filters) : undefined)
     .orderBy(desc(questions.createdAt))
     .limit(Math.min(Math.max(parsed.data.limit * 8, 80), 240));
 
   const reviewedRows = rows.map((row) => ({
     ...row,
+    passage: resolveEffectivePassage({
+      passage: row.passage,
+      questionSetContent: row.questionSetContent,
+    }),
     qualityReview: reviewQuestionQuality({
       id: row.id,
       section: row.sectionKey,
       topic: row.topicName,
       difficulty: row.difficulty,
-      passage: row.passage,
+      passage: resolveEffectivePassage({
+        passage: row.passage,
+        questionSetContent: row.questionSetContent,
+      }),
       question_text: row.prompt,
       choices: row.choices,
       correct_answer: row.correctAnswer,

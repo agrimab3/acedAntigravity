@@ -46,6 +46,10 @@ type ReviewQuestion = {
   difficulty: string;
   prompt: string;
   passage: string | null;
+  questionSetId: string | null;
+  questionSetKind: "reading_passage" | "science_stimulus" | null;
+  questionSetTitle: string | null;
+  questionSetContent: string | null;
   choices: Record<"A" | "B" | "C" | "D", string>;
   correctAnswer: string;
   explanation: string;
@@ -71,8 +75,21 @@ type ReviewQuestion = {
   };
 };
 
+type ReviewQuestionGroup = {
+  id: string;
+  sectionKey: string;
+  topicName: string;
+  topicSlug: string;
+  questionSetId: string | null;
+  questionSetKind: "reading_passage" | "science_stimulus" | null;
+  questionSetTitle: string | null;
+  sharedContent: string | null;
+  children: ReviewQuestion[];
+};
+
 type GenerationSummary = {
   inserted?: number;
+  setsInserted?: number;
   skipped?: number;
   reviewKept?: number;
   reviewRevised?: number;
@@ -216,6 +233,35 @@ export default function ReviewConsole() {
     () => questions.filter((question) => selectedQuestionIds[question.id]).length,
     [questions, selectedQuestionIds]
   );
+
+  const questionGroups = useMemo<ReviewQuestionGroup[]>(() => {
+    const groups = new Map<string, ReviewQuestionGroup>();
+
+    questions.forEach((question) => {
+      const isSetBacked = Boolean(question.questionSetId && question.questionSetContent);
+      const groupId = isSetBacked ? `set:${question.questionSetId}` : `question:${question.id}`;
+      const existing = groups.get(groupId);
+
+      if (existing) {
+        existing.children.push(question);
+        return;
+      }
+
+      groups.set(groupId, {
+        id: groupId,
+        sectionKey: question.sectionKey,
+        topicName: question.topicName,
+        topicSlug: question.topicSlug,
+        questionSetId: question.questionSetId,
+        questionSetKind: question.questionSetKind,
+        questionSetTitle: question.questionSetTitle,
+        sharedContent: question.questionSetContent,
+        children: [question],
+      });
+    });
+
+    return Array.from(groups.values());
+  }, [questions]);
 
   const allVisibleQuestionsSelected =
     questions.length > 0 && questions.every((question) => selectedQuestionIds[question.id]);
@@ -367,8 +413,6 @@ export default function ReviewConsole() {
     setFlashMessage(null);
     setGenerationDebug(null);
 
-    const batchSize = adminInteractivePerDifficulty * 3;
-
     try {
       const res = await fetch("/api/admin/backlog", {
         method: "POST",
@@ -390,9 +434,13 @@ export default function ReviewConsole() {
       const summary = (data.summary ?? null) as GenerationSummary | null;
       const failureText =
         summary?.failures?.map((failure) => failure.error).filter(Boolean).join(" | ") ?? "";
+      const setText =
+        (summary?.setsInserted ?? 0) > 0
+          ? ` across ${summary?.setsInserted ?? 0} set${summary?.setsInserted === 1 ? "" : "s"}`
+          : "";
 
       setFlashMessage(
-        `Generated ${summary?.inserted ?? 0} of ${batchSize} requested draft question(s) for ${topic.topicName}. Reviewer kept ${summary?.reviewKept ?? 0}, revised ${summary?.reviewRevised ?? 0}, rejected ${summary?.reviewRejected ?? 0}, errors ${summary?.reviewErrors ?? 0}${failureText ? ` · ${failureText}` : ""}.`
+        `Generated ${summary?.inserted ?? 0} draft question(s)${setText} for ${topic.topicName}. Reviewer kept ${summary?.reviewKept ?? 0}, revised ${summary?.reviewRevised ?? 0}, rejected ${summary?.reviewRejected ?? 0}, errors ${summary?.reviewErrors ?? 0}${failureText ? ` · ${failureText}` : ""}.`
       );
       setGenerationDebug([
         {
@@ -963,9 +1011,9 @@ export default function ReviewConsole() {
           ) : questions.length === 0 ? (
             <div style={mutedTextStyle}>no questions match the current filters.</div>
           ) : (
-            questions.map((question) => (
+            questionGroups.map((group) => (
               <article
-                key={question.id}
+                key={group.id}
                 style={{
                   borderRadius: "16px",
                   border: "1px solid rgba(255,255,255,0.08)",
@@ -983,194 +1031,246 @@ export default function ReviewConsole() {
                   }}
                 >
                   <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
-                    <label style={{ display: "inline-flex", alignItems: "center", cursor: "pointer" }}>
-                      <input
-                        type="checkbox"
-                        checked={Boolean(selectedQuestionIds[question.id])}
-                        onChange={(event) =>
-                          setSelectedQuestionIds((current) => ({
-                            ...current,
-                            [question.id]: event.target.checked,
-                          }))
+                    <Badge text={`${group.sectionKey} · ${group.topicName}`} />
+                    {group.questionSetKind ? (
+                      <Badge
+                        text={
+                          group.questionSetKind === "reading_passage"
+                            ? "shared passage set"
+                            : "shared stimulus set"
                         }
+                        tone="warning"
                       />
-                    </label>
-                    <Badge text={`${question.sectionKey} · ${question.topicName}`} />
-                    <Badge text={question.difficulty} />
-                    <Badge text={question.status} subtle />
-                    <Badge
-                      text={
-                        question.qualityReview.blockingFlags.length > 0
-                          ? "serve blocked"
-                          : question.qualityReview.warningFlags.length > 0
-                            ? `risk ${question.qualityReview.riskScore}`
-                            : "clean read"
-                      }
-                      tone={
-                        question.qualityReview.blockingFlags.length > 0
-                          ? "danger"
-                          : question.qualityReview.warningFlags.length > 0
-                            ? "warning"
-                            : "success"
-                      }
-                    />
-                    {question.generationModel ? <Badge text={question.generationModel} subtle /> : null}
+                    ) : null}
+                    {group.questionSetTitle ? <Badge text={group.questionSetTitle} subtle /> : null}
                   </div>
                   <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.34)" }}>
-                    {new Date(question.createdAt).toLocaleString()}
+                    {group.children.length} question{group.children.length === 1 ? "" : "s"}
                   </div>
                 </div>
 
-                {(question.qualityReview.blockingFlags.length > 0 ||
-                  question.qualityReview.warningFlags.length > 0) && (
-                  <div
-                    style={{
-                      borderRadius: "12px",
-                      padding: "12px 13px",
-                      background:
-                        question.qualityReview.blockingFlags.length > 0
-                          ? "rgba(240,153,123,0.11)"
-                          : "rgba(239,159,39,0.1)",
-                      border:
-                        question.qualityReview.blockingFlags.length > 0
-                          ? "1px solid rgba(240,153,123,0.22)"
-                          : "1px solid rgba(239,159,39,0.2)",
-                      marginBottom: "12px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "11px",
-                        letterSpacing: ".06em",
-                        color:
-                          question.qualityReview.blockingFlags.length > 0
-                            ? "#F0997B"
-                            : "#EF9F27",
-                        marginBottom: "8px",
-                      }}
-                    >
-                      QUALITY READ
-                    </div>
-                    <div style={{ display: "grid", gap: "8px" }}>
-                      {question.qualityReview.blockingFlags.map((flag) => (
-                        <div key={`${question.id}-${flag.code}`} style={{ fontSize: "12px", lineHeight: 1.6, color: "rgba(255,255,255,0.82)" }}>
-                          <strong style={{ color: "#F0997B" }}>block:</strong> {flag.message}
-                        </div>
-                      ))}
-                      {question.qualityReview.warningFlags.map((flag) => (
-                        <div key={`${question.id}-${flag.code}`} style={{ fontSize: "12px", lineHeight: 1.6, color: "rgba(255,255,255,0.76)" }}>
-                          <strong style={{ color: "#EF9F27" }}>watch:</strong> {flag.message}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {question.passage ? (
-                  <div style={passageStyle}>
+                {group.sharedContent ? (
+                  <div style={{ ...passageStyle, marginBottom: "14px" }}>
                     <div style={{ fontSize: "10px", letterSpacing: ".06em", color: "rgba(255,255,255,0.38)", marginBottom: "7px" }}>
-                      PASSAGE / SETUP
+                      {group.questionSetKind === "science_stimulus" ? "SHARED STIMULUS / SETUP" : "SHARED PASSAGE"}
                     </div>
                     <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.7, fontSize: "13px", color: "rgba(255,255,255,0.78)" }}>
-                      {renderFormattedText(question.passage)}
+                      {renderFormattedText(group.sharedContent)}
                     </div>
                   </div>
                 ) : null}
 
-                <div
-                  style={{
-                    fontFamily: "DM Serif Display, serif",
-                    fontSize: "20px",
-                    lineHeight: 1.45,
-                    marginBottom: "12px",
-                  }}
-                >
-                  {renderFormattedText(question.prompt)}
-                </div>
-
-                <div style={{ display: "grid", gap: "8px", marginBottom: "12px" }}>
-                  {(["A", "B", "C", "D"] as const).map((choice) => (
+                <div style={{ display: "grid", gap: "14px" }}>
+                  {group.children.map((question) => (
                     <div
-                      key={choice}
+                      key={question.id}
                       style={{
-                        borderRadius: "12px",
-                        padding: "10px 12px",
-                        border: `1px solid ${question.correctAnswer === choice ? "rgba(93,202,165,0.4)" : "rgba(255,255,255,0.08)"}`,
-                        background:
-                          question.correctAnswer === choice
-                            ? "rgba(93,202,165,0.09)"
-                            : "rgba(255,255,255,0.02)",
-                        fontSize: "13px",
-                        color: "rgba(255,255,255,0.82)",
+                        borderRadius: "14px",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        background: "rgba(255,255,255,0.02)",
+                        padding: "14px",
                       }}
                     >
-                      <strong style={{ marginRight: "8px" }}>{choice}</strong>
-                      {renderFormattedText(question.choices[choice])}
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          gap: "0.75rem",
+                          flexWrap: "wrap",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+                          <label style={{ display: "inline-flex", alignItems: "center", cursor: "pointer" }}>
+                            <input
+                              type="checkbox"
+                              checked={Boolean(selectedQuestionIds[question.id])}
+                              onChange={(event) =>
+                                setSelectedQuestionIds((current) => ({
+                                  ...current,
+                                  [question.id]: event.target.checked,
+                                }))
+                              }
+                            />
+                          </label>
+                          <Badge text={question.difficulty} />
+                          <Badge text={question.status} subtle />
+                          <Badge
+                            text={
+                              question.qualityReview.blockingFlags.length > 0
+                                ? "serve blocked"
+                                : question.qualityReview.warningFlags.length > 0
+                                  ? `risk ${question.qualityReview.riskScore}`
+                                  : "clean read"
+                            }
+                            tone={
+                              question.qualityReview.blockingFlags.length > 0
+                                ? "danger"
+                                : question.qualityReview.warningFlags.length > 0
+                                  ? "warning"
+                                  : "success"
+                            }
+                          />
+                          {question.generationModel ? <Badge text={question.generationModel} subtle /> : null}
+                        </div>
+                        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.34)" }}>
+                          {new Date(question.createdAt).toLocaleString()}
+                        </div>
+                      </div>
+
+                      {(question.qualityReview.blockingFlags.length > 0 ||
+                        question.qualityReview.warningFlags.length > 0) && (
+                        <div
+                          style={{
+                            borderRadius: "12px",
+                            padding: "12px 13px",
+                            background:
+                              question.qualityReview.blockingFlags.length > 0
+                                ? "rgba(240,153,123,0.11)"
+                                : "rgba(239,159,39,0.1)",
+                            border:
+                              question.qualityReview.blockingFlags.length > 0
+                                ? "1px solid rgba(240,153,123,0.22)"
+                                : "1px solid rgba(239,159,39,0.2)",
+                            marginBottom: "12px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: "11px",
+                              letterSpacing: ".06em",
+                              color:
+                                question.qualityReview.blockingFlags.length > 0
+                                  ? "#F0997B"
+                                  : "#EF9F27",
+                              marginBottom: "8px",
+                            }}
+                          >
+                            QUALITY READ
+                          </div>
+                          <div style={{ display: "grid", gap: "8px" }}>
+                            {question.qualityReview.blockingFlags.map((flag) => (
+                              <div key={`${question.id}-${flag.code}`} style={{ fontSize: "12px", lineHeight: 1.6, color: "rgba(255,255,255,0.82)" }}>
+                                <strong style={{ color: "#F0997B" }}>block:</strong> {flag.message}
+                              </div>
+                            ))}
+                            {question.qualityReview.warningFlags.map((flag) => (
+                              <div key={`${question.id}-${flag.code}`} style={{ fontSize: "12px", lineHeight: 1.6, color: "rgba(255,255,255,0.76)" }}>
+                                <strong style={{ color: "#EF9F27" }}>watch:</strong> {flag.message}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {!group.sharedContent && question.passage ? (
+                        <div style={passageStyle}>
+                          <div style={{ fontSize: "10px", letterSpacing: ".06em", color: "rgba(255,255,255,0.38)", marginBottom: "7px" }}>
+                            PASSAGE / SETUP
+                          </div>
+                          <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.7, fontSize: "13px", color: "rgba(255,255,255,0.78)" }}>
+                            {renderFormattedText(question.passage)}
+                          </div>
+                        </div>
+                      ) : null}
+
+                      <div
+                        style={{
+                          fontFamily: "DM Serif Display, serif",
+                          fontSize: "20px",
+                          lineHeight: 1.45,
+                          marginBottom: "12px",
+                        }}
+                      >
+                        {renderFormattedText(question.prompt)}
+                      </div>
+
+                      <div style={{ display: "grid", gap: "8px", marginBottom: "12px" }}>
+                        {(["A", "B", "C", "D"] as const).map((choice) => (
+                          <div
+                            key={choice}
+                            style={{
+                              borderRadius: "12px",
+                              padding: "10px 12px",
+                              border: `1px solid ${question.correctAnswer === choice ? "rgba(93,202,165,0.4)" : "rgba(255,255,255,0.08)"}`,
+                              background:
+                                question.correctAnswer === choice
+                                  ? "rgba(93,202,165,0.09)"
+                                  : "rgba(255,255,255,0.02)",
+                              fontSize: "13px",
+                              color: "rgba(255,255,255,0.82)",
+                            }}
+                          >
+                            <strong style={{ marginRight: "8px" }}>{choice}</strong>
+                            {renderFormattedText(question.choices[choice])}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div
+                        style={{
+                          borderRadius: "12px",
+                          padding: "12px 13px",
+                          background: "rgba(255,255,255,0.04)",
+                          color: "rgba(255,255,255,0.72)",
+                          fontSize: "13px",
+                          lineHeight: 1.65,
+                          marginBottom: "12px",
+                        }}
+                      >
+                        <strong style={{ color: "#5DCAA5" }}>Explanation:</strong> {question.explanation}
+                      </div>
+
+                      <textarea
+                        value={notesByQuestionId[question.id] ?? ""}
+                        onChange={(event) =>
+                          setNotesByQuestionId((current) => ({
+                            ...current,
+                            [question.id]: event.target.value,
+                          }))
+                        }
+                        placeholder="review notes, accuracy concerns, or why this should be rejected…"
+                        style={{
+                          width: "100%",
+                          minHeight: "92px",
+                          borderRadius: "12px",
+                          padding: "12px 13px",
+                          background: "rgba(255,255,255,0.04)",
+                          border: "1px solid rgba(255,255,255,0.09)",
+                          color: "#fff",
+                          resize: "vertical",
+                          fontSize: "13px",
+                          outline: "none",
+                          marginBottom: "12px",
+                          fontFamily: "DM Sans, sans-serif",
+                        }}
+                      />
+
+                      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                        <button
+                          onClick={() => void reviewQuestion(question.id, "published")}
+                          disabled={savingQuestionId === question.id}
+                          style={primaryButtonStyle}
+                        >
+                          publish
+                        </button>
+                        <button
+                          onClick={() => void reviewQuestion(question.id, "rejected")}
+                          disabled={savingQuestionId === question.id}
+                          style={secondaryButtonStyle}
+                        >
+                          reject
+                        </button>
+                        <button
+                          onClick={() => void reviewQuestion(question.id, "draft")}
+                          disabled={savingQuestionId === question.id}
+                          style={ghostButtonStyle}
+                        >
+                          keep as draft
+                        </button>
+                      </div>
                     </div>
                   ))}
-                </div>
-
-                <div
-                  style={{
-                    borderRadius: "12px",
-                    padding: "12px 13px",
-                    background: "rgba(255,255,255,0.04)",
-                    color: "rgba(255,255,255,0.72)",
-                    fontSize: "13px",
-                    lineHeight: 1.65,
-                    marginBottom: "12px",
-                  }}
-                >
-                  <strong style={{ color: "#5DCAA5" }}>Explanation:</strong> {question.explanation}
-                </div>
-
-                <textarea
-                  value={notesByQuestionId[question.id] ?? ""}
-                  onChange={(event) =>
-                    setNotesByQuestionId((current) => ({
-                      ...current,
-                      [question.id]: event.target.value,
-                    }))
-                  }
-                  placeholder="review notes, accuracy concerns, or why this should be rejected…"
-                  style={{
-                    width: "100%",
-                    minHeight: "92px",
-                    borderRadius: "12px",
-                    padding: "12px 13px",
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.09)",
-                    color: "#fff",
-                    resize: "vertical",
-                    fontSize: "13px",
-                    outline: "none",
-                    marginBottom: "12px",
-                    fontFamily: "DM Sans, sans-serif",
-                  }}
-                />
-
-                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                  <button
-                    onClick={() => void reviewQuestion(question.id, "published")}
-                    disabled={savingQuestionId === question.id}
-                    style={primaryButtonStyle}
-                  >
-                    publish
-                  </button>
-                  <button
-                    onClick={() => void reviewQuestion(question.id, "rejected")}
-                    disabled={savingQuestionId === question.id}
-                    style={secondaryButtonStyle}
-                  >
-                    reject
-                  </button>
-                  <button
-                    onClick={() => void reviewQuestion(question.id, "draft")}
-                    disabled={savingQuestionId === question.id}
-                    style={ghostButtonStyle}
-                  >
-                    keep as draft
-                  </button>
                 </div>
               </article>
             ))

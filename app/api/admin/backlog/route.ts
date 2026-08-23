@@ -3,7 +3,7 @@ import { promisify } from "node:util";
 import { asc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { actTopics, questions } from "@/db/schema";
+import { actTopics, questions, questionSets } from "@/db/schema";
 import { getAdminSession } from "@/lib/admin";
 import {
   auditSectionTopicIntegrity,
@@ -12,6 +12,7 @@ import {
   sortTopicsByPriority,
 } from "@/lib/content-audit";
 import { getDb } from "@/lib/db";
+import { resolveEffectivePassage } from "@/lib/question-sets";
 
 const execFileAsync = promisify(execFile);
 const sectionKeySchema = z.enum(["english", "math", "reading", "science"]);
@@ -64,19 +65,27 @@ async function loadAuditedTopics(db: NonNullable<ReturnType<typeof getDb>>) {
         status: questions.status,
         prompt: questions.prompt,
         passage: questions.passage,
+        questionSetContent: questionSets.content,
         choices: questions.choices,
         correctAnswer: questions.correctAnswer,
         explanation: questions.explanation,
       })
       .from(questions)
       .innerJoin(actTopics, eq(questions.topicId, actTopics.id))
+      .leftJoin(questionSets, eq(questions.questionSetId, questionSets.id))
       .where(eq(actTopics.isActive, true)),
   ]);
 
   const questionsByTopicId = questionRows.reduce(
     (map, row) => {
       const currentRows = map.get(row.topicId) ?? [];
-      currentRows.push(row);
+      currentRows.push({
+        ...row,
+        passage: resolveEffectivePassage({
+          passage: row.passage,
+          questionSetContent: row.questionSetContent,
+        }),
+      });
       map.set(row.topicId, currentRows);
       return map;
     },

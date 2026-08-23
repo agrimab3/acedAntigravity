@@ -6,6 +6,14 @@ import { reviewQuestionQuality } from "./lib/question-utils.ts";
 const SECTION_KEYS = ["english", "math", "reading", "science"];
 const DIFFICULTIES = ["easy", "medium", "hard"];
 const ANSWER_CHOICES = ["A", "B", "C", "D"];
+const SET_KIND_BY_SECTION = {
+  reading: "reading_passage",
+  science: "science_stimulus",
+};
+const SET_DEFAULT_CHILD_COUNT = {
+  reading: 6,
+  science: 6,
+};
 const DEFAULT_GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
 const DEFAULT_GROQ_BASE_URL = "https://api.groq.com/openai/v1";
 const DEFAULT_OLLAMA_BASE_URL = "http://127.0.0.1:11434";
@@ -158,6 +166,21 @@ const generatedQuestionSchema = z.object({
   topic: z.string().min(1),
   difficulty: z.enum(DIFFICULTIES),
   passage: z.string().nullable().optional(),
+  question_text: z.string().min(20),
+  choices: z.object({
+    A: z.string().min(1),
+    B: z.string().min(1),
+    C: z.string().min(1),
+    D: z.string().min(1),
+  }),
+  correct_answer: z.enum(ANSWER_CHOICES),
+  explanation: z.string().min(30),
+});
+
+const generatedSetQuestionSchema = z.object({
+  section: z.string().min(1),
+  topic: z.string().min(1),
+  difficulty: z.enum(DIFFICULTIES),
   question_text: z.string().min(20),
   choices: z.object({
     A: z.string().min(1),
@@ -498,6 +521,41 @@ function normalizeGeneratedQuestionRecord(question) {
   };
 }
 
+function normalizeGeneratedSetQuestionRecord(question) {
+  if (!question || typeof question !== "object") {
+    return question;
+  }
+
+  const record = question;
+  const explanation =
+    typeof record.explanation === "string"
+      ? record.explanation
+      : typeof record.rationale === "string"
+        ? record.rationale
+        : typeof record.solution === "string"
+          ? record.solution
+          : record.explanation;
+
+  return {
+    section: record.section,
+    topic: record.topic,
+    difficulty: record.difficulty,
+    question_text:
+      typeof record.question_text === "string"
+        ? record.question_text
+        : typeof record.prompt === "string"
+          ? record.prompt
+          : typeof record.question === "string"
+            ? record.question
+            : record.question_text,
+    choices: record.choices,
+    correct_answer: normalizeChoiceLetter(
+      record.correct_answer ?? record.correctAnswer ?? record.answer ?? record.answer_letter
+    ),
+    explanation,
+  };
+}
+
 function normalizeGeneratedPayload(payload) {
   if (!payload || typeof payload !== "object" || !Array.isArray(payload.questions)) {
     return payload;
@@ -506,6 +564,33 @@ function normalizeGeneratedPayload(payload) {
   return {
     ...payload,
     questions: payload.questions.map((question) => normalizeGeneratedQuestionRecord(question)),
+  };
+}
+
+function normalizeGeneratedSetPayload(payload) {
+  if (!payload || typeof payload !== "object" || !Array.isArray(payload.questions)) {
+    return payload;
+  }
+
+  const record = payload;
+  return {
+    ...record,
+    content:
+      typeof record.content === "string"
+        ? record.content
+        : typeof record.passage === "string"
+          ? record.passage
+          : record.content,
+    title:
+      typeof record.title === "string"
+        ? record.title
+        : typeof record.heading === "string"
+          ? record.heading
+          : typeof record.name === "string"
+            ? record.name
+            : record.title ?? null,
+    metadata: record.metadata ?? null,
+    questions: payload.questions.map((question) => normalizeGeneratedSetQuestionRecord(question)),
   };
 }
 
@@ -839,6 +924,98 @@ function buildGeneratedBatchSchema({ requestedCount, requestedDifficulty }) {
   });
 }
 
+function buildGeneratedSetSchema({
+  sectionKey,
+  requestedDifficultyCounts,
+  minQuestionCount,
+  maxQuestionCount,
+}) {
+  return z.object({
+    section: z.string().min(1),
+    topic: z.string().min(1),
+    kind: z.literal(SET_KIND_BY_SECTION[sectionKey]),
+    title: z.string().nullable().optional(),
+    content: z.string().min(120),
+    metadata: z.record(z.string(), z.unknown()).nullable().optional(),
+    questions: z
+      .array(generatedSetQuestionSchema)
+      .min(minQuestionCount)
+      .max(maxQuestionCount)
+      .superRefine((questions, ctx) => {
+        const counts = {
+          easy: 0,
+          medium: 0,
+          hard: 0,
+        };
+
+        questions.forEach((question, index) => {
+          if (question.section !== sectionKey) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Question ${index} returned ${question.section} instead of ${sectionKey}.`,
+            });
+          }
+
+          counts[question.difficulty] += 1;
+        });
+
+        DIFFICULTIES.forEach((difficulty) => {
+          if (counts[difficulty] !== requestedDifficultyCounts[difficulty]) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Set returned ${counts[difficulty]} ${difficulty} question(s) instead of ${requestedDifficultyCounts[difficulty]}.`,
+            });
+          }
+        });
+      }),
+  });
+}
+
+function buildRequestedDifficultySequence(requestedCounts) {
+  const sequence = [];
+  const order = ["hard", "medium", "easy"];
+  const remaining = {
+    easy: requestedCounts.easy,
+    medium: requestedCounts.medium,
+    hard: requestedCounts.hard,
+  };
+
+  while (remaining.easy > 0 || remaining.medium > 0 || remaining.hard > 0) {
+    for (const difficulty of order) {
+      if (remaining[difficulty] > 0) {
+        sequence.push(difficulty);
+        remaining[difficulty] -= 1;
+      }
+    }
+  }
+
+  return sequence;
+}
+
+function planQuestionSetDifficultyCounts(sectionKey, requestedCounts) {
+  const totalRequested = DIFFICULTIES.reduce(
+    (sum, difficulty) => sum + requestedCounts[difficulty],
+    0
+  );
+  const preferredChildCount = SET_DEFAULT_CHILD_COUNT[sectionKey] ?? totalRequested;
+  const setCount = Math.max(1, Math.ceil(totalRequested / preferredChildCount));
+  const baseSize = Math.floor(totalRequested / setCount);
+  const remainder = totalRequested % setCount;
+  const setSizes = Array.from({ length: setCount }, (_, index) => baseSize + (index < remainder ? 1 : 0));
+  const difficultySequence = buildRequestedDifficultySequence(requestedCounts);
+
+  let cursor = 0;
+  return setSizes.map((setSize) => {
+    const slice = difficultySequence.slice(cursor, cursor + setSize);
+    cursor += setSize;
+    return {
+      easy: slice.filter((difficulty) => difficulty === "easy").length,
+      medium: slice.filter((difficulty) => difficulty === "medium").length,
+      hard: slice.filter((difficulty) => difficulty === "hard").length,
+    };
+  });
+}
+
 function buildPrompt({ sectionKey, topicName, slug, requestedDifficulty, requestedCount }) {
   return `
 Generate ${requestedCount} original ACT-style multiple-choice questions.
@@ -890,6 +1067,95 @@ Batch diversity rules:
 - Vary the tested subskill within the topic.
 - Vary passage style, stem wording, distractor logic, and answer placement.
 - Avoid repeating the same numeric structure, the same rhetorical move, or the same explanation template.
+
+Section-specific rules:
+${getSectionSpecificInstructions(sectionKey)}
+
+Topic-specific rules:
+${getTopicSpecificInstructions(sectionKey, slug)}
+`.trim();
+}
+
+function buildSetPrompt({
+  sectionKey,
+  topicName,
+  slug,
+  requestedDifficultyCounts,
+}) {
+  const requestedQuestionCount = DIFFICULTIES.reduce(
+    (sum, difficulty) => sum + requestedDifficultyCounts[difficulty],
+    0
+  );
+  const kind = SET_KIND_BY_SECTION[sectionKey];
+
+  return `
+Generate 1 original ACT-style ${sectionKey === "reading" ? "Reading passage set" : "Science stimulus set"}.
+
+Section: ${sectionKey}
+Topic: ${topicName}
+Set kind: ${kind}
+
+Required child question counts:
+- easy: ${requestedDifficultyCounts.easy}
+- medium: ${requestedDifficultyCounts.medium}
+- hard: ${requestedDifficultyCounts.hard}
+- total: ${requestedQuestionCount}
+
+Return one JSON object only with exactly these top-level fields:
+- section
+- topic
+- kind
+- title
+- content
+- metadata
+- questions
+
+Top-level rules:
+- section must equal the requested section
+- topic must equal the requested topic
+- kind must equal ${kind}
+- title may be a short string or null
+- content must contain the full shared passage or stimulus text
+- metadata may be null or a plain object
+- questions must be an array of exactly ${requestedQuestionCount} child questions
+
+Child question fields:
+- section
+- topic
+- difficulty
+- question_text
+- choices
+- correct_answer
+- explanation
+
+Critical originality rules:
+- The shared passage or stimulus must be fully original.
+- Do not copy, paraphrase, or closely imitate any official ACT passage, science setup, or commercial-prep material.
+- Do not quote copyrighted prep-book text.
+- Make the structure ACT-authentic, but the wording and content must be original.
+
+Set quality rules:
+- Every child question must depend on the shared content.
+- Do not write generic questions that could be answered without reading the shared content.
+- Do not repeat the same tested move across multiple child questions.
+- Vary the subskill, stem shape, and distractor logic across children.
+- Do not include duplicate stems or near-duplicate stems within the same set.
+- Keep the set coherent: all child questions must clearly belong to the same shared content.
+
+Reading set rules:
+- Write one passage that can support multiple evidence, inference, tone, purpose, or organization questions.
+- The passage must be rich enough that the child questions require real passage interpretation.
+- Do not write a passage that simply defines a term and then asks direct recall questions.
+
+Science set rules:
+- Write one shared experiment, data summary, research summary, or conflicting-viewpoints stimulus.
+- Child questions must be answerable from the provided setup and not from outside trivia.
+- Plain-text descriptions are acceptable; rendered charts are not required.
+- If useful, metadata may include simple structured data summaries, but keep it lightweight.
+
+Distribution rules:
+- Include exactly ${requestedDifficultyCounts.easy} easy child question(s), ${requestedDifficultyCounts.medium} medium child question(s), and ${requestedDifficultyCounts.hard} hard child question(s).
+- The difficulty labels must be accurate for each child.
 
 Section-specific rules:
 ${getSectionSpecificInstructions(sectionKey)}
@@ -963,6 +1229,94 @@ function buildQuestionBatchSchema(sectionKey, requestedDifficulty, requestedCoun
       },
     },
     required: ["questions"],
+    additionalProperties: false,
+  };
+}
+
+function buildQuestionSetJsonSchema(sectionKey, requestedDifficultyCounts) {
+  const requestedQuestionCount = DIFFICULTIES.reduce(
+    (sum, difficulty) => sum + requestedDifficultyCounts[difficulty],
+    0
+  );
+
+  return {
+    type: "object",
+    properties: {
+      section: {
+        type: "string",
+        const: sectionKey,
+      },
+      topic: {
+        type: "string",
+      },
+      kind: {
+        type: "string",
+        const: SET_KIND_BY_SECTION[sectionKey],
+      },
+      title: {
+        type: ["string", "null"],
+      },
+      content: {
+        type: "string",
+      },
+      metadata: {
+        type: ["object", "null"],
+        additionalProperties: true,
+      },
+      questions: {
+        type: "array",
+        minItems: requestedQuestionCount,
+        maxItems: requestedQuestionCount,
+        items: {
+          type: "object",
+          properties: {
+            section: {
+              type: "string",
+              const: sectionKey,
+            },
+            topic: {
+              type: "string",
+            },
+            difficulty: {
+              type: "string",
+              enum: DIFFICULTIES,
+            },
+            question_text: {
+              type: "string",
+            },
+            choices: {
+              type: "object",
+              properties: {
+                A: { type: "string" },
+                B: { type: "string" },
+                C: { type: "string" },
+                D: { type: "string" },
+              },
+              required: ANSWER_CHOICES,
+              additionalProperties: false,
+            },
+            correct_answer: {
+              type: "string",
+              enum: ANSWER_CHOICES,
+            },
+            explanation: {
+              type: "string",
+            },
+          },
+          required: [
+            "section",
+            "topic",
+            "difficulty",
+            "question_text",
+            "choices",
+            "correct_answer",
+            "explanation",
+          ],
+          additionalProperties: false,
+        },
+      },
+    },
+    required: ["section", "topic", "kind", "title", "content", "metadata", "questions"],
     additionalProperties: false,
   };
 }
@@ -1326,9 +1680,123 @@ async function generateBatchForDifficulty(
   }
 }
 
+async function generateQuestionSet(
+  topic,
+  requestedDifficultyCounts,
+  attempt = 1,
+  provider = generationProvider,
+  model = generationModel,
+  hasFallenBack = false
+) {
+  try {
+    const schema = buildQuestionSetJsonSchema(topic.section_key, requestedDifficultyCounts);
+    const prompt = buildSetPrompt({
+      sectionKey: topic.section_key,
+      topicName: topic.name,
+      slug: topic.slug,
+      requestedDifficultyCounts,
+    });
+    const text = await requestStructuredJson({
+      provider,
+      model,
+      systemPrompt: GENERATION_SYSTEM_PROMPT,
+      userPrompt: prompt,
+      schema,
+      temperature: 0.7,
+    });
+    const parsedPayload = normalizeGeneratedSetPayload(parseModelJson(text));
+    const requestedQuestionCount = DIFFICULTIES.reduce(
+      (sum, difficulty) => sum + requestedDifficultyCounts[difficulty],
+      0
+    );
+
+    return buildGeneratedSetSchema({
+      sectionKey: topic.section_key,
+      requestedDifficultyCounts,
+      minQuestionCount: requestedQuestionCount,
+      maxQuestionCount: requestedQuestionCount,
+    }).parse(parsedPayload);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "unknown generation error";
+    const generationRetryLimit = fastRetryMode ? 1 : 3;
+    const shouldFallbackImmediately = provider === "gemini" && isQuotaExceededError(message);
+    const isRetryable =
+      provider === "groq"
+        ? isRetryableGroqError(message)
+        : provider === "ollama"
+          ? isRetryableOllamaError(message)
+          : isRetryableGeminiError(message);
+
+    if (attempt < generationRetryLimit && isRetryable && !shouldFallbackImmediately) {
+      const retryDelayMs =
+        extractRetryDelayMs(message) ?? (provider === "groq" ? 20000 : 35000);
+      console.warn(
+        `${provider} rate limited for ${topic.section_key}/${topic.slug}/set; retrying in ${Math.ceil(
+          retryDelayMs / 1000
+        )}s (attempt ${attempt + 1}/${generationRetryLimit}).`
+      );
+      await sleep(retryDelayMs + 1000);
+      return generateQuestionSet(
+        topic,
+        requestedDifficultyCounts,
+        attempt + 1,
+        provider,
+        model,
+        hasFallenBack
+      );
+    }
+
+    const fallbackProvider = resolveFallbackProvider(provider);
+    const fallbackModel = resolveFallbackModel(provider, "generation", model);
+
+    if (isRetryable && fallbackProvider && fallbackModel && !hasFallenBack) {
+      console.warn(
+        `${provider} stayed rate limited for ${topic.section_key}/${topic.slug}/set; falling back to ${fallbackProvider}/${fallbackModel}.`
+      );
+      return generateQuestionSet(
+        topic,
+        requestedDifficultyCounts,
+        1,
+        fallbackProvider,
+        fallbackModel,
+        true
+      );
+    }
+
+    throw error;
+  }
+}
+
 async function generateBatchForTopic(topic) {
   const generatedQuestions = [];
+  const generatedSets = [];
   const failures = [];
+
+  if (topic.section_key === "reading" || topic.section_key === "science") {
+    const setDifficultyPlans = planQuestionSetDifficultyCounts(topic.section_key, {
+      easy: perDifficulty,
+      medium: perDifficulty,
+      hard: perDifficulty,
+    });
+
+    for (const difficultyCounts of setDifficultyPlans) {
+      try {
+        const generatedSet = await generateQuestionSet(topic, difficultyCounts);
+        generatedSets.push(generatedSet);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "unknown generation error";
+        failures.push({
+          topic: `${topic.section_key}/${topic.slug}/set`,
+          error: message,
+        });
+        console.warn(
+          `Skipping ${topic.section_key}/${topic.slug}/set after generation failure: ${message}`
+        );
+      }
+    }
+
+    return { generatedQuestions, generatedSets, failures };
+  }
 
   for (const difficulty of DIFFICULTIES) {
     const requestedCount = perDifficulty;
@@ -1352,7 +1820,7 @@ async function generateBatchForTopic(topic) {
     }
   }
 
-  return { generatedQuestions, failures };
+  return { generatedQuestions, generatedSets, failures };
 }
 
 async function reviewGeneratedQuestion(
@@ -1712,6 +2180,68 @@ function sanitizeQuestion(sectionKey, topic, question) {
   };
 }
 
+function sanitizeQuestionSet(sectionKey, topic, generatedSet) {
+  if (sectionKey !== "reading" && sectionKey !== "science") {
+    throw new Error("Question sets are only supported for Reading and Science.");
+  }
+
+  if (generatedSet.section.trim().toLowerCase() !== sectionKey) {
+    throw new Error("Generated set section does not match the requested section.");
+  }
+
+  if (generatedSet.topic.trim() !== topic.name) {
+    throw new Error("Generated set topic does not match the requested topic.");
+  }
+
+  if (generatedSet.kind !== SET_KIND_BY_SECTION[sectionKey]) {
+    throw new Error("Generated set kind does not match the requested section.");
+  }
+
+  const content = generatedSet.content.trim();
+  if (content.length < 120) {
+    throw new Error("Generated set content is too short to support a coherent shared set.");
+  }
+
+  const title = typeof generatedSet.title === "string" ? generatedSet.title.trim() || null : null;
+  const metadata =
+    generatedSet.metadata && typeof generatedSet.metadata === "object" ? generatedSet.metadata : null;
+  const normalizedChildren = generatedSet.questions.map((question) =>
+    sanitizeQuestion(sectionKey, topic, {
+      ...question,
+      passage: content,
+    })
+  );
+
+  if (normalizedChildren.length < 3) {
+    throw new Error("Generated set did not produce the minimum useful child-question count.");
+  }
+
+  const seenPrompts = new Set();
+  normalizedChildren.forEach((child) => {
+    const promptKey = normalizeText(child.prompt);
+    if (seenPrompts.has(promptKey)) {
+      throw new Error("Generated set contains duplicate child question stems.");
+    }
+    seenPrompts.add(promptKey);
+  });
+
+  return {
+    sectionKey,
+    topicId: topic.id,
+    topicName: topic.name,
+    topicSlug: topic.slug,
+    kind: generatedSet.kind,
+    title,
+    content,
+    metadata,
+    questions: normalizedChildren.map((child) => ({
+      ...child,
+      passage: null,
+      sharedContent: content,
+    })),
+  };
+}
+
 async function getTopics() {
   const filters = [];
   const values = [];
@@ -1888,6 +2418,228 @@ async function insertQuestions(topic, generatedQuestions) {
   };
 }
 
+async function insertQuestionSets(topic, generatedSets) {
+  const existingRows = await client.query(
+    `
+      SELECT fingerprint
+      FROM questions
+      WHERE topic_id = $1
+        AND fingerprint IS NOT NULL
+    `,
+    [topic.id]
+  );
+
+  const knownFingerprints = new Set(existingRows.rows.map((row) => row.fingerprint));
+  let inserted = 0;
+  let skipped = 0;
+  let reviewKept = 0;
+  let reviewRevised = 0;
+  let reviewRejected = 0;
+  let reviewErrors = 0;
+  let setsInserted = 0;
+
+  for (const generatedSet of generatedSets) {
+    let normalizedSet;
+
+    try {
+      normalizedSet = sanitizeQuestionSet(topic.section_key, topic, generatedSet);
+    } catch (error) {
+      skipped += Array.isArray(generatedSet.questions) ? generatedSet.questions.length : 1;
+      console.warn(
+        `Skipping invalid ${topic.section_key}/${topic.slug} set: ${
+          error instanceof Error ? error.message : "unknown set validation error"
+        }`
+      );
+      continue;
+    }
+
+    const uniqueChildren = normalizedSet.questions.filter((question) => !knownFingerprints.has(question.fingerprint));
+
+    if (uniqueChildren.length < 3) {
+      skipped += normalizedSet.questions.length;
+      console.warn(
+        `Skipping ${topic.section_key}/${topic.slug} set after duplicate filtering: fewer than 3 unique child questions remain.`
+      );
+      continue;
+    }
+
+    const approvedChildren = [];
+
+    for (const child of uniqueChildren) {
+      let reviewerResult;
+
+      try {
+        reviewerResult = await reviewGeneratedQuestion(topic, {
+          difficulty: child.difficulty,
+          passage: child.sharedContent,
+          question_text: child.prompt,
+          choices: child.choices,
+          correct_answer: child.correctAnswer,
+          explanation: child.explanation,
+        });
+      } catch (error) {
+        reviewErrors += 1;
+        skipped += 1;
+        console.warn(
+          `Skipping ${topic.section_key}/${topic.slug} child after reviewer failure: ${
+            error instanceof Error ? error.message : "unknown reviewer error"
+          }`
+        );
+        continue;
+      }
+
+      if (reviewerResult.verdict !== "keep" || reviewerResult.suggested_difficulty !== null) {
+        skipped += 1;
+
+        if (reviewerResult.verdict === "revise") {
+          reviewRevised += 1;
+        } else if (reviewerResult.verdict === "reject") {
+          reviewRejected += 1;
+        } else if (reviewerResult.suggested_difficulty !== null) {
+          reviewRevised += 1;
+        }
+
+        console.warn(
+          `Skipping ${topic.section_key}/${topic.slug} child after AI review: ${reviewerResult.verdict} (${[
+            reviewerResult.suggested_difficulty !== null
+              ? `difficulty:${reviewerResult.suggested_difficulty}`
+              : null,
+            ...reviewerResult.main_issues,
+          ]
+            .filter(Boolean)
+            .join(", ")})`
+        );
+        continue;
+      }
+
+      reviewKept += 1;
+      approvedChildren.push({
+        ...child,
+        reviewerNote: reviewerResult.editorial_note,
+      });
+    }
+
+    if (approvedChildren.length < 3) {
+      console.warn(
+        `Skipping ${topic.section_key}/${topic.slug} set after review: fewer than 3 approved child questions remain.`
+      );
+      continue;
+    }
+
+    try {
+      await client.query("BEGIN");
+      let insertedForSet = 0;
+
+      const setInsert = await client.query(
+        `
+          INSERT INTO question_sets (
+            section_key,
+            topic_id,
+            kind,
+            title,
+            content,
+            metadata
+          )
+          VALUES ($1, $2, $3, $4, $5, $6::jsonb)
+          RETURNING id
+        `,
+        [
+          normalizedSet.sectionKey,
+          normalizedSet.topicId,
+          normalizedSet.kind,
+          normalizedSet.title,
+          normalizedSet.content,
+          JSON.stringify(normalizedSet.metadata),
+        ]
+      );
+
+      const questionSetId = setInsert.rows[0]?.id;
+
+      if (!questionSetId) {
+        throw new Error("Question set insert did not return an id.");
+      }
+
+      for (const child of approvedChildren) {
+        const result = await client.query(
+          `
+            INSERT INTO questions (
+              section_key,
+              topic_id,
+              question_set_id,
+              difficulty,
+              question_type,
+              prompt,
+              passage,
+              fingerprint,
+              choices,
+              correct_answer,
+              explanation,
+              source,
+              generation_model,
+              status,
+              review_notes
+            )
+            VALUES ($1, $2, $3, $4, 'multiple_choice', $5, NULL, $6, $7::jsonb, $8, $9, $10, $11, $12, $13)
+            ON CONFLICT (fingerprint) DO NOTHING
+            RETURNING id
+          `,
+          [
+            child.sectionKey,
+            child.topicId,
+            questionSetId,
+            child.difficulty,
+            child.prompt,
+            child.fingerprint,
+            JSON.stringify(child.choices),
+            child.correctAnswer,
+            child.explanation,
+            child.generationProvider,
+            child.generationModel,
+            requestedStatus,
+            `AI pre-review: keep. ${child.reviewerNote}`,
+          ]
+        );
+
+        if (result.rowCount > 0) {
+          knownFingerprints.add(child.fingerprint);
+          inserted += 1;
+          insertedForSet += 1;
+        } else {
+          skipped += 1;
+        }
+      }
+
+      if (insertedForSet < 3) {
+        throw new Error("Fewer than 3 child questions were inserted for the generated set.");
+      }
+
+      if (insertedForSet > 0) {
+        setsInserted += 1;
+      }
+
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      skipped += approvedChildren.length;
+      console.warn(
+        `Rolling back ${topic.section_key}/${topic.slug} set insert: ${
+          error instanceof Error ? error.message : "unknown transaction error"
+        }`
+      );
+    }
+  }
+
+  return {
+    inserted,
+    skipped,
+    reviewKept,
+    reviewRevised,
+    reviewRejected,
+    reviewErrors,
+    setsInserted,
+  };
+}
+
 async function main() {
   await client.connect();
 
@@ -1906,6 +2658,7 @@ async function main() {
       reviewModel,
       topicsProcessed: 0,
       inserted: 0,
+      setsInserted: 0,
       skipped: 0,
       reviewKept: 0,
       reviewRevised: 0,
@@ -1922,17 +2675,22 @@ async function main() {
       console.log(`\nGenerating ${topic.section_key}/${topic.slug}...`);
 
       try {
-        const { generatedQuestions, failures } = await generateBatchForTopic(topic);
+        const { generatedQuestions, generatedSets, failures } = await generateBatchForTopic(topic);
         const {
           inserted,
+          setsInserted,
           skipped,
           reviewKept,
           reviewRevised,
           reviewRejected,
           reviewErrors,
-        } = await insertQuestions(topic, generatedQuestions);
+        } =
+          generatedSets.length > 0
+            ? await insertQuestionSets(topic, generatedSets)
+            : await insertQuestions(topic, generatedQuestions);
         summary.topicsProcessed += 1;
         summary.inserted += inserted;
+        summary.setsInserted += setsInserted ?? 0;
         summary.skipped += skipped;
         summary.reviewKept += reviewKept;
         summary.reviewRevised += reviewRevised;
@@ -1941,7 +2699,9 @@ async function main() {
         summary.failures.push(...failures);
 
         console.log(
-          `Inserted ${inserted} question(s); reviewer kept ${reviewKept}, revised ${reviewRevised}, rejected ${reviewRejected}, errored ${reviewErrors}; skipped ${skipped} total for ${topic.section_key}/${topic.slug}.`
+          `Inserted ${inserted} question(s)${
+            setsInserted ? ` across ${setsInserted} set(s)` : ""
+          }; reviewer kept ${reviewKept}, revised ${reviewRevised}, rejected ${reviewRejected}, errored ${reviewErrors}; skipped ${skipped} total for ${topic.section_key}/${topic.slug}.`
         );
 
         if (delayMs > 0) {
