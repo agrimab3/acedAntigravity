@@ -110,6 +110,11 @@ export async function POST(request: Request) {
           topic: question.topic,
           difficulty: question.difficulty,
           passage: "passage" in question ? question.passage ?? null : null,
+          questionSetId: "questionSetId" in question ? question.questionSetId ?? null : null,
+          questionSetKind: "questionSetKind" in question ? question.questionSetKind ?? null : null,
+          questionSetTitle: "questionSetTitle" in question ? question.questionSetTitle ?? null : null,
+          questionSetContent:
+            "questionSetContent" in question ? question.questionSetContent ?? null : null,
           question_text: question.question_text,
           choices: question.choices,
           correct_answer: question.correct_answer,

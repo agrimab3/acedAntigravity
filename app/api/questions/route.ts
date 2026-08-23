@@ -6,10 +6,10 @@ import {
   practiceSessions,
   questionExposures,
   questions,
+  questionSets,
   topicMastery,
   topicSkillState,
 } from "@/db/schema";
-import type { ChoiceMap } from "@/db/schema";
 import {
   buildAdaptiveFeedback,
   chooseDifficultyBand,
@@ -24,7 +24,8 @@ import {
 import { getAuthSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { buildMockQuestions } from "@/lib/mock-questions";
-import { normalizeQuestionRow } from "@/lib/question-utils";
+import { hydrateQuestionSetContext, validateQuestionSetLink } from "@/lib/question-sets";
+import { normalizeQuestionRow, type NormalizedQuestionRow } from "@/lib/question-utils";
 
 const sectionSchema = z.enum(["english", "math", "reading", "science"]);
 const searchSchema = z.object({
@@ -50,6 +51,22 @@ function logSectionMismatch({
     questionId,
     questionSection,
     topicName,
+  });
+}
+
+function logQuestionSetMismatch({
+  questionId,
+  questionSetId,
+  reason,
+}: {
+  questionId: string;
+  questionSetId: string;
+  reason: string;
+}) {
+  console.error("[questions-api] Rejected mismatched question set link", {
+    questionId,
+    questionSetId,
+    reason,
   });
 }
 
@@ -217,20 +234,7 @@ export async function GET(request: Request) {
     }
 
     const difficultySweep = getDifficultySweep(normalizeDifficultyBand(targetDifficulty));
-    const selectedRows = new Map<
-      string,
-      {
-        id: string;
-        section: string;
-        topic: string;
-        difficulty: string;
-        passage: string | null;
-        question_text: string;
-        choices: ChoiceMap;
-        correct_answer: string;
-        explanation: string;
-      }
-    >();
+    const selectedRows = new Map<string, NormalizedQuestionRow>();
 
     for (const difficulty of difficultySweep) {
       const whereClause = topic
@@ -253,9 +257,16 @@ export async function GET(request: Request) {
             .select({
               id: questions.id,
               section: questions.sectionKey,
+              topicId: questions.topicId,
               topic: actTopics.name,
               difficulty: questions.difficulty,
               passage: questions.passage,
+              questionSetId: questions.questionSetId,
+              questionSetSectionKey: questionSets.sectionKey,
+              questionSetTopicId: questionSets.topicId,
+              questionSetKind: questionSets.kind,
+              questionSetTitle: questionSets.title,
+              questionSetContent: questionSets.content,
               question_text: questions.prompt,
               choices: questions.choices,
               correct_answer: questions.correctAnswer,
@@ -263,6 +274,7 @@ export async function GET(request: Request) {
             })
             .from(questions)
             .innerJoin(actTopics, eq(questions.topicId, actTopics.id))
+            .leftJoin(questionSets, eq(questions.questionSetId, questionSets.id))
             .leftJoin(
               questionExposures,
               and(
@@ -281,9 +293,16 @@ export async function GET(request: Request) {
             .select({
               id: questions.id,
               section: questions.sectionKey,
+              topicId: questions.topicId,
               topic: actTopics.name,
               difficulty: questions.difficulty,
               passage: questions.passage,
+              questionSetId: questions.questionSetId,
+              questionSetSectionKey: questionSets.sectionKey,
+              questionSetTopicId: questionSets.topicId,
+              questionSetKind: questionSets.kind,
+              questionSetTitle: questionSets.title,
+              questionSetContent: questionSets.content,
               question_text: questions.prompt,
               choices: questions.choices,
               correct_answer: questions.correctAnswer,
@@ -291,12 +310,50 @@ export async function GET(request: Request) {
             })
             .from(questions)
             .innerJoin(actTopics, eq(questions.topicId, actTopics.id))
+            .leftJoin(questionSets, eq(questions.questionSetId, questionSets.id))
             .where(whereClause)
             .orderBy(sql`random()`)
             .limit(limit * 4);
 
       for (const row of rows) {
-        const normalizedRow = normalizeQuestionRow(row);
+        const setValidation = validateQuestionSetLink({
+          questionId: row.id,
+          questionSectionKey: row.section,
+          questionTopicId: row.topicId,
+          questionSetId: row.questionSetId,
+          questionSetSectionKey: row.questionSetSectionKey,
+          questionSetTopicId: row.questionSetTopicId,
+        });
+
+        if (!setValidation.ok && row.questionSetId) {
+          logQuestionSetMismatch({
+            questionId: row.id,
+            questionSetId: row.questionSetId,
+            reason: setValidation.reason,
+          });
+        }
+
+        const hydratedSet = hydrateQuestionSetContext({
+          questionId: row.id,
+          questionSectionKey: row.section,
+          questionTopicId: row.topicId,
+          questionSetId: row.questionSetId,
+          questionSetSectionKey: row.questionSetSectionKey,
+          questionSetTopicId: row.questionSetTopicId,
+          questionSetKind: row.questionSetKind,
+          questionSetTitle: row.questionSetTitle,
+          questionSetContent: row.questionSetContent,
+          passage: row.passage,
+        });
+
+        const normalizedRow = normalizeQuestionRow({
+          ...row,
+          passage: hydratedSet.effectivePassage,
+          questionSetId: hydratedSet.questionSet?.id ?? null,
+          questionSetKind: hydratedSet.questionSet?.kind ?? null,
+          questionSetTitle: hydratedSet.questionSet?.title ?? null,
+          questionSetContent: hydratedSet.questionSet?.content ?? null,
+        });
 
         if (!normalizedRow) {
           continue;
@@ -312,7 +369,7 @@ export async function GET(request: Request) {
           continue;
         }
 
-        if (!selectedRows.has(normalizedRow.id)) {
+        if (normalizedRow && !selectedRows.has(normalizedRow.id)) {
           selectedRows.set(normalizedRow.id, normalizedRow);
         }
       }

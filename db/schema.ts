@@ -1,5 +1,7 @@
 import {
   boolean,
+  check,
+  index,
   integer,
   jsonb,
   pgTable,
@@ -8,14 +10,20 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export type ChoiceMap = Record<"A" | "B" | "C" | "D", string>;
+export type QuestionSetKind = "reading_passage" | "science_stimulus";
 export type PracticeTestQuestionSnapshot = {
   id: string;
   section: string;
   topic: string;
   difficulty: string;
   passage: string | null;
+  questionSetId: string | null;
+  questionSetKind: QuestionSetKind | null;
+  questionSetTitle: string | null;
+  questionSetContent: string | null;
   question_text: string;
   choices: ChoiceMap;
   correct_answer: "A" | "B" | "C" | "D";
@@ -89,34 +97,73 @@ export const actTopics = pgTable(
   ]
 );
 
-export const questions = pgTable("questions", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  sectionKey: text("section_key")
-    .notNull()
-    .references(() => actSections.key, { onDelete: "cascade" }),
-  topicId: uuid("topic_id")
-    .notNull()
-    .references(() => actTopics.id, { onDelete: "cascade" }),
-  difficulty: text("difficulty").default("medium").notNull(),
-  questionType: text("question_type").default("multiple_choice").notNull(),
-  prompt: text("prompt").notNull(),
-  passage: text("passage"),
-  fingerprint: text("fingerprint"),
-  choices: jsonb("choices").$type<ChoiceMap>().notNull(),
-  correctAnswer: text("correct_answer").notNull(),
-  explanation: text("explanation").notNull(),
-  source: text("source").default("internal").notNull(),
-  generationModel: text("generation_model"),
-  status: text("status").default("draft").notNull(),
-  reviewNotes: text("review_notes"),
-  reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
-  reviewedByUserId: uuid("reviewed_by_user_id").references(() => users.id, {
-    onDelete: "set null",
-  }),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-},
-  (table) => [uniqueIndex("questions_fingerprint_idx").on(table.fingerprint)]
+export const questionSets = pgTable(
+  "question_sets",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    sectionKey: text("section_key")
+      .notNull()
+      .references(() => actSections.key, { onDelete: "cascade" }),
+    topicId: uuid("topic_id")
+      .notNull()
+      .references(() => actTopics.id, { onDelete: "cascade" }),
+    kind: text("kind").$type<QuestionSetKind>().notNull(),
+    title: text("title"),
+    content: text("content").notNull(),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("question_sets_section_idx").on(table.sectionKey),
+    index("question_sets_topic_idx").on(table.topicId),
+    check(
+      "question_sets_section_allowed_ck",
+      sql`${table.sectionKey} in ('reading', 'science')`
+    ),
+    check(
+      "question_sets_kind_allowed_ck",
+      sql`${table.kind} in ('reading_passage', 'science_stimulus')`
+    ),
+  ]
+);
+
+export const questions = pgTable(
+  "questions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    sectionKey: text("section_key")
+      .notNull()
+      .references(() => actSections.key, { onDelete: "cascade" }),
+    topicId: uuid("topic_id")
+      .notNull()
+      .references(() => actTopics.id, { onDelete: "cascade" }),
+    questionSetId: uuid("question_set_id").references(() => questionSets.id, {
+      onDelete: "set null",
+    }),
+    difficulty: text("difficulty").default("medium").notNull(),
+    questionType: text("question_type").default("multiple_choice").notNull(),
+    prompt: text("prompt").notNull(),
+    passage: text("passage"),
+    fingerprint: text("fingerprint"),
+    choices: jsonb("choices").$type<ChoiceMap>().notNull(),
+    correctAnswer: text("correct_answer").notNull(),
+    explanation: text("explanation").notNull(),
+    source: text("source").default("internal").notNull(),
+    generationModel: text("generation_model"),
+    status: text("status").default("draft").notNull(),
+    reviewNotes: text("review_notes"),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewedByUserId: uuid("reviewed_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("questions_fingerprint_idx").on(table.fingerprint),
+    index("questions_question_set_idx").on(table.questionSetId),
+  ]
 );
 
 export const questionExposures = pgTable(

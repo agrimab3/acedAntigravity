@@ -1,3 +1,4 @@
+import type { QuestionSetKind } from "@/db/schema";
 import type { ChoiceMap } from "@/db/schema";
 
 export type NormalizedQuestionRow = {
@@ -6,6 +7,10 @@ export type NormalizedQuestionRow = {
   topic: string;
   difficulty: string;
   passage: string | null;
+  questionSetId: string | null;
+  questionSetKind: QuestionSetKind | null;
+  questionSetTitle: string | null;
+  questionSetContent: string | null;
   question_text: string;
   choices: ChoiceMap;
   correct_answer: keyof ChoiceMap;
@@ -511,6 +516,10 @@ export function normalizeQuestionRow(row: {
   topic: string;
   difficulty: string;
   passage: string | null;
+  questionSetId?: string | null;
+  questionSetKind?: QuestionSetKind | null;
+  questionSetTitle?: string | null;
+  questionSetContent?: string | null;
   question_text: string;
   choices: unknown;
   correct_answer: string;
@@ -530,6 +539,10 @@ export function normalizeQuestionRow(row: {
     topic: row.topic,
     difficulty: row.difficulty,
     passage: row.passage,
+    questionSetId: row.questionSetId ?? null,
+    questionSetKind: row.questionSetKind ?? null,
+    questionSetTitle: row.questionSetTitle ?? null,
+    questionSetContent: row.questionSetContent ?? null,
     question_text: row.question_text,
     choices,
     correct_answer: correctAnswer,

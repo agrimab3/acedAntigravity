@@ -43,6 +43,13 @@
       "when": 1775833105239,
       "tag": "0005_real_wildside",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1787499738676,
+      "tag": "0006_wild_shinobi_shaw",
+      "breakpoints": true
     }
   ]
 }

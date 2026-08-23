@@ -1,8 +1,9 @@
 import { and, eq, sql } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { actTopics, questionExposures, questions } from "@/db/schema";
+import { actTopics, questionExposures, questions, questionSets } from "@/db/schema";
 import type * as schema from "@/db/schema";
 import { buildMockQuestions, type PracticeQuestion } from "@/lib/mock-questions";
+import { hydrateQuestionSetContext, validateQuestionSetLink } from "@/lib/question-sets";
 import { normalizeQuestionRow, type NormalizedQuestionRow } from "@/lib/question-utils";
 import {
   getPracticeTestMode,
@@ -40,6 +41,22 @@ function logSectionMismatch({
     questionId,
     questionSection,
     topicName,
+  });
+}
+
+function logQuestionSetMismatch({
+  questionId,
+  questionSetId,
+  reason,
+}: {
+  questionId: string;
+  questionSetId: string;
+  reason: string;
+}) {
+  console.error("[practice-test-engine] Rejected mismatched question set link", {
+    questionId,
+    questionSetId,
+    reason,
   });
 }
 
@@ -110,9 +127,16 @@ export async function fetchPracticeTestSectionQuestions({
         .select({
           id: questions.id,
           section: questions.sectionKey,
+          topicId: questions.topicId,
           topic: actTopics.name,
           difficulty: questions.difficulty,
           passage: questions.passage,
+          questionSetId: questions.questionSetId,
+          questionSetSectionKey: questionSets.sectionKey,
+          questionSetTopicId: questionSets.topicId,
+          questionSetKind: questionSets.kind,
+          questionSetTitle: questionSets.title,
+          questionSetContent: questionSets.content,
           question_text: questions.prompt,
           choices: questions.choices,
           correct_answer: questions.correctAnswer,
@@ -120,6 +144,7 @@ export async function fetchPracticeTestSectionQuestions({
         })
         .from(questions)
         .innerJoin(actTopics, eq(questions.topicId, actTopics.id))
+        .leftJoin(questionSets, eq(questions.questionSetId, questionSets.id))
         .leftJoin(
           questionExposures,
           and(eq(questionExposures.questionId, questions.id), eq(questionExposures.userId, userId))
@@ -142,9 +167,16 @@ export async function fetchPracticeTestSectionQuestions({
         .select({
           id: questions.id,
           section: questions.sectionKey,
+          topicId: questions.topicId,
           topic: actTopics.name,
           difficulty: questions.difficulty,
           passage: questions.passage,
+          questionSetId: questions.questionSetId,
+          questionSetSectionKey: questionSets.sectionKey,
+          questionSetTopicId: questionSets.topicId,
+          questionSetKind: questionSets.kind,
+          questionSetTitle: questionSets.title,
+          questionSetContent: questionSets.content,
           question_text: questions.prompt,
           choices: questions.choices,
           correct_answer: questions.correctAnswer,
@@ -152,6 +184,7 @@ export async function fetchPracticeTestSectionQuestions({
         })
         .from(questions)
         .innerJoin(actTopics, eq(questions.topicId, actTopics.id))
+        .leftJoin(questionSets, eq(questions.questionSetId, questionSets.id))
         .where(
           and(
             eq(questions.status, "published"),
@@ -166,7 +199,44 @@ export async function fetchPracticeTestSectionQuestions({
   const normalized = new Map<string, NormalizedQuestionRow>();
 
   rows.forEach((row) => {
-    const question = normalizeQuestionRow(row);
+    const setValidation = validateQuestionSetLink({
+      questionId: row.id,
+      questionSectionKey: row.section,
+      questionTopicId: row.topicId,
+      questionSetId: row.questionSetId,
+      questionSetSectionKey: row.questionSetSectionKey,
+      questionSetTopicId: row.questionSetTopicId,
+    });
+
+    if (!setValidation.ok && row.questionSetId) {
+      logQuestionSetMismatch({
+        questionId: row.id,
+        questionSetId: row.questionSetId,
+        reason: setValidation.reason,
+      });
+    }
+
+    const hydratedSet = hydrateQuestionSetContext({
+      questionId: row.id,
+      questionSectionKey: row.section,
+      questionTopicId: row.topicId,
+      questionSetId: row.questionSetId,
+      questionSetSectionKey: row.questionSetSectionKey,
+      questionSetTopicId: row.questionSetTopicId,
+      questionSetKind: row.questionSetKind,
+      questionSetTitle: row.questionSetTitle,
+      questionSetContent: row.questionSetContent,
+      passage: row.passage,
+    });
+
+    const question = normalizeQuestionRow({
+      ...row,
+      passage: hydratedSet.effectivePassage,
+      questionSetId: hydratedSet.questionSet?.id ?? null,
+      questionSetKind: hydratedSet.questionSet?.kind ?? null,
+      questionSetTitle: hydratedSet.questionSet?.title ?? null,
+      questionSetContent: hydratedSet.questionSet?.content ?? null,
+    });
     if (!question) {
       return;
     }
