@@ -149,59 +149,39 @@ const RUNNER_STAR_POSITIONS = [
   { left: "71%", top: "83%", size: 1.7, delay: "-6s", duration: "21s" },
   { left: "86%", top: "77%", size: 2.3, delay: "-19s", duration: "28s" },
 ] ;
-const SCORE_CONSTELLATION_GROUPS = [
-  {
-    key: "english",
-    color: "#5DCAA5",
-    angle: 0,
-    orbitDistance: 182,
-    stars: [
-      { left: 24, top: 12, size: 5 },
-      { left: 82, top: 24, size: 4 },
-      { left: 56, top: 54, size: 4.5 },
-      { left: 18, top: 82, size: 3.5 },
-    ],
-    lines: "24,12 82,24 56,54 18,82",
-  },
-  {
-    key: "math",
-    color: "#AFA9EC",
-    angle: 90,
-    orbitDistance: 198,
-    stars: [
-      { left: 18, top: 28, size: 4.5 },
-      { left: 68, top: 10, size: 4 },
-      { left: 90, top: 54, size: 5 },
-      { left: 42, top: 84, size: 3.5 },
-    ],
-    lines: "18,28 68,10 90,54 42,84",
-  },
-  {
-    key: "reading",
-    color: "#EF9F27",
-    angle: 180,
-    orbitDistance: 176,
-    stars: [
-      { left: 14, top: 18, size: 4 },
-      { left: 72, top: 18, size: 4.5 },
-      { left: 84, top: 72, size: 4 },
-      { left: 30, top: 88, size: 5 },
-    ],
-    lines: "14,18 72,18 84,72 30,88",
-  },
-  {
-    key: "science",
-    color: "#F1997B",
-    angle: 270,
-    orbitDistance: 188,
-    stars: [
-      { left: 20, top: 16, size: 4 },
-      { left: 84, top: 30, size: 5 },
-      { left: 64, top: 78, size: 4.5 },
-      { left: 16, top: 66, size: 3.5 },
-    ],
-    lines: "20,16 84,30 64,78 16,66",
-  },
+const SCORE_GALAXY_STARS = [
+  { left: "8%", top: "14%", size: 1.8, opacity: 0.42, delay: "-1s", duration: "18s" },
+  { left: "14%", top: "26%", size: 2.4, opacity: 0.68, delay: "-6s", duration: "22s" },
+  { left: "20%", top: "10%", size: 1.4, opacity: 0.36, delay: "-11s", duration: "19s" },
+  { left: "24%", top: "38%", size: 2.8, opacity: 0.72, delay: "-3s", duration: "24s" },
+  { left: "31%", top: "18%", size: 1.7, opacity: 0.45, delay: "-8s", duration: "21s" },
+  { left: "38%", top: "8%", size: 1.2, opacity: 0.3, delay: "-13s", duration: "17s" },
+  { left: "44%", top: "24%", size: 2.2, opacity: 0.56, delay: "-5s", duration: "20s" },
+  { left: "51%", top: "15%", size: 3.2, opacity: 0.82, delay: "-2s", duration: "26s" },
+  { left: "58%", top: "32%", size: 1.6, opacity: 0.4, delay: "-9s", duration: "18s" },
+  { left: "65%", top: "12%", size: 2.5, opacity: 0.62, delay: "-4s", duration: "23s" },
+  { left: "73%", top: "20%", size: 1.4, opacity: 0.34, delay: "-12s", duration: "19s" },
+  { left: "81%", top: "9%", size: 2.7, opacity: 0.74, delay: "-7s", duration: "25s" },
+  { left: "88%", top: "24%", size: 1.9, opacity: 0.48, delay: "-14s", duration: "21s" },
+  { left: "12%", top: "54%", size: 1.3, opacity: 0.28, delay: "-10s", duration: "18s" },
+  { left: "18%", top: "67%", size: 2.2, opacity: 0.52, delay: "-2s", duration: "24s" },
+  { left: "27%", top: "58%", size: 1.7, opacity: 0.44, delay: "-16s", duration: "20s" },
+  { left: "36%", top: "72%", size: 3.4, opacity: 0.86, delay: "-5s", duration: "27s" },
+  { left: "45%", top: "62%", size: 1.5, opacity: 0.38, delay: "-8s", duration: "19s" },
+  { left: "53%", top: "76%", size: 2.6, opacity: 0.66, delay: "-1s", duration: "23s" },
+  { left: "61%", top: "60%", size: 1.2, opacity: 0.26, delay: "-15s", duration: "17s" },
+  { left: "69%", top: "71%", size: 2.1, opacity: 0.5, delay: "-6s", duration: "22s" },
+  { left: "77%", top: "63%", size: 1.6, opacity: 0.4, delay: "-9s", duration: "20s" },
+  { left: "86%", top: "74%", size: 2.9, opacity: 0.78, delay: "-3s", duration: "26s" },
+  { left: "28%", top: "84%", size: 1.4, opacity: 0.34, delay: "-13s", duration: "18s" },
+  { left: "49%", top: "88%", size: 1.8, opacity: 0.42, delay: "-7s", duration: "21s" },
+  { left: "72%", top: "86%", size: 1.3, opacity: 0.3, delay: "-11s", duration: "18s" },
+] ;
+const SCORE_GALAXY_HERO_STARS = [
+  { left: "22%", top: "30%", size: 4.2, opacity: 0.84, delay: "-2s", duration: "28s", driftX: 18, driftY: 10 },
+  { left: "74%", top: "26%", size: 5.1, opacity: 0.9, delay: "-9s", duration: "31s", driftX: -16, driftY: 12 },
+  { left: "34%", top: "72%", size: 4.6, opacity: 0.82, delay: "-5s", duration: "29s", driftX: 12, driftY: -14 },
+  { left: "66%", top: "68%", size: 5.4, opacity: 0.92, delay: "-12s", duration: "33s", driftX: -14, driftY: -10 },
 ] ;
 
 function RunnerVisualStyles() {
@@ -218,37 +198,21 @@ function RunnerVisualStyles() {
         50% { opacity: 0.72; }
       }
 
-      @keyframes aced-orbit-galaxy {
+      @keyframes aced-score-star-drift {
         0% {
-          transform: translate(-50%, -50%) rotate(var(--orbit-angle)) translateX(var(--orbit-start)) scale(1);
+          transform: translate3d(0, 0, 0);
         }
         50% {
-          transform: translate(-50%, -50%) rotate(calc(var(--orbit-angle) + var(--orbit-mid-turn))) translateX(var(--orbit-mid)) scale(0.97);
+          transform: translate3d(-10px, 12px, 0);
         }
         100% {
-          transform: translate(-50%, -50%) rotate(calc(var(--orbit-angle) + var(--orbit-end-turn))) translateX(var(--orbit-end)) scale(0.92);
+          transform: translate3d(0, 0, 0);
         }
       }
 
-      @keyframes aced-group-twinkle {
+      @keyframes aced-score-star-twinkle {
         0%, 100% { opacity: 0.42; }
         50% { opacity: 0.82; }
-      }
-
-      @keyframes aced-line-shimmer {
-        0%, 100% { opacity: 0.12; }
-        50% { opacity: 0.38; }
-      }
-
-      @keyframes aced-core-breathe {
-        0%, 100% {
-          transform: translate(-50%, -50%) scale(0.96);
-          opacity: 0.46;
-        }
-        50% {
-          transform: translate(-50%, -50%) scale(1.05);
-          opacity: 0.72;
-        }
       }
 
       @keyframes aced-haze-shift {
@@ -259,6 +223,18 @@ function RunnerVisualStyles() {
         50% {
           transform: scale(1.05) translate3d(10px, -8px, 0);
           opacity: 0.72;
+        }
+      }
+
+      @keyframes aced-hero-star-pull {
+        0% {
+          transform: translate3d(0, 0, 0) scale(1);
+        }
+        50% {
+          transform: translate3d(calc(var(--drift-x) * 0.55), calc(var(--drift-y) * 0.55), 0) scale(1.04);
+        }
+        100% {
+          transform: translate3d(var(--drift-x), var(--drift-y), 0) scale(1.08);
         }
       }
     `}</style>
@@ -311,7 +287,7 @@ function RunnerStarField({ prefersReducedMotion }: { prefersReducedMotion: boole
   );
 }
 
-function ScoreConstellationStage({
+function ScoreGalaxyStage({
   prefersReducedMotion,
 }: {
   prefersReducedMotion: boolean;
@@ -339,11 +315,11 @@ function ScoreConstellationStage({
         <div
           style={{
             position: "absolute",
-            inset: "-8%",
+            inset: "-16%",
             borderRadius: "999px",
             background:
-              "radial-gradient(circle at 35% 40%, rgba(88, 230, 213, 0.18), transparent 18%), radial-gradient(circle at 65% 54%, rgba(175, 169, 236, 0.12), transparent 24%), radial-gradient(circle at 48% 52%, rgba(13, 86, 110, 0.32), transparent 52%)",
-            filter: "blur(14px)",
+              "radial-gradient(circle at 28% 36%, rgba(88, 230, 213, 0.18), transparent 16%), radial-gradient(circle at 70% 32%, rgba(68, 190, 214, 0.14), transparent 18%), radial-gradient(circle at 50% 54%, rgba(14, 86, 110, 0.34), transparent 42%), radial-gradient(circle at 54% 58%, rgba(39, 142, 161, 0.18), transparent 26%)",
+            filter: "blur(18px)",
             animation: prefersReducedMotion ? undefined : "aced-haze-shift 5.5s ease-in-out forwards",
           }}
         />
@@ -352,96 +328,65 @@ function ScoreConstellationStage({
             position: "absolute",
             left: "50%",
             top: "50%",
-            width: "18%",
-            height: "18%",
+            width: "22%",
+            height: "22%",
             transform: "translate(-50%, -50%)",
             borderRadius: "999px",
             background:
-              "radial-gradient(circle, rgba(107, 227, 211, 0.28) 0%, rgba(47, 132, 153, 0.18) 36%, rgba(6, 20, 32, 0) 72%)",
-            filter: "blur(6px)",
-            animation: prefersReducedMotion ? undefined : "aced-core-breathe 2.8s ease-in-out infinite",
+              "radial-gradient(circle, rgba(120, 240, 227, 0.34) 0%, rgba(53, 144, 164, 0.22) 34%, rgba(6, 20, 32, 0) 74%)",
+            filter: "blur(8px)",
           }}
         />
-        {SCORE_CONSTELLATION_GROUPS.map((group) => (
-          <div
-            key={group.key}
+        {SCORE_GALAXY_STARS.map((star, index) => (
+          <span
+            key={`score-galaxy-star-${index}`}
+            style={{
+              position: "absolute",
+              left: star.left,
+              top: star.top,
+              width: `${star.size}px`,
+              height: `${star.size}px`,
+              borderRadius: "999px",
+              background: "rgba(235, 246, 255, 0.95)",
+              boxShadow:
+                star.size > 2.5
+                  ? "0 0 16px rgba(160, 240, 233, 0.34)"
+                  : "0 0 10px rgba(160, 240, 233, 0.18)",
+              opacity: prefersReducedMotion ? Math.min(star.opacity, 0.5) : star.opacity,
+              animation: prefersReducedMotion
+                ? undefined
+                : `aced-score-star-drift ${star.duration} ease-in-out ${star.delay} infinite, aced-score-star-twinkle ${Math.max(
+                    5,
+                    Number.parseInt(star.duration, 10) / 2
+                  )}s ease-in-out ${star.delay} infinite`,
+            }}
+          />
+        ))}
+        {SCORE_GALAXY_HERO_STARS.map((star, index) => (
+          <span
+            key={`score-hero-star-${index}`}
             style={
               {
                 position: "absolute",
-                left: "50%",
-                top: "50%",
-                width: "26%",
-                aspectRatio: "1 / 1",
-                transform: prefersReducedMotion
-                  ? `translate(-50%, -50%) rotate(${group.angle}deg) translateX(${Math.round(group.orbitDistance * 0.62)}px)`
-                  : undefined,
+                left: star.left,
+                top: star.top,
+                width: `${star.size}px`,
+                height: `${star.size}px`,
+                borderRadius: "999px",
+                background: "rgba(242, 251, 255, 0.98)",
+                boxShadow: "0 0 20px rgba(136, 235, 224, 0.5)",
+                opacity: prefersReducedMotion ? Math.min(star.opacity, 0.65) : star.opacity,
                 animation: prefersReducedMotion
                   ? undefined
-                  : "aced-orbit-galaxy 5.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards",
-                opacity: prefersReducedMotion ? 0.7 : 0.92,
-                ["--orbit-angle" as string]: `${group.angle}deg`,
-                ["--orbit-start" as string]: `${group.orbitDistance}px`,
-                ["--orbit-mid" as string]: `${Math.round(group.orbitDistance * 0.74)}px`,
-                ["--orbit-end" as string]: `${Math.round(group.orbitDistance * 0.44)}px`,
-                ["--orbit-mid-turn" as string]:
-                  group.key === "english"
-                    ? "110deg"
-                    : group.key === "math"
-                      ? "95deg"
-                      : group.key === "reading"
-                        ? "120deg"
-                        : "100deg",
-                ["--orbit-end-turn" as string]:
-                  group.key === "english"
-                    ? "215deg"
-                    : group.key === "math"
-                      ? "185deg"
-                      : group.key === "reading"
-                        ? "230deg"
-                        : "200deg",
+                  : `aced-hero-star-pull ${star.duration} cubic-bezier(0.22, 0.61, 0.36, 1) ${star.delay} infinite alternate, aced-score-star-twinkle ${Math.max(
+                      6,
+                      Number.parseInt(star.duration, 10) / 2
+                    )}s ease-in-out ${star.delay} infinite`,
+                ["--drift-x" as string]: `${star.driftX}px`,
+                ["--drift-y" as string]: `${star.driftY}px`,
               } as CSSProperties
             }
-          >
-            <svg
-              viewBox="0 0 100 100"
-              style={{
-                position: "absolute",
-                inset: 0,
-                overflow: "visible",
-              }}
-            >
-              <polyline
-                points={group.lines}
-                fill="none"
-                stroke={group.color}
-                strokeWidth="1"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                opacity={prefersReducedMotion ? 0.2 : 0.24}
-                style={{
-                  animation: prefersReducedMotion ? undefined : "aced-line-shimmer 2.4s ease-in-out infinite",
-                }}
-              />
-            </svg>
-            {group.stars.map((star, index) => (
-              <span
-                key={`${group.key}-star-${index}`}
-                style={{
-                  position: "absolute",
-                  left: `${star.left}%`,
-                  top: `${star.top}%`,
-                  width: `${star.size}px`,
-                  height: `${star.size}px`,
-                  borderRadius: "999px",
-                  background: group.color,
-                  boxShadow: `0 0 18px ${group.color}66`,
-                  animation: prefersReducedMotion
-                    ? undefined
-                    : `aced-group-twinkle ${1.8 + index * 0.45}s ease-in-out ${index * 0.2}s infinite`,
-                }}
-              />
-            ))}
-          </div>
+          />
         ))}
       </div>
     </div>
@@ -2086,7 +2031,7 @@ function PracticeTestRunContent() {
         }}
       >
         <RunnerVisualStyles />
-        <ScoreConstellationStage prefersReducedMotion={prefersReducedMotion} />
+        <ScoreGalaxyStage prefersReducedMotion={prefersReducedMotion} />
         <div
           style={{
             position: "absolute",
