@@ -1,6 +1,12 @@
 import { createHash } from "crypto";
 import { Client } from "pg";
 import { z } from "zod";
+import {
+  DEFAULT_GROQ_MODEL,
+  isGroqModelUnavailableError,
+  resolveGroqFallbackModel,
+  resolvePreferredGroqModel,
+} from "./lib/groq-models.ts";
 import { reviewQuestionQuality } from "./lib/question-utils.ts";
 
 const SECTION_KEYS = ["english", "math", "reading", "science"];
@@ -268,10 +274,10 @@ function resolveGenerationModel(provider, rawModel) {
   }
 
   if (provider === "groq") {
-    return (
+    return resolvePreferredGroqModel(
       process.env.GROQ_GENERATION_MODEL ||
       process.env.GROQ_MODEL ||
-      "llama-3.3-70b-versatile"
+      DEFAULT_GROQ_MODEL
     );
   }
 
@@ -293,7 +299,7 @@ function resolveReviewModel(provider, rawModel, fallbackModel) {
   }
 
   if (provider === "groq") {
-    return (
+    return resolvePreferredGroqModel(
       process.env.GROQ_REVIEW_MODEL ||
       process.env.GROQ_GENERATION_MODEL ||
       process.env.GROQ_MODEL ||
@@ -1440,7 +1446,14 @@ async function requestGeminiJson({ model, systemPrompt, userPrompt, schema, temp
   return text;
 }
 
-async function requestGroqJson({ model, systemPrompt, userPrompt, schema, temperature = 0.35 }) {
+async function requestGroqJson({
+  model,
+  systemPrompt,
+  userPrompt,
+  schema,
+  temperature = 0.35,
+  allowModelFallback = true,
+}) {
   const groqSupportsJsonSchema = supportsGroqJsonSchema(model);
   const response = await fetch(`${resolveGroqBaseUrl()}/chat/completions`, {
     method: "POST",
@@ -1492,6 +1505,25 @@ async function requestGroqJson({ model, systemPrompt, userPrompt, schema, temper
 
   if (!response.ok) {
     const message = payload?.error?.message || rawBody || `HTTP ${response.status}`;
+
+    if (allowModelFallback && isGroqModelUnavailableError(message)) {
+      const fallbackModel = resolveGroqFallbackModel(model);
+
+      if (fallbackModel !== model) {
+        console.warn(
+          `Groq model ${model} is unavailable; retrying once with fallback model ${fallbackModel}.`
+        );
+        return requestGroqJson({
+          model: fallbackModel,
+          systemPrompt,
+          userPrompt,
+          schema,
+          temperature,
+          allowModelFallback: false,
+        });
+      }
+    }
+
     throw new Error(`Groq request failed: ${message}`);
   }
 

@@ -12,6 +12,7 @@ import {
   sortTopicsByPriority,
 } from "@/lib/content-audit";
 import { getDb } from "@/lib/db";
+import { DEFAULT_GROQ_MODEL, resolvePreferredGroqModel } from "@/lib/groq-models";
 import { resolveEffectivePassage } from "@/lib/question-sets";
 
 const execFileAsync = promisify(execFile);
@@ -170,7 +171,11 @@ function resolveGenerationModel(provider: string) {
   }
 
   if (provider === "groq") {
-    return process.env.GROQ_GENERATION_MODEL || process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+    return resolvePreferredGroqModel(
+      process.env.GROQ_GENERATION_MODEL,
+      process.env.GROQ_MODEL,
+      DEFAULT_GROQ_MODEL
+    );
   }
 
   return process.env.GEMINI_GENERATION_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";

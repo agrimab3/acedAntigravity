@@ -1,5 +1,6 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { DEFAULT_GROQ_MODEL, resolvePreferredGroqModel } from "../lib/groq-models";
 import { Client } from "pg";
 
 const args = Object.fromEntries(
@@ -68,10 +69,10 @@ function resolveGenerationModel(provider: string, rawModel?: string) {
   }
 
   if (provider === "groq") {
-    return (
+    return resolvePreferredGroqModel(
       process.env.GROQ_GENERATION_MODEL ||
       process.env.GROQ_MODEL ||
-      "llama-3.3-70b-versatile"
+      DEFAULT_GROQ_MODEL
     );
   }
 
