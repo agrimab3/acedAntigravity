@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
+import { sql } from "drizzle-orm";
 import { z } from "zod";
 import {
   practiceTestAnswers,
   practiceTestSections,
   practiceTestSessions,
+  questionExposures,
   type PracticeTestQuestionSnapshot,
 } from "@/db/schema";
 import { getAuthSession } from "@/lib/auth";
@@ -118,6 +120,44 @@ export async function POST(request: Request) {
       }))
     )
   );
+
+  const realQuestionIds = Array.from(
+    new Set(
+      payload.sections.flatMap((section) =>
+        section.questions
+          .filter(
+            (question) =>
+              !question.id.startsWith("mock-") && !question.id.startsWith("section-")
+          )
+          .map((question) => question.id)
+      )
+    )
+  );
+
+  if (realQuestionIds.length > 0) {
+    await Promise.all(
+      realQuestionIds.map((questionId) =>
+        db
+          .insert(questionExposures)
+          .values({
+            userId,
+            questionId,
+            timesSeen: 1,
+            firstSeenAt: now,
+            lastSeenAt: now,
+            updatedAt: now,
+          })
+          .onConflictDoUpdate({
+            target: [questionExposures.userId, questionExposures.questionId],
+            set: {
+              timesSeen: sql`${questionExposures.timesSeen} + 1`,
+              lastSeenAt: now,
+              updatedAt: now,
+            },
+          })
+      )
+    );
+  }
 
   return NextResponse.json({
     persisted: true,

@@ -24,6 +24,25 @@ export type PracticeTestSectionPayload = {
   availableCount: number;
 };
 
+function logSectionMismatch({
+  requestedSection,
+  questionId,
+  questionSection,
+  topicName,
+}: {
+  requestedSection: PracticeTestSectionKey;
+  questionId: string;
+  questionSection: string;
+  topicName: string;
+}) {
+  console.error("[practice-test-engine] Rejected mismatched question row", {
+    requestedSection,
+    questionId,
+    questionSection,
+    topicName,
+  });
+}
+
 export function buildSectionMockQuestions(
   section: PracticeTestSectionKey,
   limit: number
@@ -105,8 +124,19 @@ export async function fetchPracticeTestSectionQuestions({
           questionExposures,
           and(eq(questionExposures.questionId, questions.id), eq(questionExposures.userId, userId))
         )
-        .where(and(eq(questions.status, "published"), eq(actTopics.sectionKey, sectionKey), eq(actTopics.isActive, true)))
-        .orderBy(sql`coalesce(${questionExposures.timesSeen}, 0) asc`, sql`random()`)
+        .where(
+          and(
+            eq(questions.status, "published"),
+            eq(questions.sectionKey, sectionKey),
+            eq(actTopics.sectionKey, sectionKey),
+            eq(actTopics.isActive, true)
+          )
+        )
+        .orderBy(
+          sql`case when ${questionExposures.id} is null then 0 else 1 end asc`,
+          sql`coalesce(${questionExposures.timesSeen}, 0) asc`,
+          sql`random()`
+        )
         .limit(count * 5)
     : await db
         .select({
@@ -122,7 +152,14 @@ export async function fetchPracticeTestSectionQuestions({
         })
         .from(questions)
         .innerJoin(actTopics, eq(questions.topicId, actTopics.id))
-        .where(and(eq(questions.status, "published"), eq(actTopics.sectionKey, sectionKey), eq(actTopics.isActive, true)))
+        .where(
+          and(
+            eq(questions.status, "published"),
+            eq(questions.sectionKey, sectionKey),
+            eq(actTopics.sectionKey, sectionKey),
+            eq(actTopics.isActive, true)
+          )
+        )
         .orderBy(sql`random()`)
         .limit(count * 5);
 
@@ -130,7 +167,21 @@ export async function fetchPracticeTestSectionQuestions({
 
   rows.forEach((row) => {
     const question = normalizeQuestionRow(row);
-    if (question && !normalized.has(question.id)) {
+    if (!question) {
+      return;
+    }
+
+    if (question.section !== sectionKey) {
+      logSectionMismatch({
+        requestedSection: sectionKey,
+        questionId: question.id,
+        questionSection: question.section,
+        topicName: question.topic,
+      });
+      return;
+    }
+
+    if (!normalized.has(question.id)) {
       normalized.set(question.id, question);
     }
   });

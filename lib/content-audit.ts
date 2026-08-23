@@ -73,6 +73,25 @@ export type ContentTopicSelectionOptions = {
   maxTopics?: number;
 };
 
+export type SectionTopicIntegrityRow = {
+  questionId: string;
+  questionSectionKey: string;
+  topicSectionKey: string;
+  topicSlug: string;
+  topicName: string;
+};
+
+export function auditSectionTopicIntegrity(rows: SectionTopicIntegrityRow[]) {
+  const mismatches = rows.filter(
+    (row) => row.questionSectionKey.trim().toLowerCase() !== row.topicSectionKey.trim().toLowerCase()
+  );
+
+  return {
+    mismatchedSectionTopicCount: mismatches.length,
+    mismatchedSectionTopicRows: mismatches,
+  };
+}
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }

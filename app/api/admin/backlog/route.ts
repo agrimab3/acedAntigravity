@@ -6,6 +6,7 @@ import { z } from "zod";
 import { actTopics, questions } from "@/db/schema";
 import { getAdminSession } from "@/lib/admin";
 import {
+  auditSectionTopicIntegrity,
   auditTopicInventory,
   selectTopicsForBacklogFill,
   sortTopicsByPriority,
@@ -52,6 +53,9 @@ async function loadAuditedTopics(db: NonNullable<ReturnType<typeof getDb>>) {
       .orderBy(asc(actTopics.sectionKey), asc(actTopics.displayOrder)),
     db
       .select({
+        questionId: questions.id,
+        questionSectionKey: questions.sectionKey,
+        topicSectionKey: actTopics.sectionKey,
         sectionKey: questions.sectionKey,
         topicId: questions.topicId,
         topicSlug: actTopics.slug,
@@ -93,8 +97,19 @@ export async function GET() {
   }
 
   const topics = await loadAuditedTopics(db);
+  const integrityRows = await db
+    .select({
+      questionId: questions.id,
+      questionSectionKey: questions.sectionKey,
+      topicSectionKey: actTopics.sectionKey,
+      topicSlug: actTopics.slug,
+      topicName: actTopics.name,
+    })
+    .from(questions)
+    .innerJoin(actTopics, eq(questions.topicId, actTopics.id));
+  const integrity = auditSectionTopicIntegrity(integrityRows);
 
-  return NextResponse.json({ topics });
+  return NextResponse.json({ topics, integrity });
 }
 
 function extractJsonSummary(stdout: string) {

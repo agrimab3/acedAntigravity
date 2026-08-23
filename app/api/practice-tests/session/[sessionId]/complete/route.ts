@@ -234,7 +234,6 @@ export async function POST(
           .onConflictDoUpdate({
             target: [questionExposures.userId, questionExposures.questionId],
             set: {
-              timesSeen: sql`${questionExposures.timesSeen} + 1`,
               timesCorrect: sql`${questionExposures.timesCorrect} + ${answer.isCorrect ? 1 : 0}`,
               timesIncorrect: sql`${questionExposures.timesIncorrect} + ${answer.isCorrect ? 0 : 1}`,
               lastSeenAt: now,

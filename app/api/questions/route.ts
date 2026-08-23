@@ -34,6 +34,25 @@ const searchSchema = z.object({
   limit: z.coerce.number().int().min(1).max(10).default(10),
 });
 
+function logSectionMismatch({
+  requestedSection,
+  questionId,
+  questionSection,
+  topicName,
+}: {
+  requestedSection: SectionKey;
+  questionId: string;
+  questionSection: string;
+  topicName: string;
+}) {
+  console.error("[questions-api] Rejected mismatched question row", {
+    requestedSection,
+    questionId,
+    questionSection,
+    topicName,
+  });
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const parsed = searchSchema.safeParse({
@@ -217,12 +236,14 @@ export async function GET(request: Request) {
       const whereClause = topic
         ? and(
             eq(questions.status, "published"),
+            eq(questions.sectionKey, section),
             eq(actTopics.sectionKey, section),
             inArray(actTopics.name, practiceScopeTopicNames),
             eq(questions.difficulty, difficulty)
           )
         : and(
             eq(questions.status, "published"),
+            eq(questions.sectionKey, section),
             eq(actTopics.sectionKey, section),
             eq(questions.difficulty, difficulty)
           );
@@ -250,7 +271,11 @@ export async function GET(request: Request) {
               )
             )
             .where(whereClause)
-            .orderBy(sql`coalesce(${questionExposures.timesSeen}, 0) asc`, sql`random()`)
+            .orderBy(
+              sql`case when ${questionExposures.id} is null then 0 else 1 end asc`,
+              sql`coalesce(${questionExposures.timesSeen}, 0) asc`,
+              sql`random()`
+            )
             .limit(limit * 4)
         : await db
             .select({
@@ -273,7 +298,21 @@ export async function GET(request: Request) {
       for (const row of rows) {
         const normalizedRow = normalizeQuestionRow(row);
 
-        if (normalizedRow && !selectedRows.has(normalizedRow.id)) {
+        if (!normalizedRow) {
+          continue;
+        }
+
+        if (normalizedRow.section !== section) {
+          logSectionMismatch({
+            requestedSection: section,
+            questionId: normalizedRow.id,
+            questionSection: normalizedRow.section,
+            topicName: normalizedRow.topic,
+          });
+          continue;
+        }
+
+        if (!selectedRows.has(normalizedRow.id)) {
           selectedRows.set(normalizedRow.id, normalizedRow);
         }
       }
