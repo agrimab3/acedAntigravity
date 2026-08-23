@@ -96,7 +96,7 @@ type CompletionReport = {
   }>;
 };
 
-type RunnerPhase = "intro" | "running" | "section-break" | "report";
+type RunnerPhase = "intro" | "running" | "section-break" | "scoring" | "report";
 
 type RunnerLoadError = {
   message: string;
@@ -110,6 +110,25 @@ type SectionTransitionState = {
   nextSectionTitle: string | null;
   reason: SectionAdvanceReason;
 };
+
+const FLAG_ACCENT_COLOR = "#F1997B";
+const SCHEDULED_BREAK_DURATION_SECONDS = 10 * 60;
+
+function shouldOfferScheduledBreak({
+  mode,
+  currentSection,
+  nextSection,
+}: {
+  mode: PracticeTestMode | null;
+  currentSection: RunnerSection | null;
+  nextSection: RunnerSection | null;
+}) {
+  return Boolean(
+    mode?.format === "full" &&
+      currentSection?.sectionKey === "math" &&
+      nextSection?.sectionKey === "reading"
+  );
+}
 
 function formatDurationLabel(minutes: number) {
   if (minutes < 60) {
@@ -295,101 +314,6 @@ function FlagIcon({
         opacity={filled ? 0.95 : 1}
       />
     </svg>
-  );
-}
-
-function CalculatorPanel({
-  open,
-  accentColor,
-  onClose,
-}: {
-  open: boolean;
-  accentColor: string;
-  onClose: () => void;
-}) {
-  if (!open) {
-    return null;
-  }
-
-  return (
-    <>
-      <div
-        onClick={onClose}
-        style={{
-          position: "fixed",
-          inset: 0,
-          background: "rgba(2, 6, 12, 0.68)",
-          backdropFilter: "blur(8px)",
-          zIndex: 44,
-        }}
-      />
-      <div
-        style={{
-          position: "fixed",
-          inset: "4vh 3vw",
-          maxWidth: "1180px",
-          margin: "0 auto",
-          borderRadius: "22px",
-          overflow: "hidden",
-          background:
-            "linear-gradient(180deg, rgba(10, 24, 35, 0.98) 0%, rgba(6, 14, 23, 0.98) 100%)",
-          border: "0.5px solid rgba(255,255,255,0.12)",
-          boxShadow: "0 28px 80px rgba(0,0,0,0.42)",
-          zIndex: 45,
-          display: "grid",
-          gridTemplateRows: "auto 1fr",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: "12px",
-            padding: "0.95rem 1rem",
-            borderBottom: "0.5px solid rgba(255,255,255,0.08)",
-          }}
-        >
-          <div>
-            <div
-              style={{
-                fontSize: "11px",
-                color: accentColor,
-                letterSpacing: ".08em",
-                textTransform: "uppercase",
-                marginBottom: "6px",
-              }}
-            >
-              Calculator
-            </div>
-            <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "28px", color: "#fff" }}>
-              Desmos Graphing Calculator
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              width: "38px",
-              height: "38px",
-              borderRadius: "999px",
-              border: "0.5px solid rgba(255,255,255,0.12)",
-              background: "rgba(255,255,255,0.05)",
-              color: "rgba(255,255,255,0.76)",
-              cursor: "pointer",
-              fontSize: "18px",
-            }}
-          >
-            ×
-          </button>
-        </div>
-        <iframe
-          title="Desmos Graphing Calculator"
-          src="https://www.desmos.com/calculator"
-          style={{ width: "100%", height: "100%", minHeight: "540px", border: "none", display: "block" }}
-        />
-      </div>
-    </>
   );
 }
 
@@ -754,6 +678,11 @@ function PracticeTestRunContent() {
   const [timeWarningMessage, setTimeWarningMessage] = useState<string | null>(null);
   const [shownTimeWarnings, setShownTimeWarnings] = useState<string[]>([]);
   const [showQuestionReview, setShowQuestionReview] = useState(false);
+  const [scheduledBreakRemainingSeconds, setScheduledBreakRemainingSeconds] = useState(
+    SCHEDULED_BREAK_DURATION_SECONDS
+  );
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [scoreInterstitialMessageIndex, setScoreInterstitialMessageIndex] = useState(0);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -831,6 +760,8 @@ function PracticeTestRunContent() {
         setTimeWarningMessage(null);
         setShownTimeWarnings([]);
         setShowQuestionReview(false);
+        setScheduledBreakRemainingSeconds(SCHEDULED_BREAK_DURATION_SECONDS);
+        setScoreInterstitialMessageIndex(0);
         setPhase("intro");
         setReport(null);
       } catch (error) {
@@ -887,14 +818,7 @@ function PracticeTestRunContent() {
         .filter((entry) => flaggedKeys.includes(entry.key))
         .map((entry) => entry.index)
     : [];
-  const unresolvedQuestionIndices = currentSection
-    ? currentSection.questions
-        .map((_, index) => index)
-        .filter((index) => {
-          const answerKey = keyFor(currentSectionIndex, index);
-          return !isAnswerChoice(selectedAnswers[answerKey]) || flaggedKeys.includes(answerKey);
-        })
-    : [];
+  const nextSection = sections[currentSectionIndex + 1] ?? null;
   const handleSectionAdvanceEvent = useEffectEvent(() => {
     void handleSectionAdvance("timeout", true);
   });
@@ -991,6 +915,19 @@ function PracticeTestRunContent() {
   }, [currentSection, currentSectionIndex, currentTimeRemaining, phase, shownTimeWarnings]);
 
   useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setPrefersReducedMotion(mediaQuery.matches);
+
+    sync();
+    mediaQuery.addEventListener("change", sync);
+    return () => mediaQuery.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
     if (!timeWarningMessage) {
       return;
     }
@@ -1001,6 +938,86 @@ function PracticeTestRunContent() {
 
     return () => window.clearTimeout(timeoutId);
   }, [timeWarningMessage]);
+
+  useEffect(() => {
+    if (phase !== "section-break") {
+      return;
+    }
+
+    setScheduledBreakRemainingSeconds(SCHEDULED_BREAK_DURATION_SECONDS);
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== "section-break") {
+      return;
+    }
+
+    if (
+      !shouldOfferScheduledBreak({
+        mode,
+        currentSection,
+        nextSection,
+      })
+    ) {
+      return;
+    }
+
+    if (scheduledBreakRemainingSeconds <= 0) {
+      setCurrentSectionIndex((current) => current + 1);
+      setCurrentQuestionIndices((current) => ({
+        ...current,
+        [currentSectionIndex + 1]: current[currentSectionIndex + 1] ?? 0,
+      }));
+      setTransitionState(null);
+      setPhase("running");
+      setQuestionStartedAtMs(Date.now());
+      return;
+    }
+
+    const countdownId = window.setTimeout(() => {
+      setScheduledBreakRemainingSeconds((current) => Math.max(0, current - 1));
+    }, 1000);
+
+    return () => window.clearTimeout(countdownId);
+  }, [
+    currentSection,
+    currentSectionIndex,
+    mode,
+    nextSection,
+    phase,
+    scheduledBreakRemainingSeconds,
+  ]);
+
+  useEffect(() => {
+    if (phase !== "scoring") {
+      setScoreInterstitialMessageIndex(0);
+      return;
+    }
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== "scoring" || !report) {
+      return;
+    }
+
+    const transitionDelay = prefersReducedMotion ? 300 : 2800;
+    const transitionId = window.setTimeout(() => {
+      setPhase("report");
+    }, transitionDelay);
+
+    if (prefersReducedMotion) {
+      return () => window.clearTimeout(transitionId);
+    }
+
+    const messageId = window.setInterval(() => {
+      setScoreInterstitialMessageIndex((current) => (current + 1) % 3);
+    }, 1100);
+
+    return () => {
+      window.clearTimeout(transitionId);
+      window.clearInterval(messageId);
+    };
+  }, [phase, prefersReducedMotion, report]);
 
   async function handleFinalizeTest() {
     if (!mode) return;
@@ -1182,6 +1199,8 @@ function PracticeTestRunContent() {
       })),
     });
 
+    let nextReport = localReport;
+
     if (persistedSession && sessionId) {
       try {
         const res = await fetch(`/api/practice-tests/session/${sessionId}/complete`, {
@@ -1201,20 +1220,16 @@ function PracticeTestRunContent() {
 
         if (res.ok) {
           const data = (await res.json()) as CompletionReport;
-          setReport(data);
-        } else {
-          setReport(localReport);
+          nextReport = data;
         }
       } catch (error) {
         console.error("Failed to persist practice test completion", error);
-        setReport(localReport);
       }
-    } else {
-      setReport(localReport);
     }
 
+    setReport(nextReport);
     setSubmitting(false);
-    setPhase("report");
+    setPhase("scoring");
   }
 
   async function handleSectionAdvance(
@@ -1562,10 +1577,14 @@ function PracticeTestRunContent() {
   }
 
   if (phase === "section-break") {
-    const nextSection = sections[currentSectionIndex + 1];
     const completedSectionTitle = transitionState?.completedSectionTitle ?? sections[currentSectionIndex]?.title ?? "Section";
     const nextSectionTitle = transitionState?.nextSectionTitle ?? nextSection?.title ?? "Next section";
     const timedOut = transitionState?.reason === "timeout";
+    const showScheduledBreak = shouldOfferScheduledBreak({
+      mode,
+      currentSection,
+      nextSection,
+    });
 
     return (
       <div
@@ -1582,60 +1601,214 @@ function PracticeTestRunContent() {
         }}
       >
         <div style={{ maxWidth: "620px", width: "100%" }}>
-          <div style={{ fontSize: "11px", letterSpacing: ".08em", textTransform: "uppercase", color: topMeta.accentColor, marginBottom: "10px" }}>
-            section complete
-          </div>
-          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "38px", marginBottom: "10px" }}>
-            {completedSectionTitle}
-            <br />
-            <em style={{ color: topMeta.accentColor }}>is locked in</em>
-          </div>
-          <div style={{ fontSize: "14px", lineHeight: 1.8, color: "rgba(255,255,255,0.68)", marginBottom: "1.2rem" }}>
-            {timedOut
-              ? `Time's up — ${completedSectionTitle} has been submitted.`
-              : "Your answers have been saved."}{" "}
-            Next up: {nextSectionTitle}.
-          </div>
+          {showScheduledBreak ? (
+            <>
+              <div style={{ fontSize: "11px", letterSpacing: ".08em", textTransform: "uppercase", color: topMeta.accentColor, marginBottom: "10px" }}>
+                take a break
+              </div>
+              <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "40px", marginBottom: "10px", lineHeight: 1.08 }}>
+                Math is locked in.
+                <br />
+                <em style={{ color: topMeta.accentColor }}>Reading is next.</em>
+              </div>
+              <div style={{ fontSize: "14px", lineHeight: 1.8, color: "rgba(255,255,255,0.68)", marginBottom: "1rem" }}>
+                Step away, reset your attention, and come back ready for the reading passages.
+              </div>
+              <div
+                style={{
+                  borderRadius: "22px",
+                  background: "rgba(255,255,255,0.055)",
+                  border: "0.5px solid rgba(255,255,255,0.1)",
+                  padding: "1.25rem 1.15rem",
+                  marginBottom: "1rem",
+                  boxShadow: "0 16px 40px rgba(0,0,0,0.24)",
+                }}
+              >
+                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.46)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: "8px" }}>
+                  scheduled break
+                </div>
+                <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "clamp(3rem,10vw,4.8rem)", lineHeight: 0.95, color: "#fff", marginBottom: "8px" }}>
+                  {formatCountdown(scheduledBreakRemainingSeconds)}
+                </div>
+                <div style={{ fontSize: "13px", lineHeight: 1.7, color: "rgba(255,255,255,0.62)" }}>
+                  No score, accuracy, or answer feedback appears here. Your test resumes with Reading.
+                </div>
+              </div>
+              <div style={{ display: "grid", gap: "10px" }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCurrentSectionIndex((current) => current + 1);
+                    setCurrentQuestionIndices((current) => ({
+                      ...current,
+                      [currentSectionIndex + 1]: current[currentSectionIndex + 1] ?? 0,
+                    }));
+                    setTransitionState(null);
+                    setPhase("running");
+                    setQuestionStartedAtMs(Date.now());
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    borderRadius: "12px",
+                    border: "none",
+                    background: topMeta.accentColor,
+                    color: "#081018",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                  }}
+                >
+                  skip break
+                </button>
+                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", textAlign: "center", lineHeight: 1.6 }}>
+                  On the real ACT, you won’t be able to skip this break.
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={{ fontSize: "11px", letterSpacing: ".08em", textTransform: "uppercase", color: topMeta.accentColor, marginBottom: "10px" }}>
+                section complete
+              </div>
+              <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "38px", marginBottom: "10px" }}>
+                {completedSectionTitle}
+                <br />
+                <em style={{ color: topMeta.accentColor }}>is locked in</em>
+              </div>
+              <div style={{ fontSize: "14px", lineHeight: 1.8, color: "rgba(255,255,255,0.68)", marginBottom: "1.2rem" }}>
+                {timedOut
+                  ? `Time's up — ${completedSectionTitle} has been submitted.`
+                  : "Your answers have been saved."}{" "}
+                Next up: {nextSectionTitle}.
+              </div>
 
+              <div
+                style={{
+                  borderRadius: "18px",
+                  background: "rgba(255,255,255,0.05)",
+                  border: "0.5px solid rgba(255,255,255,0.1)",
+                  padding: "1.05rem 1.1rem",
+                  marginBottom: "1rem",
+                  color: "rgba(255,255,255,0.72)",
+                  lineHeight: 1.7,
+                  fontSize: "13px",
+                }}
+              >
+                No scores or answer feedback appear between sections. You’ll get the full report once the entire test is complete.
+              </div>
+
+              <button
+                onClick={() => {
+                  setCurrentSectionIndex((current) => current + 1);
+                  setCurrentQuestionIndices((current) => ({
+                    ...current,
+                    [currentSectionIndex + 1]: current[currentSectionIndex + 1] ?? 0,
+                  }));
+                  setTransitionState(null);
+                  setPhase("running");
+                  setQuestionStartedAtMs(Date.now());
+                }}
+                style={{
+                  width: "100%",
+                  padding: "12px 14px",
+                  borderRadius: "12px",
+                  border: "none",
+                  background: topMeta.accentColor,
+                  color: "#081018",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                }}
+              >
+                start {nextSectionTitle.toLowerCase()} →
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (phase === "scoring" && report) {
+    const scoreInterstitialMessages = [
+      "scoring each section",
+      "mapping missed skills",
+      "building your sky",
+    ];
+
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background:
+            "radial-gradient(circle at 50% 36%, rgba(61, 192, 182, 0.18), transparent 18%), radial-gradient(circle at 18% 18%, rgba(61, 192, 182, 0.1), transparent 24%), radial-gradient(circle at 78% 22%, rgba(18, 118, 139, 0.12), transparent 24%), linear-gradient(180deg,#07121e 0%,#081726 52%,#020408 100%)",
+          color: "#fff",
+          fontFamily: "DM Sans,sans-serif",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "2rem",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "none",
+            background:
+              "linear-gradient(135deg, transparent 0%, transparent 47%, rgba(255,255,255,0.06) 48%, transparent 49%, transparent 100%), linear-gradient(45deg, transparent 0%, transparent 61%, rgba(255,255,255,0.04) 62%, transparent 63%, transparent 100%)",
+            opacity: prefersReducedMotion ? 0.4 : 0.7,
+          }}
+        />
+        {Array.from({ length: 16 }, (_, index) => (
+          <span
+            key={`score-star-${index}`}
+            style={{
+              position: "absolute",
+              left: `${10 + ((index * 17) % 78)}%`,
+              top: `${14 + ((index * 23) % 68)}%`,
+              width: index % 4 === 0 ? "3px" : "2px",
+              height: index % 4 === 0 ? "3px" : "2px",
+              borderRadius: "999px",
+              background: "rgba(255,255,255,0.88)",
+              boxShadow: "0 0 14px rgba(255,255,255,0.32)",
+              opacity: prefersReducedMotion ? 0.5 : 0.8,
+            }}
+          />
+        ))}
+        <div
+          style={{
+            position: "relative",
+            zIndex: 1,
+            maxWidth: "620px",
+            textAlign: "center",
+          }}
+        >
           <div
             style={{
-              borderRadius: "18px",
-              background: "rgba(255,255,255,0.05)",
-              border: "0.5px solid rgba(255,255,255,0.1)",
-              padding: "1.05rem 1.1rem",
-              marginBottom: "1rem",
-              color: "rgba(255,255,255,0.72)",
-              lineHeight: 1.7,
-              fontSize: "13px",
+              fontSize: "11px",
+              letterSpacing: ".08em",
+              textTransform: "uppercase",
+              color: topMeta.accentColor,
+              marginBottom: "12px",
             }}
           >
-            No scores or answer feedback appear between sections. You’ll get the full report once the entire test is complete.
+            finalizing your run
           </div>
-
-          <button
-            onClick={() => {
-              setCurrentSectionIndex((current) => current + 1);
-              setCurrentQuestionIndices((current) => ({
-                ...current,
-                [currentSectionIndex + 1]: current[currentSectionIndex + 1] ?? 0,
-              }));
-              setTransitionState(null);
-              setPhase("running");
-              setQuestionStartedAtMs(Date.now());
-            }}
+          <div
             style={{
-              width: "100%",
-              padding: "12px 14px",
-              borderRadius: "12px",
-              border: "none",
-              background: topMeta.accentColor,
-              color: "#081018",
-              cursor: "pointer",
-              fontWeight: 600,
+              fontFamily: "DM Serif Display,serif",
+              fontSize: "clamp(2.8rem, 7vw, 4.5rem)",
+              lineHeight: 1,
+              marginBottom: "14px",
             }}
           >
-            start {nextSectionTitle.toLowerCase()} →
-          </button>
+            calculating your score...
+          </div>
+          <div style={{ fontSize: "14px", lineHeight: 1.8, color: "rgba(255,255,255,0.66)" }}>
+            {scoreInterstitialMessages[scoreInterstitialMessageIndex]}
+          </div>
         </div>
       </div>
     );
@@ -2093,21 +2266,6 @@ function PracticeTestRunContent() {
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "0.9rem" }}>
-              <span
-                style={{
-                  fontSize: "10px",
-                  padding: "4px 10px",
-                  borderRadius: "999px",
-                  background: `${topMeta.accentColor}16`,
-                  border: `0.5px solid ${topMeta.accentColor}44`,
-                  color: topMeta.accentColor,
-                }}
-              >
-                timed section
-              </span>
-            </div>
-
             {currentQuestion.passage && (
               <div style={{ marginBottom: "1.15rem" }}>
                 <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.38)", letterSpacing: ".06em", marginBottom: "8px" }}>
@@ -2185,7 +2343,86 @@ function PracticeTestRunContent() {
               })}
             </div>
 
+            {currentSection.sectionKey === "math" && mode.includesDesmos ? (
+              <div style={{ marginBottom: "1rem" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowCalculator((current) => !current)}
+                  style={{
+                    padding: "11px 14px",
+                    borderRadius: "12px",
+                    border: `0.5px solid ${topMeta.accentColor}36`,
+                    background: showCalculator ? `${topMeta.accentColor}16` : "rgba(255,255,255,0.04)",
+                    color: showCalculator ? topMeta.accentColor : "rgba(255,255,255,0.82)",
+                    cursor: "pointer",
+                    marginBottom: showCalculator ? "12px" : 0,
+                  }}
+                >
+                  {showCalculator ? "hide calculator" : "open calculator"}
+                </button>
+                {showCalculator ? (
+                  <div
+                    style={{
+                      borderRadius: "18px",
+                      overflow: "hidden",
+                      border: "0.5px solid rgba(255,255,255,0.1)",
+                      background: "rgba(4, 10, 18, 0.88)",
+                      boxShadow: "0 18px 42px rgba(0,0,0,0.26)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        padding: "10px 12px",
+                        fontSize: "11px",
+                        color: "rgba(255,255,255,0.52)",
+                        borderBottom: "0.5px solid rgba(255,255,255,0.08)",
+                      }}
+                    >
+                      Desmos Graphing Calculator
+                    </div>
+                    <iframe
+                      title="Desmos Graphing Calculator"
+                      src="https://www.desmos.com/calculator"
+                      style={{ width: "100%", height: "540px", border: "none", display: "block" }}
+                    />
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  onClick={() => goToQuestion(Math.max(0, currentQuestionIndex - 1))}
+                  disabled={currentQuestionIndex === 0}
+                  style={{
+                    padding: "10px 14px",
+                    borderRadius: "12px",
+                    border: "0.5px solid rgba(255,255,255,0.12)",
+                    background: "transparent",
+                    color: currentQuestionIndex === 0 ? "rgba(255,255,255,0.26)" : "rgba(255,255,255,0.7)",
+                    cursor: currentQuestionIndex === 0 ? "default" : "pointer",
+                  }}
+                >
+                  previous
+                </button>
+                <button
+                  type="button"
+                  onClick={() => goToQuestion(Math.min(currentSection.questions.length - 1, currentQuestionIndex + 1))}
+                  disabled={currentQuestionIndex >= currentSection.questions.length - 1}
+                  style={{
+                    padding: "10px 14px",
+                    borderRadius: "12px",
+                    border: "0.5px solid rgba(255,255,255,0.12)",
+                    background: "transparent",
+                    color: currentQuestionIndex >= currentSection.questions.length - 1 ? "rgba(255,255,255,0.26)" : "rgba(255,255,255,0.7)",
+                    cursor: currentQuestionIndex >= currentSection.questions.length - 1 ? "default" : "pointer",
+                  }}
+                >
+                  next
+                </button>
+              </div>
               <button
                 type="button"
                 onClick={toggleFlag}
@@ -2197,61 +2434,32 @@ function PracticeTestRunContent() {
                   borderRadius: "12px",
                   border:
                     currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
-                      ? `0.5px solid ${topMeta.accentColor}55`
+                      ? `0.5px solid ${FLAG_ACCENT_COLOR}66`
                       : "0.5px solid rgba(255,255,255,0.12)",
                   background:
                     currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
-                      ? `${topMeta.accentColor}16`
+                      ? "rgba(241, 153, 123, 0.12)"
                       : "transparent",
                   color:
                     currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
-                      ? topMeta.accentColor
-                      : "rgba(255,255,255,0.68)",
+                      ? FLAG_ACCENT_COLOR
+                      : "rgba(255,255,255,0.62)",
                   cursor: "pointer",
+                  marginLeft: "auto",
                 }}
               >
                 <FlagIcon
                   filled={Boolean(currentQuestionKey && flaggedKeys.includes(currentQuestionKey))}
                   color={
                     currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
-                      ? topMeta.accentColor
-                      : "rgba(255,255,255,0.68)"
+                      ? FLAG_ACCENT_COLOR
+                      : "rgba(255,255,255,0.62)"
                   }
                   size={14}
                 />
                 {currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
                   ? "flagged for review"
                   : "flag for review"}
-              </button>
-              <button
-                type="button"
-                onClick={() => goToQuestion(Math.max(0, currentQuestionIndex - 1))}
-                disabled={currentQuestionIndex === 0}
-                style={{
-                  padding: "10px 14px",
-                  borderRadius: "12px",
-                  border: "0.5px solid rgba(255,255,255,0.12)",
-                  background: "transparent",
-                  color: currentQuestionIndex === 0 ? "rgba(255,255,255,0.26)" : "rgba(255,255,255,0.7)",
-                  cursor: currentQuestionIndex === 0 ? "default" : "pointer",
-                }}
-              >
-                previous
-              </button>
-              <button
-                type="button"
-                onClick={() => goToQuestion(Math.min(currentSection.questions.length - 1, currentQuestionIndex + 1))}
-                disabled={currentQuestionIndex >= currentSection.questions.length - 1}
-                style={{
-                  padding: "10px 14px",
-                  borderRadius: "12px",
-                  border: "0.5px solid rgba(255,255,255,0.12)",
-                  background: "transparent",
-                  color: currentQuestionIndex >= currentSection.questions.length - 1 ? "rgba(255,255,255,0.26)" : "rgba(255,255,255,0.7)",
-                  cursor: currentQuestionIndex >= currentSection.questions.length - 1 ? "default" : "pointer",
-                }}
-              >
-                next
               </button>
             </div>
           </div>
@@ -2327,48 +2535,7 @@ function PracticeTestRunContent() {
               >
                 open questions drawer
               </button>
-              {unresolvedQuestionIndices.length > 0 ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSubmitWarningOpen(false);
-                    setQuestionMapOpen(true);
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "11px 12px",
-                    borderRadius: "12px",
-                    border: `0.5px solid ${topMeta.accentColor}36`,
-                    background: `${topMeta.accentColor}12`,
-                    color: topMeta.accentColor,
-                    cursor: "pointer",
-                  }}
-                >
-                  review {unresolvedQuestionIndices.length} unresolved question
-                  {unresolvedQuestionIndices.length === 1 ? "" : "s"}
-                </button>
-              ) : null}
             </div>
-
-            {currentSection.sectionKey === "math" && mode.includesDesmos && (
-              <div style={{ marginBottom: "1rem" }}>
-                <button
-                  type="button"
-                  onClick={() => setShowCalculator(true)}
-                  style={{
-                    width: "100%",
-                    padding: "11px 12px",
-                    borderRadius: "12px",
-                    border: `0.5px solid ${topMeta.accentColor}36`,
-                    background: showCalculator ? `${topMeta.accentColor}16` : "rgba(255,255,255,0.04)",
-                    color: showCalculator ? topMeta.accentColor : "rgba(255,255,255,0.82)",
-                    cursor: "pointer",
-                  }}
-                >
-                  open calculator
-                </button>
-              </div>
-            )}
 
             {flaggedQuestionIndices.length > 0 && (
               <div
@@ -2467,11 +2634,6 @@ function PracticeTestRunContent() {
         onConfirmSubmit={() => {
           void handleSectionAdvance("manual", true);
         }}
-      />
-      <CalculatorPanel
-        open={currentSection.sectionKey === "math" && mode.includesDesmos && showCalculator}
-        accentColor={topMeta.accentColor}
-        onClose={() => setShowCalculator(false)}
       />
     </div>
   );
