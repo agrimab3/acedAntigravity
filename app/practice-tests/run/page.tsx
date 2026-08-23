@@ -1,6 +1,14 @@
 "use client";
 
-import { Fragment, Suspense, useEffect, useEffectEvent, useMemo, useState } from "react";
+import {
+  Fragment,
+  Suspense,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useState,
+  type CSSProperties,
+} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
@@ -113,6 +121,289 @@ type SectionTransitionState = {
 
 const FLAG_ACCENT_COLOR = "#F1997B";
 const SCHEDULED_BREAK_DURATION_SECONDS = 10 * 60;
+const RUNNER_STAR_POSITIONS = [
+  { left: "6%", top: "9%", size: 2.2, delay: "0s", duration: "20s" },
+  { left: "14%", top: "22%", size: 1.8, delay: "-4s", duration: "24s" },
+  { left: "22%", top: "12%", size: 2.8, delay: "-8s", duration: "28s" },
+  { left: "30%", top: "28%", size: 1.6, delay: "-2s", duration: "18s" },
+  { left: "38%", top: "15%", size: 2.4, delay: "-10s", duration: "26s" },
+  { left: "46%", top: "8%", size: 1.9, delay: "-5s", duration: "22s" },
+  { left: "54%", top: "24%", size: 2.6, delay: "-9s", duration: "25s" },
+  { left: "63%", top: "13%", size: 1.7, delay: "-3s", duration: "19s" },
+  { left: "72%", top: "21%", size: 2.3, delay: "-11s", duration: "27s" },
+  { left: "81%", top: "11%", size: 1.5, delay: "-7s", duration: "21s" },
+  { left: "89%", top: "18%", size: 2.7, delay: "-13s", duration: "29s" },
+  { left: "10%", top: "46%", size: 1.7, delay: "-6s", duration: "23s" },
+  { left: "20%", top: "55%", size: 2.5, delay: "-14s", duration: "30s" },
+  { left: "32%", top: "48%", size: 1.8, delay: "-1s", duration: "20s" },
+  { left: "44%", top: "59%", size: 2.3, delay: "-12s", duration: "26s" },
+  { left: "58%", top: "52%", size: 1.6, delay: "-15s", duration: "24s" },
+  { left: "69%", top: "61%", size: 2.2, delay: "-5s", duration: "28s" },
+  { left: "79%", top: "50%", size: 1.9, delay: "-9s", duration: "22s" },
+  { left: "88%", top: "58%", size: 2.8, delay: "-16s", duration: "31s" },
+  { left: "16%", top: "78%", size: 1.6, delay: "-8s", duration: "20s" },
+  { left: "27%", top: "86%", size: 2.4, delay: "-18s", duration: "27s" },
+  { left: "41%", top: "80%", size: 1.9, delay: "-4s", duration: "23s" },
+  { left: "56%", top: "88%", size: 2.6, delay: "-17s", duration: "29s" },
+  { left: "71%", top: "83%", size: 1.7, delay: "-6s", duration: "21s" },
+  { left: "86%", top: "77%", size: 2.3, delay: "-19s", duration: "28s" },
+] ;
+const SCORE_CONSTELLATION_GROUPS = [
+  {
+    key: "english",
+    color: "#5DCAA5",
+    angle: 0,
+    orbitDistance: 182,
+    stars: [
+      { left: 24, top: 12, size: 5 },
+      { left: 82, top: 24, size: 4 },
+      { left: 56, top: 54, size: 4.5 },
+      { left: 18, top: 82, size: 3.5 },
+    ],
+    lines: "24,12 82,24 56,54 18,82",
+  },
+  {
+    key: "math",
+    color: "#AFA9EC",
+    angle: 90,
+    orbitDistance: 198,
+    stars: [
+      { left: 18, top: 28, size: 4.5 },
+      { left: 68, top: 10, size: 4 },
+      { left: 90, top: 54, size: 5 },
+      { left: 42, top: 84, size: 3.5 },
+    ],
+    lines: "18,28 68,10 90,54 42,84",
+  },
+  {
+    key: "reading",
+    color: "#EF9F27",
+    angle: 180,
+    orbitDistance: 176,
+    stars: [
+      { left: 14, top: 18, size: 4 },
+      { left: 72, top: 18, size: 4.5 },
+      { left: 84, top: 72, size: 4 },
+      { left: 30, top: 88, size: 5 },
+    ],
+    lines: "14,18 72,18 84,72 30,88",
+  },
+  {
+    key: "science",
+    color: "#F1997B",
+    angle: 270,
+    orbitDistance: 188,
+    stars: [
+      { left: 20, top: 16, size: 4 },
+      { left: 84, top: 30, size: 5 },
+      { left: 64, top: 78, size: 4.5 },
+      { left: 16, top: 66, size: 3.5 },
+    ],
+    lines: "20,16 84,30 64,78 16,66",
+  },
+] ;
+
+function RunnerVisualStyles() {
+  return (
+    <style jsx global>{`
+      @keyframes aced-star-drift {
+        0% { transform: translate3d(0, 0, 0); }
+        50% { transform: translate3d(-8px, 10px, 0); }
+        100% { transform: translate3d(0, 0, 0); }
+      }
+
+      @keyframes aced-star-twinkle {
+        0%, 100% { opacity: 0.18; }
+        50% { opacity: 0.72; }
+      }
+
+      @keyframes aced-orbit-tighten {
+        0% {
+          transform: translate(-50%, -50%) rotate(var(--orbit-angle)) translateX(var(--orbit-start)) scale(1);
+        }
+        100% {
+          transform: translate(-50%, -50%) rotate(calc(var(--orbit-angle) + 150deg)) translateX(var(--orbit-end)) scale(0.92);
+        }
+      }
+
+      @keyframes aced-group-twinkle {
+        0%, 100% { opacity: 0.42; }
+        50% { opacity: 0.82; }
+      }
+
+      @keyframes aced-line-shimmer {
+        0%, 100% { opacity: 0.12; }
+        50% { opacity: 0.38; }
+      }
+
+      @keyframes aced-core-breathe {
+        0%, 100% {
+          transform: translate(-50%, -50%) scale(0.96);
+          opacity: 0.46;
+        }
+        50% {
+          transform: translate(-50%, -50%) scale(1.05);
+          opacity: 0.72;
+        }
+      }
+    `}</style>
+  );
+}
+
+function RunnerStarField({ prefersReducedMotion }: { prefersReducedMotion: boolean }) {
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: "absolute",
+        inset: 0,
+        pointerEvents: "none",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(circle at 18% 18%, rgba(61, 192, 182, 0.1), transparent 20%), radial-gradient(circle at 82% 14%, rgba(24, 120, 146, 0.12), transparent 22%), radial-gradient(circle at 56% 80%, rgba(61, 192, 182, 0.08), transparent 24%)",
+          opacity: 0.85,
+        }}
+      />
+      {RUNNER_STAR_POSITIONS.map((star, index) => (
+        <span
+          key={`runner-star-${index}`}
+          style={{
+            position: "absolute",
+            left: star.left,
+            top: star.top,
+            width: `${star.size}px`,
+            height: `${star.size}px`,
+            borderRadius: "999px",
+            background: "rgba(234, 245, 255, 0.9)",
+            boxShadow: "0 0 12px rgba(147, 218, 224, 0.22)",
+            opacity: prefersReducedMotion ? 0.24 : 0.42,
+            animation: prefersReducedMotion
+              ? undefined
+              : `aced-star-drift ${star.duration} ease-in-out ${star.delay} infinite, aced-star-twinkle ${Math.max(
+                  6,
+                  Number.parseInt(star.duration, 10) / 2
+                )}s ease-in-out ${star.delay} infinite`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function ScoreConstellationStage({
+  prefersReducedMotion,
+}: {
+  prefersReducedMotion: boolean;
+}) {
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: "absolute",
+        inset: 0,
+        pointerEvents: "none",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          width: "min(72vw, 660px)",
+          aspectRatio: "1 / 1",
+          transform: "translate(-50%, -50%)",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            width: "18%",
+            height: "18%",
+            transform: "translate(-50%, -50%)",
+            borderRadius: "999px",
+            background:
+              "radial-gradient(circle, rgba(107, 227, 211, 0.28) 0%, rgba(47, 132, 153, 0.18) 36%, rgba(6, 20, 32, 0) 72%)",
+            filter: "blur(6px)",
+            animation: prefersReducedMotion ? undefined : "aced-core-breathe 2.8s ease-in-out infinite",
+          }}
+        />
+        {SCORE_CONSTELLATION_GROUPS.map((group) => (
+          <div
+            key={group.key}
+            style={
+              {
+                position: "absolute",
+                left: "50%",
+                top: "50%",
+                width: "26%",
+                aspectRatio: "1 / 1",
+                transform: prefersReducedMotion
+                  ? `translate(-50%, -50%) rotate(${group.angle}deg) translateX(${Math.round(group.orbitDistance * 0.62)}px)`
+                  : undefined,
+                animation: prefersReducedMotion
+                  ? undefined
+                  : "aced-orbit-tighten 3s cubic-bezier(0.22, 0.61, 0.36, 1) forwards",
+                opacity: prefersReducedMotion ? 0.7 : 0.92,
+                ["--orbit-angle" as string]: `${group.angle}deg`,
+                ["--orbit-start" as string]: `${group.orbitDistance}px`,
+                ["--orbit-end" as string]: `${Math.round(group.orbitDistance * 0.44)}px`,
+              } as CSSProperties
+            }
+          >
+            <svg
+              viewBox="0 0 100 100"
+              style={{
+                position: "absolute",
+                inset: 0,
+                overflow: "visible",
+              }}
+            >
+              <polyline
+                points={group.lines}
+                fill="none"
+                stroke={group.color}
+                strokeWidth="1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity={prefersReducedMotion ? 0.2 : 0.24}
+                style={{
+                  animation: prefersReducedMotion ? undefined : "aced-line-shimmer 2.4s ease-in-out infinite",
+                }}
+              />
+            </svg>
+            {group.stars.map((star, index) => (
+              <span
+                key={`${group.key}-star-${index}`}
+                style={{
+                  position: "absolute",
+                  left: `${star.left}%`,
+                  top: `${star.top}%`,
+                  width: `${star.size}px`,
+                  height: `${star.size}px`,
+                  borderRadius: "999px",
+                  background: group.color,
+                  boxShadow: `0 0 18px ${group.color}66`,
+                  animation: prefersReducedMotion
+                    ? undefined
+                    : `aced-group-twinkle ${1.8 + index * 0.45}s ease-in-out ${index * 0.2}s infinite`,
+                }}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function shouldOfferScheduledBreak({
   mode,
@@ -1751,6 +2042,8 @@ function PracticeTestRunContent() {
           overflow: "hidden",
         }}
       >
+        <RunnerVisualStyles />
+        <ScoreConstellationStage prefersReducedMotion={prefersReducedMotion} />
         <div
           style={{
             position: "absolute",
@@ -2176,13 +2469,17 @@ function PracticeTestRunContent() {
         color: "#fff",
         fontFamily: "DM Sans,sans-serif",
         padding: "1.5rem",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
+      <RunnerVisualStyles />
+      <RunnerStarField prefersReducedMotion={prefersReducedMotion} />
       <link
         href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap"
         rel="stylesheet"
       />
-      <div style={{ maxWidth: "1240px", margin: "0 auto" }}>
+      <div style={{ maxWidth: "1240px", margin: "0 auto", position: "relative", zIndex: 1 }}>
         <nav style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
           <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px" }}>
             Aced<em style={{ color: "#1D9E75" }}>.</em>
@@ -2343,50 +2640,33 @@ function PracticeTestRunContent() {
               })}
             </div>
 
-            {currentSection.sectionKey === "math" && mode.includesDesmos ? (
+            {currentSection.sectionKey === "math" && mode.includesDesmos && showCalculator ? (
               <div style={{ marginBottom: "1rem" }}>
-                <button
-                  type="button"
-                  onClick={() => setShowCalculator((current) => !current)}
+                <div
                   style={{
-                    padding: "11px 14px",
-                    borderRadius: "12px",
-                    border: `0.5px solid ${topMeta.accentColor}36`,
-                    background: showCalculator ? `${topMeta.accentColor}16` : "rgba(255,255,255,0.04)",
-                    color: showCalculator ? topMeta.accentColor : "rgba(255,255,255,0.82)",
-                    cursor: "pointer",
-                    marginBottom: showCalculator ? "12px" : 0,
+                    borderRadius: "18px",
+                    overflow: "hidden",
+                    border: "0.5px solid rgba(255,255,255,0.1)",
+                    background: "rgba(4, 10, 18, 0.88)",
+                    boxShadow: "0 18px 42px rgba(0,0,0,0.26)",
                   }}
                 >
-                  {showCalculator ? "hide calculator" : "open calculator"}
-                </button>
-                {showCalculator ? (
                   <div
                     style={{
-                      borderRadius: "18px",
-                      overflow: "hidden",
-                      border: "0.5px solid rgba(255,255,255,0.1)",
-                      background: "rgba(4, 10, 18, 0.88)",
-                      boxShadow: "0 18px 42px rgba(0,0,0,0.26)",
+                      padding: "10px 12px",
+                      fontSize: "11px",
+                      color: "rgba(255,255,255,0.52)",
+                      borderBottom: "0.5px solid rgba(255,255,255,0.08)",
                     }}
                   >
-                    <div
-                      style={{
-                        padding: "10px 12px",
-                        fontSize: "11px",
-                        color: "rgba(255,255,255,0.52)",
-                        borderBottom: "0.5px solid rgba(255,255,255,0.08)",
-                      }}
-                    >
-                      Desmos Graphing Calculator
-                    </div>
-                    <iframe
-                      title="Desmos Graphing Calculator"
-                      src="https://www.desmos.com/calculator"
-                      style={{ width: "100%", height: "540px", border: "none", display: "block" }}
-                    />
+                    Desmos Graphing Calculator
                   </div>
-                ) : null}
+                  <iframe
+                    title="Desmos Graphing Calculator"
+                    src="https://www.desmos.com/calculator"
+                    style={{ width: "100%", height: "540px", border: "none", display: "block" }}
+                  />
+                </div>
               </div>
             ) : null}
 
@@ -2533,8 +2813,25 @@ function PracticeTestRunContent() {
                   cursor: "pointer",
                 }}
               >
-                open questions drawer
+                open questions
               </button>
+              {currentSection.sectionKey === "math" && mode.includesDesmos ? (
+                <button
+                  type="button"
+                  onClick={() => setShowCalculator((current) => !current)}
+                  style={{
+                    width: "100%",
+                    padding: "11px 12px",
+                    borderRadius: "12px",
+                    border: `0.5px solid ${topMeta.accentColor}36`,
+                    background: showCalculator ? `${topMeta.accentColor}16` : "rgba(255,255,255,0.04)",
+                    color: showCalculator ? topMeta.accentColor : "rgba(255,255,255,0.82)",
+                    cursor: "pointer",
+                  }}
+                >
+                  {showCalculator ? "hide calculator" : "open calculator"}
+                </button>
+              ) : null}
             </div>
 
             {flaggedQuestionIndices.length > 0 && (

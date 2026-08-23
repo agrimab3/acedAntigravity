@@ -71,6 +71,16 @@ export default function ProgressPage() {
       completedAt: string | null;
     }>;
   } | null>(null);
+  const [openTestMenuId, setOpenTestMenuId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    sessionId: string;
+    title: string;
+  } | null>(null);
+  const [deletingTestId, setDeletingTestId] = useState<string | null>(null);
+  const [historyFeedback, setHistoryFeedback] = useState<{
+    tone: "success" | "error";
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -111,6 +121,77 @@ export default function ProgressPage() {
     };
   }, [status]);
 
+  useEffect(() => {
+    if (!historyFeedback) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setHistoryFeedback(null);
+    }, 2600);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [historyFeedback]);
+
+  useEffect(() => {
+    if (!openTestMenuId) {
+      return;
+    }
+
+    const closeMenu = () => setOpenTestMenuId(null);
+    window.addEventListener("click", closeMenu);
+    return () => window.removeEventListener("click", closeMenu);
+  }, [openTestMenuId]);
+
+  async function handleDeleteTest() {
+    if (!deleteTarget) {
+      return;
+    }
+
+    setDeletingTestId(deleteTarget.sessionId);
+
+    try {
+      const res = await fetch(`/api/practice-tests/history/${deleteTarget.sessionId}`, {
+        method: "DELETE",
+      });
+      const payload = (await res.json().catch(() => null)) as { error?: string } | null;
+
+      if (!res.ok) {
+        throw new Error(
+          payload?.error === "Unauthorized."
+            ? "sign in again to delete this test."
+            : payload?.error === "Forbidden."
+              ? "you can't delete this test."
+              : payload?.error === "Test history not found."
+                ? "this test no longer exists."
+                : "couldn't delete this test. try again."
+        );
+      }
+
+      const progressRes = await fetch("/api/progress", { cache: "no-store" });
+      if (progressRes.ok) {
+        const nextProgress = await progressRes.json();
+        setProgress(nextProgress);
+      }
+
+      setDeleteTarget(null);
+      setOpenTestMenuId(null);
+      setHistoryFeedback({
+        tone: "success",
+        message: "test deleted",
+      });
+    } catch (error) {
+      console.error("Failed to delete practice test history", error);
+      setHistoryFeedback({
+        tone: "error",
+        message:
+          error instanceof Error ? error.message : "couldn't delete this test. try again.",
+      });
+    } finally {
+      setDeletingTestId(null);
+    }
+  }
+
   if (status === "loading" || onboardingLoading || loading) {
     return (
       <div
@@ -140,12 +221,42 @@ export default function ProgressPage() {
         background: PROGRESS_GALAXY_BACKGROUND,
         color: "#fff",
         fontFamily: "DM Sans,sans-serif",
+        position: "relative",
       }}
     >
       <link
         href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap"
         rel="stylesheet"
       />
+      {historyFeedback ? (
+        <div
+          style={{
+            position: "fixed",
+            top: "18px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 40,
+            padding: "10px 14px",
+            borderRadius: "999px",
+            border:
+              historyFeedback.tone === "success"
+                ? "0.5px solid rgba(93,202,165,0.32)"
+                : "0.5px solid rgba(240,153,123,0.32)",
+            background:
+              historyFeedback.tone === "success"
+                ? "rgba(8, 26, 22, 0.92)"
+                : "rgba(30, 14, 14, 0.92)",
+            color:
+              historyFeedback.tone === "success"
+                ? "rgba(226,255,245,0.92)"
+                : "rgba(255,230,222,0.94)",
+            fontSize: "12px",
+            boxShadow: "0 16px 34px rgba(0,0,0,0.28)",
+          }}
+        >
+          {historyFeedback.message}
+        </div>
+      ) : null}
       <div style={{ padding: "1.5rem", maxWidth: "1240px", margin: "0 auto" }}>
         <nav
           style={{
@@ -352,8 +463,16 @@ export default function ProgressPage() {
                     </div>
                   ) : (
                     progress.recentTests.map((test) => (
-                      <div key={test.sessionId} style={{ borderRadius: "14px", background: "rgba(255,255,255,0.03)", padding: "0.95rem 1rem" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: "8px" }}>
+                      <div
+                        key={test.sessionId}
+                        style={{
+                          borderRadius: "14px",
+                          background: "rgba(255,255,255,0.03)",
+                          padding: "0.95rem 1rem",
+                          position: "relative",
+                        }}
+                      >
+                        <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: "8px", alignItems: "flex-start" }}>
                           <div>
                             <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px" }}>{test.title}</div>
                             <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>
@@ -362,12 +481,84 @@ export default function ProgressPage() {
                                 : "saved test"}
                             </div>
                           </div>
-                          <div style={{ textAlign: "right" }}>
-                            <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "24px", color: "#F4F0E8" }}>
-                              {test.estimatedScore ? `${test.estimatedScore}/36` : "--"}
+                          <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                            <div style={{ textAlign: "right" }}>
+                              <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "24px", color: "#F4F0E8" }}>
+                                {test.estimatedScore ? `${test.estimatedScore}/36` : "--"}
+                              </div>
+                              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>
+                                {test.format === "full" ? "composite estimate" : "section estimate"}
+                              </div>
                             </div>
-                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>
-                              {test.format === "full" ? "composite estimate" : "section estimate"}
+                            <div
+                              onClick={(event) => event.stopPropagation()}
+                              style={{ position: "relative" }}
+                            >
+                              <button
+                                type="button"
+                                aria-label={`More actions for ${test.title}`}
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  setOpenTestMenuId((current) =>
+                                    current === test.sessionId ? null : test.sessionId
+                                  );
+                                }}
+                                style={{
+                                  width: "34px",
+                                  height: "34px",
+                                  borderRadius: "999px",
+                                  border: "0.5px solid rgba(255,255,255,0.12)",
+                                  background: "rgba(255,255,255,0.04)",
+                                  color: "rgba(255,255,255,0.66)",
+                                  cursor: "pointer",
+                                  fontSize: "18px",
+                                  lineHeight: 1,
+                                }}
+                              >
+                                ⋯
+                              </button>
+                              {openTestMenuId === test.sessionId ? (
+                                <div
+                                  style={{
+                                    position: "absolute",
+                                    top: "40px",
+                                    right: 0,
+                                    minWidth: "160px",
+                                    borderRadius: "14px",
+                                    border: "0.5px solid rgba(255,255,255,0.1)",
+                                    background:
+                                      "linear-gradient(180deg, rgba(12, 24, 35, 0.98) 0%, rgba(7, 15, 24, 0.98) 100%)",
+                                    boxShadow: "0 18px 40px rgba(0,0,0,0.34)",
+                                    padding: "8px",
+                                    zIndex: 10,
+                                  }}
+                                >
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setDeleteTarget({
+                                        sessionId: test.sessionId,
+                                        title: test.title,
+                                      });
+                                      setOpenTestMenuId(null);
+                                    }}
+                                    style={{
+                                      width: "100%",
+                                      padding: "10px 12px",
+                                      borderRadius: "10px",
+                                      border: "none",
+                                      background: "transparent",
+                                      color: "#F1997B",
+                                      cursor: "pointer",
+                                      textAlign: "left",
+                                      fontSize: "12px",
+                                      fontFamily: "DM Sans,sans-serif",
+                                    }}
+                                  >
+                                    Delete test
+                                  </button>
+                                </div>
+                              ) : null}
                             </div>
                           </div>
                         </div>
@@ -397,6 +588,90 @@ export default function ProgressPage() {
           </>
         )}
       </div>
+      {deleteTarget ? (
+        <>
+          <div
+            onClick={() => {
+              if (deletingTestId) {
+                return;
+              }
+              setDeleteTarget(null);
+            }}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(2, 6, 12, 0.72)",
+              backdropFilter: "blur(10px)",
+              zIndex: 60,
+            }}
+          />
+          <div
+            style={{
+              position: "fixed",
+              inset: "auto 1rem 1rem 1rem",
+              margin: "0 auto",
+              maxWidth: "520px",
+              borderRadius: "20px",
+              padding: "1.35rem",
+              background:
+                "linear-gradient(180deg, rgba(12, 28, 40, 0.98) 0%, rgba(6, 14, 23, 0.98) 100%)",
+              border: "0.5px solid rgba(255,255,255,0.1)",
+              boxShadow: "0 22px 60px rgba(0,0,0,0.4)",
+              zIndex: 61,
+            }}
+          >
+            <div style={{ fontSize: "11px", color: "#F1997B", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: "8px" }}>
+              Delete test
+            </div>
+            <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "32px", lineHeight: 1.1, color: "#fff", marginBottom: "10px" }}>
+              Delete this test result?
+            </div>
+            <div style={{ color: "rgba(255,255,255,0.68)", lineHeight: 1.7, fontSize: "14px", marginBottom: "1rem" }}>
+              This will remove this score and its saved test history from your account.
+            </div>
+            <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", marginBottom: "1.1rem" }}>
+              {deleteTarget.title}
+            </div>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={Boolean(deletingTestId)}
+                style={{
+                  flex: 1,
+                  minWidth: "180px",
+                  padding: "12px 14px",
+                  borderRadius: "12px",
+                  border: "0.5px solid rgba(255,255,255,0.12)",
+                  background: "transparent",
+                  color: "rgba(255,255,255,0.8)",
+                  cursor: deletingTestId ? "default" : "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleDeleteTest()}
+                disabled={Boolean(deletingTestId)}
+                style={{
+                  flex: 1,
+                  minWidth: "180px",
+                  padding: "12px 14px",
+                  borderRadius: "12px",
+                  border: "none",
+                  background: "#F1997B",
+                  color: "#1A0C0B",
+                  cursor: deletingTestId ? "default" : "pointer",
+                  fontWeight: 600,
+                }}
+              >
+                {deletingTestId ? "Deleting..." : "Delete test"}
+              </button>
+            </div>
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }

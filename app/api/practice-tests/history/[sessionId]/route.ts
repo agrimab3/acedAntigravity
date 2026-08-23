@@ -139,3 +139,47 @@ export async function GET(
     })),
   });
 }
+
+export async function DELETE(
+  _request: Request,
+  context: { params: Promise<{ sessionId: string }> }
+) {
+  const session = await getAuthSession();
+  const db = getDb();
+
+  if (!session?.user?.id || !db) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
+  const { sessionId } = await context.params;
+
+  const [existingSession] = await db
+    .select({
+      id: practiceTestSessions.id,
+      userId: practiceTestSessions.userId,
+    })
+    .from(practiceTestSessions)
+    .where(eq(practiceTestSessions.id, sessionId))
+    .limit(1);
+
+  if (!existingSession) {
+    return NextResponse.json({ error: "Test history not found." }, { status: 404 });
+  }
+
+  if (existingSession.userId !== session.user.id) {
+    return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+  }
+
+  const [deletedSession] = await db
+    .delete(practiceTestSessions)
+    .where(eq(practiceTestSessions.id, sessionId))
+    .returning({ id: practiceTestSessions.id });
+
+  if (!deletedSession) {
+    return NextResponse.json({ error: "Unable to delete this test." }, { status: 500 });
+  }
+
+  return NextResponse.json({
+    deletedSessionId: deletedSession.id,
+  });
+}
