@@ -36,7 +36,7 @@ const generationProvider = (
 )
   .trim()
   .toLowerCase();
-const generationModel = args.model || resolveGenerationModel(generationProvider);
+const generationModel = resolveGenerationModel(generationProvider, args.model);
 
 if (!["draft", "published"].includes(status)) {
   throw new Error(`Invalid status: ${status}`);
@@ -50,13 +50,18 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function resolveGenerationModel(provider) {
+function resolveGenerationModel(provider, rawModel) {
   if (provider === "groq") {
     return resolvePreferredGroqModel(
-      process.env.GROQ_GENERATION_MODEL ||
-      process.env.GROQ_MODEL ||
+      rawModel,
+      process.env.GROQ_GENERATION_MODEL,
+      process.env.GROQ_MODEL,
       DEFAULT_GROQ_MODEL
     );
+  }
+
+  if (rawModel?.trim()) {
+    return rawModel.trim();
   }
 
   return process.env.GEMINI_GENERATION_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";

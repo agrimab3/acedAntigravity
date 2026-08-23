@@ -198,6 +198,17 @@ const generatedSetQuestionSchema = z.object({
   explanation: z.string().min(30),
 });
 
+const generatedSetMetadataSchema = z
+  .object({
+    stimulusType: z.string().min(1).nullable().optional(),
+    dataSummary: z.string().min(1).nullable().optional(),
+    xAxisLabel: z.string().min(1).nullable().optional(),
+    yAxisLabel: z.string().min(1).nullable().optional(),
+    seriesLabels: z.array(z.string().min(1)).max(8).nullable().optional(),
+    viewpointLabels: z.array(z.string().min(1)).max(6).nullable().optional(),
+  })
+  .strict();
+
 const reviewedQuestionSchema = z.object({
   item_index: z.number().int().nonnegative(),
   verdict: z.enum(["keep", "revise", "reject"]),
@@ -261,6 +272,15 @@ function resolveReviewProvider(rawProvider, fallbackProvider) {
 }
 
 function resolveGenerationModel(provider, rawModel) {
+  if (provider === "groq") {
+    return resolvePreferredGroqModel(
+      rawModel,
+      process.env.GROQ_GENERATION_MODEL,
+      process.env.GROQ_MODEL,
+      DEFAULT_GROQ_MODEL
+    );
+  }
+
   if (rawModel?.trim()) {
     return rawModel.trim();
   }
@@ -272,19 +292,20 @@ function resolveGenerationModel(provider, rawModel) {
       "gemma3:4b"
     );
   }
-
-  if (provider === "groq") {
-    return resolvePreferredGroqModel(
-      process.env.GROQ_GENERATION_MODEL ||
-      process.env.GROQ_MODEL ||
-      DEFAULT_GROQ_MODEL
-    );
-  }
-
   return process.env.GEMINI_GENERATION_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
 }
 
 function resolveReviewModel(provider, rawModel, fallbackModel) {
+  if (provider === "groq") {
+    return resolvePreferredGroqModel(
+      rawModel,
+      process.env.GROQ_REVIEW_MODEL,
+      process.env.GROQ_GENERATION_MODEL,
+      process.env.GROQ_MODEL,
+      fallbackModel
+    );
+  }
+
   if (rawModel?.trim()) {
     return rawModel.trim();
   }
@@ -297,16 +318,6 @@ function resolveReviewModel(provider, rawModel, fallbackModel) {
       fallbackModel
     );
   }
-
-  if (provider === "groq") {
-    return resolvePreferredGroqModel(
-      process.env.GROQ_REVIEW_MODEL ||
-      process.env.GROQ_GENERATION_MODEL ||
-      process.env.GROQ_MODEL ||
-      fallbackModel
-    );
-  }
-
   return (
     process.env.GEMINI_REVIEW_MODEL ||
     process.env.GEMINI_GENERATION_MODEL ||
@@ -595,8 +606,39 @@ function normalizeGeneratedSetPayload(payload) {
           : typeof record.name === "string"
             ? record.name
             : record.title ?? null,
-    metadata: record.metadata ?? null,
+    metadata: normalizeGeneratedSetMetadata(record.metadata),
     questions: payload.questions.map((question) => normalizeGeneratedSetQuestionRecord(question)),
+  };
+}
+
+function normalizeGeneratedSetMetadata(metadata) {
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
+    return null;
+  }
+
+  const record = metadata;
+
+  return {
+    stimulusType:
+      typeof record.stimulusType === "string" ? record.stimulusType.trim() || null : null,
+    dataSummary:
+      typeof record.dataSummary === "string" ? record.dataSummary.trim() || null : null,
+    xAxisLabel:
+      typeof record.xAxisLabel === "string" ? record.xAxisLabel.trim() || null : null,
+    yAxisLabel:
+      typeof record.yAxisLabel === "string" ? record.yAxisLabel.trim() || null : null,
+    seriesLabels: Array.isArray(record.seriesLabels)
+      ? record.seriesLabels
+          .filter((value) => typeof value === "string")
+          .map((value) => value.trim())
+          .filter(Boolean)
+      : null,
+    viewpointLabels: Array.isArray(record.viewpointLabels)
+      ? record.viewpointLabels
+          .filter((value) => typeof value === "string")
+          .map((value) => value.trim())
+          .filter(Boolean)
+      : null,
   };
 }
 
@@ -942,7 +984,7 @@ function buildGeneratedSetSchema({
     kind: z.literal(SET_KIND_BY_SECTION[sectionKey]),
     title: z.string().nullable().optional(),
     content: z.string().min(120),
-    metadata: z.record(z.string(), z.unknown()).nullable().optional(),
+    metadata: generatedSetMetadataSchema.nullable().optional(),
     questions: z
       .array(generatedSetQuestionSchema)
       .min(minQuestionCount)
@@ -1157,7 +1199,8 @@ Science set rules:
 - Write one shared experiment, data summary, research summary, or conflicting-viewpoints stimulus.
 - Child questions must be answerable from the provided setup and not from outside trivia.
 - Plain-text descriptions are acceptable; rendered charts are not required.
-- If useful, metadata may include simple structured data summaries, but keep it lightweight.
+- If useful, metadata may be null or may include only these keys: stimulusType, dataSummary, xAxisLabel, yAxisLabel, seriesLabels, viewpointLabels.
+- Do not add any metadata keys beyond that fixed list.
 
 Distribution rules:
 - Include exactly ${requestedDifficultyCounts.easy} easy child question(s), ${requestedDifficultyCounts.medium} medium child question(s), and ${requestedDifficultyCounts.hard} hard child question(s).
@@ -1267,7 +1310,41 @@ function buildQuestionSetJsonSchema(sectionKey, requestedDifficultyCounts) {
       },
       metadata: {
         type: ["object", "null"],
-        additionalProperties: true,
+        properties: {
+          stimulusType: {
+            type: ["string", "null"],
+          },
+          dataSummary: {
+            type: ["string", "null"],
+          },
+          xAxisLabel: {
+            type: ["string", "null"],
+          },
+          yAxisLabel: {
+            type: ["string", "null"],
+          },
+          seriesLabels: {
+            type: ["array", "null"],
+            items: {
+              type: "string",
+            },
+          },
+          viewpointLabels: {
+            type: ["array", "null"],
+            items: {
+              type: "string",
+            },
+          },
+        },
+        required: [
+          "stimulusType",
+          "dataSummary",
+          "xAxisLabel",
+          "yAxisLabel",
+          "seriesLabels",
+          "viewpointLabels",
+        ],
+        additionalProperties: false,
       },
       questions: {
         type: "array",
@@ -1325,6 +1402,47 @@ function buildQuestionSetJsonSchema(sectionKey, requestedDifficultyCounts) {
     required: ["section", "topic", "kind", "title", "content", "metadata", "questions"],
     additionalProperties: false,
   };
+}
+
+function assertStrictJsonSchemaObjects(schema, path = "$") {
+  if (!schema || typeof schema !== "object" || Array.isArray(schema)) {
+    return;
+  }
+
+  const typeValues = Array.isArray(schema.type)
+    ? schema.type
+    : typeof schema.type === "string"
+      ? [schema.type]
+      : [];
+
+  if (typeValues.includes("object")) {
+    if (schema.additionalProperties !== false) {
+      throw new Error(
+        `Strict JSON schema violation at ${path}: additionalProperties:false must be set on every object.`
+      );
+    }
+
+    const properties = schema.properties && typeof schema.properties === "object" ? schema.properties : {};
+    for (const [key, propertySchema] of Object.entries(properties)) {
+      assertStrictJsonSchemaObjects(propertySchema, `${path}/properties/${key}`);
+    }
+  }
+
+  if (typeValues.includes("array") && schema.items) {
+    assertStrictJsonSchemaObjects(schema.items, `${path}/items`);
+  }
+
+  if (schema.anyOf && Array.isArray(schema.anyOf)) {
+    schema.anyOf.forEach((entry, index) =>
+      assertStrictJsonSchemaObjects(entry, `${path}/anyOf/${index}`)
+    );
+  }
+
+  if (schema.oneOf && Array.isArray(schema.oneOf)) {
+    schema.oneOf.forEach((entry, index) =>
+      assertStrictJsonSchemaObjects(entry, `${path}/oneOf/${index}`)
+    );
+  }
 }
 
 function buildReviewPrompt(topic, question) {
@@ -1455,6 +1573,9 @@ async function requestGroqJson({
   allowModelFallback = true,
 }) {
   const groqSupportsJsonSchema = supportsGroqJsonSchema(model);
+  if (groqSupportsJsonSchema) {
+    assertStrictJsonSchemaObjects(schema);
+  }
   const response = await fetch(`${resolveGroqBaseUrl()}/chat/completions`, {
     method: "POST",
     headers: {
