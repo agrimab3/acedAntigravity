@@ -25,6 +25,20 @@ function formatDuration(minutes: number) {
   return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
 }
 
+function formatHistoryTimestamp(value: string | null) {
+  if (!value) {
+    return "saved test";
+  }
+
+  return new Date(value).toLocaleString([], {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 export default function ProgressPage() {
   const router = useRouter();
   const { status, data: session } = useSession();
@@ -132,6 +146,22 @@ export default function ProgressPage() {
 
     return () => window.clearTimeout(timeoutId);
   }, [historyFeedback]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const nextMessage = new URLSearchParams(window.location.search).get("historyMessage");
+
+    if (nextMessage === "test-deleted") {
+      setHistoryFeedback({
+        tone: "success",
+        message: "test deleted",
+      });
+      router.replace("/progress");
+    }
+  }, [router]);
 
   useEffect(() => {
     if (!openTestMenuId) {
@@ -476,9 +506,7 @@ export default function ProgressPage() {
                           <div>
                             <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px" }}>{test.title}</div>
                             <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>
-                              {test.completedAt
-                                ? new Date(test.completedAt).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })
-                                : "saved test"}
+                              {formatHistoryTimestamp(test.completedAt)}
                             </div>
                           </div>
                           <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
@@ -577,7 +605,7 @@ export default function ProgressPage() {
                             fontFamily: "DM Sans,sans-serif",
                           }}
                         >
-                          review missed questions →
+                          view details →
                         </button>
                       </div>
                     ))

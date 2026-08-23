@@ -109,12 +109,36 @@ export async function GET(
       timeLimitSeconds: section.timeLimitSeconds,
     }),
   }));
+  const missedAnalysis = Array.from(
+    missedAnswerRows.reduce((map, row) => {
+      const key = `${row.sectionKey}:${row.topicName}`;
+      const current = map.get(key) ?? {
+        sectionKey: row.sectionKey,
+        sectionTitle: row.sectionTitle,
+        topicName: row.topicName,
+        misses: 0,
+      };
+
+      current.misses += 1;
+      map.set(key, current);
+      return map;
+    }, new Map<string, {
+      sectionKey: string;
+      sectionTitle: string;
+      topicName: string;
+      misses: number;
+    }>())
+  )
+    .map(([, value]) => value)
+    .sort((left, right) => right.misses - left.misses);
 
   return NextResponse.json({
     sessionId: testSession.id,
     modeKey: testSession.modeKey,
     title: mode?.title ?? testSession.modeKey,
+    shortLabel: mode?.shortLabel ?? testSession.modeKey,
     format: testSession.format,
+    status: "completed",
     totalQuestionCount: testSession.totalQuestionCount,
     answeredCount: testSession.answeredCount,
     correctCount: testSession.correctCount,
@@ -124,6 +148,7 @@ export async function GET(
     completedAt: testSession.completedAt,
     overallPacing: summarizeCompositePacing(sectionReports.map((section) => section.pacingSummary)),
     sectionReports,
+    missedAnalysis,
     missedQuestions: missedAnswerRows.map((row) => ({
       id: row.id,
       sectionRunId: row.sectionRunId,

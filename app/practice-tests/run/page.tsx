@@ -121,6 +121,7 @@ type SectionTransitionState = {
 
 const FLAG_ACCENT_COLOR = "#F1997B";
 const SCHEDULED_BREAK_DURATION_SECONDS = 10 * 60;
+const SCORING_INTERSTITIAL_DURATION_MS = 5500;
 const RUNNER_STAR_POSITIONS = [
   { left: "6%", top: "9%", size: 2.2, delay: "0s", duration: "20s" },
   { left: "14%", top: "22%", size: 1.8, delay: "-4s", duration: "24s" },
@@ -217,12 +218,15 @@ function RunnerVisualStyles() {
         50% { opacity: 0.72; }
       }
 
-      @keyframes aced-orbit-tighten {
+      @keyframes aced-orbit-galaxy {
         0% {
           transform: translate(-50%, -50%) rotate(var(--orbit-angle)) translateX(var(--orbit-start)) scale(1);
         }
+        50% {
+          transform: translate(-50%, -50%) rotate(calc(var(--orbit-angle) + var(--orbit-mid-turn))) translateX(var(--orbit-mid)) scale(0.97);
+        }
         100% {
-          transform: translate(-50%, -50%) rotate(calc(var(--orbit-angle) + 150deg)) translateX(var(--orbit-end)) scale(0.92);
+          transform: translate(-50%, -50%) rotate(calc(var(--orbit-angle) + var(--orbit-end-turn))) translateX(var(--orbit-end)) scale(0.92);
         }
       }
 
@@ -243,6 +247,17 @@ function RunnerVisualStyles() {
         }
         50% {
           transform: translate(-50%, -50%) scale(1.05);
+          opacity: 0.72;
+        }
+      }
+
+      @keyframes aced-haze-shift {
+        0%, 100% {
+          transform: scale(0.98) translate3d(0, 0, 0);
+          opacity: 0.42;
+        }
+        50% {
+          transform: scale(1.05) translate3d(10px, -8px, 0);
           opacity: 0.72;
         }
       }
@@ -324,6 +339,17 @@ function ScoreConstellationStage({
         <div
           style={{
             position: "absolute",
+            inset: "-8%",
+            borderRadius: "999px",
+            background:
+              "radial-gradient(circle at 35% 40%, rgba(88, 230, 213, 0.18), transparent 18%), radial-gradient(circle at 65% 54%, rgba(175, 169, 236, 0.12), transparent 24%), radial-gradient(circle at 48% 52%, rgba(13, 86, 110, 0.32), transparent 52%)",
+            filter: "blur(14px)",
+            animation: prefersReducedMotion ? undefined : "aced-haze-shift 5.5s ease-in-out forwards",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
             left: "50%",
             top: "50%",
             width: "18%",
@@ -351,11 +377,28 @@ function ScoreConstellationStage({
                   : undefined,
                 animation: prefersReducedMotion
                   ? undefined
-                  : "aced-orbit-tighten 3s cubic-bezier(0.22, 0.61, 0.36, 1) forwards",
+                  : "aced-orbit-galaxy 5.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards",
                 opacity: prefersReducedMotion ? 0.7 : 0.92,
                 ["--orbit-angle" as string]: `${group.angle}deg`,
                 ["--orbit-start" as string]: `${group.orbitDistance}px`,
+                ["--orbit-mid" as string]: `${Math.round(group.orbitDistance * 0.74)}px`,
                 ["--orbit-end" as string]: `${Math.round(group.orbitDistance * 0.44)}px`,
+                ["--orbit-mid-turn" as string]:
+                  group.key === "english"
+                    ? "110deg"
+                    : group.key === "math"
+                      ? "95deg"
+                      : group.key === "reading"
+                        ? "120deg"
+                        : "100deg",
+                ["--orbit-end-turn" as string]:
+                  group.key === "english"
+                    ? "215deg"
+                    : group.key === "math"
+                      ? "185deg"
+                      : group.key === "reading"
+                        ? "230deg"
+                        : "200deg",
               } as CSSProperties
             }
           >
@@ -1291,22 +1334,22 @@ function PracticeTestRunContent() {
       return;
     }
 
-    const transitionDelay = prefersReducedMotion ? 300 : 2800;
+    const transitionDelay = SCORING_INTERSTITIAL_DURATION_MS;
     const transitionId = window.setTimeout(() => {
       setPhase("report");
     }, transitionDelay);
 
-    if (prefersReducedMotion) {
-      return () => window.clearTimeout(transitionId);
-    }
-
     const messageId = window.setInterval(() => {
       setScoreInterstitialMessageIndex((current) => (current + 1) % 3);
-    }, 1100);
+    }, 1800);
 
     return () => {
       window.clearTimeout(transitionId);
-      window.clearInterval(messageId);
+      if (!prefersReducedMotion) {
+        window.clearInterval(messageId);
+      } else {
+        window.clearInterval(messageId);
+      }
     };
   }, [phase, prefersReducedMotion, report]);
 
@@ -2670,8 +2713,45 @@ function PracticeTestRunContent() {
               </div>
             ) : null}
 
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+              <button
+                type="button"
+                onClick={toggleFlag}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "10px 14px",
+                  borderRadius: "12px",
+                  border:
+                    currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
+                      ? `0.5px solid ${FLAG_ACCENT_COLOR}66`
+                      : "0.5px solid rgba(255,255,255,0.12)",
+                  background:
+                    currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
+                      ? "rgba(241, 153, 123, 0.12)"
+                      : "transparent",
+                  color:
+                    currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
+                      ? FLAG_ACCENT_COLOR
+                      : "rgba(255,255,255,0.62)",
+                  cursor: "pointer",
+                }}
+              >
+                <FlagIcon
+                  filled={Boolean(currentQuestionKey && flaggedKeys.includes(currentQuestionKey))}
+                  color={
+                    currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
+                      ? FLAG_ACCENT_COLOR
+                      : "rgba(255,255,255,0.62)"
+                  }
+                  size={14}
+                />
+                {currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
+                  ? "flagged for review"
+                  : "flag for review"}
+              </button>
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginLeft: "auto" }}>
                 <button
                   type="button"
                   onClick={() => goToQuestion(Math.max(0, currentQuestionIndex - 1))}
@@ -2703,44 +2783,6 @@ function PracticeTestRunContent() {
                   next
                 </button>
               </div>
-              <button
-                type="button"
-                onClick={toggleFlag}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "10px 14px",
-                  borderRadius: "12px",
-                  border:
-                    currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
-                      ? `0.5px solid ${FLAG_ACCENT_COLOR}66`
-                      : "0.5px solid rgba(255,255,255,0.12)",
-                  background:
-                    currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
-                      ? "rgba(241, 153, 123, 0.12)"
-                      : "transparent",
-                  color:
-                    currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
-                      ? FLAG_ACCENT_COLOR
-                      : "rgba(255,255,255,0.62)",
-                  cursor: "pointer",
-                  marginLeft: "auto",
-                }}
-              >
-                <FlagIcon
-                  filled={Boolean(currentQuestionKey && flaggedKeys.includes(currentQuestionKey))}
-                  color={
-                    currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
-                      ? FLAG_ACCENT_COLOR
-                      : "rgba(255,255,255,0.62)"
-                  }
-                  size={14}
-                />
-                {currentQuestionKey && flaggedKeys.includes(currentQuestionKey)
-                  ? "flagged for review"
-                  : "flag for review"}
-              </button>
             </div>
           </div>
 
