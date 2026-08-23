@@ -55,6 +55,20 @@ export default async function AdminReviewPage() {
           </div>
 
           <Link
+            href="/admin/question-health"
+            style={{
+              padding: "10px 14px",
+              borderRadius: "999px",
+              border: "1px solid rgba(255,255,255,0.14)",
+              color: "rgba(255,255,255,0.8)",
+              textDecoration: "none",
+              fontSize: "13px",
+            }}
+          >
+            question health
+          </Link>
+
+          <Link
             href="/dashboard"
             style={{
               padding: "10px 14px",
