@@ -32,6 +32,26 @@ const bulkPatchSchema = z.object({
 
 const patchSchema = z.union([singlePatchSchema, bulkPatchSchema]);
 
+function parseShadowReview(reviewNotes: string | null) {
+  if (!reviewNotes) {
+    return null;
+  }
+
+  const shadowLine = reviewNotes
+    .split("\n")
+    .find((line) => line.trim().startsWith("[shadow-review] "));
+
+  if (!shadowLine) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(shadowLine.replace("[shadow-review] ", "").trim());
+  } catch {
+    return null;
+  }
+}
+
 export async function GET(request: Request) {
   const session = await getAdminSession();
   const db = getDb();
@@ -120,6 +140,7 @@ export async function GET(request: Request) {
       correct_answer: row.correctAnswer,
       explanation: row.explanation,
     }),
+    shadowReview: parseShadowReview(row.reviewNotes),
   }));
 
   const filteredRows = reviewedRows.filter((row) => {

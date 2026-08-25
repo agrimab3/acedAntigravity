@@ -119,6 +119,20 @@ Reject any item that is:
 - not strong enough for publication
 - derivative in setup, wording, passage logic, or answer structure
 
+Required review order:
+1. Re-solve the question independently from the passage or stimulus before trusting the keyed answer.
+2. Determine what the correct answer should be without relying on the provided answer key where practical.
+3. Check every answer choice individually.
+4. Confirm exactly one answer is defensibly correct.
+5. Confirm the keyed answer matches the independently derived answer.
+6. Confirm the explanation agrees with the passage or stimulus data.
+7. Confirm no distractor is equivalent to the correct answer.
+8. Confirm the wording does not overstate what the evidence supports.
+9. Confirm the item still matches the requested ACT section and topic.
+10. Only then return keep.
+
+For Reading and Science, all evidence judgments must come from the supplied shared passage or stimulus.
+
 Do not repair the item unless explicitly asked.
 Evaluate it as submitted.
 
@@ -224,9 +238,27 @@ const reviewedQuestionSchema = z.object({
   single_best_answer: z.enum(["yes", "no", "unclear"]),
   explanation_consistency: z.enum(["consistent", "inconsistent", "unclear"]),
   originality: z.enum(["strong", "borderline", "weak"]),
+  unique_correct_answer: z.enum(["yes", "no", "unclear"]),
+  answer_key_verified: z.enum(["yes", "no", "unclear"]),
+  explanation_verified: z.enum(["yes", "no", "unclear"]),
+  choices_distinct: z.enum(["yes", "no", "unclear"]),
+  evidence_supported: z.enum(["yes", "no", "unclear"]),
+  section_appropriate: z.enum(["yes", "no", "unclear"]),
   main_issues: z.array(z.string().min(1)).max(6),
   suggested_difficulty: z.union([z.enum(DIFFICULTIES), z.null()]),
   editorial_note: z.string().min(1),
+});
+
+const correctnessVerifierSchema = z.object({
+  correctness_verified: z.enum(["yes", "no", "unclear"]),
+  unique_correct_answer: z.enum(["yes", "no", "unclear"]),
+  answer_key_verified: z.enum(["yes", "no", "unclear"]),
+  explanation_verified: z.enum(["yes", "no", "unclear"]),
+  choices_distinct: z.enum(["yes", "no", "unclear"]),
+  evidence_supported: z.enum(["yes", "no", "unclear"]),
+  recommended_disposition: z.enum(["keep", "revise", "reject"]),
+  main_issues: z.array(z.string().min(1)).max(6),
+  note: z.string().min(1),
 });
 
 const client = new Client({
@@ -1502,6 +1534,12 @@ For each item, return an object with exactly these fields:
 - single_best_answer
 - explanation_consistency
 - originality
+- unique_correct_answer
+- answer_key_verified
+- explanation_verified
+- choices_distinct
+- evidence_supported
+- section_appropriate
 - main_issues
 - suggested_difficulty
 - editorial_note
@@ -1515,10 +1553,17 @@ Allowed values:
 - single_best_answer: yes, no, unclear
 - explanation_consistency: consistent, inconsistent, unclear
 - originality: strong, borderline, weak
+- unique_correct_answer: yes, no, unclear
+- answer_key_verified: yes, no, unclear
+- explanation_verified: yes, no, unclear
+- choices_distinct: yes, no, unclear
+- evidence_supported: yes, no, unclear
+- section_appropriate: yes, no, unclear
 - suggested_difficulty: easy, medium, hard, null
 
 Rules:
 - Be strict.
+- Follow this order exactly: independently solve, determine the correct answer, inspect each choice, confirm exactly one defensible answer, confirm the keyed answer, confirm the explanation, confirm no equivalent distractor, confirm the wording does not overstate the evidence, confirm section/topic fit, then decide verdict.
 - Reject items that are weak even if technically answerable.
 - Reject items that feel like worksheet drills rather than ACT items.
 - Reject items whose passage simply gives away the answer.
@@ -1526,6 +1571,11 @@ Rules:
 - Reject English items with more than one reasonably defensible revision.
 - Reject Reading items whose passage does not genuinely support inference, tone, organization, or evidence-based interpretation.
 - Reject any item with a broken explanation or missing correct option.
+- For Reading and Science, use only the supplied shared passage or stimulus as evidence.
+- If no answer is fully supported, verdict must be reject.
+- If more than one answer is defensibly correct, verdict must be reject or revise.
+- If the keyed answer is not the uniquely supported answer, verdict must be reject or revise.
+- If the wording overstates what the evidence supports, verdict must not be keep.
 - Use main_issues as a concise array of the biggest problems only.
 - Keep editorial_note to one sentence.
 - There is exactly 1 item in this request, so return a single JSON object for item_index 0.
@@ -1543,6 +1593,66 @@ ${JSON.stringify([
     explanation: question.explanation,
   },
 ])}
+`.trim();
+}
+
+function buildCorrectnessVerificationPrompt(topic, question) {
+  return `
+Verify only the objective correctness of this ACT-style item.
+
+Requested section: ${topic.section_key}
+Requested topic: ${topic.name}
+
+Return one JSON object with exactly these fields:
+- correctness_verified
+- unique_correct_answer
+- answer_key_verified
+- explanation_verified
+- choices_distinct
+- evidence_supported
+- recommended_disposition
+- main_issues
+- note
+
+Allowed values:
+- correctness_verified: yes, no, unclear
+- unique_correct_answer: yes, no, unclear
+- answer_key_verified: yes, no, unclear
+- explanation_verified: yes, no, unclear
+- choices_distinct: yes, no, unclear
+- evidence_supported: yes, no, unclear
+- recommended_disposition: keep, revise, reject
+
+Verification order:
+1. Independently solve the item from the supplied passage or stimulus where practical.
+2. Determine whether exactly one answer is defensibly correct.
+3. Check whether the keyed answer matches that independently supported answer.
+4. Check whether the explanation matches the data and the keyed answer.
+5. Check whether any distractor is equivalent to the correct answer.
+6. Check whether the wording overstates what the evidence supports.
+
+Disposition rules:
+- no valid answer -> reject
+- more than one valid answer -> reject
+- keyed answer wrong -> reject or revise
+- explanation contradicts the evidence -> reject or revise
+- wording that overstates the evidence -> revise
+- if the evidence is insufficient to verify correctness confidently -> revise
+
+For Reading and Science, use only the supplied shared passage or stimulus as evidence.
+Do not assess style, originality, or broad publishability here.
+
+Item:
+${JSON.stringify({
+  section: topic.section_key,
+  topic: topic.name,
+  difficulty: question.difficulty,
+  passage: question.passage,
+  question_text: question.question_text,
+  choices: question.choices,
+  correct_answer: question.correct_answer,
+  explanation: question.explanation,
+})}
 `.trim();
 }
 
@@ -2069,6 +2179,30 @@ async function reviewGeneratedQuestion(
           type: "string",
           enum: ["strong", "borderline", "weak"],
         },
+        unique_correct_answer: {
+          type: "string",
+          enum: ["yes", "no", "unclear"],
+        },
+        answer_key_verified: {
+          type: "string",
+          enum: ["yes", "no", "unclear"],
+        },
+        explanation_verified: {
+          type: "string",
+          enum: ["yes", "no", "unclear"],
+        },
+        choices_distinct: {
+          type: "string",
+          enum: ["yes", "no", "unclear"],
+        },
+        evidence_supported: {
+          type: "string",
+          enum: ["yes", "no", "unclear"],
+        },
+        section_appropriate: {
+          type: "string",
+          enum: ["yes", "no", "unclear"],
+        },
         main_issues: {
           type: "array",
           items: { type: "string" },
@@ -2091,6 +2225,12 @@ async function reviewGeneratedQuestion(
         "single_best_answer",
         "explanation_consistency",
         "originality",
+        "unique_correct_answer",
+        "answer_key_verified",
+        "explanation_verified",
+        "choices_distinct",
+        "evidence_supported",
+        "section_appropriate",
         "main_issues",
         "suggested_difficulty",
         "editorial_note",
@@ -2140,6 +2280,123 @@ async function reviewGeneratedQuestion(
         `${provider} review stayed rate limited for ${topic.section_key}/${topic.slug}; falling back to ${fallbackProvider}/${fallbackModel}.`
       );
       return reviewGeneratedQuestion(
+        topic,
+        question,
+        1,
+        fallbackProvider,
+        fallbackModel,
+        true
+      );
+    }
+
+    throw error;
+  }
+}
+
+async function verifyGeneratedQuestionCorrectness(
+  topic,
+  question,
+  attempt = 1,
+  provider = reviewProvider,
+  model = reviewModel,
+  hasFallenBack = false
+) {
+  try {
+    const schema = {
+      type: "object",
+      properties: {
+        correctness_verified: {
+          type: "string",
+          enum: ["yes", "no", "unclear"],
+        },
+        unique_correct_answer: {
+          type: "string",
+          enum: ["yes", "no", "unclear"],
+        },
+        answer_key_verified: {
+          type: "string",
+          enum: ["yes", "no", "unclear"],
+        },
+        explanation_verified: {
+          type: "string",
+          enum: ["yes", "no", "unclear"],
+        },
+        choices_distinct: {
+          type: "string",
+          enum: ["yes", "no", "unclear"],
+        },
+        evidence_supported: {
+          type: "string",
+          enum: ["yes", "no", "unclear"],
+        },
+        recommended_disposition: {
+          type: "string",
+          enum: ["keep", "revise", "reject"],
+        },
+        main_issues: {
+          type: "array",
+          items: { type: "string" },
+        },
+        note: {
+          type: "string",
+        },
+      },
+      required: [
+        "correctness_verified",
+        "unique_correct_answer",
+        "answer_key_verified",
+        "explanation_verified",
+        "choices_distinct",
+        "evidence_supported",
+        "recommended_disposition",
+        "main_issues",
+        "note",
+      ],
+      additionalProperties: false,
+    };
+    const prompt = buildCorrectnessVerificationPrompt(topic, question);
+    const text = await requestStructuredJson({
+      provider,
+      model,
+      systemPrompt: REVIEW_SYSTEM_PROMPT,
+      userPrompt: prompt,
+      schema,
+      temperature: 0.1,
+    });
+    const parsedPayload = parseModelJson(text);
+
+    return correctnessVerifierSchema.parse(parsedPayload);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "unknown correctness verification error";
+    const reviewRetryLimit = fastRetryMode ? 1 : 2;
+    const shouldFallbackImmediately = provider === "gemini" && isQuotaExceededError(message);
+    const isRetryable =
+      provider === "groq"
+        ? isRetryableGroqError(message)
+        : provider === "ollama"
+          ? isRetryableOllamaError(message)
+          : isRetryableGeminiError(message);
+
+    if (attempt < reviewRetryLimit && isRetryable && !shouldFallbackImmediately) {
+      const retryDelayMs =
+        extractRetryDelayMs(message) ?? (provider === "groq" ? 12000 : 20000);
+      console.warn(
+        `${provider} correctness verifier rate limited for ${topic.section_key}/${topic.slug}; retrying in ${Math.ceil(
+          retryDelayMs / 1000
+        )}s (attempt ${attempt + 1}/${reviewRetryLimit}).`
+      );
+      await sleep(retryDelayMs + 1000);
+      return verifyGeneratedQuestionCorrectness(topic, question, attempt + 1, provider, model, hasFallenBack);
+    }
+
+    const fallbackProvider = resolveFallbackProvider(provider);
+    const fallbackModel = resolveFallbackModel(provider, "review", model);
+
+    if (isRetryable && fallbackProvider && fallbackModel && !hasFallenBack) {
+      console.warn(
+        `${provider} correctness verifier stayed rate limited for ${topic.section_key}/${topic.slug}; falling back to ${fallbackProvider}/${fallbackModel}.`
+      );
+      return verifyGeneratedQuestionCorrectness(
         topic,
         question,
         1,
@@ -2365,6 +2622,7 @@ function sanitizeQuestion(sectionKey, topic, question) {
     choices,
     correctAnswer: question.correct_answer,
     explanation,
+    qualityReview,
     generationModel,
     generationProvider,
     fingerprint: buildFingerprint({
@@ -2472,6 +2730,121 @@ async function getTopics() {
   return result.rows;
 }
 
+function hasHardPrimaryCorrectnessFailure(reviewerResult) {
+  return (
+    reviewerResult.correctness === "incorrect" ||
+    reviewerResult.single_best_answer === "no" ||
+    reviewerResult.unique_correct_answer === "no" ||
+    reviewerResult.answer_key_verified === "no" ||
+    reviewerResult.explanation_consistency === "inconsistent" ||
+    reviewerResult.explanation_verified === "no" ||
+    reviewerResult.choices_distinct === "no" ||
+    reviewerResult.evidence_supported === "no" ||
+    reviewerResult.section_appropriate === "no"
+  );
+}
+
+function hasVerifierHardFailure(verifierResult) {
+  return (
+    verifierResult.correctness_verified === "no" ||
+    verifierResult.unique_correct_answer === "no" ||
+    verifierResult.answer_key_verified === "no" ||
+    verifierResult.explanation_verified === "no" ||
+    verifierResult.choices_distinct === "no" ||
+    verifierResult.evidence_supported === "no" ||
+    verifierResult.recommended_disposition !== "keep"
+  );
+}
+
+function buildShadowReview(normalizedQuestion, reviewerResult, verifierResult) {
+  const deterministic = normalizedQuestion.qualityReview;
+  const primaryKeep =
+    reviewerResult.verdict === "keep" &&
+    reviewerResult.suggested_difficulty === null &&
+    !hasHardPrimaryCorrectnessFailure(reviewerResult);
+  const verifierAgrees =
+    verifierResult &&
+    verifierResult.recommended_disposition === "keep" &&
+    verifierResult.correctness_verified === "yes" &&
+    verifierResult.unique_correct_answer === "yes" &&
+    verifierResult.answer_key_verified === "yes" &&
+    verifierResult.explanation_verified === "yes" &&
+    verifierResult.choices_distinct === "yes" &&
+    verifierResult.evidence_supported === "yes";
+  const autoPublishEligible =
+    deterministic.autoPublishEligible &&
+    primaryKeep &&
+    verifierAgrees &&
+    reviewerResult.correctness === "correct" &&
+    reviewerResult.single_best_answer === "yes" &&
+    reviewerResult.unique_correct_answer === "yes" &&
+    reviewerResult.answer_key_verified === "yes" &&
+    reviewerResult.explanation_consistency === "consistent" &&
+    reviewerResult.explanation_verified === "yes" &&
+    reviewerResult.choices_distinct === "yes" &&
+    reviewerResult.evidence_supported === "yes" &&
+    reviewerResult.section_appropriate === "yes";
+  const disagreement =
+    reviewerResult.verdict === "keep" &&
+    reviewerResult.suggested_difficulty === null &&
+    verifierResult &&
+    !verifierAgrees &&
+    !hasVerifierHardFailure(verifierResult);
+
+  return {
+    autoPublishEligible,
+    disagreement,
+    deterministicAutoPublishEligible: deterministic.autoPublishEligible,
+    primaryKeep,
+    verifierAgrees: Boolean(verifierAgrees),
+  };
+}
+
+function buildReviewNotes({
+  normalizedQuestion,
+  reviewerResult,
+  verifierResult,
+  shadowReview,
+}) {
+  const lines = [`AI pre-review: ${reviewerResult.verdict}. ${reviewerResult.editorial_note}`];
+  const shadowPayload = {
+    autoPublishEligible: shadowReview.autoPublishEligible,
+    deterministicAutoPublishEligible: shadowReview.deterministicAutoPublishEligible,
+    primaryKeep: shadowReview.primaryKeep,
+    verifierAgrees: shadowReview.verifierAgrees,
+    disagreement: shadowReview.disagreement,
+    deterministicFindings: normalizedQuestion.qualityReview.findings,
+    primary: {
+      correctness: reviewerResult.correctness,
+      singleBestAnswer: reviewerResult.single_best_answer,
+      uniqueCorrectAnswer: reviewerResult.unique_correct_answer,
+      answerKeyVerified: reviewerResult.answer_key_verified,
+      explanationVerified: reviewerResult.explanation_verified,
+      choicesDistinct: reviewerResult.choices_distinct,
+      evidenceSupported: reviewerResult.evidence_supported,
+      sectionAppropriate: reviewerResult.section_appropriate,
+    },
+    verifier: verifierResult
+      ? {
+          correctnessVerified: verifierResult.correctness_verified,
+          uniqueCorrectAnswer: verifierResult.unique_correct_answer,
+          answerKeyVerified: verifierResult.answer_key_verified,
+          explanationVerified: verifierResult.explanation_verified,
+          choicesDistinct: verifierResult.choices_distinct,
+          evidenceSupported: verifierResult.evidence_supported,
+          recommendedDisposition: verifierResult.recommended_disposition,
+        }
+      : null,
+  };
+
+  if (verifierResult) {
+    lines.push(`Correctness verifier: ${verifierResult.note}`);
+  }
+
+  lines.push(`[shadow-review] ${JSON.stringify(shadowPayload)}`);
+  return lines.join("\n");
+}
+
 async function insertQuestions(topic, generatedQuestions) {
   const existingRows = await client.query(
     `
@@ -2512,6 +2885,7 @@ async function insertQuestions(topic, generatedQuestions) {
     }
 
     let reviewerResult;
+    let verifierResult = null;
 
     try {
       reviewerResult = await reviewGeneratedQuestion(topic, {
@@ -2533,14 +2907,18 @@ async function insertQuestions(topic, generatedQuestions) {
       continue;
     }
 
-    if (reviewerResult.verdict !== "keep" || reviewerResult.suggested_difficulty !== null) {
+    if (
+      reviewerResult.verdict !== "keep" ||
+      reviewerResult.suggested_difficulty !== null ||
+      hasHardPrimaryCorrectnessFailure(reviewerResult)
+    ) {
       skipped += 1;
 
       if (reviewerResult.verdict === "revise") {
         reviewRevised += 1;
       } else if (reviewerResult.verdict === "reject") {
         reviewRejected += 1;
-      } else if (reviewerResult.suggested_difficulty !== null) {
+      } else if (reviewerResult.suggested_difficulty !== null || hasHardPrimaryCorrectnessFailure(reviewerResult)) {
         reviewRevised += 1;
       }
 
@@ -2557,7 +2935,43 @@ async function insertQuestions(topic, generatedQuestions) {
       continue;
     }
 
+    try {
+      verifierResult = await verifyGeneratedQuestionCorrectness(topic, {
+        difficulty: normalizedQuestion.difficulty,
+        passage: normalizedQuestion.passage,
+        question_text: normalizedQuestion.prompt,
+        choices: normalizedQuestion.choices,
+        correct_answer: normalizedQuestion.correctAnswer,
+        explanation: normalizedQuestion.explanation,
+      });
+    } catch (error) {
+      reviewErrors += 1;
+      skipped += 1;
+      console.warn(
+        `Skipping ${topic.section_key}/${topic.slug} question after correctness verifier failure: ${
+          error instanceof Error ? error.message : "unknown correctness verifier error"
+        }`
+      );
+      continue;
+    }
+
+    if (hasVerifierHardFailure(verifierResult)) {
+      skipped += 1;
+
+      if (verifierResult.recommended_disposition === "reject") {
+        reviewRejected += 1;
+      } else {
+        reviewRevised += 1;
+      }
+
+      console.warn(
+        `Skipping ${topic.section_key}/${topic.slug} question after correctness verification: ${verifierResult.recommended_disposition} (${verifierResult.main_issues.join(", ")})`
+      );
+      continue;
+    }
+
     reviewKept += 1;
+    const shadowReview = buildShadowReview(normalizedQuestion, reviewerResult, verifierResult);
 
     const result = await client.query(
       `
@@ -2594,7 +3008,12 @@ async function insertQuestions(topic, generatedQuestions) {
         normalizedQuestion.generationProvider,
         normalizedQuestion.generationModel,
         requestedStatus,
-        `AI pre-review: keep. ${reviewerResult.editorial_note}`,
+        buildReviewNotes({
+          normalizedQuestion,
+          reviewerResult,
+          verifierResult,
+          shadowReview,
+        }),
       ]
     );
 
@@ -2665,6 +3084,7 @@ async function insertQuestionSets(topic, generatedSets) {
 
     for (const child of uniqueChildren) {
       let reviewerResult;
+      let verifierResult = null;
 
       try {
         reviewerResult = await reviewGeneratedQuestion(topic, {
@@ -2686,14 +3106,18 @@ async function insertQuestionSets(topic, generatedSets) {
         continue;
       }
 
-      if (reviewerResult.verdict !== "keep" || reviewerResult.suggested_difficulty !== null) {
+      if (
+        reviewerResult.verdict !== "keep" ||
+        reviewerResult.suggested_difficulty !== null ||
+        hasHardPrimaryCorrectnessFailure(reviewerResult)
+      ) {
         skipped += 1;
 
         if (reviewerResult.verdict === "revise") {
           reviewRevised += 1;
         } else if (reviewerResult.verdict === "reject") {
           reviewRejected += 1;
-        } else if (reviewerResult.suggested_difficulty !== null) {
+        } else if (reviewerResult.suggested_difficulty !== null || hasHardPrimaryCorrectnessFailure(reviewerResult)) {
           reviewRevised += 1;
         }
 
@@ -2710,10 +3134,51 @@ async function insertQuestionSets(topic, generatedSets) {
         continue;
       }
 
+      try {
+        verifierResult = await verifyGeneratedQuestionCorrectness(topic, {
+          difficulty: child.difficulty,
+          passage: child.sharedContent,
+          question_text: child.prompt,
+          choices: child.choices,
+          correct_answer: child.correctAnswer,
+          explanation: child.explanation,
+        });
+      } catch (error) {
+        reviewErrors += 1;
+        skipped += 1;
+        console.warn(
+          `Skipping ${topic.section_key}/${topic.slug} child after correctness verifier failure: ${
+            error instanceof Error ? error.message : "unknown correctness verifier error"
+          }`
+        );
+        continue;
+      }
+
+      if (hasVerifierHardFailure(verifierResult)) {
+        skipped += 1;
+
+        if (verifierResult.recommended_disposition === "reject") {
+          reviewRejected += 1;
+        } else {
+          reviewRevised += 1;
+        }
+
+        console.warn(
+          `Skipping ${topic.section_key}/${topic.slug} child after correctness verification: ${verifierResult.recommended_disposition} (${verifierResult.main_issues.join(", ")})`
+        );
+        continue;
+      }
+
       reviewKept += 1;
+      const shadowReview = buildShadowReview(child, reviewerResult, verifierResult);
       approvedChildren.push({
         ...child,
-        reviewerNote: reviewerResult.editorial_note,
+        reviewerNote: buildReviewNotes({
+          normalizedQuestion: child,
+          reviewerResult,
+          verifierResult,
+          shadowReview,
+        }),
       });
     }
 
@@ -2794,7 +3259,7 @@ async function insertQuestionSets(topic, generatedSets) {
             child.generationProvider,
             child.generationModel,
             requestedStatus,
-            `AI pre-review: keep. ${child.reviewerNote}`,
+            child.reviewerNote,
           ]
         );
 

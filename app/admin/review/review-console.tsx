@@ -62,6 +62,7 @@ type ReviewQuestion = {
   qualityReview: {
     shouldServe: boolean;
     riskScore: number;
+    autoPublishEligible: boolean;
     blockingFlags: Array<{
       severity: "reject" | "warn";
       code: string;
@@ -72,7 +73,20 @@ type ReviewQuestion = {
       code: string;
       message: string;
     }>;
+    findings: {
+      uniqueCorrectAnswer: "pass" | "fail" | "unknown";
+      answerKeyVerified: "pass" | "fail" | "unknown";
+      explanationVerified: "pass" | "fail" | "unknown";
+      choicesDistinct: "pass" | "fail" | "unknown";
+      evidenceSupported: "pass" | "fail" | "unknown";
+      sectionAppropriate: "pass" | "fail" | "unknown";
+    };
   };
+  shadowReview?: {
+    autoPublishEligible?: boolean;
+    disagreement?: boolean;
+    verifierAgrees?: boolean;
+  } | null;
 };
 
 type ReviewQuestionGroup = {
@@ -1356,6 +1370,25 @@ export default function ReviewConsole() {
                                   : "success"
                             }
                           />
+                          {question.shadowReview ? (
+                            <Badge
+                              text={
+                                question.shadowReview.autoPublishEligible
+                                  ? "shadow eligible"
+                                  : question.shadowReview.disagreement
+                                    ? "shadow hold"
+                                    : "not auto-eligible"
+                              }
+                              tone={
+                                question.shadowReview.autoPublishEligible
+                                  ? "success"
+                                  : question.shadowReview.disagreement
+                                    ? "warning"
+                                    : "warning"
+                              }
+                              subtle={!question.shadowReview.autoPublishEligible}
+                            />
+                          ) : null}
                           {question.generationModel ? <Badge text={question.generationModel} subtle /> : null}
                         </div>
                         <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.34)" }}>
@@ -1404,6 +1437,14 @@ export default function ReviewConsole() {
                                 <strong style={{ color: "#EF9F27" }}>watch:</strong> {flag.message}
                               </div>
                             ))}
+                            {question.shadowReview && !question.shadowReview.autoPublishEligible ? (
+                              <div style={{ fontSize: "12px", lineHeight: 1.6, color: "rgba(255,255,255,0.76)" }}>
+                                <strong style={{ color: "#EF9F27" }}>shadow:</strong>{" "}
+                                {question.shadowReview.disagreement
+                                  ? "secondary correctness verification disagreed, so this stays draft-only."
+                                  : "auto-publish shadow checks are not fully satisfied."}
+                              </div>
+                            ) : null}
                           </div>
                         </div>
                       )}
