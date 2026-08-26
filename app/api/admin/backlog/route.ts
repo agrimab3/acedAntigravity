@@ -85,6 +85,45 @@ type TopicGenerationPlan = {
   plannedSetCount: number;
 };
 
+type GenerationRunSummary = {
+  inserted?: number;
+  setsInserted?: number;
+  skipped?: number;
+  reviewKept?: number;
+  reviewRevised?: number;
+  reviewRejected?: number;
+  reviewErrors?: number;
+  paused?: boolean;
+  runState?: string;
+  pauseReason?: string | null;
+  remainingPlannedChildCount?: number;
+  providerAvailability?: unknown;
+  providerEvents?: Array<{
+    provider?: string;
+    state?: string;
+    retryAfterMs?: number;
+    message?: string;
+  }>;
+  topics?: Array<{
+    sectionKey?: string;
+    topicSlug?: string;
+    requestedChildCount?: number;
+    inserted?: number;
+    skipped?: number;
+    remainingChildCount?: number;
+    status?: string;
+    providerFailure?: {
+      provider?: string | null;
+      kind?: string | null;
+      message?: string | null;
+    };
+  }>;
+  failures?: Array<{
+    topic?: string;
+    error?: string;
+  }>;
+};
+
 async function loadAuditedTopics(db: NonNullable<ReturnType<typeof getDb>>) {
   const [topicRows, questionRows] = await Promise.all([
     db
@@ -175,7 +214,7 @@ function extractJsonSummary(stdout: string) {
     throw new Error("Generation script did not return a JSON summary.");
   }
 
-  return JSON.parse(lines.slice(startIndex).join("\n"));
+  return JSON.parse(lines.slice(startIndex).join("\n")) as GenerationRunSummary;
 }
 
 function emptyDifficultyCounts(): DifficultyCounts {
@@ -546,6 +585,8 @@ export async function POST(request: Request) {
       const totalRequestedChildCount = enforceBulkCap(plans);
 
       const results = [];
+      let pausedRun: GenerationRunSummary | null = null;
+      let processedPlans = 0;
 
       for (const plan of plans) {
         const generation = await runGeneration({
@@ -567,6 +608,40 @@ export async function POST(request: Request) {
           publishedGapCount: plan.publishedGapCount,
           summary: generation.summary,
         });
+        processedPlans += 1;
+
+        if (generation.summary?.paused) {
+          pausedRun = generation.summary;
+          break;
+        }
+      }
+
+      if (pausedRun) {
+        for (const plan of plans.slice(processedPlans)) {
+          results.push({
+            sectionKey: plan.sectionKey,
+            topicSlug: plan.topicSlug,
+            topicName: plan.topicName,
+            requestedChildCount: plan.requestedChildCount,
+            requestedDifficultyCounts: plan.requestedDifficultyCounts,
+            plannedSetCount: plan.plannedSetCount,
+            reviewPriority: plan.reviewPriority,
+            focusDifficulty: plan.focusDifficulty,
+            publishedGapCount: plan.publishedGapCount,
+            summary: {
+              inserted: 0,
+              skipped: 0,
+              reviewKept: 0,
+              reviewRevised: 0,
+              reviewRejected: 0,
+              reviewErrors: 0,
+              paused: true,
+              runState: "not_started_due_to_provider_pause",
+              remainingPlannedChildCount: plan.requestedChildCount,
+              failures: [],
+            },
+          });
+        }
       }
 
       return NextResponse.json({
@@ -579,6 +654,13 @@ export async function POST(request: Request) {
           totalRequestedChildCount,
           selectedTopicCount: selectedTopics.length,
           status: bulkRequest.status,
+          runState: pausedRun?.runState ?? "completed",
+          pauseReason: pausedRun?.pauseReason ?? null,
+          remainingPlannedChildCount:
+            pausedRun?.remainingPlannedChildCount ??
+            plans.slice(processedPlans).reduce((sum, plan) => sum + plan.requestedChildCount, 0),
+          providerAvailability: pausedRun?.providerAvailability ?? null,
+          providerEvents: pausedRun?.providerEvents ?? [],
         },
         results,
       });
@@ -592,6 +674,8 @@ export async function POST(request: Request) {
           : buildLaunchMinimumPlans(auditedTopics);
       const totalRequestedChildCount = enforceBulkCap(plans);
       const results = [];
+      let pausedRun: GenerationRunSummary | null = null;
+      let processedPlans = 0;
 
       for (const plan of plans) {
         const generation = await runGeneration({
@@ -613,6 +697,40 @@ export async function POST(request: Request) {
           publishedGapCount: plan.publishedGapCount,
           summary: generation.summary,
         });
+        processedPlans += 1;
+
+        if (generation.summary?.paused) {
+          pausedRun = generation.summary;
+          break;
+        }
+      }
+
+      if (pausedRun) {
+        for (const plan of plans.slice(processedPlans)) {
+          results.push({
+            sectionKey: plan.sectionKey,
+            topicSlug: plan.topicSlug,
+            topicName: plan.topicName,
+            requestedChildCount: plan.requestedChildCount,
+            requestedDifficultyCounts: plan.requestedDifficultyCounts,
+            plannedSetCount: plan.plannedSetCount,
+            reviewPriority: plan.reviewPriority,
+            focusDifficulty: plan.focusDifficulty,
+            publishedGapCount: plan.publishedGapCount,
+            summary: {
+              inserted: 0,
+              skipped: 0,
+              reviewKept: 0,
+              reviewRevised: 0,
+              reviewRejected: 0,
+              reviewErrors: 0,
+              paused: true,
+              runState: "not_started_due_to_provider_pause",
+              remainingPlannedChildCount: plan.requestedChildCount,
+              failures: [],
+            },
+          });
+        }
       }
 
       return NextResponse.json({
@@ -621,6 +739,13 @@ export async function POST(request: Request) {
           status: "draft",
           selectedTopicCount: plans.length,
           totalRequestedChildCount,
+          runState: pausedRun?.runState ?? "completed",
+          pauseReason: pausedRun?.pauseReason ?? null,
+          remainingPlannedChildCount:
+            pausedRun?.remainingPlannedChildCount ??
+            plans.slice(processedPlans).reduce((sum, plan) => sum + plan.requestedChildCount, 0),
+          providerAvailability: pausedRun?.providerAvailability ?? null,
+          providerEvents: pausedRun?.providerEvents ?? [],
         },
         results,
       });

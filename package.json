@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test:question-review": "node --test --experimental-strip-types scripts/question-review.test.ts",
+    "test:provider-resilience": "node --test scripts/content-generation-resilience.test.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",

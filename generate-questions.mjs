@@ -7,6 +7,15 @@ import {
   resolveGroqFallbackModel,
   resolvePreferredGroqModel,
 } from "./lib/groq-models.ts";
+import {
+  ProviderRequestError,
+  ProviderRunStoppedError,
+  classifyProviderFailure,
+  createProviderRunState,
+  executeProviderOperation,
+  parseRetryAfterMs,
+  summarizeProviderAvailability,
+} from "./lib/content-generation-resilience.mjs";
 import { reviewQuestionQuality } from "./lib/question-utils.ts";
 
 const SECTION_KEYS = ["english", "math", "reading", "science"];
@@ -169,6 +178,9 @@ const generationProvider = resolveGenerationProvider(args.provider);
 const generationModel = resolveGenerationModel(generationProvider, args.model);
 const reviewProvider = resolveReviewProvider(args["review-provider"], generationProvider);
 const reviewModel = resolveReviewModel(reviewProvider, args["review-model"], generationModel);
+const runProviderState = createProviderRunState(
+  Array.from(new Set([generationProvider, reviewProvider, resolveFallbackProvider(generationProvider), resolveFallbackProvider(reviewProvider)].filter(Boolean)))
+);
 
 if (sectionFilter && !SECTION_KEYS.includes(sectionFilter)) {
   throw new Error(`Invalid --section value: ${sectionFilter}`);
@@ -485,50 +497,6 @@ function supportsGroqJsonSchema(model) {
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function extractRetryDelayMs(message) {
-  const match = message.match(/Please retry in\s+([\d.]+)s/i);
-
-  if (!match) {
-    return null;
-  }
-
-  return Math.ceil(Number(match[1]) * 1000);
-}
-
-function isRetryableStructuredOutputError(message) {
-  return /unterminated string in json|unexpected end of json input|malformed json response|json at position/i.test(
-    message
-  );
-}
-
-function isRetryableStructuredSchemaError(message) {
-  return /invalid_value|invalid_type|correct_answer|explanation|question_text|choices/i.test(message);
-}
-
-function isQuotaExceededError(message) {
-  return /quota exceeded|billing details|free_tier_requests|resource_exhausted/i.test(message);
-}
-
-function isRetryableGeminiError(message) {
-  return (
-    /quota exceeded|retry in|429/i.test(message) ||
-    isRetryableStructuredOutputError(message) ||
-    isRetryableStructuredSchemaError(message)
-  );
-}
-
-function isRetryableGroqError(message) {
-  return (
-    /rate limit|rate_limit|too many requests|429|capacity_exceeded|498/i.test(message) ||
-    isRetryableStructuredOutputError(message) ||
-    isRetryableStructuredSchemaError(message)
-  );
-}
-
-function isRetryableOllamaError(message) {
-  return /timed out|timeout|econnreset|socket hang up/i.test(message) || isRetryableStructuredOutputError(message);
 }
 
 function parseModelJson(text) {
@@ -1697,7 +1665,16 @@ async function requestGeminiJson({ model, systemPrompt, userPrompt, schema, temp
       payload?.promptFeedback?.blockReason ||
       rawBody ||
       `HTTP ${response.status}`;
-    throw new Error(`Gemini request failed: ${message}`);
+    throw new ProviderRequestError(`Gemini request failed: ${message}`, {
+      provider: "gemini",
+      statusCode: response.status,
+      retryAfterMs: parseRetryAfterMs(response.headers.get("retry-after")),
+      classification: classifyProviderFailure({
+        message,
+        statusCode: response.status,
+        retryAfterMs: parseRetryAfterMs(response.headers.get("retry-after")),
+      }),
+    });
   }
 
   const text =
@@ -1708,7 +1685,10 @@ async function requestGeminiJson({ model, systemPrompt, userPrompt, schema, temp
       .trim() ?? "";
 
   if (!text) {
-    throw new Error("Gemini returned an empty response.");
+    throw new ProviderRequestError("Gemini returned an empty response.", {
+      provider: "gemini",
+      classification: classifyProviderFailure({ message: "empty response" }),
+    });
   }
 
   return text;
@@ -1795,13 +1775,25 @@ async function requestGroqJson({
       }
     }
 
-    throw new Error(`Groq request failed: ${message}`);
+    throw new ProviderRequestError(`Groq request failed: ${message}`, {
+      provider: "groq",
+      statusCode: response.status,
+      retryAfterMs: parseRetryAfterMs(response.headers.get("retry-after")),
+      classification: classifyProviderFailure({
+        message,
+        statusCode: response.status,
+        retryAfterMs: parseRetryAfterMs(response.headers.get("retry-after")),
+      }),
+    });
   }
 
   const text = payload?.choices?.[0]?.message?.content?.trim() || "";
 
   if (!text) {
-    throw new Error("Groq returned an empty response.");
+    throw new ProviderRequestError("Groq returned an empty response.", {
+      provider: "groq",
+      classification: classifyProviderFailure({ message: "empty response" }),
+    });
   }
 
   return text;
@@ -1844,13 +1836,25 @@ async function requestOllamaJson({ model, systemPrompt, userPrompt, schema, temp
 
   if (!response.ok) {
     const message = payload?.error || rawBody || `HTTP ${response.status}`;
-    throw new Error(`Ollama request failed: ${message}`);
+    throw new ProviderRequestError(`Ollama request failed: ${message}`, {
+      provider: "ollama",
+      statusCode: response.status,
+      retryAfterMs: parseRetryAfterMs(response.headers.get("retry-after")),
+      classification: classifyProviderFailure({
+        message,
+        statusCode: response.status,
+        retryAfterMs: parseRetryAfterMs(response.headers.get("retry-after")),
+      }),
+    });
   }
 
   const text = payload?.message?.content?.trim() || "";
 
   if (!text) {
-    throw new Error("Ollama returned an empty response.");
+    throw new ProviderRequestError("Ollama returned an empty response.", {
+      provider: "ollama",
+      classification: classifyProviderFailure({ message: "empty response" }),
+    });
   }
 
   return text;
@@ -1893,181 +1897,122 @@ async function requestStructuredJson({
   });
 }
 
+function buildOperationCandidates(mode, provider, model) {
+  const fallbackProvider = resolveFallbackProvider(provider);
+  const fallbackModel = resolveFallbackModel(provider, mode, model);
+
+  return {
+    primary: { provider, model },
+    fallback:
+      fallbackProvider && fallbackModel
+        ? {
+            provider: fallbackProvider,
+            model: fallbackModel,
+          }
+        : null,
+  };
+}
+
 async function generateBatchForDifficulty(
   topic,
   requestedDifficulty,
   requestedCount,
-  attempt = 1,
   provider = generationProvider,
-  model = generationModel,
-  hasFallenBack = false
+  model = generationModel
 ) {
-  try {
-    const schema = buildQuestionBatchSchema(
-      topic.section_key,
-      requestedDifficulty,
-      requestedCount
-    );
-    const prompt = buildPrompt({
-      sectionKey: topic.section_key,
-      topicName: topic.name,
-      slug: topic.slug,
-      requestedDifficulty,
-      requestedCount,
-    });
-    const text = await requestStructuredJson({
-      provider,
-      model,
-      systemPrompt: GENERATION_SYSTEM_PROMPT,
-      userPrompt: prompt,
-      schema,
-      temperature: 0.7,
-    });
-    const parsedPayload = normalizeGeneratedPayload(parseModelJson(text));
+  const schema = buildQuestionBatchSchema(
+    topic.section_key,
+    requestedDifficulty,
+    requestedCount
+  );
+  const prompt = buildPrompt({
+    sectionKey: topic.section_key,
+    topicName: topic.name,
+    slug: topic.slug,
+    requestedDifficulty,
+    requestedCount,
+  });
+  const { primary, fallback } = buildOperationCandidates("generation", provider, model);
+  const operationResult = await executeProviderOperation({
+    runState: runProviderState,
+    operation: `generation:${topic.section_key}/${topic.slug}/${requestedDifficulty}`,
+    primary,
+    fallback,
+    maxRetries: fastRetryMode ? 1 : 3,
+    defaultRetryDelayMs: primary.provider === "groq" ? 20000 : 35000,
+    wait: sleep,
+    perform: async (candidate) => {
+      const text = await requestStructuredJson({
+        provider: candidate.provider,
+        model: candidate.model,
+        systemPrompt: GENERATION_SYSTEM_PROMPT,
+        userPrompt: prompt,
+        schema,
+        temperature: 0.7,
+      });
+      const parsedPayload = normalizeGeneratedPayload(parseModelJson(text));
 
-    return buildGeneratedBatchSchema({
-      requestedCount,
-      requestedDifficulty,
-    }).parse(parsedPayload).questions;
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "unknown generation error";
-    const generationRetryLimit = fastRetryMode ? 1 : 3;
+      return {
+        questions: buildGeneratedBatchSchema({
+          requestedCount,
+          requestedDifficulty,
+        }).parse(parsedPayload).questions,
+      };
+    },
+  });
 
-    const shouldFallbackImmediately = provider === "gemini" && isQuotaExceededError(message);
-    const isRetryable =
-      provider === "groq"
-        ? isRetryableGroqError(message)
-        : provider === "ollama"
-          ? isRetryableOllamaError(message)
-          : isRetryableGeminiError(message);
-
-    if (attempt < generationRetryLimit && isRetryable && !shouldFallbackImmediately) {
-      const retryDelayMs =
-        extractRetryDelayMs(message) ?? (provider === "groq" ? 20000 : 35000);
-      console.warn(
-        `${provider} rate limited for ${topic.section_key}/${topic.slug}/${requestedDifficulty}; retrying in ${Math.ceil(
-          retryDelayMs / 1000
-        )}s (attempt ${attempt + 1}/${generationRetryLimit}).`
-      );
-      await sleep(retryDelayMs + 1000);
-      return generateBatchForDifficulty(
-        topic,
-        requestedDifficulty,
-        requestedCount,
-        attempt + 1,
-        provider,
-        model,
-        hasFallenBack
-      );
-    }
-
-    const fallbackProvider = resolveFallbackProvider(provider);
-    const fallbackModel = resolveFallbackModel(provider, "generation", model);
-
-    if (isRetryable && fallbackProvider && fallbackModel && !hasFallenBack) {
-      console.warn(
-        `${provider} stayed rate limited for ${topic.section_key}/${topic.slug}/${requestedDifficulty}; falling back to ${fallbackProvider}/${fallbackModel}.`
-      );
-      return generateBatchForDifficulty(
-        topic,
-        requestedDifficulty,
-        requestedCount,
-        1,
-        fallbackProvider,
-        fallbackModel,
-        true
-      );
-    }
-
-    throw error;
-  }
+  return operationResult.questions;
 }
 
 async function generateQuestionSet(
   topic,
   requestedDifficultyCounts,
-  attempt = 1,
   provider = generationProvider,
-  model = generationModel,
-  hasFallenBack = false
+  model = generationModel
 ) {
-  try {
-    const schema = buildQuestionSetJsonSchema(topic.section_key, requestedDifficultyCounts);
-    const prompt = buildSetPrompt({
-      sectionKey: topic.section_key,
-      topicName: topic.name,
-      slug: topic.slug,
-      requestedDifficultyCounts,
-    });
-    const text = await requestStructuredJson({
-      provider,
-      model,
-      systemPrompt: GENERATION_SYSTEM_PROMPT,
-      userPrompt: prompt,
-      schema,
-      temperature: 0.7,
-    });
-    const parsedPayload = normalizeGeneratedSetPayload(parseModelJson(text));
-    const requestedQuestionCount = DIFFICULTIES.reduce(
-      (sum, difficulty) => sum + requestedDifficultyCounts[difficulty],
-      0
-    );
+  const schema = buildQuestionSetJsonSchema(topic.section_key, requestedDifficultyCounts);
+  const prompt = buildSetPrompt({
+    sectionKey: topic.section_key,
+    topicName: topic.name,
+    slug: topic.slug,
+    requestedDifficultyCounts,
+  });
+  const requestedQuestionCount = DIFFICULTIES.reduce(
+    (sum, difficulty) => sum + requestedDifficultyCounts[difficulty],
+    0
+  );
+  const { primary, fallback } = buildOperationCandidates("generation", provider, model);
+  const operationResult = await executeProviderOperation({
+    runState: runProviderState,
+    operation: `generation:${topic.section_key}/${topic.slug}/set`,
+    primary,
+    fallback,
+    maxRetries: fastRetryMode ? 1 : 3,
+    defaultRetryDelayMs: primary.provider === "groq" ? 20000 : 35000,
+    wait: sleep,
+    perform: async (candidate) => {
+      const text = await requestStructuredJson({
+        provider: candidate.provider,
+        model: candidate.model,
+        systemPrompt: GENERATION_SYSTEM_PROMPT,
+        userPrompt: prompt,
+        schema,
+        temperature: 0.7,
+      });
+      const parsedPayload = normalizeGeneratedSetPayload(parseModelJson(text));
 
-    return buildGeneratedSetSchema({
-      sectionKey: topic.section_key,
-      requestedDifficultyCounts,
-      minQuestionCount: requestedQuestionCount,
-      maxQuestionCount: requestedQuestionCount,
-    }).parse(parsedPayload);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "unknown generation error";
-    const generationRetryLimit = fastRetryMode ? 1 : 3;
-    const shouldFallbackImmediately = provider === "gemini" && isQuotaExceededError(message);
-    const isRetryable =
-      provider === "groq"
-        ? isRetryableGroqError(message)
-        : provider === "ollama"
-          ? isRetryableOllamaError(message)
-          : isRetryableGeminiError(message);
+      return {
+        generatedSet: buildGeneratedSetSchema({
+          sectionKey: topic.section_key,
+          requestedDifficultyCounts,
+          minQuestionCount: requestedQuestionCount,
+          maxQuestionCount: requestedQuestionCount,
+        }).parse(parsedPayload),
+      };
+    },
+  });
 
-    if (attempt < generationRetryLimit && isRetryable && !shouldFallbackImmediately) {
-      const retryDelayMs =
-        extractRetryDelayMs(message) ?? (provider === "groq" ? 20000 : 35000);
-      console.warn(
-        `${provider} rate limited for ${topic.section_key}/${topic.slug}/set; retrying in ${Math.ceil(
-          retryDelayMs / 1000
-        )}s (attempt ${attempt + 1}/${generationRetryLimit}).`
-      );
-      await sleep(retryDelayMs + 1000);
-      return generateQuestionSet(
-        topic,
-        requestedDifficultyCounts,
-        attempt + 1,
-        provider,
-        model,
-        hasFallenBack
-      );
-    }
-
-    const fallbackProvider = resolveFallbackProvider(provider);
-    const fallbackModel = resolveFallbackModel(provider, "generation", model);
-
-    if (isRetryable && fallbackProvider && fallbackModel && !hasFallenBack) {
-      console.warn(
-        `${provider} stayed rate limited for ${topic.section_key}/${topic.slug}/set; falling back to ${fallbackProvider}/${fallbackModel}.`
-      );
-      return generateQuestionSet(
-        topic,
-        requestedDifficultyCounts,
-        1,
-        fallbackProvider,
-        fallbackModel,
-        true
-      );
-    }
-
-    throw error;
-  }
+  return operationResult.generatedSet;
 }
 
 async function generateBatchForTopic(topic) {
@@ -2087,6 +2032,10 @@ async function generateBatchForTopic(topic) {
         const generatedSet = await generateQuestionSet(topic, difficultyCounts);
         generatedSets.push(generatedSet);
       } catch (error) {
+        if (error instanceof ProviderRunStoppedError) {
+          throw error;
+        }
+
         const message = error instanceof Error ? error.message : "unknown generation error";
         failures.push({
           topic: `${topic.section_key}/${topic.slug}/set`,
@@ -2117,6 +2066,18 @@ async function generateBatchForTopic(topic) {
       const batch = await generateBatchForDifficulty(topic, difficulty, candidateCount);
       generatedQuestions.push(...batch);
     } catch (error) {
+      if (error instanceof ProviderRunStoppedError) {
+        error.progress = {
+          inserted,
+          skipped,
+          reviewKept,
+          reviewRevised,
+          reviewRejected,
+          reviewErrors,
+        };
+        throw error;
+      }
+
       const message = error instanceof Error ? error.message : "unknown generation error";
       failures.push({
         topic: `${topic.section_key}/${topic.slug}/${difficulty}`,
@@ -2134,280 +2095,222 @@ async function generateBatchForTopic(topic) {
 async function reviewGeneratedQuestion(
   topic,
   question,
-  attempt = 1,
   provider = reviewProvider,
-  model = reviewModel,
-  hasFallenBack = false
+  model = reviewModel
 ) {
-  try {
-    const schema = {
-      type: "object",
-      properties: {
-        item_index: {
-          type: "integer",
-          minimum: 0,
-        },
-        verdict: {
-          type: "string",
-          enum: ["keep", "revise", "reject"],
-        },
-        confidence: {
-          type: "string",
-          enum: ["high", "medium", "low"],
-        },
-        correctness: {
-          type: "string",
-          enum: ["correct", "incorrect", "unclear"],
-        },
-        topic_fidelity: {
-          type: "string",
-          enum: ["strong", "partial", "weak"],
-        },
-        difficulty_accuracy: {
-          type: "string",
-          enum: ["accurate", "too_easy", "too_hard", "unclear"],
-        },
-        single_best_answer: {
-          type: "string",
-          enum: ["yes", "no", "unclear"],
-        },
-        explanation_consistency: {
-          type: "string",
-          enum: ["consistent", "inconsistent", "unclear"],
-        },
-        originality: {
-          type: "string",
-          enum: ["strong", "borderline", "weak"],
-        },
-        unique_correct_answer: {
-          type: "string",
-          enum: ["yes", "no", "unclear"],
-        },
-        answer_key_verified: {
-          type: "string",
-          enum: ["yes", "no", "unclear"],
-        },
-        explanation_verified: {
-          type: "string",
-          enum: ["yes", "no", "unclear"],
-        },
-        choices_distinct: {
-          type: "string",
-          enum: ["yes", "no", "unclear"],
-        },
-        evidence_supported: {
-          type: "string",
-          enum: ["yes", "no", "unclear"],
-        },
-        section_appropriate: {
-          type: "string",
-          enum: ["yes", "no", "unclear"],
-        },
-        main_issues: {
-          type: "array",
-          items: { type: "string" },
-        },
-        suggested_difficulty: {
-          type: ["string", "null"],
-          enum: [...DIFFICULTIES, null],
-        },
-        editorial_note: {
-          type: "string",
-        },
+  const schema = {
+    type: "object",
+    properties: {
+      item_index: {
+        type: "integer",
+        minimum: 0,
       },
-      required: [
-        "item_index",
-        "verdict",
-        "confidence",
-        "correctness",
-        "topic_fidelity",
-        "difficulty_accuracy",
-        "single_best_answer",
-        "explanation_consistency",
-        "originality",
-        "unique_correct_answer",
-        "answer_key_verified",
-        "explanation_verified",
-        "choices_distinct",
-        "evidence_supported",
-        "section_appropriate",
-        "main_issues",
-        "suggested_difficulty",
-        "editorial_note",
-      ],
-      additionalProperties: false,
-    };
-    const prompt = buildReviewPrompt(topic, question);
-    const text = await requestStructuredJson({
-      provider,
-      model,
-      systemPrompt: REVIEW_SYSTEM_PROMPT,
-      userPrompt: prompt,
-      schema,
-      temperature: 0.2,
-    });
-    const parsedPayload = parseModelJson(text);
+      verdict: {
+        type: "string",
+        enum: ["keep", "revise", "reject"],
+      },
+      confidence: {
+        type: "string",
+        enum: ["high", "medium", "low"],
+      },
+      correctness: {
+        type: "string",
+        enum: ["correct", "incorrect", "unclear"],
+      },
+      topic_fidelity: {
+        type: "string",
+        enum: ["strong", "partial", "weak"],
+      },
+      difficulty_accuracy: {
+        type: "string",
+        enum: ["accurate", "too_easy", "too_hard", "unclear"],
+      },
+      single_best_answer: {
+        type: "string",
+        enum: ["yes", "no", "unclear"],
+      },
+      explanation_consistency: {
+        type: "string",
+        enum: ["consistent", "inconsistent", "unclear"],
+      },
+      originality: {
+        type: "string",
+        enum: ["strong", "borderline", "weak"],
+      },
+      unique_correct_answer: {
+        type: "string",
+        enum: ["yes", "no", "unclear"],
+      },
+      answer_key_verified: {
+        type: "string",
+        enum: ["yes", "no", "unclear"],
+      },
+      explanation_verified: {
+        type: "string",
+        enum: ["yes", "no", "unclear"],
+      },
+      choices_distinct: {
+        type: "string",
+        enum: ["yes", "no", "unclear"],
+      },
+      evidence_supported: {
+        type: "string",
+        enum: ["yes", "no", "unclear"],
+      },
+      section_appropriate: {
+        type: "string",
+        enum: ["yes", "no", "unclear"],
+      },
+      main_issues: {
+        type: "array",
+        items: { type: "string" },
+      },
+      suggested_difficulty: {
+        type: ["string", "null"],
+        enum: [...DIFFICULTIES, null],
+      },
+      editorial_note: {
+        type: "string",
+      },
+    },
+    required: [
+      "item_index",
+      "verdict",
+      "confidence",
+      "correctness",
+      "topic_fidelity",
+      "difficulty_accuracy",
+      "single_best_answer",
+      "explanation_consistency",
+      "originality",
+      "unique_correct_answer",
+      "answer_key_verified",
+      "explanation_verified",
+      "choices_distinct",
+      "evidence_supported",
+      "section_appropriate",
+      "main_issues",
+      "suggested_difficulty",
+      "editorial_note",
+    ],
+    additionalProperties: false,
+  };
+  const prompt = buildReviewPrompt(topic, question);
+  const { primary, fallback } = buildOperationCandidates("review", provider, model);
+  const operationResult = await executeProviderOperation({
+    runState: runProviderState,
+    operation: `review:${topic.section_key}/${topic.slug}`,
+    primary,
+    fallback,
+    maxRetries: fastRetryMode ? 1 : 2,
+    defaultRetryDelayMs: primary.provider === "groq" ? 12000 : 20000,
+    wait: sleep,
+    perform: async (candidate) => {
+      const text = await requestStructuredJson({
+        provider: candidate.provider,
+        model: candidate.model,
+        systemPrompt: REVIEW_SYSTEM_PROMPT,
+        userPrompt: prompt,
+        schema,
+        temperature: 0.2,
+      });
+      const parsedPayload = parseModelJson(text);
 
-    return reviewedQuestionSchema.parse(parsedPayload);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "unknown review error";
-    const reviewRetryLimit = fastRetryMode ? 1 : 2;
-    const shouldFallbackImmediately = provider === "gemini" && isQuotaExceededError(message);
-    const isRetryable =
-      provider === "groq"
-        ? isRetryableGroqError(message)
-        : provider === "ollama"
-          ? isRetryableOllamaError(message)
-          : isRetryableGeminiError(message);
+      return {
+        reviewerResult: reviewedQuestionSchema.parse(parsedPayload),
+      };
+    },
+  });
 
-    if (attempt < reviewRetryLimit && isRetryable && !shouldFallbackImmediately) {
-      const retryDelayMs =
-        extractRetryDelayMs(message) ?? (provider === "groq" ? 12000 : 20000);
-      console.warn(
-        `${provider} review rate limited for ${topic.section_key}/${topic.slug}; retrying in ${Math.ceil(
-          retryDelayMs / 1000
-        )}s (attempt ${attempt + 1}/${reviewRetryLimit}).`
-      );
-      await sleep(retryDelayMs + 1000);
-      return reviewGeneratedQuestion(topic, question, attempt + 1, provider, model, hasFallenBack);
-    }
-
-    const fallbackProvider = resolveFallbackProvider(provider);
-    const fallbackModel = resolveFallbackModel(provider, "review", model);
-
-    if (isRetryable && fallbackProvider && fallbackModel && !hasFallenBack) {
-      console.warn(
-        `${provider} review stayed rate limited for ${topic.section_key}/${topic.slug}; falling back to ${fallbackProvider}/${fallbackModel}.`
-      );
-      return reviewGeneratedQuestion(
-        topic,
-        question,
-        1,
-        fallbackProvider,
-        fallbackModel,
-        true
-      );
-    }
-
-    throw error;
-  }
+  return operationResult.reviewerResult;
 }
 
 async function verifyGeneratedQuestionCorrectness(
   topic,
   question,
-  attempt = 1,
   provider = reviewProvider,
-  model = reviewModel,
-  hasFallenBack = false
+  model = reviewModel
 ) {
-  try {
-    const schema = {
-      type: "object",
-      properties: {
-        correctness_verified: {
-          type: "string",
-          enum: ["yes", "no", "unclear"],
-        },
-        unique_correct_answer: {
-          type: "string",
-          enum: ["yes", "no", "unclear"],
-        },
-        answer_key_verified: {
-          type: "string",
-          enum: ["yes", "no", "unclear"],
-        },
-        explanation_verified: {
-          type: "string",
-          enum: ["yes", "no", "unclear"],
-        },
-        choices_distinct: {
-          type: "string",
-          enum: ["yes", "no", "unclear"],
-        },
-        evidence_supported: {
-          type: "string",
-          enum: ["yes", "no", "unclear"],
-        },
-        recommended_disposition: {
-          type: "string",
-          enum: ["keep", "revise", "reject"],
-        },
-        main_issues: {
-          type: "array",
-          items: { type: "string" },
-        },
-        note: {
-          type: "string",
-        },
+  const schema = {
+    type: "object",
+    properties: {
+      correctness_verified: {
+        type: "string",
+        enum: ["yes", "no", "unclear"],
       },
-      required: [
-        "correctness_verified",
-        "unique_correct_answer",
-        "answer_key_verified",
-        "explanation_verified",
-        "choices_distinct",
-        "evidence_supported",
-        "recommended_disposition",
-        "main_issues",
-        "note",
-      ],
-      additionalProperties: false,
-    };
-    const prompt = buildCorrectnessVerificationPrompt(topic, question);
-    const text = await requestStructuredJson({
-      provider,
-      model,
-      systemPrompt: REVIEW_SYSTEM_PROMPT,
-      userPrompt: prompt,
-      schema,
-      temperature: 0.1,
-    });
-    const parsedPayload = parseModelJson(text);
+      unique_correct_answer: {
+        type: "string",
+        enum: ["yes", "no", "unclear"],
+      },
+      answer_key_verified: {
+        type: "string",
+        enum: ["yes", "no", "unclear"],
+      },
+      explanation_verified: {
+        type: "string",
+        enum: ["yes", "no", "unclear"],
+      },
+      choices_distinct: {
+        type: "string",
+        enum: ["yes", "no", "unclear"],
+      },
+      evidence_supported: {
+        type: "string",
+        enum: ["yes", "no", "unclear"],
+      },
+      recommended_disposition: {
+        type: "string",
+        enum: ["keep", "revise", "reject"],
+      },
+      main_issues: {
+        type: "array",
+        items: { type: "string" },
+      },
+      note: {
+        type: "string",
+      },
+    },
+    required: [
+      "correctness_verified",
+      "unique_correct_answer",
+      "answer_key_verified",
+      "explanation_verified",
+      "choices_distinct",
+      "evidence_supported",
+      "recommended_disposition",
+      "main_issues",
+      "note",
+    ],
+    additionalProperties: false,
+  };
+  const prompt = buildCorrectnessVerificationPrompt(topic, question);
+  const { primary, fallback } = buildOperationCandidates("review", provider, model);
+  const operationResult = await executeProviderOperation({
+    runState: runProviderState,
+    operation: `verify:${topic.section_key}/${topic.slug}`,
+    primary,
+    fallback,
+    maxRetries: fastRetryMode ? 1 : 2,
+    defaultRetryDelayMs: primary.provider === "groq" ? 12000 : 20000,
+    wait: sleep,
+    perform: async (candidate) => {
+      const text = await requestStructuredJson({
+        provider: candidate.provider,
+        model: candidate.model,
+        systemPrompt: REVIEW_SYSTEM_PROMPT,
+        userPrompt: prompt,
+        schema,
+        temperature: 0.1,
+      });
+      const parsedPayload = parseModelJson(text);
 
-    return correctnessVerifierSchema.parse(parsedPayload);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "unknown correctness verification error";
-    const reviewRetryLimit = fastRetryMode ? 1 : 2;
-    const shouldFallbackImmediately = provider === "gemini" && isQuotaExceededError(message);
-    const isRetryable =
-      provider === "groq"
-        ? isRetryableGroqError(message)
-        : provider === "ollama"
-          ? isRetryableOllamaError(message)
-          : isRetryableGeminiError(message);
+      return {
+        verifierResult: correctnessVerifierSchema.parse(parsedPayload),
+      };
+    },
+  });
 
-    if (attempt < reviewRetryLimit && isRetryable && !shouldFallbackImmediately) {
-      const retryDelayMs =
-        extractRetryDelayMs(message) ?? (provider === "groq" ? 12000 : 20000);
-      console.warn(
-        `${provider} correctness verifier rate limited for ${topic.section_key}/${topic.slug}; retrying in ${Math.ceil(
-          retryDelayMs / 1000
-        )}s (attempt ${attempt + 1}/${reviewRetryLimit}).`
-      );
-      await sleep(retryDelayMs + 1000);
-      return verifyGeneratedQuestionCorrectness(topic, question, attempt + 1, provider, model, hasFallenBack);
-    }
-
-    const fallbackProvider = resolveFallbackProvider(provider);
-    const fallbackModel = resolveFallbackModel(provider, "review", model);
-
-    if (isRetryable && fallbackProvider && fallbackModel && !hasFallenBack) {
-      console.warn(
-        `${provider} correctness verifier stayed rate limited for ${topic.section_key}/${topic.slug}; falling back to ${fallbackProvider}/${fallbackModel}.`
-      );
-      return verifyGeneratedQuestionCorrectness(
-        topic,
-        question,
-        1,
-        fallbackProvider,
-        fallbackModel,
-        true
-      );
-    }
-
-    throw error;
-  }
+  return operationResult.verifierResult;
 }
 
 function sanitizeQuestion(sectionKey, topic, question) {
@@ -2845,6 +2748,18 @@ function buildReviewNotes({
   return lines.join("\n");
 }
 
+function getRequestedChildCountForTopic() {
+  return DIFFICULTIES.reduce((sum, difficulty) => sum + requestedDifficultyCounts[difficulty], 0);
+}
+
+function getPlannedSetCountForTopic(sectionKey) {
+  if (sectionKey !== "reading" && sectionKey !== "science") {
+    return 0;
+  }
+
+  return Math.max(1, Math.ceil(getRequestedChildCountForTopic() / (SET_DEFAULT_CHILD_COUNT[sectionKey] ?? 6)));
+}
+
 async function insertQuestions(topic, generatedQuestions) {
   const existingRows = await client.query(
     `
@@ -2897,6 +2812,18 @@ async function insertQuestions(topic, generatedQuestions) {
         explanation: normalizedQuestion.explanation,
       });
     } catch (error) {
+      if (error instanceof ProviderRunStoppedError) {
+        error.progress = {
+          inserted,
+          skipped,
+          reviewKept,
+          reviewRevised,
+          reviewRejected,
+          reviewErrors,
+        };
+        throw error;
+      }
+
       reviewErrors += 1;
       skipped += 1;
       console.warn(
@@ -2945,6 +2872,10 @@ async function insertQuestions(topic, generatedQuestions) {
         explanation: normalizedQuestion.explanation,
       });
     } catch (error) {
+      if (error instanceof ProviderRunStoppedError) {
+        throw error;
+      }
+
       reviewErrors += 1;
       skipped += 1;
       console.warn(
@@ -3096,6 +3027,19 @@ async function insertQuestionSets(topic, generatedSets) {
           explanation: child.explanation,
         });
       } catch (error) {
+        if (error instanceof ProviderRunStoppedError) {
+          error.progress = {
+            inserted,
+            skipped,
+            reviewKept,
+            reviewRevised,
+            reviewRejected,
+            reviewErrors,
+            setsInserted,
+          };
+          throw error;
+        }
+
         reviewErrors += 1;
         skipped += 1;
         console.warn(
@@ -3144,6 +3088,19 @@ async function insertQuestionSets(topic, generatedSets) {
           explanation: child.explanation,
         });
       } catch (error) {
+        if (error instanceof ProviderRunStoppedError) {
+          error.progress = {
+            inserted,
+            skipped,
+            reviewKept,
+            reviewRevised,
+            reviewRejected,
+            reviewErrors,
+            setsInserted,
+          };
+          throw error;
+        }
+
         reviewErrors += 1;
         skipped += 1;
         console.warn(
@@ -3327,6 +3284,13 @@ async function main() {
       reviewRevised: 0,
       reviewRejected: 0,
       reviewErrors: 0,
+      paused: false,
+      runState: "completed",
+      pauseReason: null,
+      remainingPlannedChildCount: 0,
+      providerAvailability: null,
+      providerEvents: [],
+      topics: [],
       failures: [],
     };
 
@@ -3334,8 +3298,10 @@ async function main() {
       `Generating ACT inventory for ${topics.length} topic(s) with difficulty plan easy:${requestedDifficultyCounts.easy}, medium:${requestedDifficultyCounts.medium}, hard:${requestedDifficultyCounts.hard}.`
     );
 
-    for (const topic of topics) {
+    for (const [topicIndex, topic] of topics.entries()) {
       console.log(`\nGenerating ${topic.section_key}/${topic.slug}...`);
+      const requestedChildCount = getRequestedChildCountForTopic();
+      const plannedSetCount = getPlannedSetCountForTopic(topic.section_key);
 
       try {
         const { generatedQuestions, generatedSets, failures } = await generateBatchForTopic(topic);
@@ -3360,6 +3326,21 @@ async function main() {
         summary.reviewRejected += reviewRejected;
         summary.reviewErrors += reviewErrors;
         summary.failures.push(...failures);
+        summary.topics.push({
+          sectionKey: topic.section_key,
+          topicSlug: topic.slug,
+          requestedChildCount,
+          plannedSetCount,
+          inserted,
+          skipped,
+          reviewKept,
+          reviewRevised,
+          reviewRejected,
+          reviewErrors,
+          remainingChildCount: Math.max(0, requestedChildCount - inserted),
+          status: "completed",
+          providerAvailability: summarizeProviderAvailability(runProviderState),
+        });
 
         console.log(
           `Inserted ${inserted} question(s)${
@@ -3374,7 +3355,80 @@ async function main() {
         const message = error instanceof Error ? error.message : "unknown error";
         summary.failures.push({ topic: `${topic.section_key}/${topic.slug}`, error: message });
         console.error(`Failed ${topic.section_key}/${topic.slug}: ${message}`);
+
+        if (error instanceof ProviderRunStoppedError) {
+          const partialProgress = error.progress ?? {};
+          const partialInserted = Number(partialProgress.inserted ?? 0);
+          const partialSkipped = Number(partialProgress.skipped ?? 0);
+          const partialReviewKept = Number(partialProgress.reviewKept ?? 0);
+          const partialReviewRevised = Number(partialProgress.reviewRevised ?? 0);
+          const partialReviewRejected = Number(partialProgress.reviewRejected ?? 0);
+          const partialReviewErrors = Number(partialProgress.reviewErrors ?? 0);
+          const partialSetsInserted = Number(partialProgress.setsInserted ?? 0);
+          summary.paused = true;
+          summary.runState = "paused_due_to_provider";
+          summary.pauseReason = error.classification?.kind ?? "providers-unavailable";
+          summary.providerAvailability = summarizeProviderAvailability(runProviderState);
+          summary.providerEvents = runProviderState.events;
+          summary.inserted += partialInserted;
+          summary.skipped += partialSkipped;
+          summary.reviewKept += partialReviewKept;
+          summary.reviewRevised += partialReviewRevised;
+          summary.reviewRejected += partialReviewRejected;
+          summary.reviewErrors += partialReviewErrors;
+          summary.setsInserted += partialSetsInserted;
+          summary.remainingPlannedChildCount += Math.max(0, requestedChildCount - partialInserted);
+          summary.topics.push({
+            sectionKey: topic.section_key,
+            topicSlug: topic.slug,
+            requestedChildCount,
+            plannedSetCount,
+            inserted: partialInserted,
+            skipped: partialSkipped,
+            reviewKept: partialReviewKept,
+            reviewRevised: partialReviewRevised,
+            reviewRejected: partialReviewRejected,
+            reviewErrors: partialReviewErrors,
+            remainingChildCount: Math.max(0, requestedChildCount - partialInserted),
+            status: "paused_due_to_provider",
+            providerFailure: {
+              provider: error.provider,
+              kind: error.classification?.kind ?? "providers-unavailable",
+              message,
+            },
+            providerAvailability: summary.providerAvailability,
+          });
+
+          const remainingTopics = topics.slice(topicIndex + 1);
+          for (const remainingTopic of remainingTopics) {
+            const remainingRequestedChildCount = getRequestedChildCountForTopic();
+            summary.remainingPlannedChildCount += remainingRequestedChildCount;
+            summary.topics.push({
+              sectionKey: remainingTopic.section_key,
+              topicSlug: remainingTopic.slug,
+              requestedChildCount: remainingRequestedChildCount,
+              plannedSetCount: getPlannedSetCountForTopic(remainingTopic.section_key),
+              inserted: 0,
+              skipped: 0,
+              reviewKept: 0,
+              reviewRevised: 0,
+              reviewRejected: 0,
+              reviewErrors: 0,
+              remainingChildCount: remainingRequestedChildCount,
+              status: "not_started_due_to_provider_pause",
+            });
+          }
+          break;
+        }
       }
+    }
+
+    if (!summary.providerAvailability) {
+      summary.providerAvailability = summarizeProviderAvailability(runProviderState);
+    }
+
+    if (summary.providerEvents.length === 0) {
+      summary.providerEvents = runProviderState.events;
     }
 
     if (jsonOnly) {

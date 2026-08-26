@@ -109,6 +109,15 @@ type GenerationSummary = {
   reviewRevised?: number;
   reviewRejected?: number;
   reviewErrors?: number;
+  paused?: boolean;
+  runState?: string;
+  remainingPlannedChildCount?: number;
+  providerEvents?: Array<{
+    provider?: string;
+    state?: string;
+    retryAfterMs?: number;
+    message?: string;
+  }>;
   failures?: Array<{
     topic?: string;
     error?: string;
@@ -233,6 +242,28 @@ function summarizeGenerationResults(
       reviewErrors: 0,
     }
   );
+}
+
+function describeProviderPause(selection: {
+  runState?: string;
+  remainingPlannedChildCount?: number;
+  providerEvents?: Array<{
+    provider?: string;
+    state?: string;
+  }>;
+  pauseReason?: string | null;
+}) {
+  if (selection.runState !== "paused_due_to_provider") {
+    return null;
+  }
+
+  const latestProviderEvent = [...(selection.providerEvents ?? [])]
+    .reverse()
+    .find((event) => event.provider && event.state);
+  const providerLabel = latestProviderEvent?.provider ? latestProviderEvent.provider : "provider";
+  const providerState = latestProviderEvent?.state ? latestProviderEvent.state.replace(/-/g, " ") : "unavailable";
+
+  return `Paused: ${providerLabel} ${providerState}. ${selection.remainingPlannedChildCount ?? 0} planned child questions remain.`;
 }
 
 export default function ReviewConsole() {
@@ -467,13 +498,14 @@ export default function ReviewConsole() {
       }
 
       const totals = summarizeGenerationResults(data.results ?? []);
+      const pauseMessage = describeProviderPause(data.selection ?? {});
 
       setFlashMessage(
         `Filled ${data.selection?.selectedTopicCount ?? 0} critical topic batch${
           data.selection?.selectedTopicCount === 1 ? "" : "es"
         }: requested ${totals.requested}, inserted ${totals.inserted}${
           totals.insertedSets > 0 ? ` across ${totals.insertedSets} set${totals.insertedSets === 1 ? "" : "s"}` : ""
-        }, reviewer kept ${totals.kept}, revised ${totals.revised}, rejected ${totals.rejected}, errors ${totals.reviewErrors}.`
+        }, reviewer kept ${totals.kept}, revised ${totals.revised}, rejected ${totals.rejected}, errors ${totals.reviewErrors}.${pauseMessage ? ` ${pauseMessage}` : ""}`
       );
       setGenerationDebug(
         (data.results ?? []).map(
@@ -592,12 +624,13 @@ export default function ReviewConsole() {
       }
 
       const totals = summarizeGenerationResults(data.results ?? []);
+      const pauseMessage = describeProviderPause(data.selection ?? {});
       setFlashMessage(
         `${
           preset === "critical-gaps" ? "Critical gaps sprint" : "Toward launch minimum"
         }: requested ${totals.requested}, inserted ${totals.inserted}${
           totals.insertedSets > 0 ? ` across ${totals.insertedSets} set${totals.insertedSets === 1 ? "" : "s"}` : ""
-        }, reviewer kept ${totals.kept}, revised ${totals.revised}, rejected ${totals.rejected}, errors ${totals.reviewErrors}.`
+        }, reviewer kept ${totals.kept}, revised ${totals.revised}, rejected ${totals.rejected}, errors ${totals.reviewErrors}.${pauseMessage ? ` ${pauseMessage}` : ""}`
       );
       setGenerationDebug(
         (data.results ?? []).map(
