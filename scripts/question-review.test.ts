@@ -32,6 +32,41 @@ test("science no-valid-answer case does not classify clean", () => {
   assert.equal(review.findings.answerKeyVerified, "fail");
 });
 
+test("production science contradiction case does not classify clean", () => {
+  const review = reviewQuestionQuality({
+    id: "science-production-no-valid-answer",
+    section: "science",
+    topic: "Data Representation",
+    difficulty: "medium",
+    passage: [
+      "Plant height was measured for seedlings in a Control group and a Fertilizer B group over eight weeks.",
+      "Week 2: Control = 5.1 cm, Fertilizer B = 5.2 cm.",
+      "Week 4: Control = 7.0 cm, Fertilizer B = 7.8 cm.",
+      "Week 6: Control = 8.5 cm, Fertilizer B = 9.9 cm.",
+      "Week 8: Control = 9.0 cm, Fertilizer B = 11.5 cm.",
+    ].join(" "),
+    question_text:
+      "Which statement best describes the overall trend for Fertilizer B compared to the Control group over the eight weeks?",
+    choices: {
+      A: "Fertilizer B consistently outperformed the Control by at least 1 cm at each measurement.",
+      B: "Fertilizer B started lower but surpassed the Control after week 4.",
+      C: "Fertilizer B and the Control had identical growth patterns.",
+      D: "Fertilizer B showed no growth after week 4.",
+    },
+    correct_answer: "B",
+    explanation:
+      "Choice B is correct because Fertilizer B began slightly lower than the Control but surpassed it after week 4.",
+  });
+
+  assert.equal(review.shouldServe, false);
+  assert.equal(review.autoPublishEligible, false);
+  assert(review.blockingFlags.some((flag) => flag.code === "no-supported-choice"));
+  assert(review.blockingFlags.some((flag) => flag.code === "explanation-stimulus-contradiction"));
+  assert.equal(review.findings.uniqueCorrectAnswer, "fail");
+  assert.equal(review.findings.answerKeyVerified, "fail");
+  assert.equal(review.findings.explanationVerified, "fail");
+});
+
 test("equivalent answer-choice case does not classify clean", () => {
   const review = reviewQuestionQuality({
     id: "science-equivalent-choices",

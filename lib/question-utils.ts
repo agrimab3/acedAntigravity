@@ -252,6 +252,359 @@ function extractScienceMeasurements(passage: string | null) {
   };
 }
 
+type ParsedScienceMeasurements = NonNullable<ReturnType<typeof extractScienceMeasurements>>;
+
+function getCommonScienceTimes(
+  parsedMeasurements: ParsedScienceMeasurements,
+  leftValues: Map<string, number>,
+  rightValues: Map<string, number>
+) {
+  return parsedMeasurements.orderedTimes.filter((time) => leftValues.has(time) && rightValues.has(time));
+}
+
+function getThresholdScienceTimes(
+  commonTimes: string[],
+  thresholdLabel: string,
+  mode: "after" | "by"
+) {
+  const thresholdMeta = parseTimeLabel(thresholdLabel);
+
+  if (!thresholdMeta) {
+    return [];
+  }
+
+  return commonTimes.filter((time) => {
+    const timeMeta = parseTimeLabel(time);
+
+    if (!timeMeta || timeMeta.unit !== thresholdMeta.unit) {
+      return false;
+    }
+
+    return mode === "after" ? timeMeta.count > thresholdMeta.count : timeMeta.count >= thresholdMeta.count;
+  });
+}
+
+function resolveScienceSeriesValues(
+  label: string,
+  parsedMeasurements: ParsedScienceMeasurements
+) {
+  const seriesKey = matchSeriesName(label, Array.from(parsedMeasurements.measurements.keys()));
+
+  if (!seriesKey) {
+    return null;
+  }
+
+  const values = parsedMeasurements.measurements.get(seriesKey);
+
+  if (!values) {
+    return null;
+  }
+
+  return { seriesKey, values };
+}
+
+function nearlyEqual(left: number, right: number, tolerance = 1e-9) {
+  return Math.abs(left - right) <= tolerance;
+}
+
+function evaluateScienceComparativeClaim(
+  text: string,
+  parsedMeasurements: ParsedScienceMeasurements
+): boolean | null {
+  const methodSignature = extractMethodSignature(text);
+
+  if (methodSignature) {
+    return true;
+  }
+
+  const normalizedText = normalizeChoiceForComparison(text);
+
+  const surpassMatch = normalizedText.match(
+    /([a-z][a-z0-9()\- ]+?)\s+(?:started|began)\s+(?:slightly\s+|somewhat\s+)?(lower|below|higher|above)\s+(?:than\s+)?(?:the\s+)?([a-z][a-z0-9()\- ]+?)\s+but\s+(surpassed|overtook|rose above|moved above|fell below|dropped below)\s+(?:the\s+)?([a-z][a-z0-9()\- ]+?)?\s*(?:after|by)\s+(week|day|trial|month|year|hour)\s*(\d+)/i
+  );
+
+  if (surpassMatch) {
+    const leftSeries = resolveScienceSeriesValues(surpassMatch[1], parsedMeasurements);
+    const rightSeries = resolveScienceSeriesValues(surpassMatch[3], parsedMeasurements);
+    const repeatedRightSeries = surpassMatch[5]
+      ? resolveScienceSeriesValues(surpassMatch[5], parsedMeasurements)
+      : rightSeries;
+    const thresholdLabel = normalizeTimeLabel(surpassMatch[6], Number(surpassMatch[7]));
+
+    if (!leftSeries || !rightSeries || !repeatedRightSeries) {
+      return null;
+    }
+
+    if (rightSeries.seriesKey !== repeatedRightSeries.seriesKey) {
+      return null;
+    }
+
+    const commonTimes = getCommonScienceTimes(parsedMeasurements, leftSeries.values, rightSeries.values);
+    const earliestTime = commonTimes[0];
+
+    if (!earliestTime) {
+      return null;
+    }
+
+    const earliestLeft = leftSeries.values.get(earliestTime);
+    const earliestRight = rightSeries.values.get(earliestTime);
+
+    if (earliestLeft === undefined || earliestRight === undefined) {
+      return null;
+    }
+
+    const startedComparison =
+      (surpassMatch[2] === "lower" || surpassMatch[2] === "below")
+        ? earliestLeft < earliestRight
+        : earliestLeft > earliestRight;
+    const thresholdTimes = getThresholdScienceTimes(
+      commonTimes,
+      thresholdLabel,
+      normalizedText.includes(" by ") ? "by" : "after"
+    );
+
+    if (thresholdTimes.length === 0) {
+      return false;
+    }
+
+    const surpassedAfterThreshold = thresholdTimes.some((time) => {
+      const leftValue = leftSeries.values.get(time);
+      const rightValue = rightSeries.values.get(time);
+
+      if (leftValue === undefined || rightValue === undefined) {
+        return false;
+      }
+
+      return /(fell below|dropped below)/.test(surpassMatch[4])
+        ? leftValue < rightValue
+        : leftValue > rightValue;
+    });
+
+    return startedComparison && surpassedAfterThreshold;
+  }
+
+  const thresholdMatch = normalizedText.match(
+    /([a-z][a-z0-9()\- ]+?)\s+(?:consistently\s+)?(?:outperformed|exceeded|was at least|was more than)\s+(?:the\s+)?([a-z][a-z0-9()\- ]+?)\s+by\s+at\s+least\s+(-?\d+(?:\.\d+)?)\s*(?:cm|mm|m|%|percent)?\s+at\s+(?:every|each)\s+(?:measurement|time point|interval)/i
+  );
+
+  if (thresholdMatch) {
+    const leftSeries = resolveScienceSeriesValues(thresholdMatch[1], parsedMeasurements);
+    const rightSeries = resolveScienceSeriesValues(thresholdMatch[2], parsedMeasurements);
+    const threshold = Number(thresholdMatch[3]);
+
+    if (!leftSeries || !rightSeries || !Number.isFinite(threshold)) {
+      return null;
+    }
+
+    const commonTimes = getCommonScienceTimes(parsedMeasurements, leftSeries.values, rightSeries.values);
+
+    if (commonTimes.length === 0) {
+      return null;
+    }
+
+    return commonTimes.every((time) => {
+      const leftValue = leftSeries.values.get(time);
+      const rightValue = rightSeries.values.get(time);
+
+      if (leftValue === undefined || rightValue === undefined) {
+        return false;
+      }
+
+      return leftValue - rightValue >= threshold;
+    });
+  }
+
+  const remainedMatch = normalizedText.match(
+    /([a-z][a-z0-9()\- ]+?)\s+(?:remained|stayed|was)\s+(above|below|higher than|lower than|greater than|less than)\s+(?:the\s+)?([a-z][a-z0-9()\- ]+?)\s+(?:throughout|at\s+(?:every|each)\s+(?:measurement|time point|interval))/i
+  );
+
+  if (remainedMatch) {
+    const leftSeries = resolveScienceSeriesValues(remainedMatch[1], parsedMeasurements);
+    const rightSeries = resolveScienceSeriesValues(remainedMatch[3], parsedMeasurements);
+
+    if (!leftSeries || !rightSeries) {
+      return null;
+    }
+
+    const commonTimes = getCommonScienceTimes(parsedMeasurements, leftSeries.values, rightSeries.values);
+
+    if (commonTimes.length === 0) {
+      return null;
+    }
+
+    const relation = remainedMatch[2];
+
+    return commonTimes.every((time) => {
+      const leftValue = leftSeries.values.get(time);
+      const rightValue = rightSeries.values.get(time);
+
+      if (leftValue === undefined || rightValue === undefined) {
+        return false;
+      }
+
+      return /(below|lower than|less than)/.test(relation)
+        ? leftValue < rightValue
+        : leftValue > rightValue;
+    });
+  }
+
+  const identicalMatch = normalizedText.match(
+    /([a-z][a-z0-9()\- ]+?)\s+and\s+(?:the\s+)?([a-z][a-z0-9()\- ]+?)\s+had\s+identical\s+(?:growth\s+)?patterns?/i
+  );
+
+  if (identicalMatch) {
+    const leftSeries = resolveScienceSeriesValues(identicalMatch[1], parsedMeasurements);
+    const rightSeries = resolveScienceSeriesValues(identicalMatch[2], parsedMeasurements);
+
+    if (!leftSeries || !rightSeries) {
+      return null;
+    }
+
+    const commonTimes = getCommonScienceTimes(parsedMeasurements, leftSeries.values, rightSeries.values);
+
+    if (commonTimes.length < 2) {
+      return null;
+    }
+
+    const leftDeltas = commonTimes.slice(1).map((time, index) => {
+      const previousTime = commonTimes[index];
+      return (leftSeries.values.get(time) ?? Number.NaN) - (leftSeries.values.get(previousTime) ?? Number.NaN);
+    });
+    const rightDeltas = commonTimes.slice(1).map((time, index) => {
+      const previousTime = commonTimes[index];
+      return (rightSeries.values.get(time) ?? Number.NaN) - (rightSeries.values.get(previousTime) ?? Number.NaN);
+    });
+
+    return leftDeltas.every(
+      (leftDelta, index) => Number.isFinite(leftDelta) && nearlyEqual(leftDelta, rightDeltas[index] ?? Number.NaN)
+    );
+  }
+
+  const noGrowthMatch = normalizedText.match(
+    /([a-z][a-z0-9()\- ]+?)\s+(?:showed|had)\s+no\s+growth\s+after\s+(week|day|trial|month|year|hour)\s*(\d+)/i
+  );
+
+  if (noGrowthMatch) {
+    const series = resolveScienceSeriesValues(noGrowthMatch[1], parsedMeasurements);
+    const thresholdLabel = normalizeTimeLabel(noGrowthMatch[2], Number(noGrowthMatch[3]));
+
+    if (!series) {
+      return null;
+    }
+
+    const orderedTimes = parsedMeasurements.orderedTimes.filter((time) => series.values.has(time));
+    const thresholdTimes = getThresholdScienceTimes(orderedTimes, thresholdLabel, "after");
+
+    if (thresholdTimes.length === 0) {
+      return false;
+    }
+
+    const thresholdIndex = orderedTimes.findIndex((time) => time === thresholdTimes[0]);
+
+    if (thresholdIndex <= 0) {
+      return false;
+    }
+
+    return thresholdTimes.every((time) => {
+      const previousTime = orderedTimes[orderedTimes.indexOf(time) - 1];
+      const currentValue = series.values.get(time);
+      const previousValue = previousTime ? series.values.get(previousTime) : undefined;
+
+      return currentValue !== undefined && previousValue !== undefined && nearlyEqual(currentValue, previousValue);
+    });
+  }
+
+  const monotonicMatch = normalizedText.match(
+    /([a-z][a-z0-9()\- ]+?)\s+(increased|decreased|declined|grew)\s+(?:steadily\s+)?throughout/i
+  );
+
+  if (monotonicMatch) {
+    const series = resolveScienceSeriesValues(monotonicMatch[1], parsedMeasurements);
+
+    if (!series) {
+      return null;
+    }
+
+    const orderedValues = parsedMeasurements.orderedTimes
+      .filter((time) => series.values.has(time))
+      .map((time) => series.values.get(time))
+      .filter((value): value is number => value !== undefined);
+
+    if (orderedValues.length < 2) {
+      return null;
+    }
+
+    if (monotonicMatch[2] === "grew" || monotonicMatch[2] === "increased") {
+      return orderedValues.every((value, index) => index === 0 || value > orderedValues[index - 1]);
+    }
+
+    return orderedValues.every((value, index) => index === 0 || value < orderedValues[index - 1]);
+  }
+
+  const simpleStartMatch = normalizedText.match(
+    /([a-z][a-z0-9()\- ]+?)\s+(?:started|began)\s+(?:slightly\s+|somewhat\s+)?(lower|below|higher|above)\s+(?:than\s+)?(?:the\s+)?([a-z][a-z0-9()\- ]+?)\b/i
+  );
+
+  if (simpleStartMatch) {
+    const leftSeries = resolveScienceSeriesValues(simpleStartMatch[1], parsedMeasurements);
+    const rightSeries = resolveScienceSeriesValues(simpleStartMatch[3], parsedMeasurements);
+
+    if (!leftSeries || !rightSeries) {
+      return null;
+    }
+
+    const commonTimes = getCommonScienceTimes(parsedMeasurements, leftSeries.values, rightSeries.values);
+    const earliestTime = commonTimes[0];
+
+    if (!earliestTime) {
+      return null;
+    }
+
+    const leftValue = leftSeries.values.get(earliestTime);
+    const rightValue = rightSeries.values.get(earliestTime);
+
+    if (leftValue === undefined || rightValue === undefined) {
+      return null;
+    }
+
+    return /(lower|below)/.test(simpleStartMatch[2]) ? leftValue < rightValue : leftValue > rightValue;
+  }
+
+  return null;
+}
+
+function explanationContradictsScienceStimulus(
+  explanation: string,
+  parsedMeasurements: ParsedScienceMeasurements
+) {
+  const clauses = explanation
+    .split(/(?<=[.?!])\s+|;|\bbut\b|\bbecause\b|\bhowever\b/gi)
+    .map((clause) =>
+      clause
+        .replace(/^\s*(choice|answer)\s+[a-d]\s+is\s+correct\s+(?:because\s+)?/i, "")
+        .trim()
+    )
+    .filter(Boolean);
+
+  let recognizedClauseCount = 0;
+
+  for (const clause of clauses) {
+    const result = evaluateScienceComparativeClaim(clause, parsedMeasurements);
+
+    if (result === null) {
+      continue;
+    }
+
+    recognizedClauseCount += 1;
+
+    if (result === false) {
+      return true;
+    }
+  }
+
+  return recognizedClauseCount > 0 ? false : null;
+}
+
 function matchSeriesName(text: string, availableSeriesKeys: string[]) {
   const normalizedText = sanitizeSeriesKey(text);
   const matchingKeys = availableSeriesKeys.filter(
@@ -320,97 +673,12 @@ function extractSupportedScienceChoiceStatuses(
 
   for (const choice of ["A", "B", "C", "D"] as const) {
     const text = choices[choice];
-    const methodSignature = extractMethodSignature(text);
+    const evaluated = evaluateScienceComparativeClaim(text, parsedMeasurements);
+    statuses[choice] = evaluated;
 
-    if (methodSignature) {
-      statuses[choice] = true;
+    if (evaluated !== null) {
       recognizedChoiceCount += 1;
-      continue;
     }
-
-    const surpassMatch = text.match(
-      /([A-Za-z][A-Za-z0-9()\- ]+?)\s+started\s+(?:lower|below)\s+but\s+surpassed\s+(?:the\s+)?([A-Za-z][A-Za-z0-9()\- ]+?)\s+(?:after|by)\s+(week|day|trial|month|year|hour)\s*(\d+)/i
-    );
-
-    if (surpassMatch) {
-      const leftSeries = matchSeriesName(surpassMatch[1], availableSeriesKeys);
-      const rightSeries = matchSeriesName(surpassMatch[2], availableSeriesKeys);
-      const thresholdLabel = normalizeTimeLabel(surpassMatch[3], Number(surpassMatch[4]));
-
-      if (!leftSeries || !rightSeries) {
-        statuses[choice] = null;
-        continue;
-      }
-
-      const leftValues = parsedMeasurements.measurements.get(leftSeries);
-      const rightValues = parsedMeasurements.measurements.get(rightSeries);
-
-      if (!leftValues || !rightValues) {
-        statuses[choice] = null;
-        continue;
-      }
-
-      const commonTimes = parsedMeasurements.orderedTimes.filter(
-        (time) => leftValues.has(time) && rightValues.has(time)
-      );
-      const earliestTime = commonTimes[0];
-      const startedLower =
-        earliestTime !== undefined &&
-        (leftValues.get(earliestTime) ?? Number.NaN) < (rightValues.get(earliestTime) ?? Number.NaN);
-      const surpassedAfterThreshold = commonTimes
-        .filter((time) => {
-          const timeMeta = parseTimeLabel(time);
-          const thresholdMeta = parseTimeLabel(thresholdLabel);
-
-          if (!timeMeta || !thresholdMeta || timeMeta.unit !== thresholdMeta.unit) {
-            return false;
-          }
-
-          return timeMeta.count > thresholdMeta.count;
-        })
-        .some((time) => (leftValues.get(time) ?? Number.NaN) > (rightValues.get(time) ?? Number.NaN));
-
-      statuses[choice] = Boolean(startedLower && surpassedAfterThreshold);
-      recognizedChoiceCount += 1;
-      continue;
-    }
-
-    const thresholdMatch = text.match(
-      /([A-Za-z][A-Za-z0-9()\- ]+?)\s+(?:outperformed|exceeded|was at least|was more than)\s+(?:the\s+)?([A-Za-z][A-Za-z0-9()\- ]+?)\s+by\s+at\s+least\s+(-?\d+(?:\.\d+)?)\s*(?:cm|mm|m|%|percent)?\s+at\s+every\s+(?:measurement|time point|interval)/i
-    );
-
-    if (thresholdMatch) {
-      const leftSeries = matchSeriesName(thresholdMatch[1], availableSeriesKeys);
-      const rightSeries = matchSeriesName(thresholdMatch[2], availableSeriesKeys);
-      const threshold = Number(thresholdMatch[3]);
-
-      if (!leftSeries || !rightSeries || !Number.isFinite(threshold)) {
-        statuses[choice] = null;
-        continue;
-      }
-
-      const leftValues = parsedMeasurements.measurements.get(leftSeries);
-      const rightValues = parsedMeasurements.measurements.get(rightSeries);
-
-      if (!leftValues || !rightValues) {
-        statuses[choice] = null;
-        continue;
-      }
-
-      const commonTimes = parsedMeasurements.orderedTimes.filter(
-        (time) => leftValues.has(time) && rightValues.has(time)
-      );
-
-      statuses[choice] =
-        commonTimes.length > 0 &&
-        commonTimes.every(
-          (time) => (leftValues.get(time) ?? Number.NaN) - (rightValues.get(time) ?? Number.NaN) >= threshold
-        );
-      recognizedChoiceCount += 1;
-      continue;
-    }
-
-    statuses[choice] = null;
   }
 
   if (recognizedChoiceCount === 0) {
@@ -827,6 +1095,27 @@ export function reviewQuestionQuality(row: {
           "reject",
           "unsupported-keyed-answer",
           "The keyed answer is not the uniquely supported choice from the stimulus."
+        );
+      }
+    }
+  }
+
+  if (row.section === "science") {
+    const parsedMeasurements = extractScienceMeasurements(row.passage);
+
+    if (parsedMeasurements) {
+      const explanationContradiction = explanationContradictsScienceStimulus(
+        row.explanation,
+        parsedMeasurements
+      );
+
+      if (explanationContradiction === true) {
+        findings.explanationVerified = "fail";
+        pushFlag(
+          flags,
+          "reject",
+          "explanation-stimulus-contradiction",
+          "The explanation makes a factual claim that the stimulus contradicts."
         );
       }
     }
