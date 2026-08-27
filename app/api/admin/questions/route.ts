@@ -1,3 +1,5 @@
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -6,6 +8,9 @@ import { getAdminSession } from "@/lib/admin";
 import { getDb } from "@/lib/db";
 import { resolveEffectivePassage } from "@/lib/question-sets";
 import { reviewQuestionQuality } from "@/lib/question-utils";
+
+const execFileAsync = promisify(execFile);
+const MAX_REREVIEW_BATCH = 24;
 
 const listSchema = z.object({
   status: z.enum(["draft", "published", "rejected"]).optional(),
@@ -31,6 +36,41 @@ const bulkPatchSchema = z.object({
 });
 
 const patchSchema = z.union([singlePatchSchema, bulkPatchSchema]);
+
+const singleRereviewSchema = z.object({
+  mode: z.literal("re-review-single"),
+  questionId: z.string().uuid(),
+});
+
+const bulkRereviewSchema = z.object({
+  mode: z.literal("re-review-bulk"),
+  questionIds: z.array(z.string().uuid()).min(1).max(MAX_REREVIEW_BATCH),
+});
+
+const rereviewSchema = z.union([singleRereviewSchema, bulkRereviewSchema]);
+
+function extractJsonSummary(stdout: string) {
+  const lines = stdout.trim().split("\n");
+  const startIndex = lines.findIndex((line) => line.trim().startsWith("{"));
+
+  if (startIndex === -1) {
+    throw new Error("Re-review script did not return a JSON summary.");
+  }
+
+  return JSON.parse(lines.slice(startIndex).join("\n")) as {
+    processed?: number;
+    updated?: number;
+    skipped?: number;
+    blocked?: number;
+    warning?: number;
+    clean?: number;
+    reviewKept?: number;
+    reviewRevised?: number;
+    reviewRejected?: number;
+    reviewErrors?: number;
+    failures?: Array<{ topic?: string; error?: string }>;
+  };
+}
 
 function parseShadowReview(reviewNotes: string | null) {
   if (!reviewNotes) {
@@ -268,4 +308,65 @@ export async function PATCH(request: Request) {
   }
 
   return NextResponse.json({ question: updatedQuestion });
+}
+
+export async function POST(request: Request) {
+  const session = await getAdminSession();
+  const db = getDb();
+
+  if (!session?.user?.id || !db) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
+  const parsed = rereviewSchema.safeParse(await request.json());
+
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid re-review request." }, { status: 400 });
+  }
+
+  const questionIds =
+    parsed.data.mode === "re-review-bulk" ? parsed.data.questionIds : [parsed.data.questionId];
+
+  try {
+    const child = await execFileAsync(
+      "node",
+      [
+        "generate-questions.mjs",
+        `--rereview-question-ids=${questionIds.join(",")}`,
+        `--reviewed-by-user-id=${session.user.id}`,
+        "--delay-ms=0",
+        "--fast-retry=1",
+        "--json=1",
+      ],
+      {
+        cwd: process.cwd(),
+        env: process.env,
+        timeout: 240000,
+        maxBuffer: 1024 * 1024 * 4,
+      }
+    );
+
+    return NextResponse.json({
+      updatedCount: questionIds.length,
+      summary: extractJsonSummary(child.stdout),
+      stdout: child.stdout,
+      stderr: child.stderr,
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error && "stdout" in error && typeof (error as { stdout?: string }).stdout === "string"
+        ? (() => {
+            try {
+              const summary = extractJsonSummary((error as { stdout: string }).stdout);
+              return summary.failures?.map((failure) => failure.error).filter(Boolean).join(" | ") || error.message;
+            } catch {
+              return error.message;
+            }
+          })()
+        : error instanceof Error
+          ? error.message
+          : "Re-review failed.";
+
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }

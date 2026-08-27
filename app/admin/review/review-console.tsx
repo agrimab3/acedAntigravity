@@ -284,6 +284,8 @@ export default function ReviewConsole() {
   const [runningBulkFill, setRunningBulkFill] = useState(false);
   const [runningLaunchSprint, setRunningLaunchSprint] = useState<"critical-gaps" | "launch-minimum" | null>(null);
   const [savingQuestionId, setSavingQuestionId] = useState<string | null>(null);
+  const [rerunningQuestionId, setRerunningQuestionId] = useState<string | null>(null);
+  const [rerunningVisibleDrafts, setRerunningVisibleDrafts] = useState(false);
   const [bulkSaving, setBulkSaving] = useState(false);
   const [notesByQuestionId, setNotesByQuestionId] = useState<Record<string, string>>({});
   const [selectedQuestionIds, setSelectedQuestionIds] = useState<Record<string, boolean>>({});
@@ -735,6 +737,67 @@ export default function ReviewConsole() {
       setFlashMessage(error instanceof Error ? error.message : "Bulk review update failed.");
     } finally {
       setBulkSaving(false);
+    }
+  }
+
+  async function rereviewDrafts(questionIds: string[], scope: "single" | "visible") {
+    if (questionIds.length === 0) {
+      setFlashMessage("No draft questions are available to re-review.");
+      return;
+    }
+
+    if (scope === "visible") {
+      setRerunningVisibleDrafts(true);
+    } else {
+      setRerunningQuestionId(questionIds[0] ?? null);
+    }
+
+    setFlashMessage(null);
+
+    try {
+      const res = await fetch("/api/admin/questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(
+          scope === "visible"
+            ? {
+                mode: "re-review-bulk",
+                questionIds,
+              }
+            : {
+                mode: "re-review-single",
+                questionId: questionIds[0],
+              }
+        ),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Re-review failed.");
+      }
+
+      const summary = data.summary as
+        | {
+            updated?: number;
+            blocked?: number;
+            warning?: number;
+            clean?: number;
+            reviewErrors?: number;
+          }
+        | undefined;
+
+      setFlashMessage(
+        `Re-reviewed ${summary?.updated ?? questionIds.length} draft question${
+          (summary?.updated ?? questionIds.length) === 1 ? "" : "s"
+        }: ${summary?.blocked ?? 0} blocked, ${summary?.warning ?? 0} warning, ${summary?.clean ?? 0} clean, ${summary?.reviewErrors ?? 0} errors.`
+      );
+      await Promise.all([loadBacklog(), loadQuestions()]);
+    } catch (error) {
+      setFlashMessage(error instanceof Error ? error.message : "Re-review failed.");
+    } finally {
+      setRerunningQuestionId(null);
+      setRerunningVisibleDrafts(false);
     }
   }
 
@@ -1273,6 +1336,20 @@ export default function ReviewConsole() {
           </div>
 
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            {activeStatus === "draft" ? (
+              <button
+                onClick={() =>
+                  void rereviewDrafts(
+                    questions.filter((question) => question.status === "draft").map((question) => question.id),
+                    "visible"
+                  )
+                }
+                disabled={rerunningVisibleDrafts || questions.filter((question) => question.status === "draft").length === 0}
+                style={ghostButtonStyle}
+              >
+                {rerunningVisibleDrafts ? "re-reviewing drafts…" : "re-review visible drafts"}
+              </button>
+            ) : null}
             <button
               onClick={() => void bulkReviewQuestions("rejected")}
               disabled={bulkSaving}
@@ -1566,23 +1643,32 @@ export default function ReviewConsole() {
                       />
 
                       <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                        {question.status === "draft" ? (
+                          <button
+                            onClick={() => void rereviewDrafts([question.id], "single")}
+                            disabled={rerunningQuestionId === question.id || savingQuestionId === question.id}
+                            style={ghostButtonStyle}
+                          >
+                            {rerunningQuestionId === question.id ? "re-reviewing…" : "re-review"}
+                          </button>
+                        ) : null}
                         <button
                           onClick={() => void reviewQuestion(question.id, "published")}
-                          disabled={savingQuestionId === question.id}
+                          disabled={savingQuestionId === question.id || rerunningQuestionId === question.id}
                           style={primaryButtonStyle}
                         >
                           publish
                         </button>
                         <button
                           onClick={() => void reviewQuestion(question.id, "rejected")}
-                          disabled={savingQuestionId === question.id}
+                          disabled={savingQuestionId === question.id || rerunningQuestionId === question.id}
                           style={secondaryButtonStyle}
                         >
                           reject
                         </button>
                         <button
                           onClick={() => void reviewQuestion(question.id, "draft")}
-                          disabled={savingQuestionId === question.id}
+                          disabled={savingQuestionId === question.id || rerunningQuestionId === question.id}
                           style={ghostButtonStyle}
                         >
                           keep as draft
