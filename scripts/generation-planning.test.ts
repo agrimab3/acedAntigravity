@@ -3,10 +3,12 @@ import assert from "node:assert/strict";
 import {
   buildMissingDifficultySequence,
   buildPromptDifficultyBlueprint,
+  decideChildDisposition,
   formatDifficultyReviewerAssessment,
   mergeRevisedChildShape,
   planQuestionSetDifficultyCounts,
   shouldReviseForDifficulty,
+  toCanonicalChild,
 } from "../lib/content-generation-planning.ts";
 
 test("requested easy medium hard blueprint remains explicit", () => {
@@ -180,5 +182,113 @@ test("difficulty reviewer formatting stays explicit", () => {
       suggestedDifficulty: "easy",
     }),
     "too_easy->easy"
+  );
+});
+
+test("keep plus accurate maps to accept", () => {
+  assert.equal(
+    decideChildDisposition({
+      reviewerVerdict: "keep",
+      requestedDifficulty: "easy",
+      generatedDifficulty: "easy",
+      difficultyAccuracy: "accurate",
+      suggestedDifficulty: null,
+      hasHardFailure: false,
+    }),
+    "accept"
+  );
+});
+
+test("keep plus accurate is never skip-like", () => {
+  assert.notEqual(
+    decideChildDisposition({
+      reviewerVerdict: "keep",
+      requestedDifficulty: "medium",
+      generatedDifficulty: "medium",
+      difficultyAccuracy: "accurate",
+      suggestedDifficulty: "medium",
+      hasHardFailure: false,
+    }),
+    "reject"
+  );
+});
+
+test("review response metadata cannot be mistaken for a canonical child", () => {
+  assert.throws(
+    () =>
+      toCanonicalChild(
+        {
+          verdict: "keep",
+          confidence: "high",
+          correctness: "correct",
+          difficulty_accuracy: "accurate",
+        },
+        {
+          section: "science",
+          topic: "Data Representation",
+          requestedDifficulty: "medium",
+        }
+      ),
+    /review metadata/
+  );
+});
+
+test("canonical child guard accepts a complete child object", () => {
+  const canonical = toCanonicalChild(
+    {
+      section: "science",
+      topic: "Data Representation",
+      difficulty: "medium",
+      question_text: "Which statement is best supported by the figure data?",
+      choices: {
+        A: "Choice A",
+        B: "Choice B",
+        C: "Choice C",
+        D: "Choice D",
+      },
+      correct_answer: "B",
+      explanation: "Choice B matches the plotted values while the others contradict the figure.",
+    },
+    {
+      section: "science",
+      topic: "Data Representation",
+      requestedDifficulty: "medium",
+    }
+  );
+
+  assert.equal(canonical.section, "science");
+  assert.equal(canonical.topic, "Data Representation");
+  assert.equal(canonical.difficulty, "medium");
+  assert.equal(canonical.correct_answer, "B");
+});
+
+test("canonical child guard fails locally with a clean missing-fields error", () => {
+  assert.throws(
+    () =>
+      toCanonicalChild(
+        {
+          section: "science",
+        },
+        {
+          section: "science",
+          topic: "Data Representation",
+          requestedDifficulty: "hard",
+        }
+      ),
+    /missing required fields/
+  );
+});
+
+test("suggested difficulty matching the requested difficulty still accepts keep", () => {
+  assert.equal(
+    decideChildDisposition({
+      reviewerVerdict: "keep",
+      requestedDifficulty: "hard",
+      generatedDifficulty: "hard",
+      difficultyAccuracy: "accurate",
+      suggestedDifficulty: "hard",
+      hasHardFailure: false,
+    }),
+    "accept"
   );
 });

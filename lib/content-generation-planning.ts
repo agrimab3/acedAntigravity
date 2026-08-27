@@ -1,6 +1,7 @@
 export type DifficultyKey = "easy" | "medium" | "hard";
 export type DifficultyCounts = Record<DifficultyKey, number>;
 export type DifficultyAssessment = "accurate" | "too_easy" | "too_hard" | "unclear";
+export type ChildDisposition = "accept" | "revise" | "reject" | "replace";
 
 const PLANNING_DIFFICULTY_ORDER: DifficultyKey[] = ["hard", "medium", "easy"];
 const PROMPT_DIFFICULTY_ORDER: DifficultyKey[] = ["easy", "medium", "hard"];
@@ -143,6 +144,8 @@ type CanonicalChildShape = {
   explanation: string;
 };
 
+type QuestionLikeObject = Partial<CanonicalChildShape> & Record<string, unknown>;
+
 export function mergeRevisedChildShape({
   originalChild,
   revisedFields,
@@ -165,4 +168,129 @@ export function mergeRevisedChildShape({
     correct_answer: revisedFields?.correct_answer ?? originalChild.correct_answer,
     explanation: revisedFields?.explanation ?? originalChild.explanation,
   } satisfies CanonicalChildShape;
+}
+
+export function decideChildDisposition({
+  reviewerVerdict,
+  requestedDifficulty,
+  generatedDifficulty,
+  difficultyAccuracy,
+  suggestedDifficulty,
+  hasHardFailure,
+}: {
+  reviewerVerdict: "keep" | "revise" | "reject";
+  requestedDifficulty: DifficultyKey;
+  generatedDifficulty: DifficultyKey;
+  difficultyAccuracy: DifficultyAssessment;
+  suggestedDifficulty: DifficultyKey | null;
+  hasHardFailure: boolean;
+}): ChildDisposition {
+  if (hasHardFailure || reviewerVerdict === "reject") {
+    return "reject";
+  }
+
+  if (
+    shouldReviseForDifficulty({
+      requestedDifficulty,
+      generatedDifficulty,
+      difficultyAccuracy,
+      suggestedDifficulty,
+    })
+  ) {
+    return "revise";
+  }
+
+  if (
+    reviewerVerdict === "keep" &&
+    (suggestedDifficulty === null || suggestedDifficulty === requestedDifficulty)
+  ) {
+    return "accept";
+  }
+
+  return "reject";
+}
+
+export function toCanonicalChild(
+  candidate: unknown,
+  {
+    originalChild,
+    section,
+    topic,
+    requestedDifficulty,
+  }: {
+    originalChild?: CanonicalChildShape | null;
+    section: string;
+    topic: string;
+    requestedDifficulty: DifficultyKey;
+  }
+) {
+  if (!candidate || typeof candidate !== "object") {
+    throw new Error("Candidate child is not an object.");
+  }
+
+  const candidateObject = candidate as Record<string, unknown>;
+  const questionFieldKeys = [
+    "section",
+    "topic",
+    "difficulty",
+    "question_text",
+    "choices",
+    "correct_answer",
+    "explanation",
+  ] as const;
+  const reviewMetadataKeys = [
+    "verdict",
+    "confidence",
+    "correctness",
+    "difficulty_accuracy",
+    "suggested_difficulty",
+    "editorial_note",
+  ] as const;
+  const hasQuestionFields = questionFieldKeys.some((key) => key in candidateObject);
+  const hasReviewMetadata = reviewMetadataKeys.some((key) => key in candidateObject);
+
+  if (!hasQuestionFields && hasReviewMetadata) {
+    throw new Error("Candidate child looks like review metadata instead of question content.");
+  }
+
+  const merged = mergeRevisedChildShape({
+    originalChild:
+      originalChild ??
+      ({
+        section,
+        topic,
+        difficulty: requestedDifficulty,
+      } as CanonicalChildShape),
+    revisedFields: candidateObject as QuestionLikeObject,
+    requestedDifficulty,
+    section,
+    topic,
+  });
+
+  const missingFields = questionFieldKeys.filter((key) => {
+    if (key === "section" || key === "topic" || key === "difficulty") {
+      return false;
+    }
+
+    const value = merged[key];
+
+    if (key === "choices") {
+      return (
+        !value ||
+        typeof value !== "object" ||
+        !("A" in value) ||
+        !("B" in value) ||
+        !("C" in value) ||
+        !("D" in value)
+      );
+    }
+
+    return typeof value !== "string" || value.trim().length === 0;
+  });
+
+  if (missingFields.length > 0) {
+    throw new Error(`Canonical child is missing required fields: ${missingFields.join(", ")}`);
+  }
+
+  return merged;
 }
