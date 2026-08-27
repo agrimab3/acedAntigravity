@@ -1,5 +1,6 @@
 export type DifficultyKey = "easy" | "medium" | "hard";
 export type DifficultyCounts = Record<DifficultyKey, number>;
+export type DifficultyAssessment = "accurate" | "too_easy" | "too_hard" | "unclear";
 
 const PLANNING_DIFFICULTY_ORDER: DifficultyKey[] = ["hard", "medium", "easy"];
 const PROMPT_DIFFICULTY_ORDER: DifficultyKey[] = ["easy", "medium", "hard"];
@@ -87,4 +88,81 @@ export function buildMissingDifficultySequence(
   } satisfies DifficultyCounts;
 
   return buildRequestedDifficultySequence(missingCounts, PROMPT_DIFFICULTY_ORDER);
+}
+
+export function shouldReviseForDifficulty({
+  requestedDifficulty,
+  generatedDifficulty,
+  difficultyAccuracy,
+  suggestedDifficulty,
+}: {
+  requestedDifficulty: DifficultyKey;
+  generatedDifficulty: DifficultyKey;
+  difficultyAccuracy: DifficultyAssessment;
+  suggestedDifficulty: DifficultyKey | null;
+}) {
+  if (difficultyAccuracy === "too_easy" || difficultyAccuracy === "too_hard") {
+    return true;
+  }
+
+  if (
+    suggestedDifficulty !== null &&
+    suggestedDifficulty !== requestedDifficulty
+  ) {
+    return true;
+  }
+
+  if (generatedDifficulty !== requestedDifficulty) {
+    return true;
+  }
+
+  return false;
+}
+
+export function formatDifficultyReviewerAssessment({
+  difficultyAccuracy,
+  suggestedDifficulty,
+}: {
+  difficultyAccuracy: DifficultyAssessment;
+  suggestedDifficulty: DifficultyKey | null;
+}) {
+  return difficultyAccuracy === "accurate"
+    ? "accurate"
+    : suggestedDifficulty
+      ? `${difficultyAccuracy}->${suggestedDifficulty}`
+      : difficultyAccuracy;
+}
+
+type CanonicalChildShape = {
+  section: string;
+  topic: string;
+  difficulty: DifficultyKey;
+  question_text: string;
+  choices: Record<"A" | "B" | "C" | "D", string>;
+  correct_answer: "A" | "B" | "C" | "D";
+  explanation: string;
+};
+
+export function mergeRevisedChildShape({
+  originalChild,
+  revisedFields,
+  requestedDifficulty,
+  section,
+  topic,
+}: {
+  originalChild: CanonicalChildShape;
+  revisedFields: Partial<CanonicalChildShape> | null | undefined;
+  requestedDifficulty: DifficultyKey;
+  section: string;
+  topic: string;
+}) {
+  return {
+    section,
+    topic,
+    difficulty: requestedDifficulty,
+    question_text: revisedFields?.question_text ?? originalChild.question_text,
+    choices: revisedFields?.choices ?? originalChild.choices,
+    correct_answer: revisedFields?.correct_answer ?? originalChild.correct_answer,
+    explanation: revisedFields?.explanation ?? originalChild.explanation,
+  } satisfies CanonicalChildShape;
 }

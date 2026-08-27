@@ -10,7 +10,10 @@ import {
 import {
   buildMissingDifficultySequence,
   buildPromptDifficultyBlueprint,
+  formatDifficultyReviewerAssessment,
+  mergeRevisedChildShape,
   planQuestionSetDifficultyCounts,
+  shouldReviseForDifficulty,
 } from "./lib/content-generation-planning.ts";
 import {
   ProviderRequestError,
@@ -2172,22 +2175,27 @@ function formatDifficultyDebugLabel({
   generatedDifficulty,
   reviewerResult,
 }) {
-  const reviewerAssessment =
-    reviewerResult.difficulty_accuracy === "accurate"
-      ? "accurate"
-      : reviewerResult.suggested_difficulty
-        ? `${reviewerResult.difficulty_accuracy}->${reviewerResult.suggested_difficulty}`
-        : reviewerResult.difficulty_accuracy;
+  const reviewerAssessment = formatDifficultyReviewerAssessment({
+    difficultyAccuracy: reviewerResult.difficulty_accuracy,
+    suggestedDifficulty: reviewerResult.suggested_difficulty,
+  });
 
   return `requested=${requestedDifficulty} · generated=${generatedDifficulty} · reviewer_assessment=${reviewerAssessment}`;
 }
 
-function isDifficultyRepairable(reviewerResult) {
+function shouldTriggerDifficultyRevision({
+  requestedDifficulty,
+  normalizedQuestion,
+  reviewerResult,
+}) {
   return (
-    (reviewerResult.difficulty_accuracy === "too_easy" ||
-      reviewerResult.difficulty_accuracy === "too_hard" ||
-      reviewerResult.suggested_difficulty !== null) &&
-    !hasHardPrimaryCorrectnessFailure(reviewerResult)
+    !hasHardPrimaryCorrectnessFailure(reviewerResult) &&
+    shouldReviseForDifficulty({
+      requestedDifficulty,
+      generatedDifficulty: normalizedQuestion.difficulty,
+      difficultyAccuracy: reviewerResult.difficulty_accuracy,
+      suggestedDifficulty: reviewerResult.suggested_difficulty,
+    })
   );
 }
 
@@ -2274,7 +2282,20 @@ async function reviseSetChildForDifficulty(
   provider = generationProvider,
   model = generationModel
 ) {
-  const schema = buildSetChildSchema(topic.section_key, requestedDifficulty);
+  const responseSchema = z.object({
+    section: z.string().min(1).optional(),
+    topic: z.string().min(1).optional(),
+    difficulty: z.enum(DIFFICULTIES).optional(),
+    question_text: z.string().min(20).optional(),
+    choices: z.object({
+      A: z.string().min(1),
+      B: z.string().min(1),
+      C: z.string().min(1),
+      D: z.string().min(1),
+    }).optional(),
+    correct_answer: z.enum(ANSWER_CHOICES).optional(),
+    explanation: z.string().min(30).optional(),
+  }).strict();
   const prompt = buildSetChildRevisionPrompt({
     topic,
     sharedContent,
@@ -2297,13 +2318,27 @@ async function reviseSetChildForDifficulty(
         model: candidate.model,
         systemPrompt: GENERATION_SYSTEM_PROMPT,
         userPrompt: prompt,
-        schema,
+        schema: responseSchema,
         temperature: 0.65,
       });
       const parsedPayload = parseModelJson(text);
 
       return {
-        question: schema.parse(parsedPayload),
+        question: mergeRevisedChildShape({
+          originalChild: {
+            section: topic.section_key,
+            topic: topic.name,
+            difficulty: child.difficulty,
+            question_text: child.prompt,
+            choices: child.choices,
+            correct_answer: child.correctAnswer,
+            explanation: child.explanation,
+          },
+          revisedFields: responseSchema.parse(parsedPayload),
+          requestedDifficulty,
+          section: topic.section_key,
+          topic: topic.name,
+        }),
       };
     },
   });
@@ -3113,14 +3148,18 @@ async function runReviewPipelineForQuestion({
     reviewerResult.suggested_difficulty !== null ||
     hasHardPrimaryCorrectnessFailure(reviewerResult)
   ) {
-    if (onDifficultyRepair && isDifficultyRepairable(reviewerResult)) {
+    if (onDifficultyRepair && shouldTriggerDifficultyRevision({
+      requestedDifficulty,
+      normalizedQuestion,
+      reviewerResult,
+    })) {
       counters.reviewRevised += 1;
       console.warn(
-        `Revising ${contextLabel} for difficulty: ${formatDifficultyDebugLabel({
+        `Review disposition for ${contextLabel}: ${formatDifficultyDebugLabel({
           requestedDifficulty,
           generatedDifficulty: normalizedQuestion.difficulty,
           reviewerResult,
-        })}`
+        })} · action=revise`
       );
 
       let repairedQuestion = null;
@@ -3131,7 +3170,11 @@ async function runReviewPipelineForQuestion({
         counters.reviewErrors += 1;
         counters.skipped += 1;
         console.warn(
-          `Skipping ${contextLabel} after difficulty revision failure: ${
+          `Revision failed for ${contextLabel}: ${formatDifficultyDebugLabel({
+            requestedDifficulty,
+            generatedDifficulty: normalizedQuestion.difficulty,
+            reviewerResult,
+          })} · action=revise · revision=failed · ${
             error instanceof Error ? error.message : "unknown revision error"
           }`
         );
@@ -3147,6 +3190,13 @@ async function runReviewPipelineForQuestion({
           onDifficultyRepair: null,
         });
         mergeReviewCounters(counters, repairedResult.counters);
+        console.warn(
+          `Revision completed for ${contextLabel}: ${formatDifficultyDebugLabel({
+            requestedDifficulty,
+            generatedDifficulty: normalizedQuestion.difficulty,
+            reviewerResult,
+          })} · action=revise · revision=${repairedResult.approved ? "accepted" : "failed"}`
+        );
         return repairedResult.approved
           ? {
               approved: true,
@@ -3156,7 +3206,7 @@ async function runReviewPipelineForQuestion({
               verifierResult: repairedResult.verifierResult,
               reviewerNote: repairedResult.reviewerNote,
             }
-          : { approved: false, counters };
+          : { approved: false, counters, normalizedQuestion: repairedResult.normalizedQuestion ?? normalizedQuestion, reviewerResult };
       }
     }
 
@@ -3166,10 +3216,18 @@ async function runReviewPipelineForQuestion({
         requestedDifficulty,
         generatedDifficulty: normalizedQuestion.difficulty,
         reviewerResult,
-      })}${reviewerResult.main_issues.length > 0 ? ` · ${reviewerResult.main_issues.join(", ")}` : ""})`
+      })} · action=skip${reviewerResult.main_issues.length > 0 ? ` · ${reviewerResult.main_issues.join(", ")}` : ""})`
     );
     return { approved: false, counters, normalizedQuestion, reviewerResult };
   }
+
+  console.warn(
+    `Review disposition for ${contextLabel}: ${formatDifficultyDebugLabel({
+      requestedDifficulty,
+      generatedDifficulty: normalizedQuestion.difficulty,
+      reviewerResult,
+    })} · action=keep`
+  );
 
   try {
     verifierResult = await verifyGeneratedQuestionCorrectness(topic, buildQuestionReviewPayload(normalizedQuestion));

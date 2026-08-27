@@ -3,7 +3,10 @@ import assert from "node:assert/strict";
 import {
   buildMissingDifficultySequence,
   buildPromptDifficultyBlueprint,
+  formatDifficultyReviewerAssessment,
+  mergeRevisedChildShape,
   planQuestionSetDifficultyCounts,
+  shouldReviseForDifficulty,
 } from "../lib/content-generation-planning.ts";
 
 test("requested easy medium hard blueprint remains explicit", () => {
@@ -57,5 +60,125 @@ test("set remains incomplete when multiple missing difficulties remain", () => {
       ["easy"]
     ),
     ["medium", "hard"]
+  );
+});
+
+test("accurate difficulty does not trigger revision", () => {
+  assert.equal(
+    shouldReviseForDifficulty({
+      requestedDifficulty: "medium",
+      generatedDifficulty: "medium",
+      difficultyAccuracy: "accurate",
+      suggestedDifficulty: null,
+    }),
+    false
+  );
+});
+
+test("matching requested and generated difficulty does not trigger revision", () => {
+  assert.equal(
+    shouldReviseForDifficulty({
+      requestedDifficulty: "hard",
+      generatedDifficulty: "hard",
+      difficultyAccuracy: "unclear",
+      suggestedDifficulty: "hard",
+    }),
+    false
+  );
+});
+
+test("too easy review for requested medium triggers revision", () => {
+  assert.equal(
+    shouldReviseForDifficulty({
+      requestedDifficulty: "medium",
+      generatedDifficulty: "medium",
+      difficultyAccuracy: "too_easy",
+      suggestedDifficulty: "easy",
+    }),
+    true
+  );
+});
+
+test("revision merge preserves section topic and requested difficulty", () => {
+  const merged = mergeRevisedChildShape({
+    originalChild: {
+      section: "science",
+      topic: "Data Representation",
+      difficulty: "medium",
+      question_text: "Original prompt",
+      choices: {
+        A: "1",
+        B: "2",
+        C: "3",
+        D: "4",
+      },
+      correct_answer: "B",
+      explanation: "Original explanation with enough detail to pass validation.",
+    },
+    revisedFields: {
+      question_text: "Revised prompt",
+      explanation: "Revised explanation with enough detail to pass validation cleanly.",
+    },
+    requestedDifficulty: "hard",
+    section: "science",
+    topic: "Data Representation",
+  });
+
+  assert.deepEqual(merged, {
+    section: "science",
+    topic: "Data Representation",
+    difficulty: "hard",
+    question_text: "Revised prompt",
+    choices: {
+      A: "1",
+      B: "2",
+      C: "3",
+      D: "4",
+    },
+    correct_answer: "B",
+    explanation: "Revised explanation with enough detail to pass validation cleanly.",
+  });
+});
+
+test("malformed revision fragments still preserve the full canonical child shape", () => {
+  const merged = mergeRevisedChildShape({
+    originalChild: {
+      section: "reading",
+      topic: "Natural Science",
+      difficulty: "easy",
+      question_text: "Original reading prompt",
+      choices: {
+        A: "Alpha",
+        B: "Beta",
+        C: "Gamma",
+        D: "Delta",
+      },
+      correct_answer: "A",
+      explanation: "Original explanation with sufficient detail for validation purposes.",
+    },
+    revisedFields: {
+      section: "math",
+      topic: "Functions",
+      difficulty: "medium",
+    },
+    requestedDifficulty: "easy",
+    section: "reading",
+    topic: "Natural Science",
+  });
+
+  assert.equal(merged.section, "reading");
+  assert.equal(merged.topic, "Natural Science");
+  assert.equal(merged.difficulty, "easy");
+  assert.equal(merged.question_text, "Original reading prompt");
+  assert.equal(merged.correct_answer, "A");
+});
+
+test("difficulty reviewer formatting stays explicit", () => {
+  assert.equal(
+    formatDifficultyReviewerAssessment({
+      difficultyAccuracy: "too_easy",
+      suggestedDifficulty: "easy",
+    }),
+    "too_easy->easy"
   );
 });
