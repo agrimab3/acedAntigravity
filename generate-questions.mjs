@@ -14,6 +14,7 @@ import {
   toCanonicalChild,
 } from "./lib/content-generation-planning.ts";
 import {
+  buildProviderCandidates,
   buildVerifierProviderOrder,
   resolveFallbackProviders,
   resolveGenerationModel,
@@ -1894,23 +1895,19 @@ async function requestStructuredJson({
 }
 
 function buildOperationCandidates(mode, provider, model, options = {}) {
-  const fallbackProviders =
-    options.fallbackProviders ??
-    resolveFallbackProviders(provider);
-  const fallbacks = fallbackProviders
-    .map((fallbackProvider) => ({
-      provider: fallbackProvider,
-      model:
-        mode === "review"
-          ? resolveReviewModel(fallbackProvider, null, model)
-          : resolveGenerationModel(fallbackProvider, null),
-    }))
-    .filter((candidate) => candidate.provider && candidate.model);
+  const fallbackProviders = options.fallbackProviders ?? resolveFallbackProviders(provider);
+  const candidates = buildProviderCandidates({
+    mode,
+    primaryProvider: provider,
+    primaryModel: model,
+    fallbackProviders,
+  });
 
   return {
-    primary: { provider, model },
-    fallback: fallbacks[0] ?? null,
-    fallbacks: fallbacks.slice(1),
+    primary: candidates[0] ?? { provider, model },
+    fallback: candidates[1] ?? null,
+    fallbacks: candidates.slice(2),
+    candidates,
   };
 }
 
@@ -2624,35 +2621,76 @@ async function verifyGeneratedQuestionCorrectness(
   const prompt = buildCorrectnessVerificationPrompt(topic, question);
   const verifierProviderOrder = buildVerifierProviderOrder(generationSourceProvider, provider);
   const primaryProvider = verifierProviderOrder[0] ?? provider;
-  const primaryModel = resolveReviewModel(primaryProvider, primaryProvider === provider ? model : null, model);
-  const { primary, fallback, fallbacks } = buildOperationCandidates("review", primaryProvider, primaryModel, {
+  const primaryModel = resolveReviewModel(
+    primaryProvider,
+    primaryProvider === provider ? model : null,
+    primaryProvider === provider ? model : null
+  );
+  const { primary, fallback, fallbacks, candidates } = buildOperationCandidates("review", primaryProvider, primaryModel, {
     fallbackProviders: verifierProviderOrder.slice(1),
   });
-  const operationResult = await executeProviderOperation({
-    runState: runProviderState,
-    operation: `verify:${topic.section_key}/${topic.slug}`,
-    primary,
-    fallback,
-    fallbacks,
-    maxRetries: fastRetryMode ? 1 : 2,
-    defaultRetryDelayMs: primary.provider === "groq" ? 12000 : 20000,
-    wait: sleep,
-    perform: async (candidate) => {
-      const text = await requestStructuredJson({
-        provider: candidate.provider,
-        model: candidate.model,
-        systemPrompt: REVIEW_SYSTEM_PROMPT,
-        userPrompt: prompt,
-        schema,
-        temperature: 0.1,
-      });
-      const parsedPayload = parseModelJson(text);
+  const attemptedProviders = new Set();
+  let operationResult;
 
-      return {
-        verifierResult: correctnessVerifierSchema.parse(parsedPayload),
-      };
-    },
-  });
+  try {
+    operationResult = await executeProviderOperation({
+      runState: runProviderState,
+      operation: `verify:${topic.section_key}/${topic.slug}`,
+      primary,
+      fallback,
+      fallbacks,
+      maxRetries: fastRetryMode ? 1 : 2,
+      defaultRetryDelayMs: primary.provider === "groq" ? 12000 : 20000,
+      wait: sleep,
+      onEvent: (event) => {
+        if (event.state === "attempting" && !attemptedProviders.has(event.provider)) {
+          const isSourceProvider = generationSourceProvider && event.provider === generationSourceProvider;
+
+          if (attemptedProviders.size === 0) {
+            console.warn(`Correctness verifier attempting ${event.provider} (${event.model}).`);
+          } else if (isSourceProvider) {
+            console.warn(`Verifier independence degraded; falling back to ${event.provider} (${event.model}).`);
+          } else {
+            console.warn(`Correctness verifier falling back to ${event.provider} (${event.model}).`);
+          }
+
+          attemptedProviders.add(event.provider);
+          return;
+        }
+
+        if (event.state === "retrying") {
+          console.warn(`${event.provider} temporary failure: ${event.message}`);
+          return;
+        }
+
+        if (event.state === "fallback-success" || event.state === "success" || event.state === "recovered") {
+          console.warn(`Correctness verifier succeeded with ${event.provider} (${event.model}).`);
+        }
+      },
+      perform: async (candidate) => {
+        const text = await requestStructuredJson({
+          provider: candidate.provider,
+          model: candidate.model,
+          systemPrompt: REVIEW_SYSTEM_PROMPT,
+          userPrompt: prompt,
+          schema,
+          temperature: 0.1,
+        });
+        const parsedPayload = parseModelJson(text);
+
+        return {
+          verifierResult: correctnessVerifierSchema.parse(parsedPayload),
+        };
+      },
+    });
+  } catch (error) {
+    if (error instanceof ProviderRunStoppedError) {
+      const candidateSummary = candidates.map((candidate) => `${candidate.provider} (${candidate.model})`).join(" -> ");
+      console.warn(`All verifier providers unavailable; pausing run. Candidates: ${candidateSummary}`);
+    }
+
+    throw error;
+  }
 
   if (operationResult.provider !== generationSourceProvider) {
     console.warn(

@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildVerifierProviderOrder } from "../lib/content-generation-providers.mjs";
+import {
+  buildProviderCandidates,
+  buildVerifierProviderOrder,
+} from "../lib/content-generation-providers.mjs";
 import {
   buildMissingDifficultySequence,
   buildPromptDifficultyBlueprint,
@@ -313,4 +316,25 @@ test("openrouter generator prefers groq then gemini for verification independenc
   });
 
   assert.deepEqual(order, ["groq", "gemini", "openrouter"]);
+});
+
+test("verifier candidates keep openrouter after gemini with provider-specific models", () => {
+  const candidates = buildProviderCandidates({
+    mode: "review",
+    primaryProvider: "gemini",
+    primaryModel: "gemini-2.5-flash-lite",
+    fallbackProviders: ["openrouter", "groq"],
+    env: {
+      GROQ_API_KEY: "groq-key",
+      GROQ_MODEL: "openai/gpt-oss-120b",
+      GEMINI_API_KEY: "gemini-key",
+      OPENROUTER_API_KEY: "openrouter-key",
+    },
+  });
+
+  assert.deepEqual(candidates, [
+    { provider: "gemini", model: "gemini-2.5-flash-lite" },
+    { provider: "openrouter", model: "openai/gpt-4.1-mini" },
+    { provider: "groq", model: "openai/gpt-oss-120b" },
+  ]);
 });

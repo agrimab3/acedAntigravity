@@ -357,3 +357,106 @@ test("partial progress survives provider transition", async () => {
   assert.deepEqual(completed, [1, 2]);
   assert.equal(second.providerUsed, "openrouter");
 });
+
+test("Gemini high demand retries in bounds then falls through to OpenRouter", async () => {
+  const runState = createProviderRunState(["groq", "gemini", "openrouter"]);
+  const waitRecorder = createWaitRecorder();
+  const attemptsByProvider = {};
+
+  const result = await executeProviderOperation({
+    runState,
+    operation: "verify:test",
+    primary: { provider: "gemini", model: "gemini-2.5-flash-lite" },
+    fallback: { provider: "openrouter", model: "openai/gpt-4.1-mini" },
+    fallbacks: [{ provider: "groq", model: "openai/gpt-oss-120b" }],
+    maxRetries: 2,
+    defaultRetryDelayMs: 20000,
+    wait: waitRecorder.wait,
+    now: waitRecorder.now,
+    perform: async ({ provider }) => {
+      attemptsByProvider[provider] = (attemptsByProvider[provider] ?? 0) + 1;
+
+      if (provider === "gemini") {
+        throw new ProviderRequestError(
+          "Gemini request failed: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+          {
+            provider,
+            statusCode: 429,
+            classification: classifyProviderFailure({
+              message:
+                "This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+              statusCode: 429,
+            }),
+          }
+        );
+      }
+
+      return { providerUsed: provider };
+    },
+  });
+
+  assert.equal(result.providerUsed, "openrouter");
+  assert.equal(attemptsByProvider.gemini, 2);
+  assert.equal(attemptsByProvider.openrouter, 1);
+  assert.deepEqual(waitRecorder.waits, [21000]);
+});
+
+test("Gemini high demand and OpenRouter failure degrade verifier independence to Groq", async () => {
+  const runState = createProviderRunState(["groq", "gemini", "openrouter"]);
+  const attempts = [];
+
+  const result = await executeProviderOperation({
+    runState,
+    operation: "verify:test",
+    primary: { provider: "gemini", model: "gemini-2.5-flash-lite" },
+    fallback: { provider: "openrouter", model: "openai/gpt-4.1-mini" },
+    fallbacks: [{ provider: "groq", model: "openai/gpt-oss-120b" }],
+    maxRetries: 1,
+    perform: async ({ provider }) => {
+      attempts.push(provider);
+
+      if (provider === "gemini") {
+        throw new ProviderRequestError(
+          "Gemini request failed: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+          {
+            provider,
+            statusCode: 429,
+            classification: classifyProviderFailure({
+              message:
+                "This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+              statusCode: 429,
+            }),
+          }
+        );
+      }
+
+      if (provider === "openrouter") {
+        throw new ProviderRequestError("OpenRouter request failed: temporary service unavailable", {
+          provider,
+          statusCode: 503,
+          classification: classifyProviderFailure({
+            message: "temporary service unavailable",
+            statusCode: 503,
+          }),
+        });
+      }
+
+      return { providerUsed: provider };
+    },
+  });
+
+  assert.deepEqual(attempts, ["gemini", "openrouter", "groq"]);
+  assert.equal(result.providerUsed, "groq");
+});
+
+test("high-demand resource exhausted classification stays temporary", () => {
+  const classification = classifyProviderFailure({
+    message:
+      "RESOURCE_EXHAUSTED: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+    statusCode: 429,
+  });
+
+  assert.equal(classification.kind, "temporary-rate-limit");
+  assert.equal(classification.retryable, true);
+  assert.equal(classification.disableForRun, false);
+});
