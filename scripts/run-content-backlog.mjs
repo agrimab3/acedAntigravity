@@ -1,7 +1,10 @@
 import { Client } from "pg";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { DEFAULT_GROQ_MODEL, resolvePreferredGroqModel } from "../lib/groq-models.ts";
+import {
+  resolveGenerationModel,
+  resolveGenerationProvider,
+} from "../lib/content-generation-providers.mjs";
 
 const execFileAsync = promisify(execFile);
 
@@ -28,14 +31,7 @@ const sections = (args.sections || "reading,science")
 const targetCount = Math.max(3, Number(args.target || 10));
 const topicSleepMs = Math.max(0, Number(args["topic-sleep-ms"] || 75000));
 const status = (args.status || "draft").trim().toLowerCase();
-const generationProvider = (
-  args.provider ||
-  process.env.QUESTION_GENERATION_PROVIDER ||
-  process.env.CONTENT_GENERATION_PROVIDER ||
-  (process.env.GROQ_API_KEY ? "groq" : "gemini")
-)
-  .trim()
-  .toLowerCase();
+const generationProvider = resolveGenerationProvider(args.provider);
 const generationModel = resolveGenerationModel(generationProvider, args.model);
 
 if (!["draft", "published"].includes(status)) {
@@ -48,23 +44,6 @@ const client = new Client({
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function resolveGenerationModel(provider, rawModel) {
-  if (provider === "groq") {
-    return resolvePreferredGroqModel(
-      rawModel,
-      process.env.GROQ_GENERATION_MODEL,
-      process.env.GROQ_MODEL,
-      DEFAULT_GROQ_MODEL
-    );
-  }
-
-  if (rawModel?.trim()) {
-    return rawModel.trim();
-  }
-
-  return process.env.GEMINI_GENERATION_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
 }
 
 function extractJsonSummary(stdout) {

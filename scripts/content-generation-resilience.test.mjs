@@ -24,12 +24,13 @@ function createWaitRecorder() {
 }
 
 test("Groq succeeds normally", async () => {
-  const runState = createProviderRunState(["groq", "gemini"]);
+  const runState = createProviderRunState(["groq", "gemini", "openrouter"]);
   const result = await executeProviderOperation({
     runState,
     operation: "generation:test",
     primary: { provider: "groq", model: "g1" },
     fallback: { provider: "gemini", model: "g2" },
+    fallbacks: [{ provider: "openrouter", model: "g3" }],
     perform: async ({ provider }) => ({ providerUsed: provider }),
   });
 
@@ -38,7 +39,7 @@ test("Groq succeeds normally", async () => {
 });
 
 test("Groq temporary 429 retries and succeeds", async () => {
-  const runState = createProviderRunState(["groq", "gemini"]);
+  const runState = createProviderRunState(["groq", "gemini", "openrouter"]);
   const waitRecorder = createWaitRecorder();
   let attempts = 0;
 
@@ -47,6 +48,7 @@ test("Groq temporary 429 retries and succeeds", async () => {
     operation: "review:test",
     primary: { provider: "groq", model: "g1" },
     fallback: { provider: "gemini", model: "g2" },
+    fallbacks: [{ provider: "openrouter", model: "g3" }],
     defaultRetryDelayMs: 15000,
     wait: waitRecorder.wait,
     now: waitRecorder.now,
@@ -75,7 +77,7 @@ test("Groq temporary 429 retries and succeeds", async () => {
 });
 
 test("Groq repeated rate limit falls back to Gemini", async () => {
-  const runState = createProviderRunState(["groq", "gemini"]);
+  const runState = createProviderRunState(["groq", "gemini", "openrouter"]);
   const waitRecorder = createWaitRecorder();
 
   const result = await executeProviderOperation({
@@ -83,6 +85,7 @@ test("Groq repeated rate limit falls back to Gemini", async () => {
     operation: "review:test",
     primary: { provider: "groq", model: "g1" },
     fallback: { provider: "gemini", model: "g2" },
+    fallbacks: [{ provider: "openrouter", model: "g3" }],
     maxRetries: 2,
     defaultRetryDelayMs: 1000,
     wait: waitRecorder.wait,
@@ -110,7 +113,7 @@ test("Groq repeated rate limit falls back to Gemini", async () => {
 });
 
 test("Gemini temporary quota timing retries and succeeds", async () => {
-  const runState = createProviderRunState(["gemini"]);
+  const runState = createProviderRunState(["gemini", "openrouter"]);
   const waitRecorder = createWaitRecorder();
   let attempts = 0;
 
@@ -147,7 +150,7 @@ test("Gemini temporary quota timing retries and succeeds", async () => {
 });
 
 test("Gemini hard quota disables Gemini for remainder of run", async () => {
-  const runState = createProviderRunState(["groq", "gemini"]);
+  const runState = createProviderRunState(["groq", "gemini", "openrouter"]);
 
   await assert.rejects(
     () =>
@@ -174,8 +177,37 @@ test("Gemini hard quota disables Gemini for remainder of run", async () => {
   assert.equal(geminiSnapshot?.state, "disabled");
 });
 
-test("both providers unavailable stops batch immediately", async () => {
-  const runState = createProviderRunState(["groq", "gemini"]);
+test("Groq and Gemini failure falls through to OpenRouter", async () => {
+  const runState = createProviderRunState(["groq", "gemini", "openrouter"]);
+
+  const result = await executeProviderOperation({
+    runState,
+    operation: "generation:test",
+    primary: { provider: "groq", model: "g1" },
+    fallback: { provider: "gemini", model: "g2" },
+    fallbacks: [{ provider: "openrouter", model: "g3" }],
+    perform: async ({ provider }) => {
+      if (provider === "groq" || provider === "gemini") {
+        throw new ProviderRequestError(`${provider} request failed: quota exceeded`, {
+          provider,
+          statusCode: 429,
+          classification: classifyProviderFailure({
+            message: "quota exceeded",
+            statusCode: 429,
+          }),
+        });
+      }
+
+      return { providerUsed: provider };
+    },
+  });
+
+  assert.equal(result.providerUsed, "openrouter");
+  assert.equal(result.usedFallback, true);
+});
+
+test("all three providers unavailable stops batch cleanly", async () => {
+  const runState = createProviderRunState(["groq", "gemini", "openrouter"]);
 
   await assert.rejects(
     () =>
@@ -184,6 +216,7 @@ test("both providers unavailable stops batch immediately", async () => {
         operation: "generation:test",
         primary: { provider: "groq", model: "g1" },
         fallback: { provider: "gemini", model: "g2" },
+        fallbacks: [{ provider: "openrouter", model: "g3" }],
         perform: async ({ provider }) => {
           throw new ProviderRequestError(`${provider} unavailable`, {
             provider,
@@ -202,7 +235,7 @@ test("both providers unavailable stops batch immediately", async () => {
 });
 
 test("provider marked disabled is skipped on later operations", async () => {
-  const runState = createProviderRunState(["groq", "gemini"]);
+  const runState = createProviderRunState(["groq", "gemini", "openrouter"]);
 
   await assert.rejects(
     () =>
@@ -229,8 +262,98 @@ test("provider marked disabled is skipped on later operations", async () => {
     operation: "review:second",
     primary: { provider: "gemini", model: "g2" },
     fallback: { provider: "groq", model: "g1" },
+    fallbacks: [{ provider: "openrouter", model: "g3" }],
     perform: async ({ provider }) => ({ providerUsed: provider }),
   });
 
   assert.equal(result.providerUsed, "groq");
+});
+
+test("hard quota disables a provider for the run and later falls through to OpenRouter", async () => {
+  const runState = createProviderRunState(["groq", "gemini", "openrouter"]);
+
+  await assert.rejects(
+    () =>
+      executeProviderOperation({
+        runState,
+        operation: "generation:first",
+        primary: { provider: "groq", model: "g1" },
+        perform: async ({ provider }) => {
+          throw new ProviderRequestError("Groq request failed: quota exceeded", {
+            provider,
+            statusCode: 429,
+            classification: classifyProviderFailure({
+              message: "quota exceeded",
+              statusCode: 429,
+            }),
+          });
+        },
+      }),
+    ProviderRunStoppedError
+  );
+
+  const result = await executeProviderOperation({
+    runState,
+    operation: "generation:second",
+    primary: { provider: "groq", model: "g1" },
+    fallback: { provider: "gemini", model: "g2" },
+    fallbacks: [{ provider: "openrouter", model: "g3" }],
+    perform: async ({ provider }) => {
+      if (provider === "gemini") {
+        throw new ProviderRequestError("Gemini request failed: quota exceeded", {
+          provider,
+          statusCode: 429,
+          classification: classifyProviderFailure({
+            message: "quota exceeded",
+            statusCode: 429,
+          }),
+        });
+      }
+
+      return { providerUsed: provider };
+    },
+  });
+
+  assert.equal(result.providerUsed, "openrouter");
+});
+
+test("partial progress survives provider transition", async () => {
+  const runState = createProviderRunState(["groq", "gemini", "openrouter"]);
+  const completed = [];
+
+  const first = await executeProviderOperation({
+    runState,
+    operation: "generation:item-1",
+    primary: { provider: "groq", model: "g1" },
+    fallback: { provider: "gemini", model: "g2" },
+    fallbacks: [{ provider: "openrouter", model: "g3" }],
+    perform: async ({ provider }) => ({ providerUsed: provider, itemId: 1 }),
+  });
+  completed.push(first.itemId);
+
+  const second = await executeProviderOperation({
+    runState,
+    operation: "generation:item-2",
+    primary: { provider: "groq", model: "g1" },
+    fallback: { provider: "gemini", model: "g2" },
+    fallbacks: [{ provider: "openrouter", model: "g3" }],
+    perform: async ({ provider }) => {
+      if (provider === "groq" || provider === "gemini") {
+        throw new ProviderRequestError(`${provider} request failed: quota exceeded`, {
+          provider,
+          statusCode: 429,
+          classification: classifyProviderFailure({
+            message: "quota exceeded",
+            statusCode: 429,
+          }),
+        });
+      }
+
+      return { providerUsed: provider, itemId: 2 };
+    },
+  });
+  completed.push(second.itemId);
+
+  assert.deepEqual(completed, [1, 2]);
+  assert.equal(second.providerUsed, "openrouter");
 });

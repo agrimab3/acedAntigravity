@@ -1,6 +1,9 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { DEFAULT_GROQ_MODEL, resolvePreferredGroqModel } from "../lib/groq-models";
+import {
+  resolveGenerationModel,
+  resolveGenerationProvider,
+} from "../lib/content-generation-providers.mjs";
 import { Client } from "pg";
 
 const args = Object.fromEntries(
@@ -51,34 +54,6 @@ if (!["draft", "published"].includes(status)) {
 const client = new Client({
   connectionString: databaseUrl,
 });
-
-function resolveGenerationProvider(rawProvider?: string) {
-  return (
-    rawProvider ||
-    process.env.QUESTION_GENERATION_PROVIDER ||
-    process.env.CONTENT_GENERATION_PROVIDER ||
-    (process.env.GROQ_API_KEY ? "groq" : "gemini")
-  )
-    .trim()
-    .toLowerCase();
-}
-
-function resolveGenerationModel(provider: string, rawModel?: string) {
-  if (provider === "groq") {
-    return resolvePreferredGroqModel(
-      rawModel,
-      process.env.GROQ_GENERATION_MODEL,
-      process.env.GROQ_MODEL,
-      DEFAULT_GROQ_MODEL
-    );
-  }
-
-  if (rawModel?.trim()) {
-    return rawModel.trim();
-  }
-
-  return process.env.GEMINI_GENERATION_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
-}
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));

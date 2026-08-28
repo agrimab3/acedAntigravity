@@ -11,8 +11,11 @@ import {
   selectTopicsForBacklogFill,
   sortTopicsByPriority,
 } from "@/lib/content-audit";
+import {
+  resolveGenerationModel,
+  resolveGenerationProvider,
+} from "@/lib/content-generation-providers.mjs";
 import { getDb } from "@/lib/db";
-import { DEFAULT_GROQ_MODEL, resolvePreferredGroqModel } from "@/lib/groq-models";
 import { resolveEffectivePassage } from "@/lib/question-sets";
 
 const execFileAsync = promisify(execFile);
@@ -462,54 +465,6 @@ function buildLaunchMinimumPlans(auditedTopics: AuditedTopic[]) {
   }
 
   return plans;
-}
-
-function resolveGenerationProvider() {
-  const configuredProvider =
-    process.env.QUESTION_GENERATION_PROVIDER || process.env.CONTENT_GENERATION_PROVIDER;
-  const hasOllamaConfig = Boolean(
-    process.env.OLLAMA_GENERATION_MODEL ||
-      process.env.OLLAMA_REVIEW_MODEL ||
-      process.env.OLLAMA_MODEL ||
-      process.env.OLLAMA_API_BASE_URL ||
-      process.env.OLLAMA_BASE_URL
-  );
-  const hasGeminiKey = Boolean(process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY);
-  const hasGroqKey = Boolean(process.env.GROQ_API_KEY);
-
-  if (configuredProvider?.trim()) {
-    return configuredProvider.trim().toLowerCase();
-  }
-
-  if (hasOllamaConfig) {
-    return "ollama";
-  }
-
-  if (hasGeminiKey) {
-    return "gemini";
-  }
-
-  if (hasGroqKey) {
-    return "groq";
-  }
-
-  return "gemini";
-}
-
-function resolveGenerationModel(provider: string) {
-  if (provider === "ollama") {
-    return process.env.OLLAMA_GENERATION_MODEL || process.env.OLLAMA_MODEL || "gemma3:4b";
-  }
-
-  if (provider === "groq") {
-    return resolvePreferredGroqModel(
-      process.env.GROQ_GENERATION_MODEL,
-      process.env.GROQ_MODEL,
-      DEFAULT_GROQ_MODEL
-    );
-  }
-
-  return process.env.GEMINI_GENERATION_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
 }
 
 async function runGeneration({

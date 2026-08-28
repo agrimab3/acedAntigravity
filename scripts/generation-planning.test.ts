@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { buildVerifierProviderOrder } from "../lib/content-generation-providers.mjs";
 import {
   buildMissingDifficultySequence,
   buildPromptDifficultyBlueprint,
@@ -291,4 +292,25 @@ test("suggested difficulty matching the requested difficulty still accepts keep"
     }),
     "accept"
   );
+});
+
+test("verifier prefers a different provider than the generator when available", () => {
+  const order = buildVerifierProviderOrder("groq", "groq", {
+    GROQ_API_KEY: "groq-key",
+    GEMINI_API_KEY: "gemini-key",
+    OPENROUTER_API_KEY: "openrouter-key",
+  });
+
+  assert.deepEqual(order, ["gemini", "openrouter", "groq"]);
+  assert.equal(order[0], "gemini");
+});
+
+test("openrouter generator prefers groq then gemini for verification independence", () => {
+  const order = buildVerifierProviderOrder("openrouter", "openrouter", {
+    GROQ_API_KEY: "groq-key",
+    GEMINI_API_KEY: "gemini-key",
+    OPENROUTER_API_KEY: "openrouter-key",
+  });
+
+  assert.deepEqual(order, ["groq", "gemini", "openrouter"]);
 });

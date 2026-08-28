@@ -2,10 +2,8 @@ import { createHash } from "crypto";
 import { Client } from "pg";
 import { z } from "zod";
 import {
-  DEFAULT_GROQ_MODEL,
   isGroqModelUnavailableError,
   resolveGroqFallbackModel,
-  resolvePreferredGroqModel,
 } from "./lib/groq-models.ts";
 import {
   buildMissingDifficultySequence,
@@ -15,6 +13,14 @@ import {
   planQuestionSetDifficultyCounts,
   toCanonicalChild,
 } from "./lib/content-generation-planning.ts";
+import {
+  buildVerifierProviderOrder,
+  resolveFallbackProviders,
+  resolveGenerationModel,
+  resolveGenerationProvider,
+  resolveReviewModel,
+  resolveReviewProvider,
+} from "./lib/content-generation-providers.mjs";
 import {
   ProviderRequestError,
   ProviderRunStoppedError,
@@ -39,8 +45,8 @@ const SET_DEFAULT_CHILD_COUNT = {
 };
 const DEFAULT_GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
 const DEFAULT_GROQ_BASE_URL = "https://api.groq.com/openai/v1";
+const DEFAULT_OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
 const DEFAULT_OLLAMA_BASE_URL = "http://127.0.0.1:11434";
-const SUPPORTED_PROVIDERS = ["gemini", "groq", "ollama"];
 const GENERATION_SYSTEM_PROMPT = `
 You are Aced's ACT item writer.
 
@@ -161,6 +167,7 @@ No commentary outside the JSON.
 const databaseUrl = process.env.DATABASE_URL;
 const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 const groqApiKey = process.env.GROQ_API_KEY || "";
+const openRouterApiKey = process.env.OPENROUTER_API_KEY || "";
 const ollamaBaseUrl =
   process.env.OLLAMA_API_BASE_URL || process.env.OLLAMA_BASE_URL || DEFAULT_OLLAMA_BASE_URL;
 
@@ -190,7 +197,16 @@ const generationModel = resolveGenerationModel(generationProvider, args.model);
 const reviewProvider = resolveReviewProvider(args["review-provider"], generationProvider);
 const reviewModel = resolveReviewModel(reviewProvider, args["review-model"], generationModel);
 const runProviderState = createProviderRunState(
-  Array.from(new Set([generationProvider, reviewProvider, resolveFallbackProvider(generationProvider), resolveFallbackProvider(reviewProvider)].filter(Boolean)))
+  Array.from(
+    new Set(
+      [
+        generationProvider,
+        reviewProvider,
+        ...resolveFallbackProviders(generationProvider),
+        ...resolveFallbackProviders(reviewProvider),
+      ].filter(Boolean)
+    )
+  )
 );
 
 if (sectionFilter && !SECTION_KEYS.includes(sectionFilter)) {
@@ -207,6 +223,10 @@ if (!isRereviewMode && generationProvider === "gemini" && !geminiApiKey) {
 
 if (!isRereviewMode && generationProvider === "groq" && !groqApiKey) {
   throw new Error("GROQ_API_KEY is required when using the Groq generation provider.");
+}
+
+if (!isRereviewMode && generationProvider === "openrouter" && !openRouterApiKey) {
+  throw new Error("OPENROUTER_API_KEY is required when using the OpenRouter generation provider.");
 }
 
 const generatedQuestionSchema = z.object({
@@ -345,133 +365,14 @@ function parseUuidListArg(rawValue) {
     .filter((value) => /^[0-9a-f-]{36}$/i.test(value));
 }
 
-function resolveGenerationProvider(rawProvider) {
-  const configured =
-    rawProvider ||
-    process.env.QUESTION_GENERATION_PROVIDER ||
-    process.env.CONTENT_GENERATION_PROVIDER ||
-    (hasConfiguredOllama() ? "ollama" : groqApiKey ? "groq" : "gemini");
+function resolveOpenRouterBaseUrl() {
+  const configured = process.env.OPENROUTER_BASE_URL || process.env.OPENROUTER_API_BASE_URL;
 
-  const normalized = configured.trim().toLowerCase();
-
-  if (!SUPPORTED_PROVIDERS.includes(normalized)) {
-    throw new Error(`Unsupported generation provider: ${normalized}`);
+  if (!configured) {
+    return DEFAULT_OPENROUTER_BASE_URL;
   }
 
-  return normalized;
-}
-
-function resolveReviewProvider(rawProvider, fallbackProvider) {
-  const configured =
-    rawProvider ||
-    process.env.QUESTION_REVIEW_PROVIDER ||
-    process.env.CONTENT_REVIEW_PROVIDER ||
-    fallbackProvider;
-
-  const normalized = configured.trim().toLowerCase();
-
-  if (!SUPPORTED_PROVIDERS.includes(normalized)) {
-    throw new Error(`Unsupported review provider: ${normalized}`);
-  }
-
-  return normalized;
-}
-
-function resolveGenerationModel(provider, rawModel) {
-  if (provider === "groq") {
-    return resolvePreferredGroqModel(
-      rawModel,
-      process.env.GROQ_GENERATION_MODEL,
-      process.env.GROQ_MODEL,
-      DEFAULT_GROQ_MODEL
-    );
-  }
-
-  if (rawModel?.trim()) {
-    return rawModel.trim();
-  }
-
-  if (provider === "ollama") {
-    return (
-      process.env.OLLAMA_GENERATION_MODEL ||
-      process.env.OLLAMA_MODEL ||
-      "gemma3:4b"
-    );
-  }
-  return process.env.GEMINI_GENERATION_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
-}
-
-function resolveReviewModel(provider, rawModel, fallbackModel) {
-  if (provider === "groq") {
-    return resolvePreferredGroqModel(
-      rawModel,
-      process.env.GROQ_REVIEW_MODEL,
-      process.env.GROQ_GENERATION_MODEL,
-      process.env.GROQ_MODEL,
-      fallbackModel
-    );
-  }
-
-  if (rawModel?.trim()) {
-    return rawModel.trim();
-  }
-
-  if (provider === "ollama") {
-    return (
-      process.env.OLLAMA_REVIEW_MODEL ||
-      process.env.OLLAMA_GENERATION_MODEL ||
-      process.env.OLLAMA_MODEL ||
-      fallbackModel
-    );
-  }
-  return (
-    process.env.GEMINI_REVIEW_MODEL ||
-    process.env.GEMINI_GENERATION_MODEL ||
-    process.env.GEMINI_MODEL ||
-    fallbackModel
-  );
-}
-
-function resolveFallbackProvider(primaryProvider) {
-  if (primaryProvider === "ollama") {
-    if (geminiApiKey) {
-      return "gemini";
-    }
-
-    if (groqApiKey) {
-      return "groq";
-    }
-
-    return null;
-  }
-
-  if (hasConfiguredOllama()) {
-    return "ollama";
-  }
-
-  if (primaryProvider === "groq" && geminiApiKey) {
-    return "gemini";
-  }
-
-  if (primaryProvider === "gemini" && groqApiKey) {
-    return "groq";
-  }
-
-  return null;
-}
-
-function resolveFallbackModel(primaryProvider, mode, fallbackModel) {
-  const fallbackProvider = resolveFallbackProvider(primaryProvider);
-
-  if (!fallbackProvider) {
-    return null;
-  }
-
-  if (mode === "review") {
-    return resolveReviewModel(fallbackProvider, null, fallbackModel);
-  }
-
-  return resolveGenerationModel(fallbackProvider, null);
+  return configured.replace(/\/$/, "");
 }
 
 function resolveGeminiBaseUrl() {
@@ -496,16 +397,6 @@ function resolveGroqBaseUrl() {
 
 function resolveOllamaBaseUrl() {
   return ollamaBaseUrl.replace(/\/$/, "");
-}
-
-function hasConfiguredOllama() {
-  return Boolean(
-    process.env.OLLAMA_GENERATION_MODEL ||
-      process.env.OLLAMA_REVIEW_MODEL ||
-      process.env.OLLAMA_MODEL ||
-      process.env.OLLAMA_API_BASE_URL ||
-      process.env.OLLAMA_BASE_URL
-  );
 }
 
 function supportsGroqJsonSchema(model) {
@@ -1823,6 +1714,77 @@ async function requestGroqJson({
   return text;
 }
 
+async function requestOpenRouterJson({ model, systemPrompt, userPrompt, schema, temperature = 0.35 }) {
+  assertStrictJsonSchemaObjects(schema);
+  const response = await fetch(`${resolveOpenRouterBaseUrl()}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${openRouterApiKey}`,
+      "HTTP-Referer": "https://aced.app",
+      "X-Title": "Aced Content Generation",
+      "X-OpenRouter-Metadata": "enabled",
+    },
+    body: JSON.stringify({
+      model,
+      temperature,
+      max_tokens: 4096,
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        {
+          role: "user",
+          content: userPrompt,
+        },
+      ],
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "aced_structured_response",
+          strict: true,
+          schema,
+        },
+      },
+    }),
+  });
+
+  const rawBody = await response.text();
+  let payload;
+
+  try {
+    payload = rawBody ? JSON.parse(rawBody) : null;
+  } catch {
+    payload = null;
+  }
+
+  if (!response.ok) {
+    const message = payload?.error?.message || rawBody || `HTTP ${response.status}`;
+    throw new ProviderRequestError(`OpenRouter request failed: ${message}`, {
+      provider: "openrouter",
+      statusCode: response.status,
+      retryAfterMs: parseRetryAfterMs(response.headers.get("retry-after")),
+      classification: classifyProviderFailure({
+        message,
+        statusCode: response.status,
+        retryAfterMs: parseRetryAfterMs(response.headers.get("retry-after")),
+      }),
+    });
+  }
+
+  const text = payload?.choices?.[0]?.message?.content?.trim() || "";
+
+  if (!text) {
+    throw new ProviderRequestError("OpenRouter returned an empty response.", {
+      provider: "openrouter",
+      classification: classifyProviderFailure({ message: "empty response" }),
+    });
+  }
+
+  return text;
+}
+
 async function requestOllamaJson({ model, systemPrompt, userPrompt, schema, temperature = 0.35 }) {
   const response = await fetch(`${resolveOllamaBaseUrl()}/api/chat`, {
     method: "POST",
@@ -1912,6 +1874,16 @@ async function requestStructuredJson({
     });
   }
 
+  if (provider === "openrouter") {
+    return requestOpenRouterJson({
+      model,
+      systemPrompt,
+      userPrompt,
+      schema,
+      temperature,
+    });
+  }
+
   return requestGeminiJson({
     model,
     systemPrompt,
@@ -1921,19 +1893,24 @@ async function requestStructuredJson({
   });
 }
 
-function buildOperationCandidates(mode, provider, model) {
-  const fallbackProvider = resolveFallbackProvider(provider);
-  const fallbackModel = resolveFallbackModel(provider, mode, model);
+function buildOperationCandidates(mode, provider, model, options = {}) {
+  const fallbackProviders =
+    options.fallbackProviders ??
+    resolveFallbackProviders(provider);
+  const fallbacks = fallbackProviders
+    .map((fallbackProvider) => ({
+      provider: fallbackProvider,
+      model:
+        mode === "review"
+          ? resolveReviewModel(fallbackProvider, null, model)
+          : resolveGenerationModel(fallbackProvider, null),
+    }))
+    .filter((candidate) => candidate.provider && candidate.model);
 
   return {
     primary: { provider, model },
-    fallback:
-      fallbackProvider && fallbackModel
-        ? {
-            provider: fallbackProvider,
-            model: fallbackModel,
-          }
-        : null,
+    fallback: fallbacks[0] ?? null,
+    fallbacks: fallbacks.slice(1),
   };
 }
 
@@ -1956,12 +1933,13 @@ async function generateBatchForDifficulty(
     requestedDifficulty,
     requestedCount,
   });
-  const { primary, fallback } = buildOperationCandidates("generation", provider, model);
+  const { primary, fallback, fallbacks } = buildOperationCandidates("generation", provider, model);
   const operationResult = await executeProviderOperation({
     runState: runProviderState,
     operation: `generation:${topic.section_key}/${topic.slug}/${requestedDifficulty}`,
     primary,
     fallback,
+    fallbacks,
     maxRetries: fastRetryMode ? 1 : 3,
     defaultRetryDelayMs: primary.provider === "groq" ? 20000 : 35000,
     wait: sleep,
@@ -1985,7 +1963,11 @@ async function generateBatchForDifficulty(
     },
   });
 
-  return operationResult.questions;
+  return {
+    questions: operationResult.questions,
+    provider: operationResult.provider,
+    model: operationResult.model,
+  };
 }
 
 async function generateQuestionSet(
@@ -2005,12 +1987,13 @@ async function generateQuestionSet(
     (sum, difficulty) => sum + requestedDifficultyCounts[difficulty],
     0
   );
-  const { primary, fallback } = buildOperationCandidates("generation", provider, model);
+  const { primary, fallback, fallbacks } = buildOperationCandidates("generation", provider, model);
   const operationResult = await executeProviderOperation({
     runState: runProviderState,
     operation: `generation:${topic.section_key}/${topic.slug}/set`,
     primary,
     fallback,
+    fallbacks,
     maxRetries: fastRetryMode ? 1 : 3,
     defaultRetryDelayMs: primary.provider === "groq" ? 20000 : 35000,
     wait: sleep,
@@ -2036,7 +2019,11 @@ async function generateQuestionSet(
     },
   });
 
-  return operationResult.generatedSet;
+  return {
+    generatedSet: operationResult.generatedSet,
+    provider: operationResult.provider,
+    model: operationResult.model,
+  };
 }
 
 function buildSetChildSchema(sectionKey, requestedDifficulty) {
@@ -2245,12 +2232,13 @@ async function generateReplacementSetChild(
     requestedDifficulty,
     existingPrompts,
   });
-  const { primary, fallback } = buildOperationCandidates("generation", provider, model);
+  const { primary, fallback, fallbacks } = buildOperationCandidates("generation", provider, model);
   const operationResult = await executeProviderOperation({
     runState: runProviderState,
     operation: `generation:${topic.section_key}/${topic.slug}/replacement/${requestedDifficulty}`,
     primary,
     fallback,
+    fallbacks,
     maxRetries: fastRetryMode ? 1 : 2,
     defaultRetryDelayMs: primary.provider === "groq" ? 20000 : 35000,
     wait: sleep,
@@ -2271,7 +2259,11 @@ async function generateReplacementSetChild(
     },
   });
 
-  return operationResult.question;
+  return {
+    question: operationResult.question,
+    provider: operationResult.provider,
+    model: operationResult.model,
+  };
 }
 
 async function reviseSetChildForDifficulty(
@@ -2306,12 +2298,13 @@ async function reviseSetChildForDifficulty(
     child,
     reviewerResult,
   });
-  const { primary, fallback } = buildOperationCandidates("generation", provider, model);
+  const { primary, fallback, fallbacks } = buildOperationCandidates("generation", provider, model);
   const operationResult = await executeProviderOperation({
     runState: runProviderState,
     operation: `generation:${topic.section_key}/${topic.slug}/revise/${requestedDifficulty}`,
     primary,
     fallback,
+    fallbacks,
     maxRetries: fastRetryMode ? 1 : 2,
     defaultRetryDelayMs: primary.provider === "groq" ? 20000 : 35000,
     wait: sleep,
@@ -2336,7 +2329,11 @@ async function reviseSetChildForDifficulty(
     },
   });
 
-  return operationResult.question;
+  return {
+    question: operationResult.question,
+    provider: operationResult.provider,
+    model: operationResult.model,
+  };
 }
 
 async function generateBatchForTopic(topic) {
@@ -2353,9 +2350,11 @@ async function generateBatchForTopic(topic) {
 
     for (const difficultyCounts of setDifficultyPlans) {
       try {
-        const generatedSet = await generateQuestionSet(topic, difficultyCounts);
+        const generatedSetResult = await generateQuestionSet(topic, difficultyCounts);
         generatedSets.push({
-          ...generatedSet,
+          ...generatedSetResult.generatedSet,
+          _generationProvider: generatedSetResult.provider,
+          _generationModel: generatedSetResult.model,
           requestedDifficultyCounts: difficultyCounts,
         });
       } catch (error) {
@@ -2390,8 +2389,14 @@ async function generateBatchForTopic(topic) {
     );
 
     try {
-      const batch = await generateBatchForDifficulty(topic, difficulty, candidateCount);
-      generatedQuestions.push(...batch);
+      const batchResult = await generateBatchForDifficulty(topic, difficulty, candidateCount);
+      generatedQuestions.push(
+        ...batchResult.questions.map((question) => ({
+          ...question,
+          _generationProvider: batchResult.provider,
+          _generationModel: batchResult.model,
+        }))
+      );
     } catch (error) {
       if (error instanceof ProviderRunStoppedError) {
         error.progress = {
@@ -2523,12 +2528,13 @@ async function reviewGeneratedQuestion(
     additionalProperties: false,
   };
   const prompt = buildReviewPrompt(topic, question);
-  const { primary, fallback } = buildOperationCandidates("review", provider, model);
+  const { primary, fallback, fallbacks } = buildOperationCandidates("review", provider, model);
   const operationResult = await executeProviderOperation({
     runState: runProviderState,
     operation: `review:${topic.section_key}/${topic.slug}`,
     primary,
     fallback,
+    fallbacks,
     maxRetries: fastRetryMode ? 1 : 2,
     defaultRetryDelayMs: primary.provider === "groq" ? 12000 : 20000,
     wait: sleep,
@@ -2549,14 +2555,19 @@ async function reviewGeneratedQuestion(
     },
   });
 
-  return operationResult.reviewerResult;
+  return {
+    reviewerResult: operationResult.reviewerResult,
+    provider: operationResult.provider,
+    model: operationResult.model,
+  };
 }
 
 async function verifyGeneratedQuestionCorrectness(
   topic,
   question,
   provider = reviewProvider,
-  model = reviewModel
+  model = reviewModel,
+  generationSourceProvider = null
 ) {
   const schema = {
     type: "object",
@@ -2611,12 +2622,18 @@ async function verifyGeneratedQuestionCorrectness(
     additionalProperties: false,
   };
   const prompt = buildCorrectnessVerificationPrompt(topic, question);
-  const { primary, fallback } = buildOperationCandidates("review", provider, model);
+  const verifierProviderOrder = buildVerifierProviderOrder(generationSourceProvider, provider);
+  const primaryProvider = verifierProviderOrder[0] ?? provider;
+  const primaryModel = resolveReviewModel(primaryProvider, primaryProvider === provider ? model : null, model);
+  const { primary, fallback, fallbacks } = buildOperationCandidates("review", primaryProvider, primaryModel, {
+    fallbackProviders: verifierProviderOrder.slice(1),
+  });
   const operationResult = await executeProviderOperation({
     runState: runProviderState,
     operation: `verify:${topic.section_key}/${topic.slug}`,
     primary,
     fallback,
+    fallbacks,
     maxRetries: fastRetryMode ? 1 : 2,
     defaultRetryDelayMs: primary.provider === "groq" ? 12000 : 20000,
     wait: sleep,
@@ -2637,10 +2654,20 @@ async function verifyGeneratedQuestionCorrectness(
     },
   });
 
-  return operationResult.verifierResult;
+  if (operationResult.provider !== generationSourceProvider) {
+    console.warn(
+      `Correctness verifier using ${operationResult.provider} for provider independence.`
+    );
+  }
+
+  return {
+    verifierResult: operationResult.verifierResult,
+    provider: operationResult.provider,
+    model: operationResult.model,
+  };
 }
 
-function sanitizeQuestion(sectionKey, topic, question) {
+function sanitizeQuestion(sectionKey, topic, question, sourceMetadata = {}) {
   if (question.section.trim().toLowerCase() !== sectionKey) {
     throw new Error("Generated section does not match the requested section.");
   }
@@ -2853,8 +2880,8 @@ function sanitizeQuestion(sectionKey, topic, question) {
     correctAnswer: question.correct_answer,
     explanation,
     qualityReview,
-    generationModel,
-    generationProvider,
+    generationModel: sourceMetadata.generationModel ?? generationModel,
+    generationProvider: sourceMetadata.generationProvider ?? generationProvider,
     fingerprint: buildFingerprint({
       sectionKey,
       topicSlug: topic.slug,
@@ -3118,9 +3145,12 @@ async function runReviewPipelineForQuestion({
   let reviewerResult;
   let verifierResult = null;
   let disposition = "reject";
+  let reviewProviderUsed = null;
 
   try {
-    reviewerResult = await reviewGeneratedQuestion(topic, buildQuestionReviewPayload(normalizedQuestion));
+    const reviewOperation = await reviewGeneratedQuestion(topic, buildQuestionReviewPayload(normalizedQuestion));
+    reviewerResult = reviewOperation.reviewerResult;
+    reviewProviderUsed = reviewOperation.provider;
   } catch (error) {
     if (error instanceof ProviderRunStoppedError) {
       error.progress = counters;
@@ -3245,7 +3275,14 @@ async function runReviewPipelineForQuestion({
   );
 
   try {
-    verifierResult = await verifyGeneratedQuestionCorrectness(topic, buildQuestionReviewPayload(normalizedQuestion));
+    const verificationOperation = await verifyGeneratedQuestionCorrectness(
+      topic,
+      buildQuestionReviewPayload(normalizedQuestion),
+      reviewProvider,
+      reviewModel,
+      normalizedQuestion.generationProvider ?? reviewProviderUsed
+    );
+    verifierResult = verificationOperation.verifierResult;
   } catch (error) {
     if (error instanceof ProviderRunStoppedError) {
       error.progress = counters;
@@ -3328,7 +3365,10 @@ async function insertQuestions(topic, generatedQuestions) {
     let normalizedQuestion;
 
     try {
-      normalizedQuestion = sanitizeQuestion(topic.section_key, topic, generatedQuestion);
+      normalizedQuestion = sanitizeQuestion(topic.section_key, topic, generatedQuestion, {
+        generationProvider: generatedQuestion._generationProvider,
+        generationModel: generatedQuestion._generationModel,
+      });
     } catch (error) {
       skipped += 1;
       console.warn(
@@ -3503,10 +3543,18 @@ async function insertQuestionSets(topic, generatedSets) {
               reviewerResult,
             });
 
-            return sanitizeQuestion(topic.section_key, topic, {
-              ...revisedRawChild,
-              passage: child.sharedContent,
-            });
+            return sanitizeQuestion(
+              topic.section_key,
+              topic,
+              {
+                ...revisedRawChild.question,
+                passage: child.sharedContent,
+              },
+              {
+                generationProvider: revisedRawChild.provider,
+                generationModel: revisedRawChild.model,
+              }
+            );
           },
         });
 
@@ -3561,15 +3609,23 @@ async function insertQuestionSets(topic, generatedSets) {
             requestedDifficulty: missingDifficulty,
             existingPrompts: Array.from(existingPrompts),
           });
-          const replacementCandidate = toCanonicalSetChildCandidate(replacementRawChild, {
+          const replacementCandidate = toCanonicalSetChildCandidate(replacementRawChild.question, {
             topic,
             originalChild: null,
             requestedDifficulty: missingDifficulty,
           });
-          const replacementChild = sanitizeQuestion(topic.section_key, topic, {
-            ...replacementCandidate,
-            passage: normalizedSet.content,
-          });
+          const replacementChild = sanitizeQuestion(
+            topic.section_key,
+            topic,
+            {
+              ...replacementCandidate,
+              passage: normalizedSet.content,
+            },
+            {
+              generationProvider: replacementRawChild.provider,
+              generationModel: replacementRawChild.model,
+            }
+          );
 
           if (
             knownFingerprints.has(replacementChild.fingerprint) ||
@@ -3599,10 +3655,18 @@ async function insertQuestionSets(topic, generatedSets) {
                 reviewerResult,
               });
 
-              return sanitizeQuestion(topic.section_key, topic, {
-                ...revisedRawChild,
-                passage: normalizedSet.content,
-              });
+              return sanitizeQuestion(
+                topic.section_key,
+                topic,
+                {
+                  ...revisedRawChild.question,
+                  passage: normalizedSet.content,
+                },
+                {
+                  generationProvider: revisedRawChild.provider,
+                  generationModel: revisedRawChild.model,
+                }
+              );
             },
           });
 
