@@ -6,6 +6,7 @@ import {
   classifyProviderFailure,
   createProviderRunState,
   executeProviderOperation,
+  resolveRetryDelayMs,
   summarizeProviderAvailability,
 } from "../lib/content-generation-resilience.mjs";
 
@@ -147,6 +148,66 @@ test("Gemini temporary quota timing retries and succeeds", async () => {
 
   assert.equal(result.ok, true);
   assert.deepEqual(waitRecorder.waits, [31000]);
+});
+
+test("transport failures retry before falling back and retain a transport classification", async () => {
+  const runState = createProviderRunState(["gemini", "groq"]);
+  const waitRecorder = createWaitRecorder();
+  const attempts = [];
+
+  const result = await executeProviderOperation({
+    runState,
+    operation: "review:test",
+    primary: { provider: "gemini", model: "gemini-2.5-flash" },
+    fallback: { provider: "groq", model: "openai/gpt-oss-120b" },
+    maxRetries: 2,
+    defaultRetryDelayMs: 1000,
+    wait: waitRecorder.wait,
+    now: waitRecorder.now,
+    perform: async ({ provider }) => {
+      attempts.push(provider);
+      if (provider === "gemini") {
+        throw new ProviderRequestError("Gemini transport failed before response headers: fetch failed; ECONNRESET", {
+          provider: "gemini",
+          classification: classifyProviderFailure({
+            message: "Gemini transport failed before response headers: fetch failed; ECONNRESET",
+          }),
+        });
+      }
+      return { providerUsed: provider };
+    },
+  });
+
+  assert.deepEqual(attempts, ["gemini", "gemini", "groq"]);
+  assert.equal(result.providerUsed, "groq");
+  assert.equal(runState.events.find((event) => event.state === "retrying")?.failureKind, "temporary-transport");
+});
+
+test("Gemini high-demand primary review safely falls back without approving it automatically", async () => {
+  const runState = createProviderRunState(["gemini", "groq"]);
+  const waitRecorder = createWaitRecorder();
+  const result = await executeProviderOperation({
+    runState,
+    operation: "review:test",
+    primary: { provider: "gemini", model: "gemini-2.5-flash" },
+    fallback: { provider: "groq", model: "openai/gpt-oss-120b" },
+    maxRetries: 1,
+    wait: waitRecorder.wait,
+    now: waitRecorder.now,
+    perform: async ({ provider }) => {
+      if (provider === "gemini") {
+        throw new ProviderRequestError("Gemini request failed: model is experiencing high demand", {
+          provider: "gemini",
+          classification: classifyProviderFailure({ message: "Gemini request failed: model is experiencing high demand" }),
+        });
+      }
+      return { reviewerResult: { verdict: "keep" } };
+    },
+  });
+
+  assert.equal(result.provider, "groq");
+  assert.equal(result.usedFallback, true);
+  assert.equal(runState.events.some((event) => event.state === "fallback-success"), true);
 });
 
 test("Gemini hard quota disables Gemini for remainder of run", async () => {
@@ -459,4 +520,124 @@ test("high-demand resource exhausted classification stays temporary", () => {
   assert.equal(classification.kind, "temporary-rate-limit");
   assert.equal(classification.retryable, true);
   assert.equal(classification.disableForRun, false);
+});
+
+function beforeHeaderTransportFailure(provider) {
+  const message = `${provider} transport failed before response headers: fetch failed; ECONNRESET`;
+  return new ProviderRequestError(message, {
+    provider,
+    classification: classifyProviderFailure({ message }),
+  });
+}
+
+test("Groq generation transport failure retries with capped exponential backoff and then succeeds once", async () => {
+  const runState = createProviderRunState(["groq", "gemini"]);
+  const waitRecorder = createWaitRecorder();
+  let attempts = 0;
+  let insertedCandidates = 0;
+
+  const result = await executeProviderOperation({
+    runState,
+    operation: "generation:math/algebra/hard",
+    primary: { provider: "groq", model: "openai/gpt-oss-120b" },
+    fallback: { provider: "gemini", model: "gemini-2.5-flash" },
+    maxRetries: 2,
+    wait: waitRecorder.wait,
+    now: waitRecorder.now,
+    perform: async ({ provider }) => {
+      attempts += 1;
+      if (provider === "groq" && attempts === 1) throw beforeHeaderTransportFailure(provider);
+      insertedCandidates += 1;
+      return { providerUsed: provider, candidateId: "one-generated-candidate" };
+    },
+  });
+
+  assert.equal(result.providerUsed, "groq");
+  assert.equal(result.attempt, 2);
+  assert.equal(insertedCandidates, 1, "a retry must not create a duplicate candidate");
+  assert.deepEqual(waitRecorder.waits, [1000]);
+  assert.equal(runState.events.find((event) => event.state === "retrying")?.failureKind, "temporary-transport");
+});
+
+test("Groq generation transport retries exhaust before Gemini fallback succeeds", async () => {
+  const runState = createProviderRunState(["groq", "gemini"]);
+  const waitRecorder = createWaitRecorder();
+  const attempts = [];
+
+  const result = await executeProviderOperation({
+    runState,
+    operation: "generation:math/functions/hard",
+    primary: { provider: "groq", model: "openai/gpt-oss-120b" },
+    fallback: { provider: "gemini", model: "gemini-2.5-flash" },
+    maxRetries: 2,
+    wait: waitRecorder.wait,
+    now: waitRecorder.now,
+    perform: async ({ provider }) => {
+      attempts.push(provider);
+      if (provider === "groq") throw beforeHeaderTransportFailure(provider);
+      return { providerUsed: provider };
+    },
+  });
+
+  assert.deepEqual(attempts, ["groq", "groq", "gemini"]);
+  assert.equal(result.providerUsed, "gemini");
+  assert.equal(result.usedFallback, true);
+  assert.deepEqual(waitRecorder.waits, [1000]);
+});
+
+test("all before-header generation transport failures terminalize explicitly after fallback exhaustion", async () => {
+  const runState = createProviderRunState(["groq", "gemini"]);
+  const waitRecorder = createWaitRecorder();
+
+  await assert.rejects(
+    () => executeProviderOperation({
+      runState,
+      operation: "generation:math/geometry/hard",
+      primary: { provider: "groq", model: "openai/gpt-oss-120b" },
+      fallback: { provider: "gemini", model: "gemini-2.5-flash" },
+      maxRetries: 1,
+      wait: waitRecorder.wait,
+      now: waitRecorder.now,
+      perform: async ({ provider }) => { throw beforeHeaderTransportFailure(provider); },
+    }),
+    (error) => error instanceof ProviderRunStoppedError && error.classification?.kind === "temporary-transport"
+  );
+  assert.equal(runState.events.filter((event) => event.state === "failed").length, 2);
+});
+
+test("primary review and verifier transport recovery resume their own stage only", async () => {
+  const runState = createProviderRunState(["groq", "gemini"]);
+  const waitRecorder = createWaitRecorder();
+  const operations = [];
+  const recoveredStages = [];
+
+  for (const operation of ["review:math/functions", "verify:math/functions"]) {
+    let attempts = 0;
+    const result = await executeProviderOperation({
+      runState,
+      operation,
+      primary: { provider: "groq", model: "openai/gpt-oss-120b" },
+      fallback: { provider: "gemini", model: "gemini-2.5-flash" },
+      maxRetries: 2,
+      wait: waitRecorder.wait,
+      now: waitRecorder.now,
+      perform: async ({ provider }) => {
+        operations.push(operation);
+        attempts += 1;
+        if (attempts === 1) throw beforeHeaderTransportFailure(provider);
+        return { stage: operation };
+      },
+    });
+    recoveredStages.push(result.stage);
+  }
+
+  assert.deepEqual(recoveredStages, ["review:math/functions", "verify:math/functions"]);
+  assert.deepEqual(operations, ["review:math/functions", "review:math/functions", "verify:math/functions", "verify:math/functions"]);
+});
+
+test("transport cooldown is provider-specific, bounded, and absent after normal success", () => {
+  const transport = classifyProviderFailure({ message: "Groq transport failed before response headers: ETIMEDOUT" });
+  assert.equal(resolveRetryDelayMs({ classification: transport, attempt: 1, defaultRetryDelayMs: 20000 }), 1000);
+  assert.equal(resolveRetryDelayMs({ classification: transport, attempt: 4, defaultRetryDelayMs: 20000 }), 8000);
+  assert.equal(resolveRetryDelayMs({ classification: { kind: "temporary-rate-limit", retryAfterMs: null }, attempt: 1, defaultRetryDelayMs: 20000 }), 20000);
 });

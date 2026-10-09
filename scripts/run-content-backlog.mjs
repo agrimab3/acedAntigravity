@@ -67,7 +67,7 @@ async function getBacklogTopics() {
         coalesce(sum(case when q.status = 'draft' then 1 else 0 end), 0)::int as draft_count,
         coalesce(sum(case when q.status = 'published' then 1 else 0 end), 0)::int as published_count
       from act_topics t
-      left join questions q on q.topic_id = t.id
+      left join questions q on q.topic_id = t.id and q.usage_scope = 'practice'
       where t.is_active = true
         and t.section_key = any($1::text[])
       group by t.section_key, t.slug, t.name, t.display_order

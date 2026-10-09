@@ -1,0 +1,53 @@
+name: Nightly Content Factory
+
+on:
+  schedule:
+    # 11:17 UTC is roughly 3:17 AM Pacific during daylight time.
+    - cron: "17 11 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: aced-content-nightly
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: [self-hosted, linux, x64, aced, vps]
+    timeout-minutes: 35
+    steps:
+      - name: Generate controlled content batches
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          APP_ROOT="/root/apps/aced"
+          CURRENT_DIR="${APP_ROOT}/current"
+          RUN_ENV_FILE="${APP_ROOT}/shared/.env"
+
+          if [[ ! -f "${CURRENT_DIR}/package.json" ]]; then
+            echo "Missing deployed Aced app at ${CURRENT_DIR}" >&2
+            exit 1
+          fi
+
+          if [[ ! -f "${RUN_ENV_FILE}" ]]; then
+            echo "Missing production env file at ${RUN_ENV_FILE}" >&2
+            exit 1
+          fi
+
+          cd "${CURRENT_DIR}"
+          set -a
+          source "${RUN_ENV_FILE}"
+          set +a
+
+          npm run content:nightly -- --reserve-limit=6 --practice-limit=6 --provider=gemini
+
+      - name: Print updated inventory plan
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /root/apps/aced/current
+          set -a
+          source /root/apps/aced/shared/.env
+          set +a
+          node scripts/content-plan.mjs --top=20

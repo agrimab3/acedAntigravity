@@ -1,4 +1,4 @@
-import { createHash } from "crypto";
+import { createHash, randomUUID } from "crypto";
 import { Client } from "pg";
 import { z } from "zod";
 import {
@@ -8,12 +8,14 @@ import {
 import {
   buildMissingDifficultySequence,
   buildPromptDifficultyBlueprint,
+  buildSetChildJsonSchema,
   decideChildDisposition,
   formatDifficultyReviewerAssessment,
   planQuestionSetDifficultyCounts,
   toCanonicalChild,
 } from "./lib/content-generation-planning.ts";
 import {
+  SUPPORTED_CONTENT_PROVIDERS,
   buildProviderCandidates,
   buildVerifierProviderOrder,
   resolveFallbackProviders,
@@ -31,6 +33,7 @@ import {
   parseRetryAfterMs,
   summarizeProviderAvailability,
 } from "./lib/content-generation-resilience.mjs";
+import { generatedTopicMatchesRequested } from "./lib/generation-topic-validation.mjs";
 import { reviewQuestionQuality } from "./lib/question-utils.ts";
 
 const SECTION_KEYS = ["english", "math", "reading", "science"];
@@ -98,9 +101,11 @@ Do not output any item that:
 - would likely be flagged by a human editor as too easy, too generic, too short, too direct, or too sloppy
 
 Difficulty standard:
-- Easy: credible ACT warm-up, never childish, trivial, or elementary.
-- Medium: standard ACT difficulty, usually requiring at least one non-obvious reasoning step, closer passage discrimination, or stronger distractor filtering.
-- Hard: upper-range ACT, requiring tighter reasoning, stronger distractors, or more complex setup without becoming artificial.
+- Easy: a direct but credible ACT-level interpretation, generally requiring one clear reasoning step. Distractors must reflect plausible misreads, not childish errors.
+- Medium: requires combining or comparing multiple pieces of information, or making a non-obvious inference, relationship, or transformation. It is not medium merely because one formula must be evaluated.
+- Hard: requires layered reasoning, conditional interpretation, synthesis, subtle discrimination, or identifying what evidence does or does not establish. Distractors remain plausible until the relevant reasoning is applied.
+- Never create difficulty primarily through repetitive arithmetic, long calculations, many nearly identical table lookups, algebraic busywork, unusually long wording, or harder vocabulary.
+- If removing repetitive arithmetic would make the problem easy, the item is not genuinely hard.
 
 Do not lower the quality bar just to satisfy requested counts.
 If a requested difficulty is harder to write well, spend more effort improving the item before outputting it.
@@ -157,6 +162,14 @@ Required review order:
 
 For Reading and Science, all evidence judgments must come from the supplied shared passage or stimulus.
 
+Calibration requirements:
+- Explicitly assess reasoning depth separately from computational burden. More arithmetic is not stronger reasoning.
+- Reject or downgrade hard Science items whose primary difficulty is repetitive calculation, and medium Science items that are essentially Math questions with science-flavored data.
+- Reject or downgrade Reading items with absurd, extreme, differently toned, or otherwise obviously implausible distractors. A hard Reading answer must not be directly stated by the passage.
+- Reject or downgrade Math medium/hard items whose only difficulty is routine or lengthy algebra.
+- Reject or downgrade English items whose explanation relies on an oversimplified grammar slogan rather than the actual function of the revision in context.
+- For Geometry, inspect the literal object named in the stem before solving: a segment is finite, a line is infinite, and a ray has one endpoint. Reject an item that uses an unstated extension, treats a line intersection as a segment intersection, or conflates parallel, perpendicular, collinear, angle, circle-tangency, or circle-intersection relationships. Any needed extension, ray, line, or tangency assumption must be stated explicitly.
+
 Do not repair the item unless explicitly asked.
 Evaluate it as submitted.
 
@@ -187,12 +200,20 @@ const requestedDifficultyCounts = parseRequestedDifficultyCounts(args["difficult
 };
 const isRereviewMode = rereviewQuestionIds.length > 0;
 const requestedStatus = (args.status || "draft").trim().toLowerCase();
+const requestedUsageScope = (args["usage-scope"] || "practice").trim().toLowerCase();
 const sectionFilter = args.section?.trim().toLowerCase();
 const topicFilter = args.topic?.trim().toLowerCase();
 const topicLimit = args["limit-topics"] ? Math.max(1, Number(args["limit-topics"])) : null;
 const delayMs = Math.max(0, Number(args["delay-ms"] || 800));
+const candidateCountOverride = args["candidate-count"]
+  ? Number(args["candidate-count"])
+  : null;
 const jsonOnly = args.json === "true" || args.json === "1";
 const fastRetryMode = args["fast-retry"] === "true" || args["fast-retry"] === "1";
+const requestedRunId = args["run-id"]?.trim() || null;
+const verifierProviderOverride = args["verifier-provider"]?.trim().toLowerCase() || null;
+const verifierModelOverride = args["verifier-model"]?.trim() || null;
+const comparisonMode = args["comparison-mode"] === "true" || args["comparison-mode"] === "1";
 const generationProvider = resolveGenerationProvider(args.provider);
 const generationModel = resolveGenerationModel(generationProvider, args.model);
 const reviewProvider = resolveReviewProvider(args["review-provider"], generationProvider);
@@ -218,6 +239,14 @@ if (!["draft", "published"].includes(requestedStatus)) {
   throw new Error(`Invalid --status value: ${requestedStatus}`);
 }
 
+if (!["practice", "mock_reserve"].includes(requestedUsageScope)) {
+  throw new Error(`Invalid --usage-scope value: ${requestedUsageScope}`);
+}
+
+if (requestedUsageScope === "mock_reserve" && requestedStatus !== "draft") {
+  throw new Error("mock_reserve generation must be stored as draft for human review.");
+}
+
 if (!isRereviewMode && generationProvider === "gemini" && !geminiApiKey) {
   throw new Error("GEMINI_API_KEY is required when using the Gemini generation provider.");
 }
@@ -228,6 +257,21 @@ if (!isRereviewMode && generationProvider === "groq" && !groqApiKey) {
 
 if (!isRereviewMode && generationProvider === "openrouter" && !openRouterApiKey) {
   throw new Error("OPENROUTER_API_KEY is required when using the OpenRouter generation provider.");
+}
+
+if (
+  candidateCountOverride !== null &&
+  (!Number.isInteger(candidateCountOverride) || candidateCountOverride < 1)
+) {
+  throw new Error("--candidate-count must be a positive integer.");
+}
+
+if (requestedRunId && !z.string().uuid().safeParse(requestedRunId).success) {
+  throw new Error("--run-id must be a UUID.");
+}
+
+if (verifierProviderOverride && !SUPPORTED_CONTENT_PROVIDERS.includes(verifierProviderOverride)) {
+  throw new Error(`Unsupported --verifier-provider value: ${verifierProviderOverride}`);
 }
 
 const generatedQuestionSchema = z.object({
@@ -288,6 +332,11 @@ const reviewedQuestionSchema = z.object({
   choices_distinct: z.enum(["yes", "no", "unclear"]),
   evidence_supported: z.enum(["yes", "no", "unclear"]),
   section_appropriate: z.enum(["yes", "no", "unclear"]),
+  reasoning_depth: z.enum(["low", "moderate", "high"]),
+  computational_burden: z.enum(["low", "moderate", "high"]),
+  distractor_plausibility: z.enum(["weak", "adequate", "strong"]),
+  answer_directly_stated: z.enum(["yes", "no", "unclear"]),
+  act_authenticity: z.enum(["weak", "adequate", "strong"]),
   main_issues: z.array(z.string().min(1)).max(6),
   suggested_difficulty: z.union([z.enum(DIFFICULTIES), z.null()]),
   editorial_note: z.string().min(1),
@@ -302,12 +351,167 @@ const correctnessVerifierSchema = z.object({
   evidence_supported: z.enum(["yes", "no", "unclear"]),
   recommended_disposition: z.enum(["keep", "revise", "reject"]),
   main_issues: z.array(z.string().min(1)).max(6),
-  note: z.string().min(1),
+  note: z.string(),
 });
 
 const client = new Client({
   connectionString: databaseUrl,
 });
+const generationRunId = requestedRunId || randomUUID();
+
+function safeCandidateAuditFields(candidate) {
+  if (!candidate || typeof candidate !== "object") {
+    return {};
+  }
+
+  const record = candidate;
+  return {
+    generatedDifficulty: typeof record.difficulty === "string" ? record.difficulty : null,
+    passage: typeof record.passage === "string" ? record.passage : null,
+    prompt:
+      typeof record.question_text === "string"
+        ? record.question_text
+        : typeof record.prompt === "string"
+          ? record.prompt
+          : null,
+    choices: record.choices && typeof record.choices === "object" ? record.choices : null,
+    correctAnswer:
+      typeof record.correct_answer === "string"
+        ? record.correct_answer
+        : typeof record.correctAnswer === "string"
+          ? record.correctAnswer
+          : null,
+    explanation: typeof record.explanation === "string" ? record.explanation : null,
+  };
+}
+
+async function createCandidateAudit({
+  topic,
+  requestedDifficulty,
+  candidate,
+  generationProvider: candidateProvider = generationProvider,
+  generationModel: candidateModel = generationModel,
+  generationAttempt = 1,
+}) {
+  const candidateId = randomUUID();
+  const fields = safeCandidateAuditFields(candidate);
+
+  await client.query(
+    `
+      INSERT INTO question_generation_audits (
+        run_id, candidate_id, section_key, topic_id, topic_name,
+        requested_difficulty, generated_difficulty, passage, prompt, choices,
+        correct_answer, explanation, generation_provider, generation_model,
+        generation_attempt, provider_attempts, final_disposition
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb,
+        $11, $12, $13, $14, $15, $16::jsonb, 'pending'
+      )
+    `,
+    [
+      generationRunId,
+      candidateId,
+      topic.section_key,
+      topic.id,
+      topic.name,
+      requestedDifficulty,
+      fields.generatedDifficulty,
+      fields.passage,
+      fields.prompt,
+      fields.choices ? JSON.stringify(fields.choices) : null,
+      fields.correctAnswer,
+      fields.explanation,
+      candidateProvider,
+      candidateModel,
+      generationAttempt,
+      JSON.stringify(runProviderState.events),
+    ]
+  );
+
+  return candidateId;
+}
+
+async function updateCandidateAudit(candidateId, updates = {}) {
+  const entries = Object.entries(updates).filter(([, value]) => value !== undefined);
+  if (!candidateId || entries.length === 0) {
+    return;
+  }
+
+  const values = [];
+  const assignments = entries.map(([key, value], index) => {
+    values.push(
+      [
+        "generatedDifficulty",
+        "passage",
+        "prompt",
+        "choices",
+        "correctAnswer",
+        "explanation",
+        "deterministicFindings",
+        "blockingFlags",
+        "warningFlags",
+        "primaryReviewerResult",
+        "verifierResult",
+        "providerAttempts",
+        "parserSchemaErrors",
+      ].includes(key) && value !== null
+        ? JSON.stringify(value)
+        : value
+    );
+    const column = {
+      deterministicFindings: "deterministic_findings",
+      generatedDifficulty: "generated_difficulty",
+      passage: "passage",
+      prompt: "prompt",
+      choices: "choices",
+      correctAnswer: "correct_answer",
+      explanation: "explanation",
+      blockingFlags: "blocking_flags",
+      warningFlags: "warning_flags",
+      primaryReviewerResult: "primary_reviewer_result",
+      verifierResult: "verifier_result",
+      providerAttempts: "provider_attempts",
+      parserSchemaErrors: "parser_schema_errors",
+      finalDisposition: "final_disposition",
+      finalReason: "final_reason",
+    }[key];
+    const jsonColumn = [
+      "deterministicFindings",
+      "choices",
+      "blockingFlags",
+      "warningFlags",
+      "primaryReviewerResult",
+      "verifierResult",
+      "providerAttempts",
+      "parserSchemaErrors",
+    ].includes(key);
+    return `${column} = $${index + 1}${jsonColumn ? "::jsonb" : ""}`;
+  });
+
+  values.push(candidateId);
+  await client.query(
+    `UPDATE question_generation_audits
+       SET ${assignments.join(", ")}, updated_at = now()
+     WHERE candidate_id = $${values.length}`,
+    values
+  );
+}
+
+async function recordGenerationFailureAudit({ topic, requestedDifficulty, error }) {
+  const auditCandidateId = await createCandidateAudit({
+    topic,
+    requestedDifficulty,
+    candidate: null,
+  });
+  const message = error instanceof Error ? error.message : "unknown generation error";
+
+  await updateCandidateAudit(auditCandidateId, {
+    providerAttempts: runProviderState.events,
+    parserSchemaErrors: [message],
+    finalDisposition: "provider_schema_failure",
+    finalReason: message,
+  });
+}
 
 function parseArgs(argv) {
   return Object.fromEntries(
@@ -671,9 +875,15 @@ function getSectionSpecificInstructions(sectionKey) {
     case "math":
       return [
         "Write ACT Math items, not worksheet drills.",
+        "Use an authentic ACT-style situation or representation whose details change the mathematical setup; changing only the nouns, units, or surface context of a textbook exercise is not original.",
+        "Vary stem construction and question purpose. Do not default every item to 'what is x?', 'what is the value of', or 'how many' when an interpretation, comparison, constraint, or model-selection question would be clearer.",
+        "Favor concise prompts with a reason for the context. Remove decorative story details and avoid familiar discount, ticket, pencil, paint-mixture, garden-area, and generic rate-work shells unless the context creates a non-obvious but fair modeling decision.",
+        "Build distractors from distinct, diagnosable wrong models: a missed constraint, reversed relationship, incorrect unit, boundary mistake, or plausible interpretation—not arbitrary nearby numbers or routine arithmetic slips alone.",
         "Medium and hard items must require more than direct substitution, direct evaluation, routine formula recall, or immediate solving.",
-        "Prefer items involving structure, interpretation, comparison, constraints, modeling, composition, piecewise reasoning, or multi-step setup.",
+        "Prefer modeling, interpretation, comparison, constraints, combining representations, efficient setup, geometry/algebra relationships, function meaning, or multi-step applications where the setup is the challenge.",
         "If the item can be solved instantly by plugging into one formula or one expression, it is not medium or hard.",
+        "Do not use bare solve-for-x, clean consecutive-integer exercises, or direct function substitution/composition as the entire challenge for medium or hard.",
+        "Do not make an item hard primarily by lengthening routine algebra.",
         "Use passage = null unless a short real-world setup is needed.",
         "Avoid tiny stems with purely numeric answer choices unless the reasoning burden is genuinely ACT-level.",
         "Distractors should reflect realistic mathematical mistakes, not random numbers.",
@@ -692,6 +902,16 @@ function getSectionSpecificInstructions(sectionKey) {
         "Do not create isolated grammar drills dressed up as ACT questions.",
         "Medium and hard items must involve a real editorial decision, not just obvious error spotting.",
         "Grammar, clarity, logic, tone, and cohesion should interact the way they do on ACT English.",
+        "Before finalizing, mentally apply every proposed revision to the passage, verify each pronoun/modifier/clause reference, verify each punctuation or grammar claim, and ensure the explanation describes the keyed edit's actual effect.",
+        "Do not use a generic rule such as 'that is clearer than which' unless the clause's grammatical function in this exact sentence supports it.",
+        "Apply every answer choice mentally to the actual passage before selecting the key. Compare final edited meaning and sentence position, not just the choice strings; choices that produce the same final passage or a no-op movement are not distinct.",
+        "Require exactly one grammatically valid, semantically appropriate, and contextually best revision. Reject malformed substitutions, fabricated grammar rules, unsupported tense corrections, and explanations that describe an order or result different from the revised passage.",
+        "For Organization & Flow, provide at least 4–5 meaningful sentences with a clear paragraph purpose; every movement choice must resolve to a distinct final position justified by discourse structure.",
+        "For Transitions & Cohesion, provide enough preceding and following context to establish the relationship, ensure the keyed transition creates a complete grammatical sentence, and make distractors represent plausible relationship errors.",
+        "For Sentence Structure and Grammar/Usage, the original must contain a real, context-supported error and only one choice may fix that specific error; do not claim mixed tense is wrong without temporal context.",
+        "For Punctuation, evaluate clause structure and semantic relationship directly. Colon, dash, semicolon, and comma choices must not be rejected or accepted by generic style slogans; if multiple marks are defensible, reject the design.",
+        "For Precision & Concision, preserve exact meaning and require a meaningful clarity, redundancy, or precision decision rather than trivial shortening when several choices are acceptable.",
+        "Use distractors based on real editing mistakes and ensure they differ in actual edited meaning or grammar, not merely as strings.",
       ].join("\n");
     case "reading":
       return [
@@ -699,6 +919,7 @@ function getSectionSpecificInstructions(sectionKey) {
         "The passage must be rich enough to support inference, tone, evidence, organization, or meaning questions.",
         "Do not write passages that simply define a concept and then ask what the concept means.",
         "Do not write questions whose answer is almost directly paraphrased from one sentence in the passage.",
+        "Keep Reading distractors textually plausible, similar in tone and specificity, and tied to nearby but ultimately incorrect interpretations. Avoid extreme, cartoonish, or obviously unrelated choices.",
         "Literary Narrative must be actual narrative prose with a speaker, character, scene, memory, or interaction.",
         "Social Science must feel like a real social-science, civic, historical, or cultural passage, not a dictionary entry.",
         "Humanities must feel interpretive, artistic, historical, philosophical, or cultural.",
@@ -708,7 +929,9 @@ function getSectionSpecificInstructions(sectionKey) {
       return [
         "Every Science item must include an experiment summary, data summary, or conflicting-viewpoints setup.",
         "The question must require interpretation of the setup, not outside trivia.",
-        "Hard items should require comparison, variable tracking, inference, or ruling out tempting but unsupported conclusions.",
+        "Favor comparing trends across conditions, evaluating which claim is supported, predicting from a demonstrated pattern, testing a hypothesis, interpreting design/variables, comparing explanations, and reasoning across rows or figures.",
+        "Hard items should require comparison, variable tracking, inference, or ruling out tempting but unsupported conclusions—not repetitive sums, many nearly identical lookups, or calculator-heavy arithmetic.",
+        "Use pure lookup only occasionally for easy items. Do not use percent change as the main source of medium difficulty or tedious computation as the main source of hard difficulty.",
         "If the student could answer without using the setup, reject and rewrite the item.",
         "Use concise but information-rich setups.",
       ].join("\n");
@@ -738,6 +961,7 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
       "The best answer should improve coherence and flow, not sentence-level grammar.",
       "Use passage-based revision prompts such as where a sentence should move, whether it should stay, or which order is most logical.",
       "Do not ask students to move a sentence to the position where it already appears, and do not make deletion the right answer unless the sentence is clearly off-topic.",
+      "Use at least 4–5 meaningful sentences and identify the paragraph's purpose; resolve each placement choice against the current order so 'after sentence 1' cannot duplicate 'keep it where it is'.",
       "Make the correct placement or revision clearly better than the distractors.",
     ],
     "english:transitions-and-cohesion": [
@@ -745,6 +969,7 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
       "Make the relationship between ideas explicit so the student's job is choosing the most coherent bridge.",
       "Use a short passage and mark the target sentence or phrase with [underline]...[/underline] when relevant.",
       "If the question asks for a transition, the underlined text in the passage should be the exact transition slot or sentence being revised.",
+      "The surrounding sentences must establish the logical relationship; substitute each transition and reject any keyed or distractor result that leaves a malformed sentence.",
     ],
     "english:precision-and-concision": [
       "Focus on cutting redundancy, choosing precise wording, and preserving meaning with the clearest phrasing.",
@@ -764,12 +989,14 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
       "Test punctuation through revision in context, not isolated punctuation drills.",
       "Use commas, semicolons, colons, dashes, apostrophes, and end punctuation only where context creates one clearly best answer.",
       "Avoid choices where more than one punctuation option could reasonably work in context.",
+      "Judge punctuation by the actual clauses and intended relationship; do not rely on claims that a dash is automatically informal or a colon automatically too strong.",
     ],
     "english:grammar-and-usage": [
       "Focus on subject-verb agreement, pronoun agreement, verb tense, modifier placement, idiomatic usage, and sentence clarity in context.",
       "Every item must be a revision item with [underline] tags in the passage.",
       "Make the wrong choices realistic and grammatically tempting when possible.",
       "If more than one answer is acceptable English, reject and rewrite the item.",
+      "Require a real error in the original and a context-supported correction; do not invent tense errors without a temporal reason or use unsupported which/that shortcuts.",
     ],
     "english:sentence-structure": [
       "Focus on clause relationships, modifiers, subordination, coordination, sentence boundaries, and structural clarity.",
@@ -878,6 +1105,9 @@ function getTopicSpecificInstructions(sectionKey, topicSlug) {
     "science:data-representation": [
       "Use a short setup that summarizes a table, graph, or data trend in words and includes concrete numbers or variable changes.",
       "Questions should ask for a trend, comparison, interpolation, or direct data-based conclusion.",
+      "Avoid single-cell lookup questions such as asking for one value copied directly from one table cell; even easy items should require comparing, ranking, or connecting at least two displayed values.",
+      "For medium items, require combining at least two observations, such as comparing changes across conditions or identifying which variable relationship is strongest.",
+      "For hard items, require multi-variable reasoning, prediction, or synthesis across the shared data while keeping the answer fully supported by the presented information and not by outside science knowledge.",
     ],
     "science:research-summaries": [
       "Use a short experiment or study summary with variables, procedure, and results.",
@@ -977,11 +1207,12 @@ function buildDifficultyCalibrationInstructions(sectionKey) {
   if (sectionKey === "science") {
     return `
 Difficulty calibration:
-- Easy: direct lookup, straightforward comparison, or one-step interpretation from the stimulus.
-- Medium: percent or rate comparison, interpolation, trend interpretation, or combining two pieces of information.
-- Hard: multi-step reasoning across rows or variables, evaluating competing conclusions, extrapolation only when assumptions are explicit, identifying what added evidence would support a claim, or comparing rates/relationships rather than reading one value.
+- Easy: direct but credible interpretation: a lookup, straightforward comparison, or one-step conclusion from the stimulus. Flag it as low reasoning depth, but it may still be a valid easy item.
+- Medium: combines or compares multiple pieces of scientific information to establish a trend, relationship, supported claim, or design implication. Do not use a percent-change calculation as the main source of difficulty.
+- Hard: requires layered scientific interpretation: evaluate competing claims, identify what evidence does or does not establish, predict a result from a demonstrated pattern, compare explanations, or reason about design/variables. Strong hard items reward interpretation, not calculator endurance.
 - Do not call a direct lookup medium or hard just because the wording is longer.
-- Do not fake hard difficulty by adding verbose phrasing to an easy task.
+- Do not fake hard difficulty by adding repetitive arithmetic, many nearly identical lookups, or verbose phrasing to an easy task.
+- If removing repeated calculations would make the question easy, label it too easy or reject it rather than calling it hard.
 `.trim();
   }
 
@@ -989,14 +1220,51 @@ Difficulty calibration:
     return `
 Difficulty calibration:
 - Easy: explicit detail or straightforward meaning grounded in one clear passage location.
-- Medium: inference, function, relationship, or context reasoning that requires stronger evidence filtering.
-- Hard: synthesis across multiple passage portions, subtle inference, author purpose or structure, or weighing competing evidence.
+- Medium: inference, function, relationship, perspective shift, or context reasoning that requires stronger evidence filtering and several plausible interpretations.
+- Hard: synthesis across multiple passage portions, subtle inference, author purpose or structure, or resolving genuinely competing plausible readings.
 - Do not label a direct detail question as medium or hard unless the reasoning truly becomes less direct.
-- Do not fake hard difficulty with ornate wording or vague abstraction.
+- Do not fake hard difficulty with ornate wording, vague abstraction, or distractors that are cartoonishly wrong.
+`.trim();
+  }
+
+  if (sectionKey === "math") {
+    return `
+Difficulty calibration:
+- Easy: a credible ACT warm-up with one meaningful setup or interpretation decision, accessible numbers, concise wording, and diagnostic distractors. It may take one main step, but it must not be a bare calculation or familiar worksheet shell.
+- Medium: the key challenge is selecting or transforming the right representation, constraint, or relationship; not merely carrying out one formula.
+- Hard: the setup requires layered interpretation, constraints, modeling, or efficient synthesis before the algebra becomes routine.
+- For every difficulty, ask what the student must notice, choose, or reconcile before calculating. If the answer is only substitution or arithmetic, redesign the item.
+- Preserve novelty through the mathematical relationship and the decision the context requires, not through obscure vocabulary, inflated numbers, or extra algebra.
+- Do not create medium or hard difficulty through algebra length, clean consecutive-integer drills, or direct function substitution/composition alone.
+`.trim();
+  }
+
+  if (sectionKey === "english") {
+    return `
+Difficulty calibration:
+- Easy: one clear editorial decision in context, with credible alternatives.
+- Medium: a real interaction among grammar, logic, cohesion, tone, or sentence structure.
+- Hard: subtle contextual discrimination where every option is plausible until the precise grammatical or rhetorical function is applied.
+- Never rely on a generic grammar slogan; the explanation must describe the actual effect of the keyed edit in this passage.
 `.trim();
   }
 
   return "";
+}
+
+function buildEasyMathGenerationInstructions(sectionKey, requestedDifficulty) {
+  if (sectionKey !== "math" || requestedDifficulty !== "easy") {
+    return "";
+  }
+
+  return `
+Easy Math quality requirements:
+- Easy means fewer reasoning steps and accessible numbers, not a bare solve-for-x, direct arithmetic drill, trivial formula substitution, or generic discount, ticket, pencil, or unit-rate worksheet.
+- Prefer one meaningful setup decision: choose an equation from a realistic context, interpret a representation, apply one constraint, identify a relationship, use light proportional reasoning, interpret simple geometry, or reason about a basic statistics/probability situation.
+- Keep calculation short after the setup decision. The mathematical relationship, not arithmetic length, must distinguish the correct choice.
+- Make every distractor diagnostic: each wrong value should correspond to a plausible setup, unit, relationship, or interpretation error rather than a random number.
+- Avoid familiar classroom shells unless the context introduces a genuine choice of representation or constraint.
+`.trim();
 }
 
 function buildPrompt({ sectionKey, topicName, slug, requestedDifficulty, requestedCount }) {
@@ -1051,6 +1319,11 @@ Batch diversity rules:
 - Vary passage style, stem wording, distractor logic, and answer placement.
 - Avoid repeating the same numeric structure, the same rhetorical move, or the same explanation template.
 
+Difficulty calibration rules:
+${buildDifficultyCalibrationInstructions(sectionKey)}
+
+${buildEasyMathGenerationInstructions(sectionKey, requestedDifficulty)}
+
 Section-specific rules:
 ${getSectionSpecificInstructions(sectionKey)}
 
@@ -1077,8 +1350,8 @@ function buildSetPrompt({
           ? difficulty === "easy"
             ? " — direct lookup, straightforward comparison, or one-step interpretation"
             : difficulty === "medium"
-              ? " — percent/change/rate comparison, interpolation, or combining two data points"
-              : " — multi-step reasoning, competing conclusions, explicit extrapolation assumptions, or evidence support"
+              ? " — compare multiple pieces of evidence to infer a trend, relationship, supported claim, or design implication"
+              : " — layered interpretation: competing conclusions, conditional prediction, experimental design, or what evidence does or does not establish; not repetitive arithmetic"
           : difficulty === "easy"
             ? " — explicit detail or straightforward meaning"
             : difficulty === "medium"
@@ -1424,6 +1697,11 @@ For each item, return an object with exactly these fields:
 - choices_distinct
 - evidence_supported
 - section_appropriate
+- reasoning_depth
+- computational_burden
+- distractor_plausibility
+- answer_directly_stated
+- act_authenticity
 - main_issues
 - suggested_difficulty
 - editorial_note
@@ -1443,6 +1721,11 @@ Allowed values:
 - choices_distinct: yes, no, unclear
 - evidence_supported: yes, no, unclear
 - section_appropriate: yes, no, unclear
+- reasoning_depth: low, moderate, high
+- computational_burden: low, moderate, high
+- distractor_plausibility: weak, adequate, strong
+- answer_directly_stated: yes, no, unclear
+- act_authenticity: weak, adequate, strong
 - suggested_difficulty: easy, medium, hard, null
 
 Rules:
@@ -1452,14 +1735,27 @@ Rules:
 - Reject items that feel like worksheet drills rather than ACT items.
 - Reject items whose passage simply gives away the answer.
 - Reject medium or hard math items that are just direct substitution, direct evaluation, formula recall, or routine solving.
+- Reject or revise medium/hard Math items whose primary difficulty is lengthy algebra rather than selecting, modeling, or interpreting the right mathematical relationship.
 - Reject English items with more than one reasonably defensible revision.
+- Reject or revise English explanations that invoke an unsupported shorthand rule (for example, treating "that" as automatically clearer than "which") instead of explaining the revision's actual grammatical function in context.
+- For punctuation, evaluate each option's actual syntactic and semantic validity in the sentence. Do not dismiss a colon or dash with a generic style slogan such as "too informal"; if more than one mark can reasonably connect the clauses in context, reject or revise for ambiguity.
+- Verify every stated distractor rationale against the actual choice. A keyed answer can be correct while an explanation is still broken because it assigns the wrong result or mistake to a distractor; such an item must not be kept.
 - Reject Reading items whose passage does not genuinely support inference, tone, organization, or evidence-based interpretation.
+- Reject or revise Reading items with weak distractor plausibility: extreme, absurd, differently toned, or otherwise obviously wrong options. For hard Reading, reject an answer directly stated by the passage.
+- Reject or revise medium Science items that are primarily arithmetic applied to science-flavored data, and hard Science items whose difficulty is mostly repetitive calculation or nearly identical data lookups.
+- Treat an easy Science lookup as potentially valid but record low reasoning depth when applicable; do not inflate its difficulty label.
 - Reject any item with a broken explanation or missing correct option.
+- For Geometry, verify literal object validity before calculating: do not accept a stem that says finite segments intersect when its own solution puts the named point beyond an endpoint. Require all line, ray, extension, parallel/perpendicular, collinearity, angle, and circle-tangency/intersection assumptions needed by the solution to be explicitly stated.
 - For Reading and Science, use only the supplied shared passage or stimulus as evidence.
 - If no answer is fully supported, verdict must be reject.
 - If more than one answer is defensibly correct, verdict must be reject or revise.
 - If the keyed answer is not the uniquely supported answer, verdict must be reject or revise.
 - If the wording overstates what the evidence supports, verdict must not be keep.
+- Rate reasoning_depth by the inference, synthesis, discrimination, or setup-selection required after routine computation is removed.
+- Rate computational_burden separately; high computational burden never by itself justifies medium or hard difficulty.
+- Rate distractor_plausibility by whether wrong choices are nearby, textually grounded competing readings or diagnostic mistakes rather than implausible throwaways.
+- Set answer_directly_stated to yes when the keyed answer substantially restates an explicit passage sentence rather than requiring inference.
+- Rate act_authenticity weak when the item reads like a classroom drill, worksheet, or calculation exercise instead of an ACT-style reasoning task.
 - Use main_issues as a concise array of the biggest problems only.
 - Keep editorial_note to one sentence.
 - There is exactly 1 item in this request, so return a single JSON object for item_index 0.
@@ -1522,6 +1818,7 @@ Disposition rules:
 - explanation contradicts the evidence -> reject or revise
 - wording that overstates the evidence -> revise
 - if the evidence is insufficient to verify correctness confidently -> revise
+- For Geometry, treat the literal object stated in the stem as binding: a point beyond a segment endpoint cannot be an intersection point of that finite segment. Reject or revise when the solution requires an unstated extension, ray, line, parallel/perpendicular, collinearity, angle, or circle-tangency/intersection assumption.
 
 For Reading and Science, use only the supplied shared passage or stimulus as evidence.
 Do not assess style, originality, or broad publishability here.
@@ -1540,8 +1837,26 @@ ${JSON.stringify({
 `.trim();
 }
 
+async function fetchProviderResponse(provider, url, options) {
+  try {
+    return await fetch(url, options);
+  } catch (error) {
+    const cause = error && typeof error === "object" ? error.cause : null;
+    const causeCode = cause && typeof cause === "object" && "code" in cause ? cause.code : null;
+    const causeMessage = cause instanceof Error ? cause.message : null;
+    const detail = [error instanceof Error ? error.message : "fetch failed", causeCode, causeMessage]
+      .filter(Boolean)
+      .join("; ");
+    const message = `${provider} transport failed before response headers: ${detail}`;
+    throw new ProviderRequestError(message, {
+      provider: provider.toLowerCase(),
+      classification: classifyProviderFailure({ message }),
+    });
+  }
+}
+
 async function requestGeminiJson({ model, systemPrompt, userPrompt, schema, temperature = 0.35 }) {
-  const response = await fetch(`${resolveGeminiBaseUrl()}/models/${model}:generateContent`, {
+  const response = await fetchProviderResponse("Gemini", `${resolveGeminiBaseUrl()}/models/${model}:generateContent`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -1617,12 +1932,14 @@ async function requestGroqJson({
   schema,
   temperature = 0.35,
   allowModelFallback = true,
+  allowSchemaTransportFallback = true,
+  useJsonObjectMode = false,
 }) {
-  const groqSupportsJsonSchema = supportsGroqJsonSchema(model);
+  const groqSupportsJsonSchema = supportsGroqJsonSchema(model) && !useJsonObjectMode;
   if (groqSupportsJsonSchema) {
     assertStrictJsonSchemaObjects(schema);
   }
-  const response = await fetch(`${resolveGroqBaseUrl()}/chat/completions`, {
+  const response = await fetchProviderResponse("Groq", `${resolveGroqBaseUrl()}/chat/completions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -1673,6 +1990,26 @@ async function requestGroqJson({
   if (!response.ok) {
     const message = payload?.error?.message || rawBody || `HTTP ${response.status}`;
 
+    if (
+      allowSchemaTransportFallback &&
+      groqSupportsJsonSchema &&
+      /invalid json schema for response_format|\/required:.*required.*array including every key|json_schema.*strict/i.test(message)
+    ) {
+      console.warn(
+        "Groq rejected the strict response schema at the transport layer; retrying once in JSON-object mode with local schema validation."
+      );
+      return requestGroqJson({
+        model,
+        systemPrompt,
+        userPrompt,
+        schema,
+        temperature,
+        allowModelFallback,
+        allowSchemaTransportFallback: false,
+        useJsonObjectMode: true,
+      });
+    }
+
     if (allowModelFallback && isGroqModelUnavailableError(message)) {
       const fallbackModel = resolveGroqFallbackModel(model);
 
@@ -1687,6 +2024,8 @@ async function requestGroqJson({
           schema,
           temperature,
           allowModelFallback: false,
+          allowSchemaTransportFallback,
+          useJsonObjectMode,
         });
       }
     }
@@ -1717,7 +2056,7 @@ async function requestGroqJson({
 
 async function requestOpenRouterJson({ model, systemPrompt, userPrompt, schema, temperature = 0.35 }) {
   assertStrictJsonSchemaObjects(schema);
-  const response = await fetch(`${resolveOpenRouterBaseUrl()}/chat/completions`, {
+  const response = await fetchProviderResponse("OpenRouter", `${resolveOpenRouterBaseUrl()}/chat/completions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -1787,7 +2126,7 @@ async function requestOpenRouterJson({ model, systemPrompt, userPrompt, schema, 
 }
 
 async function requestOllamaJson({ model, systemPrompt, userPrompt, schema, temperature = 0.35 }) {
-  const response = await fetch(`${resolveOllamaBaseUrl()}/api/chat`, {
+  const response = await fetchProviderResponse("Ollama", `${resolveOllamaBaseUrl()}/api/chat`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -2222,7 +2561,8 @@ async function generateReplacementSetChild(
   provider = generationProvider,
   model = generationModel
 ) {
-  const schema = buildSetChildSchema(topic.section_key, requestedDifficulty);
+  const parser = buildSetChildSchema(topic.section_key, requestedDifficulty);
+  const schema = buildSetChildJsonSchema(topic.section_key, requestedDifficulty);
   const prompt = buildSetChildGenerationPrompt({
     topic,
     sharedContent,
@@ -2251,7 +2591,7 @@ async function generateReplacementSetChild(
       const parsedPayload = parseModelJson(text);
 
       return {
-        question: schema.parse(parsedPayload),
+        question: parser.parse(parsedPayload),
       };
     },
   });
@@ -2274,20 +2614,8 @@ async function reviseSetChildForDifficulty(
   provider = generationProvider,
   model = generationModel
 ) {
-  const responseSchema = z.object({
-    section: z.string().min(1).optional(),
-    topic: z.string().min(1).optional(),
-    difficulty: z.enum(DIFFICULTIES).optional(),
-    question_text: z.string().min(20).optional(),
-    choices: z.object({
-      A: z.string().min(1),
-      B: z.string().min(1),
-      C: z.string().min(1),
-      D: z.string().min(1),
-    }).optional(),
-    correct_answer: z.enum(ANSWER_CHOICES).optional(),
-    explanation: z.string().min(30).optional(),
-  }).strict();
+  const responseSchema = buildSetChildSchema(topic.section_key, requestedDifficulty);
+  const responseJsonSchema = buildSetChildJsonSchema(topic.section_key, requestedDifficulty);
   const prompt = buildSetChildRevisionPrompt({
     topic,
     sharedContent,
@@ -2311,7 +2639,7 @@ async function reviseSetChildForDifficulty(
         model: candidate.model,
         systemPrompt: GENERATION_SYSTEM_PROMPT,
         userPrompt: prompt,
-        schema: responseSchema,
+        schema: responseJsonSchema,
         temperature: 0.65,
       });
       const parsedPayload = parseModelJson(text);
@@ -2356,8 +2684,19 @@ async function generateBatchForTopic(topic) {
         });
       } catch (error) {
         if (error instanceof ProviderRunStoppedError) {
+          await recordGenerationFailureAudit({
+            topic,
+            requestedDifficulty: `${difficultyCounts.easy ?? 0} easy, ${difficultyCounts.medium ?? 0} medium, ${difficultyCounts.hard ?? 0} hard shared set`,
+            error,
+          });
           throw error;
         }
+
+        await recordGenerationFailureAudit({
+          topic,
+          requestedDifficulty: `${difficultyCounts.easy ?? 0} easy, ${difficultyCounts.medium ?? 0} medium, ${difficultyCounts.hard ?? 0} hard shared set`,
+          error,
+        });
 
         const message = error instanceof Error ? error.message : "unknown generation error";
         failures.push({
@@ -2380,10 +2719,13 @@ async function generateBatchForTopic(topic) {
       continue;
     }
 
-    const candidateCount = Math.min(
-      6,
-      Math.max(requestedCount, requestedCount + (requestedCount === 1 ? 2 : 1))
-    );
+    const candidateCount =
+      candidateCountOverride === null
+        ? Math.min(
+            6,
+            Math.max(requestedCount, requestedCount + (requestedCount === 1 ? 2 : 1))
+          )
+        : Math.max(requestedCount, candidateCountOverride);
 
     try {
       const batchResult = await generateBatchForDifficulty(topic, difficulty, candidateCount);
@@ -2396,16 +2738,12 @@ async function generateBatchForTopic(topic) {
       );
     } catch (error) {
       if (error instanceof ProviderRunStoppedError) {
-        error.progress = {
-          inserted,
-          skipped,
-          reviewKept,
-          reviewRevised,
-          reviewRejected,
-          reviewErrors,
-        };
+        await recordGenerationFailureAudit({ topic, requestedDifficulty: difficulty, error });
+        error.progress = error.progress ?? {};
         throw error;
       }
+
+      await recordGenerationFailureAudit({ topic, requestedDifficulty: difficulty, error });
 
       const message = error instanceof Error ? error.message : "unknown generation error";
       failures.push({
@@ -2490,6 +2828,26 @@ async function reviewGeneratedQuestion(
         type: "string",
         enum: ["yes", "no", "unclear"],
       },
+      reasoning_depth: {
+        type: "string",
+        enum: ["low", "moderate", "high"],
+      },
+      computational_burden: {
+        type: "string",
+        enum: ["low", "moderate", "high"],
+      },
+      distractor_plausibility: {
+        type: "string",
+        enum: ["weak", "adequate", "strong"],
+      },
+      answer_directly_stated: {
+        type: "string",
+        enum: ["yes", "no", "unclear"],
+      },
+      act_authenticity: {
+        type: "string",
+        enum: ["weak", "adequate", "strong"],
+      },
       main_issues: {
         type: "array",
         items: { type: "string" },
@@ -2518,6 +2876,11 @@ async function reviewGeneratedQuestion(
       "choices_distinct",
       "evidence_supported",
       "section_appropriate",
+      "reasoning_depth",
+      "computational_burden",
+      "distractor_plausibility",
+      "answer_directly_stated",
+      "act_authenticity",
       "main_issues",
       "suggested_difficulty",
       "editorial_note",
@@ -2601,9 +2964,7 @@ async function verifyGeneratedQuestionCorrectness(
         type: "array",
         items: { type: "string" },
       },
-      note: {
-        type: "string",
-      },
+      note: { type: "string" },
     },
     required: [
       "correctness_verified",
@@ -2619,15 +2980,17 @@ async function verifyGeneratedQuestionCorrectness(
     additionalProperties: false,
   };
   const prompt = buildCorrectnessVerificationPrompt(topic, question);
-  const verifierProviderOrder = buildVerifierProviderOrder(generationSourceProvider, provider);
+  const verifierProviderOrder = verifierProviderOverride
+    ? [verifierProviderOverride]
+    : buildVerifierProviderOrder(generationSourceProvider, provider);
   const primaryProvider = verifierProviderOrder[0] ?? provider;
-  const primaryModel = resolveReviewModel(
+  const primaryModel = verifierModelOverride || resolveReviewModel(
     primaryProvider,
     primaryProvider === provider ? model : null,
     primaryProvider === provider ? model : null
   );
   const { primary, fallback, fallbacks, candidates } = buildOperationCandidates("review", primaryProvider, primaryModel, {
-    fallbackProviders: verifierProviderOrder.slice(1),
+    fallbackProviders: verifierProviderOverride ? [] : verifierProviderOrder.slice(1),
   });
   const attemptedProviders = new Set();
   let operationResult;
@@ -2710,7 +3073,14 @@ function sanitizeQuestion(sectionKey, topic, question, sourceMetadata = {}) {
     throw new Error("Generated section does not match the requested section.");
   }
 
-  if (question.topic.trim() !== topic.name) {
+  if (
+    !generatedTopicMatchesRequested({
+      expectedTopic: topic.name,
+      generatedTopic: question.topic,
+      sectionKey,
+      question,
+    })
+  ) {
     throw new Error("Generated topic does not match the requested topic.");
   }
 
@@ -2956,20 +3326,13 @@ function sanitizeQuestionSet(sectionKey, topic, generatedSet, requestedDifficult
   const title = typeof generatedSet.title === "string" ? generatedSet.title.trim() || null : null;
   const metadata =
     generatedSet.metadata && typeof generatedSet.metadata === "object" ? generatedSet.metadata : null;
-  const normalizedChildren = generatedSet.questions.map((question) =>
-    sanitizeQuestion(sectionKey, topic, {
-      ...question,
-      passage: content,
-    })
-  );
-
-  if (normalizedChildren.length < 3) {
+  if (generatedSet.questions.length < 3) {
     throw new Error("Generated set did not produce the minimum useful child-question count.");
   }
 
   const seenPrompts = new Set();
-  normalizedChildren.forEach((child) => {
-    const promptKey = normalizeText(child.prompt);
+  generatedSet.questions.forEach((child) => {
+    const promptKey = normalizeText(child.question_text);
     if (seenPrompts.has(promptKey)) {
       throw new Error("Generated set contains duplicate child question stems.");
     }
@@ -2986,11 +3349,7 @@ function sanitizeQuestionSet(sectionKey, topic, generatedSet, requestedDifficult
     content,
     metadata,
     requestedDifficultyCounts,
-    questions: normalizedChildren.map((child) => ({
-      ...child,
-      passage: null,
-      sharedContent: content,
-    })),
+    questions: generatedSet.questions,
   };
 }
 
@@ -3119,6 +3478,11 @@ function buildReviewNotes({
       choicesDistinct: reviewerResult.choices_distinct,
       evidenceSupported: reviewerResult.evidence_supported,
       sectionAppropriate: reviewerResult.section_appropriate,
+      reasoningDepth: reviewerResult.reasoning_depth,
+      computationalBurden: reviewerResult.computational_burden,
+      distractorPlausibility: reviewerResult.distractor_plausibility,
+      answerDirectlyStated: reviewerResult.answer_directly_stated,
+      actAuthenticity: reviewerResult.act_authenticity,
     },
     verifier: verifierResult
       ? {
@@ -3178,6 +3542,7 @@ async function runReviewPipelineForQuestion({
   requestedDifficulty = normalizedQuestion.difficulty,
   contextLabel,
   onDifficultyRepair,
+  auditCandidateId = null,
 }) {
   const counters = createReviewCounters();
   let reviewerResult;
@@ -3191,18 +3556,34 @@ async function runReviewPipelineForQuestion({
     reviewProviderUsed = reviewOperation.provider;
   } catch (error) {
     if (error instanceof ProviderRunStoppedError) {
+      const message = error.message || "review provider became unavailable";
+      counters.reviewErrors += 1;
+      counters.skipped += 1;
+      await updateCandidateAudit(auditCandidateId, {
+        providerAttempts: runProviderState.events,
+        parserSchemaErrors: [message],
+        finalDisposition: "rejected_reviewer_error",
+        finalReason: message,
+      });
+      error.auditTerminalized = true;
       error.progress = counters;
       throw error;
     }
 
     counters.reviewErrors += 1;
     counters.skipped += 1;
+    await updateCandidateAudit(auditCandidateId, {
+      providerAttempts: runProviderState.events,
+      parserSchemaErrors: [error instanceof Error ? error.message : "unknown reviewer error"],
+      finalDisposition: "rejected_reviewer_error",
+      finalReason: error instanceof Error ? error.message : "unknown reviewer error",
+    });
     console.warn(
       `Skipping ${contextLabel} after reviewer failure: ${
         error instanceof Error ? error.message : "unknown reviewer error"
       }`
     );
-    return { approved: false, counters, normalizedQuestion };
+    return { approved: false, counters, normalizedQuestion, disposition: "rejected_reviewer_error" };
   }
 
   disposition = decideChildDisposition({
@@ -3212,6 +3593,11 @@ async function runReviewPipelineForQuestion({
     difficultyAccuracy: reviewerResult.difficulty_accuracy,
     suggestedDifficulty: reviewerResult.suggested_difficulty,
     hasHardFailure: hasHardPrimaryCorrectnessFailure(reviewerResult),
+  });
+
+  await updateCandidateAudit(auditCandidateId, {
+    primaryReviewerResult: reviewerResult,
+    providerAttempts: runProviderState.events,
   });
 
   if (disposition === "revise") {
@@ -3323,18 +3709,59 @@ async function runReviewPipelineForQuestion({
     verifierResult = verificationOperation.verifierResult;
   } catch (error) {
     if (error instanceof ProviderRunStoppedError) {
+      if (comparisonMode) {
+        counters.reviewErrors += 1;
+        await updateCandidateAudit(auditCandidateId, {
+          primaryReviewerResult: reviewerResult,
+          providerAttempts: runProviderState.events,
+          parserSchemaErrors: [error.message],
+          finalDisposition: "unverified_comparison",
+          finalReason: "Verifier unavailable in opt-in comparison mode.",
+        });
+        return { approved: false, unverifiedForComparison: true, counters, normalizedQuestion, reviewerResult, disposition: "unverified_comparison" };
+      }
+      const message = error.message || "correctness verifier became unavailable";
+      counters.reviewErrors += 1;
+      counters.skipped += 1;
+      await updateCandidateAudit(auditCandidateId, {
+        primaryReviewerResult: reviewerResult,
+        providerAttempts: runProviderState.events,
+        parserSchemaErrors: [message],
+        finalDisposition: "rejected_verifier_error",
+        finalReason: message,
+      });
+      error.auditTerminalized = true;
       error.progress = counters;
       throw error;
     }
 
+    if (comparisonMode) {
+      counters.reviewErrors += 1;
+      await updateCandidateAudit(auditCandidateId, {
+        primaryReviewerResult: reviewerResult,
+        providerAttempts: runProviderState.events,
+        parserSchemaErrors: [error instanceof Error ? error.message : "unknown verifier error"],
+        finalDisposition: "unverified_comparison",
+        finalReason: "Verifier unavailable in opt-in comparison mode.",
+      });
+      return { approved: false, unverifiedForComparison: true, counters, normalizedQuestion, reviewerResult, disposition: "unverified_comparison" };
+    }
+
     counters.reviewErrors += 1;
     counters.skipped += 1;
+    await updateCandidateAudit(auditCandidateId, {
+      primaryReviewerResult: reviewerResult,
+      providerAttempts: runProviderState.events,
+      parserSchemaErrors: [error instanceof Error ? error.message : "unknown verifier error"],
+      finalDisposition: "rejected_verifier_error",
+      finalReason: error instanceof Error ? error.message : "unknown verifier error",
+    });
     console.warn(
       `Skipping ${contextLabel} after correctness verifier failure: ${
         error instanceof Error ? error.message : "unknown correctness verifier error"
       }`
     );
-    return { approved: false, counters, normalizedQuestion, reviewerResult, disposition: "replace" };
+    return { approved: false, counters, normalizedQuestion, reviewerResult, disposition: "rejected_verifier_error" };
   }
 
   if (hasVerifierHardFailure(verifierResult)) {
@@ -3400,6 +3827,13 @@ async function insertQuestions(topic, generatedQuestions) {
   let reviewErrors = 0;
 
   for (const generatedQuestion of generatedQuestions) {
+    const auditCandidateId = await createCandidateAudit({
+      topic,
+      requestedDifficulty: generatedQuestion.difficulty,
+      candidate: generatedQuestion,
+      generationProvider: generatedQuestion._generationProvider,
+      generationModel: generatedQuestion._generationModel,
+    });
     let normalizedQuestion;
 
     try {
@@ -3409,6 +3843,12 @@ async function insertQuestions(topic, generatedQuestions) {
       });
     } catch (error) {
       skipped += 1;
+      await updateCandidateAudit(auditCandidateId, {
+        providerAttempts: runProviderState.events,
+        parserSchemaErrors: [error instanceof Error ? error.message : "unknown validation error"],
+        finalDisposition: "rejected_deterministic",
+        finalReason: error instanceof Error ? error.message : "unknown validation error",
+      });
       console.warn(
         `Skipping invalid ${topic.section_key}/${topic.slug} question: ${
           error instanceof Error ? error.message : "unknown validation error"
@@ -3419,8 +3859,23 @@ async function insertQuestions(topic, generatedQuestions) {
 
     if (knownFingerprints.has(normalizedQuestion.fingerprint)) {
       skipped += 1;
+      await updateCandidateAudit(auditCandidateId, {
+        deterministicFindings: normalizedQuestion.qualityReview.findings,
+        blockingFlags: normalizedQuestion.qualityReview.blockingFlags,
+        warningFlags: normalizedQuestion.qualityReview.warningFlags,
+        providerAttempts: runProviderState.events,
+        finalDisposition: "skipped_duplicate",
+        finalReason: "Duplicate question fingerprint.",
+      });
       continue;
     }
+
+    await updateCandidateAudit(auditCandidateId, {
+      deterministicFindings: normalizedQuestion.qualityReview.findings,
+      blockingFlags: normalizedQuestion.qualityReview.blockingFlags,
+      warningFlags: normalizedQuestion.qualityReview.warningFlags,
+      providerAttempts: runProviderState.events,
+    });
 
     let reviewedQuestion;
 
@@ -3430,6 +3885,7 @@ async function insertQuestions(topic, generatedQuestions) {
         normalizedQuestion,
         contextLabel: `${topic.section_key}/${topic.slug} question`,
         onDifficultyRepair: null,
+        auditCandidateId,
       });
     } catch (error) {
       if (error instanceof ProviderRunStoppedError) {
@@ -3455,6 +3911,13 @@ async function insertQuestions(topic, generatedQuestions) {
     reviewErrors += reviewedQuestion.counters.reviewErrors;
 
     if (!reviewedQuestion.approved) {
+      await updateCandidateAudit(auditCandidateId, {
+        primaryReviewerResult: reviewedQuestion.reviewerResult ?? null,
+        verifierResult: reviewedQuestion.verifierResult ?? null,
+        providerAttempts: runProviderState.events,
+        finalDisposition: reviewedQuestion.disposition ?? "rejected_review",
+        finalReason: "Candidate did not pass the review pipeline.",
+      });
       continue;
     }
 
@@ -3475,10 +3938,11 @@ async function insertQuestions(topic, generatedQuestions) {
           explanation,
           source,
           generation_model,
+          usage_scope,
           status,
           review_notes
         )
-        VALUES ($1, $2, $3, 'multiple_choice', $4, $5, $6, $7::jsonb, $8, $9, $10, $11, $12, $13)
+        VALUES ($1, $2, $3, 'multiple_choice', $4, $5, $6, $7::jsonb, $8, $9, $10, $11, $12, $13, $14)
         ON CONFLICT (fingerprint) DO NOTHING
         RETURNING id
       `,
@@ -3494,6 +3958,7 @@ async function insertQuestions(topic, generatedQuestions) {
         approvedQuestion.explanation,
         approvedQuestion.generationProvider,
         approvedQuestion.generationModel,
+        requestedUsageScope,
         requestedStatus,
         reviewedQuestion.reviewerNote,
       ]
@@ -3502,8 +3967,22 @@ async function insertQuestions(topic, generatedQuestions) {
     if (result.rowCount > 0) {
       knownFingerprints.add(approvedQuestion.fingerprint);
       inserted += 1;
+      await updateCandidateAudit(auditCandidateId, {
+        primaryReviewerResult: reviewedQuestion.reviewerResult ?? null,
+        verifierResult: reviewedQuestion.verifierResult ?? null,
+        providerAttempts: runProviderState.events,
+        finalDisposition: "stored_draft",
+        finalReason: null,
+      });
     } else {
       skipped += 1;
+      await updateCandidateAudit(auditCandidateId, {
+        primaryReviewerResult: reviewedQuestion.reviewerResult ?? null,
+        verifierResult: reviewedQuestion.verifierResult ?? null,
+        providerAttempts: runProviderState.events,
+        finalDisposition: "skipped_duplicate",
+        finalReason: "Question fingerprint conflicted during insert.",
+      });
     }
   }
 
@@ -3545,6 +4024,25 @@ async function insertQuestionSets(topic, generatedSets) {
       normalizedSet = sanitizeQuestionSet(topic.section_key, topic, generatedSet, generatedSet.requestedDifficultyCounts ?? null);
     } catch (error) {
       skipped += Array.isArray(generatedSet.questions) ? generatedSet.questions.length : 1;
+      if (Array.isArray(generatedSet.questions)) {
+        await Promise.all(
+          generatedSet.questions.map(async (rawChild) => {
+            const auditCandidateId = await createCandidateAudit({
+              topic,
+              requestedDifficulty: rawChild.difficulty ?? "unknown",
+              candidate: { ...rawChild, passage: generatedSet.content ?? null },
+              generationProvider: generatedSet._generationProvider,
+              generationModel: generatedSet._generationModel,
+            });
+            await updateCandidateAudit(auditCandidateId, {
+              providerAttempts: runProviderState.events,
+              parserSchemaErrors: [error instanceof Error ? error.message : "unknown set validation error"],
+              finalDisposition: "rejected_set_structure",
+              finalReason: error instanceof Error ? error.message : "unknown set validation error",
+            });
+          })
+        );
+      }
       console.warn(
         `Skipping invalid ${topic.section_key}/${topic.slug} set: ${
           error instanceof Error ? error.message : "unknown set validation error"
@@ -3553,20 +4051,60 @@ async function insertQuestionSets(topic, generatedSets) {
       continue;
     }
 
-    const uniqueChildren = normalizedSet.questions.filter((question) => !knownFingerprints.has(question.fingerprint));
-
-    if (uniqueChildren.length < 3) {
-      skipped += normalizedSet.questions.length;
-      console.warn(
-        `Skipping ${topic.section_key}/${topic.slug} set after duplicate filtering: fewer than 3 unique child questions remain.`
-      );
-      continue;
-    }
-
     const approvedChildren = [];
-    const existingPrompts = new Set(uniqueChildren.map((child) => child.prompt));
+    const existingPrompts = new Set();
 
-    for (const child of uniqueChildren) {
+    for (const rawChild of normalizedSet.questions) {
+      const auditCandidateId = await createCandidateAudit({
+        topic,
+        requestedDifficulty: rawChild.difficulty,
+        candidate: { ...rawChild, passage: normalizedSet.content },
+        generationProvider: generatedSet._generationProvider,
+        generationModel: generatedSet._generationModel,
+      });
+      let child;
+
+      try {
+        child = sanitizeQuestion(
+          topic.section_key,
+          topic,
+          { ...rawChild, passage: normalizedSet.content },
+          {
+            generationProvider: generatedSet._generationProvider,
+            generationModel: generatedSet._generationModel,
+          }
+        );
+      } catch (error) {
+        skipped += 1;
+        await updateCandidateAudit(auditCandidateId, {
+          providerAttempts: runProviderState.events,
+          parserSchemaErrors: [error instanceof Error ? error.message : "unknown child validation error"],
+          finalDisposition: "rejected_deterministic",
+          finalReason: error instanceof Error ? error.message : "unknown child validation error",
+        });
+        continue;
+      }
+
+      if (knownFingerprints.has(child.fingerprint)) {
+        skipped += 1;
+        await updateCandidateAudit(auditCandidateId, {
+          deterministicFindings: child.qualityReview.findings,
+          blockingFlags: child.qualityReview.blockingFlags,
+          warningFlags: child.qualityReview.warningFlags,
+          providerAttempts: runProviderState.events,
+          finalDisposition: "skipped_duplicate",
+          finalReason: "Duplicate question fingerprint.",
+        });
+        continue;
+      }
+
+      await updateCandidateAudit(auditCandidateId, {
+        deterministicFindings: child.qualityReview.findings,
+        blockingFlags: child.qualityReview.blockingFlags,
+        warningFlags: child.qualityReview.warningFlags,
+        providerAttempts: runProviderState.events,
+      });
+
       try {
         const reviewedChild = await runReviewPipelineForQuestion({
           topic,
@@ -3576,7 +4114,7 @@ async function insertQuestionSets(topic, generatedSets) {
           onDifficultyRepair: async (reviewerResult) => {
             const revisedRawChild = await reviseSetChildForDifficulty(topic, {
               child,
-              sharedContent: child.sharedContent,
+              sharedContent: normalizedSet.content,
               requestedDifficulty: child.difficulty,
               reviewerResult,
             });
@@ -3586,7 +4124,7 @@ async function insertQuestionSets(topic, generatedSets) {
               topic,
               {
                 ...revisedRawChild.question,
-                passage: child.sharedContent,
+                passage: normalizedSet.content,
               },
               {
                 generationProvider: revisedRawChild.provider,
@@ -3594,6 +4132,7 @@ async function insertQuestionSets(topic, generatedSets) {
               }
             );
           },
+          auditCandidateId,
         });
 
         skipped += reviewedChild.counters.skipped;
@@ -3606,13 +4145,37 @@ async function insertQuestionSets(topic, generatedSets) {
           approvedChildren.push({
             ...reviewedChild.normalizedQuestion,
             passage: null,
-            sharedContent: child.sharedContent,
+            sharedContent: normalizedSet.content,
             reviewerNote: reviewedChild.reviewerNote,
+            auditCandidateId,
           });
           existingPrompts.add(reviewedChild.normalizedQuestion.prompt);
+          await updateCandidateAudit(auditCandidateId, {
+            primaryReviewerResult: reviewedChild.reviewerResult ?? null,
+            verifierResult: reviewedChild.verifierResult ?? null,
+            providerAttempts: runProviderState.events,
+            finalDisposition: "approved_pending_set",
+            finalReason: null,
+          });
+        } else {
+          await updateCandidateAudit(auditCandidateId, {
+            primaryReviewerResult: reviewedChild.reviewerResult ?? null,
+            verifierResult: reviewedChild.verifierResult ?? null,
+            providerAttempts: runProviderState.events,
+            finalDisposition: reviewedChild.disposition ?? "rejected_review",
+            finalReason: "Shared-set child did not pass the review pipeline.",
+          });
         }
       } catch (error) {
         if (error instanceof ProviderRunStoppedError) {
+          if (!error.auditTerminalized) {
+            await updateCandidateAudit(auditCandidateId, {
+              providerAttempts: runProviderState.events,
+              parserSchemaErrors: [error.message],
+              finalDisposition: "provider_schema_failure",
+              finalReason: error.message,
+            });
+          }
           const progress = error.progress ?? {};
           error.progress = {
             inserted,
@@ -3641,6 +4204,12 @@ async function insertQuestionSets(topic, generatedSets) {
       let replacementApproved = false;
 
       for (let attempt = 1; attempt <= maxReplacementAttemptsPerMissingChild; attempt += 1) {
+        const replacementAuditId = await createCandidateAudit({
+          topic,
+          requestedDifficulty: missingDifficulty,
+          candidate: { passage: normalizedSet.content },
+          generationAttempt: attempt,
+        });
         try {
           const replacementRawChild = await generateReplacementSetChild(topic, {
             sharedContent: normalizedSet.content,
@@ -3651,6 +4220,18 @@ async function insertQuestionSets(topic, generatedSets) {
             topic,
             originalChild: null,
             requestedDifficulty: missingDifficulty,
+          });
+          const replacementFields = safeCandidateAuditFields({
+            ...replacementCandidate,
+            passage: normalizedSet.content,
+          });
+          await updateCandidateAudit(replacementAuditId, {
+            generatedDifficulty: replacementFields.generatedDifficulty,
+            passage: replacementFields.passage,
+            prompt: replacementFields.prompt,
+            choices: replacementFields.choices,
+            correctAnswer: replacementFields.correctAnswer,
+            explanation: replacementFields.explanation,
           });
           const replacementChild = sanitizeQuestion(
             topic.section_key,
@@ -3665,12 +4246,24 @@ async function insertQuestionSets(topic, generatedSets) {
             }
           );
 
+          await updateCandidateAudit(replacementAuditId, {
+            deterministicFindings: replacementChild.qualityReview.findings,
+            blockingFlags: replacementChild.qualityReview.blockingFlags,
+            warningFlags: replacementChild.qualityReview.warningFlags,
+            providerAttempts: runProviderState.events,
+          });
+
           if (
             knownFingerprints.has(replacementChild.fingerprint) ||
             approvedChildren.some((child) => child.fingerprint === replacementChild.fingerprint) ||
             existingPrompts.has(replacementChild.prompt)
           ) {
             skipped += 1;
+            await updateCandidateAudit(replacementAuditId, {
+              providerAttempts: runProviderState.events,
+              finalDisposition: "skipped_duplicate",
+              finalReason: "Replacement duplicated an existing question or prompt.",
+            });
             console.warn(
               `Skipping ${topic.section_key}/${topic.slug} replacement child after duplicate filtering: requested=${missingDifficulty} · attempt=${attempt}`
             );
@@ -3706,6 +4299,7 @@ async function insertQuestionSets(topic, generatedSets) {
                 }
               );
             },
+            auditCandidateId: replacementAuditId,
           });
 
           skipped += reviewedReplacement.counters.skipped;
@@ -3715,6 +4309,13 @@ async function insertQuestionSets(topic, generatedSets) {
           reviewErrors += reviewedReplacement.counters.reviewErrors;
 
           if (!reviewedReplacement.approved) {
+            await updateCandidateAudit(replacementAuditId, {
+              primaryReviewerResult: reviewedReplacement.reviewerResult ?? null,
+              verifierResult: reviewedReplacement.verifierResult ?? null,
+              providerAttempts: runProviderState.events,
+              finalDisposition: reviewedReplacement.disposition ?? "rejected_review",
+              finalReason: "Replacement did not pass the review pipeline.",
+            });
             continue;
           }
 
@@ -3723,12 +4324,28 @@ async function insertQuestionSets(topic, generatedSets) {
             passage: null,
             sharedContent: normalizedSet.content,
             reviewerNote: reviewedReplacement.reviewerNote,
+            auditCandidateId: replacementAuditId,
           });
           existingPrompts.add(reviewedReplacement.normalizedQuestion.prompt);
           replacementApproved = true;
+          await updateCandidateAudit(replacementAuditId, {
+            primaryReviewerResult: reviewedReplacement.reviewerResult ?? null,
+            verifierResult: reviewedReplacement.verifierResult ?? null,
+            providerAttempts: runProviderState.events,
+            finalDisposition: "approved_pending_set",
+            finalReason: null,
+          });
           break;
         } catch (error) {
           if (error instanceof ProviderRunStoppedError) {
+            if (!error.auditTerminalized) {
+              await updateCandidateAudit(replacementAuditId, {
+                providerAttempts: runProviderState.events,
+                parserSchemaErrors: [error.message],
+                finalDisposition: "provider_schema_failure",
+                finalReason: error.message,
+              });
+            }
             const progress = error.progress ?? {};
             error.progress = {
               inserted,
@@ -3744,6 +4361,12 @@ async function insertQuestionSets(topic, generatedSets) {
 
           reviewErrors += 1;
           skipped += 1;
+          await updateCandidateAudit(replacementAuditId, {
+            providerAttempts: runProviderState.events,
+            parserSchemaErrors: [error instanceof Error ? error.message : "unknown replacement error"],
+            finalDisposition: "rejected_parser_or_provider",
+            finalReason: error instanceof Error ? error.message : "unknown replacement error",
+          });
           console.warn(
             `Skipping ${topic.section_key}/${topic.slug} replacement child after generation failure: requested=${missingDifficulty} · attempt=${attempt} · ${
               error instanceof Error ? error.message : "unknown replacement error"
@@ -3816,10 +4439,11 @@ async function insertQuestionSets(topic, generatedSets) {
               explanation,
               source,
               generation_model,
+              usage_scope,
               status,
               review_notes
             )
-            VALUES ($1, $2, $3, $4, 'multiple_choice', $5, NULL, $6, $7::jsonb, $8, $9, $10, $11, $12, $13)
+            VALUES ($1, $2, $3, $4, 'multiple_choice', $5, NULL, $6, $7::jsonb, $8, $9, $10, $11, $12, $13, $14)
             ON CONFLICT (fingerprint) DO NOTHING
             RETURNING id
           `,
@@ -3835,6 +4459,7 @@ async function insertQuestionSets(topic, generatedSets) {
             child.explanation,
             child.generationProvider,
             child.generationModel,
+            requestedUsageScope,
             requestedStatus,
             child.reviewerNote,
           ]
@@ -3844,8 +4469,18 @@ async function insertQuestionSets(topic, generatedSets) {
           knownFingerprints.add(child.fingerprint);
           inserted += 1;
           insertedForSet += 1;
+          await updateCandidateAudit(child.auditCandidateId, {
+            finalDisposition: "stored_draft",
+            finalReason: null,
+            providerAttempts: runProviderState.events,
+          });
         } else {
           skipped += 1;
+          await updateCandidateAudit(child.auditCandidateId, {
+            finalDisposition: "skipped_duplicate",
+            finalReason: "Question fingerprint conflicted during set insert.",
+            providerAttempts: runProviderState.events,
+          });
         }
       }
 
@@ -3861,6 +4496,15 @@ async function insertQuestionSets(topic, generatedSets) {
     } catch (error) {
       await client.query("ROLLBACK");
       skipped += approvedChildren.length;
+      await Promise.all(
+        approvedChildren.map((child) =>
+          updateCandidateAudit(child.auditCandidateId, {
+            finalDisposition: "approved_set_not_committed",
+            finalReason: error instanceof Error ? error.message : "unknown set transaction error",
+            providerAttempts: runProviderState.events,
+          })
+        )
+      );
       console.warn(
         `Rolling back ${topic.section_key}/${topic.slug} set insert: ${
           error instanceof Error ? error.message : "unknown transaction error"
@@ -4066,6 +4710,7 @@ async function main() {
     const summary = {
       provider: generationProvider,
       model: generationModel,
+      usageScope: requestedUsageScope,
       reviewProvider,
       reviewModel,
       topicsProcessed: 0,
@@ -4087,7 +4732,7 @@ async function main() {
     };
 
     console.log(
-      `Generating ACT inventory for ${topics.length} topic(s) with difficulty plan easy:${requestedDifficultyCounts.easy}, medium:${requestedDifficultyCounts.medium}, hard:${requestedDifficultyCounts.hard}.`
+      `Generating ACT inventory for ${topics.length} topic(s) in ${requestedUsageScope} with difficulty plan easy:${requestedDifficultyCounts.easy}, medium:${requestedDifficultyCounts.medium}, hard:${requestedDifficultyCounts.hard}.`
     );
 
     for (const [topicIndex, topic] of topics.entries()) {

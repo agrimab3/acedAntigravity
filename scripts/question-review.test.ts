@@ -153,3 +153,236 @@ test("valid science item still passes deterministic review", () => {
   assert.equal(review.blockingFlags.length, 0);
   assert.equal(review.warningFlags.length, 0);
 });
+
+test("Validation 03 Geometry segment-extension premise is blocked", () => {
+  const review = reviewQuestionQuality({
+    id: "math-scale-validation-03-geometry-segment-extension",
+    section: "math",
+    topic: "Geometry",
+    difficulty: "medium",
+    passage: null,
+    question_text:
+      "In triangle ABC, points D and E lie on sides AB and AC respectively. The ratios AD:DB = 2:3 and AE:EC = 1:4. Segments DE and BC intersect at point F. What is the ratio BF:FC?",
+    choices: { A: "2:5", B: "3:8", C: "4:7", D: "5:9" },
+    correct_answer: "B",
+    explanation:
+      "Line DE meets line BC at F, which lies beyond B. Thus BF:FC = 3:8.",
+  });
+
+  assert.equal(review.shouldServe, false);
+  assert.equal(review.findings.evidenceSupported, "fail");
+  assert(review.blockingFlags.some((flag) => flag.code === "geometry-unstated-segment-extension"));
+});
+
+test("explicit line intersection remains eligible when its point lies beyond a segment endpoint", () => {
+  const review = reviewQuestionQuality({
+    id: "geometry-explicit-line-extension",
+    section: "math",
+    topic: "Geometry",
+    difficulty: "medium",
+    passage: null,
+    question_text:
+      "In triangle ABC, points D and E lie on sides AB and AC respectively. Lines DE and BC intersect at point F. Point F lies beyond B on line BC. What is the ratio BF:FC?",
+    choices: { A: "1:2", B: "2:3", C: "3:4", D: "4:5" },
+    correct_answer: "B",
+    explanation: "The stated lines, rather than finite segments, meet at F beyond B.",
+  });
+
+  assert.equal(review.blockingFlags.some((flag) => flag.code === "geometry-unstated-segment-extension"), false);
+});
+
+test("English leave-in-place and move-to-current-position choices are equivalent", () => {
+  const review = reviewQuestionQuality({
+    id: "english-current-position-equivalence",
+    section: "english",
+    topic: "Organization & Flow",
+    difficulty: "easy",
+    passage:
+      "The city’s annual marathon draws thousands of runners each spring. [underline]Spectators line the streets, cheering and offering water stations.[/underline] Organizers begin planning the route months in advance.",
+    question_text: "Which revision would most improve the organization and flow of the paragraph?",
+    choices: {
+      A: "Leave the underlined sentence where it is.",
+      B: "Move the underlined sentence to follow the third sentence.",
+      C: "Move the underlined sentence to follow the first sentence.",
+      D: "Delete the underlined sentence.",
+    },
+    correct_answer: "B",
+    explanation: "Choice B creates a more logical chronological sequence.",
+  });
+
+  assert.equal(review.findings.choicesDistinct, "fail");
+  assert(review.blockingFlags.some((flag) => flag.code === "equivalent-english-revision-actions"));
+  assert.equal(review.shouldServe, false);
+});
+
+test("distinct English movement choices remain eligible for review", () => {
+  const review = reviewQuestionQuality({
+    id: "english-distinct-movement-actions",
+    section: "english",
+    topic: "Organization & Flow",
+    difficulty: "easy",
+    passage:
+      "The city’s annual marathon draws thousands of runners each spring. [underline]Spectators line the streets, cheering and offering water stations.[/underline] Organizers begin planning the route months in advance. The event raises funds for local charities.",
+    question_text: "Which revision would most improve the organization and flow of the paragraph?",
+    choices: {
+      A: "Leave the underlined sentence where it is.",
+      B: "Move the underlined sentence to follow the third sentence.",
+      C: "Move the underlined sentence to follow the second sentence.",
+      D: "Delete the underlined sentence.",
+    },
+    correct_answer: "B",
+    explanation: "Choice B places the spectator details after the planning details.",
+  });
+
+  assert.equal(review.findings.choicesDistinct, "pass");
+  assert.equal(review.blockingFlags.some((flag) => flag.code === "equivalent-english-revision-actions"), false);
+});
+
+test("EM01 detects placement choices that resolve to the current position", () => {
+  const review = reviewQuestionQuality({
+    id: "EM01-duplicate-placement",
+    section: "english",
+    topic: "Organization & Flow",
+    difficulty: "hard",
+    passage:
+      "Urban beekeeping has surged in popularity over the past decade, offering city dwellers a chance to support pollinator populations. [underline]While honeybees have been domesticated for millennia, their role in modern agriculture remains a topic of debate.[/underline] Recent surveys indicate that rooftop hives can produce comparable honey yields to rural apiaries. However, the density of hives in densely populated areas raises concerns about disease transmission among colonies. Moreover, city planners must consider the placement of hives to avoid conflicts with building codes and resident complaints. Understanding both the historical significance and contemporary challenges of beekeeping can guide effective policy development.",
+    question_text: "Which of the following is the best place to insert the underlined sentence in the passage?",
+    choices: {
+      A: "After sentence 1",
+      B: "After sentence 3",
+      C: "After sentence 5",
+      D: "Keep the sentence where it is",
+    },
+    correct_answer: "A",
+    explanation: "The historical context belongs after the opening sentence.",
+  });
+
+  assert.equal(review.findings.choicesDistinct, "fail");
+  assert(review.blockingFlags.some((flag) => flag.code === "equivalent-english-revision-actions"));
+});
+
+test("EM05 blocks a transition blank where no choice supplies the required subject", () => {
+  const review = reviewQuestionQuality({
+    id: "EM05-no-grammatical-completion",
+    section: "english",
+    topic: "Transitions & Cohesion",
+    difficulty: "medium",
+    passage:
+      "Recent studies have shown that urban green spaces improve mental health. However, many city planners overlook the importance of maintaining these areas. [underline]______[/underline] leads to a decline in community well-being.",
+    question_text: "Which choice best fills the blank to create a logical connection between the sentences?",
+    choices: { A: "Consequently", B: "Nevertheless", C: "In addition", D: "For example" },
+    correct_answer: "A",
+    explanation: "Consequently signals a cause-effect relationship.",
+  });
+
+  assert(review.blockingFlags.some((flag) => flag.code === "no-grammatical-transition-completion"));
+  assert.equal(review.shouldServe, false);
+});
+
+test("EM12 layered piecewise composition is not flagged as routine formula substitution", () => {
+  const review = reviewQuestionQuality({
+    id: "EM12-layered-piecewise-composition",
+    section: "math",
+    topic: "Functions",
+    difficulty: "medium",
+    passage: null,
+    question_text:
+      "The function f is defined by cases: f(x)=x+2 for x less than or equal to 0 and f(x)=3x-1 for x greater than 0. What is the sum of all real numbers x that satisfy f(f(x))=4?",
+    choices: { A: "5/9", B: "1/3", C: "2/3", D: "1" },
+    correct_answer: "A",
+    explanation:
+      "The composition requires separate branch cases. The valid solutions are -1/3 and 8/9, whose sum is 5/9.",
+  });
+
+  assert.equal(review.warningFlags.some((flag) => flag.code === "formula-substitution-math"), false);
+});
+
+test("EM18 layered vertex and single-intersection reasoning is not flagged as routine formula substitution", () => {
+  const review = reviewQuestionQuality({
+    id: "EM18-layered-quadratic-intersection",
+    section: "math",
+    topic: "Algebra",
+    difficulty: "hard",
+    passage: null,
+    question_text:
+      "The quadratic function f(x) has its vertex at (2, -3) and passes through (0, 5). Another quadratic g(x)=x^2+px+q intersects f(x) at exactly one point, and that point is the vertex of f. What is p?",
+    choices: { A: "-2", B: "-4", C: "0", D: "3" },
+    correct_answer: "B",
+    explanation:
+      "Derive f from vertex information, use the vertex as the shared point, and use the discriminant condition for exactly one intersection. This gives p=-4.",
+  });
+
+  assert.equal(review.warningFlags.some((flag) => flag.code === "formula-substitution-math"), false);
+});
+
+test("the Validation Batch 02 Functions system is not flagged as routine formula substitution", () => {
+  const review = reviewQuestionQuality({
+    id: "validation-02-derived-quadratic-parameters",
+    section: "math",
+    topic: "Functions",
+    difficulty: "medium",
+    passage: null,
+    question_text:
+      "A quadratic function f is defined for all real numbers by f(x)=ax^2+bx+c, where a, b, and c are constants. It is known that f(1)=2, f(2)=3, the parabola opens upward, and the vertex of the parabola lies on the line y = x + 1. What is f(3)?",
+    choices: { A: "2", B: "4", C: "8", D: "6" },
+    correct_answer: "D",
+    explanation:
+      "The two function values determine b and c in terms of a. Combining the vertex-on-a-line condition with those equations gives a^2=1; opening upward gives a=1, so f(x)=x^2-2x+3 and f(3)=6.",
+  });
+
+  assert.equal(review.warningFlags.some((flag) => flag.code === "formula-substitution-math"), false);
+});
+
+test("routine function evaluation remains flagged as formula substitution", () => {
+  const review = reviewQuestionQuality({
+    id: "routine-function-evaluation",
+    section: "math",
+    topic: "Functions",
+    difficulty: "medium",
+    passage: null,
+    question_text: "For f(x)=3x+2, what is f(5)?",
+    choices: { A: "13", B: "15", C: "17", D: "25" },
+    correct_answer: "C",
+    explanation: "Substitute 5 for x: f(5)=3(5)+2=17.",
+  });
+
+  assert(review.warningFlags.some((flag) => flag.code === "formula-substitution-math"));
+});
+
+test("EM16 catches a distractor rationale that assigns the no-discount result to the wrong choice", () => {
+  const review = reviewQuestionQuality({
+    id: "EM16-incorrect-distractor-rationale",
+    section: "math",
+    topic: "Number & Quantity",
+    difficulty: "easy",
+    passage: null,
+    question_text:
+      "A pack of 12 pencils costs $3.60. If a customer buys 5 packs and receives a 10% discount on the total purchase price, what is the total amount the customer pays?",
+    choices: { A: "$15.30", B: "$16.20", C: "$17.10", D: "$18.00" },
+    correct_answer: "B",
+    explanation:
+      "The total before discount is $18.00 and the discounted total is $16.20, choice B. Choice A forgets to apply the discount, while D ignores the discount altogether.",
+  });
+
+  assert(review.blockingFlags.some((flag) => flag.code === "incorrect-distractor-rationale"));
+  assert.equal(review.findings.explanationVerified, "fail");
+});
+
+test("math pack-size distractor issue is retained as a warning", () => {
+  const review = reviewQuestionQuality({
+    id: "math-pack-size-distractors",
+    section: "math",
+    topic: "Number & Quantity",
+    difficulty: "easy",
+    passage: null,
+    question_text:
+      "A pack of 5 regular pens costs $3 and a pack of 8 premium pens costs $5. A customer wants exactly 40 pens. How many premium pens will the customer purchase?",
+    choices: { A: "0", B: "5", C: "8", D: "10" },
+    correct_answer: "A",
+    explanation:
+      "Eight regular packs provide 40 pens for $24, while five premium packs provide 40 pens for $25.",
+  });
+
+  assert(review.warningFlags.some((flag) => flag.code === "non-diagnostic-pack-distractors"));
+  assert.equal(review.shouldServe, true);
+});

@@ -59,6 +59,36 @@ export function planQuestionSetDifficultyCounts(
   });
 }
 
+
+
+export function buildSetChildJsonSchema(sectionKey: string, requestedDifficulty: DifficultyKey) {
+  const answerChoices = ["A", "B", "C", "D"] as const;
+  return {
+    type: "object",
+    properties: {
+      section: { type: "string", const: sectionKey },
+      topic: { type: "string" },
+      difficulty: { type: "string", const: requestedDifficulty },
+      question_text: { type: "string" },
+      choices: {
+        type: "object",
+        properties: {
+          A: { type: "string" },
+          B: { type: "string" },
+          C: { type: "string" },
+          D: { type: "string" },
+        },
+        required: [...answerChoices],
+        additionalProperties: false,
+      },
+      correct_answer: { type: "string", enum: [...answerChoices] },
+      explanation: { type: "string" },
+    },
+    required: ["section", "topic", "difficulty", "question_text", "choices", "correct_answer", "explanation"],
+    additionalProperties: false,
+  };
+}
+
 export function buildPromptDifficultyBlueprint(requestedCounts: DifficultyCounts) {
   return buildRequestedDifficultySequence(requestedCounts, PROMPT_DIFFICULTY_ORDER);
 }

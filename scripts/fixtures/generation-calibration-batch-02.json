@@ -1,0 +1,101 @@
+[
+  {
+    "id": "science-easy-lookup",
+    "section": "science",
+    "difficulty": "easy",
+    "prompt": "According to Table 1, which plant species had the highest average weekly height increase under full sunlight during week 2?",
+    "expectedSignals": {
+      "reasoning_depth": "low",
+      "computational_burden": "low",
+      "act_authenticity": "adequate"
+    }
+  },
+  {
+    "id": "science-medium-percent-change",
+    "section": "science",
+    "difficulty": "medium",
+    "prompt": "By what percent did Aster's average weekly increase under full sunlight change from week 1 to week 4?",
+    "expectedSignals": {
+      "reasoning_depth": "low",
+      "computational_burden": "moderate",
+      "act_authenticity": "weak"
+    }
+  },
+  {
+    "id": "science-hard-repetitive-sums",
+    "section": "science",
+    "difficulty": "hard",
+    "prompt": "A researcher wants to choose the light condition that produces the smallest absolute difference in total four-week height increase between the Basil and Clover species. Using the data in Table 1, which light condition should the researcher select?",
+    "expectedSignals": {
+      "reasoning_depth": "moderate",
+      "computational_burden": "high",
+      "act_authenticity": "weak"
+    }
+  },
+  {
+    "id": "reading-hard-direct-theme",
+    "section": "reading",
+    "difficulty": "hard",
+    "prompt": "Based on the passage, which statement most accurately reflects the narrator's overall feeling as they contemplate the cabin and its surroundings?",
+    "expectedSignals": {
+      "distractor_plausibility": "weak",
+      "answer_directly_stated": "yes",
+      "act_authenticity": "weak"
+    }
+  },
+  {
+    "id": "reading-medium-mood",
+    "section": "reading",
+    "difficulty": "medium",
+    "prompt": "Based on the passage, which of the following statements best captures the narrator's overall perspective on change?",
+    "expectedSignals": {
+      "distractor_plausibility": "weak",
+      "answer_directly_stated": "yes",
+      "act_authenticity": "weak"
+    }
+  },
+  {
+    "id": "math-medium-consecutive-even-integers",
+    "section": "math",
+    "difficulty": "medium",
+    "prompt": "The product of two consecutive even integers is 224. What is the larger of the two integers?",
+    "expectedSignals": {
+      "reasoning_depth": "low",
+      "computational_burden": "moderate",
+      "act_authenticity": "weak"
+    }
+  },
+  {
+    "id": "math-hard-function-composition",
+    "section": "math",
+    "difficulty": "hard",
+    "prompt": "Let f(x)=2x^2-5x+3 and let g(x)=(x+1)/(x-2). What is the sum of all real numbers x for which f(g(x))=7?",
+    "expectedSignals": {
+      "reasoning_depth": "moderate",
+      "computational_burden": "high",
+      "act_authenticity": "weak"
+    }
+  },
+  {
+    "id": "english-which-that-rationale",
+    "section": "english",
+    "difficulty": "hard",
+    "prompt": "Which of the following revisions best improves the underlined portion?",
+    "rationaleExcerpt": "Option B changes which to that, turning the clause into a restrictive one that clearly refers to the project.",
+    "expectedSignals": {
+      "act_authenticity": "weak"
+    },
+    "expectedIssue": "unsupported grammar rationale"
+  },
+  {
+    "id": "english-punctuation-ambiguity",
+    "section": "english",
+    "difficulty": "easy",
+    "prompt": "The committee reviewed the proposals, they approved the most feasible one.",
+    "rationaleExcerpt": "A colon would suggest the second clause explains the first, and a dash is too informal for this context.",
+    "expectedSignals": {
+      "choices_distinct": "requires contextual validation"
+    },
+    "expectedIssue": "punctuation ambiguity must be judged by syntactic and semantic validity"
+  }
+]

@@ -7,6 +7,7 @@ import {
 import {
   buildMissingDifficultySequence,
   buildPromptDifficultyBlueprint,
+  buildSetChildJsonSchema,
   decideChildDisposition,
   formatDifficultyReviewerAssessment,
   mergeRevisedChildShape,
@@ -39,6 +40,27 @@ test("question set planning preserves requested difficulty counts", () => {
     medium: 1,
     hard: 1,
   });
+});
+
+
+
+test("shared-set child JSON schema is strict for provider structured output", () => {
+  const schema = buildSetChildJsonSchema("reading", "hard");
+
+  assert.equal(schema.additionalProperties, false);
+  assert.deepEqual(schema.required, [
+    "section",
+    "topic",
+    "difficulty",
+    "question_text",
+    "choices",
+    "correct_answer",
+    "explanation",
+  ]);
+  assert.equal(schema.properties.choices.additionalProperties, false);
+  assert.deepEqual(schema.properties.choices.required, ["A", "B", "C", "D"]);
+  assert.equal(schema.properties.section.const, "reading");
+  assert.equal(schema.properties.difficulty.const, "hard");
 });
 
 test("missing child replacement targets the missing requested difficulty", () => {

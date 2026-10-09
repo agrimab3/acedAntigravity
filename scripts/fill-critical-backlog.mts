@@ -697,6 +697,7 @@ async function loadAuditedTopics() {
         from questions q
         inner join act_topics t on q.topic_id = t.id
         where t.is_active = true
+          and q.usage_scope = 'practice'
       `
     ),
   ]);

@@ -107,6 +107,211 @@ export function areEquivalentChoices(left: string, right: string) {
   return Math.abs(numericLeft - numericRight) < 1e-9;
 }
 
+type EnglishAction = { kind: "leave" | "move"; targetAfterSentence: number };
+
+function getUnderlinedSentencePosition(passage: string | null) {
+  if (!passage) return null;
+  const markerIndex = passage.search(/\[underline\]/i);
+  if (markerIndex < 0) return null;
+  const before = passage.slice(0, markerIndex);
+  const completedSentences = (before.match(/[.!?](?:\s|$)/g) ?? []).length;
+  return completedSentences + 1;
+}
+
+function parseEnglishRevisionAction(choice: string, currentPosition: number): EnglishAction | null {
+  const normalized = normalizeChoiceForComparison(choice);
+  if (/\b(?:leave|keep) (?:the )?(?:underlined )?sentence where it is\b/.test(normalized)) {
+    return { kind: "leave", targetAfterSentence: currentPosition - 1 };
+  }
+
+  const moveMatch = normalized.match(
+    /\b(?:move (?:the )?(?:underlined )?sentence to follow (?:the )?|after (?:the )?sentence )?(first|second|third|fourth|\d+)(?: sentence)?\b/
+  );
+  if (!moveMatch) return null;
+  const ordinal = moveMatch[1];
+  const targetAfterSentence =
+    ordinal === "first" ? 1 : ordinal === "second" ? 2 : ordinal === "third" ? 3 : ordinal === "fourth" ? 4 : Number(ordinal);
+  return Number.isInteger(targetAfterSentence) && targetAfterSentence > 0
+    ? { kind: "move", targetAfterSentence }
+    : null;
+}
+
+export function findEquivalentEnglishRevisionChoices(
+  passage: string | null,
+  choices: ChoiceMap | null
+) {
+  const currentPosition = getUnderlinedSentencePosition(passage);
+  if (!choices || currentPosition === null) return [] as Array<[keyof ChoiceMap, keyof ChoiceMap]>;
+  const actions = (Object.keys(choices) as Array<keyof ChoiceMap>)
+    .map((key) => [key, parseEnglishRevisionAction(choices[key], currentPosition)] as const)
+    .filter((entry): entry is readonly [keyof ChoiceMap, EnglishAction] => entry[1] !== null);
+  const equivalent: Array<[keyof ChoiceMap, keyof ChoiceMap]> = [];
+
+  for (let index = 0; index < actions.length; index += 1) {
+    for (let innerIndex = index + 1; innerIndex < actions.length; innerIndex += 1) {
+      if (actions[index][1].targetAfterSentence === actions[innerIndex][1].targetAfterSentence) {
+        equivalent.push([actions[index][0], actions[innerIndex][0]]);
+      }
+    }
+  }
+
+  return equivalent;
+}
+
+const TRANSITION_ADVERBS = new Set([
+  "accordingly",
+  "also",
+  "consequently",
+  "furthermore",
+  "however",
+  "indeed",
+  "instead",
+  "meanwhile",
+  "moreover",
+  "nevertheless",
+  "nonetheless",
+  "otherwise",
+  "similarly",
+  "therefore",
+  "thus",
+]);
+
+const TRANSITION_PHRASES = new Set(["as a result", "for example", "in addition", "on the other hand"]);
+
+function isStandaloneTransition(choice: string) {
+  const normalized = normalizeChoiceForComparison(choice).replace(/,$/, "");
+  return TRANSITION_ADVERBS.has(normalized) || TRANSITION_PHRASES.has(normalized);
+}
+
+function findInvalidEnglishTransitionCompletion(
+  passage: string | null,
+  choices: ChoiceMap | null,
+  correctAnswer: keyof ChoiceMap | null
+) {
+  if (!passage || !choices) return null;
+
+  const blankMatch = passage.match(/\[underline\]\s*(?:_{2,}|…+|\.\.\.)\s*\[\/underline\]\s*([A-Za-z]+)\b/i);
+  if (!blankMatch) return null;
+
+  // This deliberately targets only an obvious subject gap such as
+  // "Consequently leads to ...". It is not intended to parse English generally.
+  const followingWord = blankMatch[1].toLowerCase();
+  if (!/^(leads|causes|creates|results|suggests|shows|indicates|makes|provides)$/i.test(followingWord)) {
+    return null;
+  }
+
+  const viableChoices = (Object.entries(choices) as Array<[keyof ChoiceMap, string]>).filter(
+    ([, choice]) => !isStandaloneTransition(choice)
+  );
+  const keyedChoice = correctAnswer ? choices[correctAnswer] : null;
+  const keyedIsStandaloneTransition = keyedChoice !== null && isStandaloneTransition(keyedChoice);
+
+  return {
+    noViableCompletion: viableChoices.length === 0,
+    keyedCompletionInvalid: keyedIsStandaloneTransition,
+  };
+}
+
+function findDiscountDistractorExplanationMismatch(
+  questionText: string,
+  choices: ChoiceMap | null,
+  explanation: string
+) {
+  if (!choices) return null;
+  const priceMatch = questionText.match(/pack(?:\s+of\s+\d+\s+\w+)?\s+costs?\s+\$\s*(\d+(?:\.\d+)?)/i);
+  const purchaseMatch = questionText.match(/buys?\s+(\d+(?:\.\d+)?)\s+packs?[^.]*?(\d+(?:\.\d+)?)%\s+discount/i);
+  if (!priceMatch || !purchaseMatch) return null;
+
+  const packs = Number(purchaseMatch[1]);
+  const price = Number(priceMatch[1]);
+  if (!Number.isFinite(packs) || !Number.isFinite(price)) return null;
+  const undiscountedTotal = packs * price;
+  const mistakenChoiceMentions = Array.from(
+    explanation.matchAll(/(?:choice\s*)?([A-D])\s+(?:forgets|ignores)\s+(?:to\s+apply|the)\s*(?:the\s+)?discount/gi)
+  )
+    .map((match) => match[1]?.toUpperCase())
+    .filter((choice): choice is keyof ChoiceMap => Boolean(choice));
+
+  const mismatches = mistakenChoiceMentions.filter((choice) => {
+    const amount = Number(choices[choice].replace(/[^0-9.-]/g, ""));
+    return Number.isFinite(amount) && Math.abs(amount - undiscountedTotal) > 0.01;
+  });
+
+  return mismatches.length > 0 ? mismatches : null;
+}
+
+function hasLayeredMathReasoning(questionText: string, explanation: string) {
+  const combined = `${questionText} ${explanation}`.toLowerCase();
+  const hasPiecewiseBranching = /piecewise|begin\{cases\}|\bcases\b/.test(combined) && /f\s*\(\s*f\s*\(/.test(combined);
+  const hasStructuralCondition =
+    /vertex/.test(combined) &&
+    /intersect(?:s|ion)?|exactly one point|discriminant|tangen(?:t|cy)/.test(combined) &&
+    /discriminant|exactly one point|only common point/.test(combined);
+  const functionConditions = (combined.match(/\b[fgh]\s*\(\s*-?\d+(?:\.\d+)?\s*\)\s*=/g) ?? []).length;
+  const hasParameterizedFunction = /\b[fgh]\s*\(\s*x\s*\)\s*=\s*[a-z]/.test(combined);
+  const hasFunctionStructureConstraint =
+    /\bvertex\b|opens? (?:upward|downward)|axis of symmetry|lies on (?:the )?line|intersect(?:s|ion)?|tangen(?:t|cy)|discriminant/.test(
+      combined
+    );
+  const hasDerivedParameterSystem =
+    hasParameterizedFunction && functionConditions >= 2 && hasFunctionStructureConstraint;
+
+  return hasPiecewiseBranching || hasStructuralCondition || hasDerivedParameterSystem;
+}
+
+function findMathPackDistractorWarning(questionText: string, choices: ChoiceMap | null) {
+  if (!choices) return null;
+  const packMatch = questionText.match(/pack of\s+(\d+)\s+premium\s+(?:pens|items|tickets|units)/i);
+  const asksForItems = /how many premium (?:pens|items|tickets|units)/i.test(questionText);
+  if (!packMatch || !asksForItems) return null;
+  const packSize = Number(packMatch[1]);
+  if (!Number.isInteger(packSize) || packSize < 2) return null;
+  const invalidChoices = (Object.entries(choices) as Array<[keyof ChoiceMap, string]>).filter(
+    ([, choice]) => /^\d+$/.test(choice.trim()) && Number(choice) !== 0 && Number(choice) % packSize !== 0
+  );
+  return invalidChoices.length >= 2
+    ? `Multiple distractors (${invalidChoices.map(([key]) => key).join(", ")}) violate the explicit premium-pack size of ${packSize}.`
+    : null;
+}
+
+function findGeometryLiteralObjectConflict(
+  questionText: string,
+  passage: string | null,
+  explanation: string
+) {
+  const stated = `${questionText} ${passage ?? ""}`;
+  const segmentIntersection = stated.match(
+    /\bsegments?\s+([A-Z]{2})\s+(?:and|with)\s+([A-Z]{2})\s+intersect(?:\s+at\s+(?:point\s+)?([A-Z]))?/i
+  );
+  if (!segmentIntersection) return null;
+
+  const firstSegment = segmentIntersection[1].toUpperCase();
+  const secondSegment = segmentIntersection[2].toUpperCase();
+  const intersectionPoint = segmentIntersection[3]?.toUpperCase() ?? null;
+  if (!intersectionPoint) return null;
+
+  // This is intentionally narrow: an explanation that places the named
+  // intersection beyond an endpoint contradicts a stem that calls the finite
+  // objects segments. It does not attempt to prove arbitrary geometry claims.
+  const beyondMatch = explanation.match(
+    new RegExp(`\\b${intersectionPoint}(?:,\\s*which)?\\s+(?:lies|is)\\s+(?:beyond|outside)\\s+(?:point\\s+)?([A-Z])\\b`, "i")
+  );
+  const extensionMatch = explanation.match(
+    new RegExp(`\\b${intersectionPoint}\\s+(?:lies|is)\\s+on\\s+the\\s+extension\\s+of\\s+(?:segment\\s+)?([A-Z]{2})\\b`, "i")
+  );
+  const endpoint = beyondMatch?.[1]?.toUpperCase() ?? null;
+  const extendedObject = extensionMatch?.[1]?.toUpperCase() ?? null;
+
+  if (
+    (endpoint && (firstSegment.includes(endpoint) || secondSegment.includes(endpoint))) ||
+    (extendedObject && (extendedObject === firstSegment || extendedObject === secondSegment))
+  ) {
+    return { firstSegment, secondSegment, intersectionPoint };
+  }
+
+  return null;
+}
+
 export function normalizeChoices(choices: unknown): ChoiceMap | null {
   if (!choices || typeof choices !== "object") {
     return null;
@@ -734,6 +939,42 @@ export function reviewQuestionQuality(row: {
     }
   }
 
+  if (row.section === "english") {
+    const equivalentActions = findEquivalentEnglishRevisionChoices(row.passage, choices);
+    if (equivalentActions.length > 0) {
+      findings.choicesDistinct = "fail";
+      pushFlag(
+        flags,
+        "reject",
+        "equivalent-english-revision-actions",
+        "Two English revision choices resolve to the same passage position."
+      );
+    }
+
+    const transitionCompletion = findInvalidEnglishTransitionCompletion(
+      row.passage,
+      choices,
+      correctAnswer
+    );
+    if (transitionCompletion?.noViableCompletion) {
+      findings.evidenceSupported = "fail";
+      pushFlag(
+        flags,
+        "reject",
+        "no-grammatical-transition-completion",
+        "No supplied transition choice can grammatically fill the marked subject position."
+      );
+    } else if (transitionCompletion?.keyedCompletionInvalid) {
+      findings.answerKeyVerified = "fail";
+      pushFlag(
+        flags,
+        "reject",
+        "invalid-keyed-transition-completion",
+        "The keyed transition cannot grammatically complete the marked sentence."
+      );
+    }
+  }
+
   const combinedText = `${row.question_text} ${row.passage ?? ""}`.toLowerCase();
   const normalizedTopic = normalizeTopicLabel(row.topic);
   const normalizedDifficulty = row.difficulty.trim().toLowerCase();
@@ -745,6 +986,24 @@ export function reviewQuestionQuality(row: {
     choices !== null &&
     Object.values(choices).every((choice) => /^-?\d+(\.\d+)?$/.test(choice.trim()));
   const isMediumHard = normalizedDifficulty === "medium" || normalizedDifficulty === "hard";
+
+  const packDistractorWarning = row.section === "math" ? findMathPackDistractorWarning(row.question_text, choices) : null;
+  if (packDistractorWarning) {
+    pushFlag(flags, "warn", "non-diagnostic-pack-distractors", packDistractorWarning);
+  }
+
+  if (
+    normalizedDifficulty === "easy" &&
+    explanationWordCount > 90 &&
+    explanationWordCount > Math.max(45, promptWordCount * 2)
+  ) {
+    pushFlag(
+      flags,
+      "warn",
+      "overlong-easy-explanation",
+      "Easy-item explanation is disproportionately long relative to the stem."
+    );
+  }
 
   if (row.section === "english" && (!row.passage || row.passage.trim().length === 0)) {
     findings.sectionAppropriate = "fail";
@@ -817,6 +1076,42 @@ export function reviewQuestionQuality(row: {
       "explanation-answer-mismatch",
       "Explanation points to a different answer choice than the keyed correct answer."
     );
+  }
+
+  if (row.section === "math") {
+    const discountDistractorMismatches = findDiscountDistractorExplanationMismatch(
+      row.question_text,
+      choices,
+      row.explanation
+    );
+    if (discountDistractorMismatches) {
+      findings.explanationVerified = "fail";
+      pushFlag(
+        flags,
+        "reject",
+        "incorrect-distractor-rationale",
+        `Explanation assigns an incorrect no-discount result to choice(s) ${discountDistractorMismatches.join(", ")}.`
+      );
+    }
+  }
+
+  if (row.section === "math" && normalizedTopic.includes("geometry")) {
+    const geometryConflict = findGeometryLiteralObjectConflict(
+      row.question_text,
+      row.passage,
+      row.explanation
+    );
+    if (geometryConflict) {
+      findings.evidenceSupported = "fail";
+      findings.uniqueCorrectAnswer = "fail";
+      findings.answerKeyVerified = "fail";
+      pushFlag(
+        flags,
+        "reject",
+        "geometry-unstated-segment-extension",
+        `The stem says finite segments ${geometryConflict.firstSegment} and ${geometryConflict.secondSegment} intersect at ${geometryConflict.intersectionPoint}, but the explanation places that point beyond a segment endpoint.`
+      );
+    }
   }
 
   if (
@@ -956,7 +1251,8 @@ export function reviewQuestionQuality(row: {
     if (
       /\b([fgh]\s*\(\s*x\s*\)\s*=|[fgh]\s*\(\s*-?\d+\s*\)|5th term|nth term|sum of the first \d+ terms?|value of [fgh]\([^)]+\))\b/i.test(
         row.question_text
-      )
+      ) &&
+      !hasLayeredMathReasoning(row.question_text, row.explanation)
     ) {
       pushFlag(
         flags,
