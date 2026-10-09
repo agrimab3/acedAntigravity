@@ -131,6 +131,8 @@ function PracticeContent() {
   const [questionStartedAtMs, setQuestionStartedAtMs] = useState<number>(Date.now());
   const [questionElapsedSeconds, setQuestionElapsedSeconds] = useState(0);
   const [questionHintCount, setQuestionHintCount] = useState(0);
+  const [tutorHintLevel, setTutorHintLevel] = useState(0);
+  const [answerRevealedBeforeSubmit, setAnswerRevealedBeforeSubmit] = useState(false);
   const [questionTimings, setQuestionTimings] = useState<number[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const msgsRef = useRef<HTMLDivElement>(null);
@@ -164,6 +166,8 @@ function PracticeContent() {
     setQuestionStartedAtMs(Date.now());
     setQuestionElapsedSeconds(0);
     setQuestionHintCount(0);
+    setTutorHintLevel(0);
+    setAnswerRevealedBeforeSubmit(false);
     setQuestionTimings([]);
     setAiMessages([{ role: "bot", text: getIntroTutorMessage(topic, officialCategory) }]);
     setQuestionsLoading(true);
@@ -315,16 +319,12 @@ function PracticeContent() {
   const handleSubmit = async () => {
     if (!picked || submitted) return;
     setSubmitted(true);
-    const isCorrect = picked === q.correct_answer;
-    const timeSpentSeconds = Math.max(1, Math.round((Date.now() - questionStartedAtMs) / 1000));
-    const newAnswered = answered + 1;
-    const newCorrect = isCorrect ? correct + 1 : correct;
-    setQuestionTimings((prev) => [...prev, timeSpentSeconds]);
-    setAnswered(newAnswered);
-    if (isCorrect) setCorrect(newCorrect);
-    else setMissed(prev => [...prev, q]);
 
-    if (practiceSessionId && !q.id.startsWith("mock-")) {
+    const timeSpentSeconds = Math.max(1, Math.round((Date.now() - questionStartedAtMs) / 1000));
+    let countsAsCorrect = picked === q.correct_answer;
+    let revealedBeforeSubmit = answerRevealedBeforeSubmit;
+
+    if (practiceSessionId) {
       try {
         const res = await fetch("/api/practice/answer", {
           method: "POST",
@@ -333,13 +333,13 @@ function PracticeContent() {
             sessionId: practiceSessionId,
             questionId: q.id,
             selectedAnswer: picked,
-            isCorrect,
             timeSpentSeconds,
-            hintCount: questionHintCount,
           }),
         });
 
         const data = (await res.json()) as {
+          isCorrect?: boolean;
+          answerRevealedBeforeSubmit?: boolean;
           adaptive?: {
             recommendedDifficulty?: string;
             label?: string;
@@ -347,6 +347,14 @@ function PracticeContent() {
             direction?: "up" | "down" | "steady";
           };
         };
+
+        if (typeof data.isCorrect === "boolean") {
+          countsAsCorrect = data.isCorrect;
+        }
+        if (typeof data.answerRevealedBeforeSubmit === "boolean") {
+          revealedBeforeSubmit = data.answerRevealedBeforeSubmit;
+          setAnswerRevealedBeforeSubmit(data.answerRevealedBeforeSubmit);
+        }
 
         if (data.adaptive?.recommendedDifficulty) {
           const recommendedDifficulty = data.adaptive.recommendedDifficulty;
@@ -359,9 +367,12 @@ function PracticeContent() {
             direction: data.adaptive.direction ?? "steady",
           });
           setQuestions((prev) => {
-            const answered = prev.slice(0, qIndex + 1);
+            const answeredQuestions = prev.slice(0, qIndex + 1);
             const remaining = prev.slice(qIndex + 1);
-            return [...answered, ...sortQuestionsTowardDifficulty(remaining, recommendedDifficulty)];
+            return [
+              ...answeredQuestions,
+              ...sortQuestionsTowardDifficulty(remaining, recommendedDifficulty),
+            ];
           });
         }
       } catch (error) {
@@ -369,13 +380,24 @@ function PracticeContent() {
       }
     }
 
-    setAiMessages([{
-      role: 'bot',
-      text: isCorrect
-        ? `great job! ${q.explanation}`
-        : `not quite! ${q.explanation} want me to explain further?`
-    }]);
+    setQuestionTimings((prev) => [...prev, timeSpentSeconds]);
+    setAnswered((value) => value + 1);
+    if (countsAsCorrect) {
+      setCorrect((value) => value + 1);
+    } else {
+      setMissed((prev) => [...prev, q]);
+    }
 
+    setAiMessages([
+      {
+        role: "bot",
+        text: revealedBeforeSubmit
+          ? `since the answer was revealed before you submitted, this one counts as missed for progress. ${q.explanation}`
+          : countsAsCorrect
+            ? `great job! ${q.explanation}`
+            : `not quite! ${q.explanation} want me to explain further?`,
+      },
+    ]);
   };
 
   const handleNext = async () => {
@@ -389,41 +411,82 @@ function PracticeContent() {
       setQuestionStartedAtMs(Date.now());
       setQuestionElapsedSeconds(0);
       setQuestionHintCount(0);
+      setTutorHintLevel(0);
+      setAnswerRevealedBeforeSubmit(false);
       setAiMessages([{ role: "bot", text: getIntroTutorMessage(topic, officialCategory) }]);
     }
   };
 
-  const sendAI = async () => {
-    if (!aiInput.trim() || aiLoading) return;
-    const msg = aiInput.trim();
-    setAiInput('');
-    setAiMessages(prev => [...prev, { role: 'user', text: msg }]);
+  const sendAI = async (
+    action: "message" | "hint" | "show_answer" = "message",
+    presetMessage?: string
+  ) => {
+    const msg = (presetMessage ?? aiInput).trim();
+    if (!msg || aiLoading) return;
+
+    if (!practiceSessionId) {
+      setAiMessages((prev) => [
+        ...prev,
+        { role: "bot", text: "the tutor isn't available for this practice session right now." },
+      ]);
+      return;
+    }
+
+    setAiInput("");
+    setAiMessages((prev) => [...prev, { role: "user", text: msg }]);
     setAiLoading(true);
-    setQuestionHintCount((count) => count + 1);
+
     try {
-      const res = await fetch('/api/tutor', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/tutor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: msg,
-          question: q.passage
-            ? `Passage:\n${q.passage}\n\nQuestion:\n${q.question_text}`
-            : q.question_text,
-          section, topic,
-          explanation: q.explanation,
-          difficulty: q.difficulty,
+          questionId: q.id,
+          sessionId: practiceSessionId,
+          action,
           sessionAccuracyPct: answered > 0 ? Math.round((correct / answered) * 100) : 0,
           targetDifficulty,
-          officialCategory,
         }),
       });
-      const data = await res.json();
-      setAiMessages(prev => [...prev, { role: 'bot', text: data.reply }]);
-    } catch {
-      setAiMessages(prev => [...prev, { role: 'bot', text: 'sorry, I had trouble connecting. try again!' }]);
+      const data = (await res.json()) as {
+        reply?: string;
+        hintLevel?: number;
+        hintCount?: number;
+        answerRevealed?: boolean;
+        error?: string;
+      };
+
+      if (!res.ok) {
+        throw new Error(data.error || "Tutor request failed.");
+      }
+
+      if (typeof data.hintLevel === "number") {
+        setTutorHintLevel(data.hintLevel);
+      }
+      if (typeof data.hintCount === "number") {
+        setQuestionHintCount(data.hintCount);
+      }
+      if (typeof data.answerRevealed === "boolean") {
+        setAnswerRevealedBeforeSubmit(data.answerRevealed);
+      }
+
+      setAiMessages((prev) => [
+        ...prev,
+        { role: "bot", text: data.reply || "let's keep working through it." },
+      ]);
+    } catch (error) {
+      console.error("Tutor request failed", error);
+      setAiMessages((prev) => [
+        ...prev,
+        { role: "bot", text: "sorry, I had trouble connecting. try again!" },
+      ]);
+    } finally {
+      setAiLoading(false);
+      setTimeout(() => {
+        if (msgsRef.current) msgsRef.current.scrollTop = msgsRef.current.scrollHeight;
+      }, 100);
     }
-    setAiLoading(false);
-    setTimeout(() => { if (msgsRef.current) msgsRef.current.scrollTop = msgsRef.current.scrollHeight; }, 100);
   };
 
   const pct = questions.length > 0 ? Math.round((qIndex / questions.length) * 100) : 0;
@@ -707,16 +770,39 @@ function PracticeContent() {
                     <br />
                     &quot;give me a hint&quot;
                     <br />
-                    &quot;why is B wrong?&quot;
+                    &quot;what should I look for?&quot;
                     <br />
                     &quot;explain this more simply&quot;
                   </div>
                 )}
               </div>
 
+              {!submitted && (
+                <div style={{ display: 'flex', gap: '8px', padding: '10px 14px 0', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    disabled={aiLoading}
+                    onClick={() => void sendAI("hint", "give me a hint")}
+                    style={{ border: '0.5px solid rgba(255,255,255,0.14)', borderRadius: '999px', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.76)', padding: '6px 10px', fontSize: '11px', cursor: aiLoading ? 'default' : 'pointer', fontFamily: 'DM Sans,sans-serif' }}
+                  >
+                    Hint
+                  </button>
+                  {tutorHintLevel >= 1 && !answerRevealedBeforeSubmit && (
+                    <button
+                      type="button"
+                      disabled={aiLoading}
+                      onClick={() => void sendAI("show_answer", "show answer")}
+                      style={{ border: '0.5px solid rgba(240,153,123,0.32)', borderRadius: '999px', background: 'rgba(240,153,123,0.08)', color: '#F0997B', padding: '6px 10px', fontSize: '11px', cursor: aiLoading ? 'default' : 'pointer', fontFamily: 'DM Sans,sans-serif' }}
+                    >
+                      Show answer
+                    </button>
+                  )}
+                </div>
+              )}
+
               <div style={{ display: 'flex', gap: '8px', padding: '12px 14px', borderTop: '0.5px solid rgba(255,255,255,0.07)' }}>
-                <input value={aiInput} onChange={e => setAiInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendAI()} placeholder="ask the tutor anything..." style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '8px 12px', fontSize: '12px', color: '#fff', outline: 'none', fontFamily: 'DM Sans,sans-serif' }} />
-                <button onClick={sendAI} style={{ width: '30px', height: '30px', borderRadius: '50%', background: meta.color, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <input value={aiInput} onChange={e => setAiInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') void sendAI(); }} placeholder="ask the tutor anything..." style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '8px 12px', fontSize: '12px', color: '#fff', outline: 'none', fontFamily: 'DM Sans,sans-serif' }} />
+                <button onClick={() => void sendAI()} style={{ width: '30px', height: '30px', borderRadius: '50%', background: meta.color, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6h10M6 1l5 5-5 5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </button>
               </div>

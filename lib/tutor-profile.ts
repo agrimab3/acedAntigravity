@@ -76,16 +76,34 @@ type TutorPromptContext = {
   topic?: string;
   officialCategory?: string;
   question: string;
-  explanation: string;
   difficulty?: string;
   studentAccuracyPct?: number;
   targetDifficulty?: string;
+  mode: "general" | "hint" | "review";
+  choices?: Record<string, string>;
+  correctAnswer?: string;
+  explanation?: string;
 };
 
 export function buildTutorInstructions(
   profile: Awaited<ReturnType<typeof getActiveTutorProfile>>,
   context: TutorPromptContext
 ) {
+  const reviewContext =
+    context.mode === "review"
+      ? `
+- Choices: ${JSON.stringify(context.choices ?? {})}
+- Correct answer: ${context.correctAnswer || "unknown"}
+- Canonical explanation: ${context.explanation || "not available"}`
+      : "";
+
+  const modeRules =
+    context.mode === "review"
+      ? `The student has already submitted. You may identify the correct answer and use the canonical explanation freely.`
+      : context.mode === "hint"
+        ? `Give one specific hint about the key idea or rule. Do not name, confirm, or reveal the correct answer. Do not quote an answer choice as the answer.`
+        : `Give a general strategy or guiding question. Do not judge any answer choice, name the correct answer, or provide a full solution.`;
+
   return `
 ${profile.systemPrompt}
 
@@ -96,34 +114,20 @@ Current context:
 - Question difficulty: ${context.difficulty || "unknown"}
 - Current target difficulty: ${context.targetDifficulty || "unknown"}
 - Student session accuracy so far: ${context.studentAccuracyPct ?? 0}%
-- Canonical explanation available: ${context.explanation}
-
-Hint policy:
-${profile.hintPolicy || "Offer strategic hints before full explanations."}
-
-Review policy:
-${profile.reviewPolicy || "Explain the right answer and the trap in the wrong choices."}
+- Tutor mode: ${context.mode}
+${reviewContext}
 
 Question:
 ${context.question}
 
-Response rules:
-- Your default mode is ACT hint mode.
-- In hint mode, respond with exactly 2 short sentences unless the student explicitly asks for more depth.
-- Sentence 1 should name the ACT skill, clue, or trap to notice.
-- Sentence 2 should tell the student what to do next.
-- Treat the official ACT category as background context, but coach at the selected skill-star level.
-- Prefer a strategic nudge over a complete walkthrough.
-- If asked for a hint, do not give away the answer directly.
-- If the student already got it wrong, explain the misconception cleanly and briefly.
-- Use collaborative language like "let's" and "try this" when it helps the student feel supported.
-- If the student asks "why" or "explain," you may use up to 3 short sentences, then stop.
+Hard response rules:
+- ${modeRules}
+- Keep the tone short, friendly, calm, and encouraging.
 - Use confident plain English suitable for a high school student.
-- Mention the ACT skill being tested when helpful: parallel structure, elimination, main idea, slope, data trend, conflicting viewpoints, etc.
+- Prefer one or two short sentences before submission.
+- Use collaborative language like "let's" and "try this" when useful.
+- Never pretend the student has submitted when they have not.
 - Avoid filler, pep-talk fluff, and long intros.
-- Avoid blunt corrections such as "No," "Wrong," or "Obviously."
-- In hint mode, aim for about 20 to 40 words total.
-- Be crisp, complete, and natural. Never output a fragment, bullet list, or mini-essay.
-- Always return complete sentences. Never cut off mid-thought.
+- Always return complete sentences.
 `.trim();
 }

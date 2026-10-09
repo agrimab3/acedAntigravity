@@ -5,6 +5,7 @@ import {
   actTopics,
   practiceAnswers,
   practiceSessions,
+  practiceTutorStates,
   questionExposures,
   questions,
   topicMastery,
@@ -18,14 +19,13 @@ import {
 import { isTopicInPracticeScope, type SectionKey } from "@/lib/act-taxonomy";
 import { getAuthSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import { getEffectivePracticeCorrectness } from "@/lib/tutor-guard";
 
 const answerSchema = z.object({
   sessionId: z.string().uuid().nullable().optional(),
   questionId: z.string().min(1),
   selectedAnswer: z.enum(["A", "B", "C", "D"]),
-  isCorrect: z.boolean(),
   timeSpentSeconds: z.coerce.number().int().min(0).default(0),
-  hintCount: z.coerce.number().int().min(0).default(0),
 });
 
 export async function POST(request: Request) {
@@ -43,8 +43,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ persisted: false });
   }
 
-  const { sessionId, questionId, selectedAnswer, isCorrect, timeSpentSeconds, hintCount } =
-    parsed.data;
+  const { sessionId, questionId, selectedAnswer, timeSpentSeconds } = parsed.data;
 
   if (!sessionId || questionId.startsWith("mock-")) {
     return NextResponse.json({ persisted: false });
@@ -55,6 +54,7 @@ export async function POST(request: Request) {
       id: questions.id,
       topicId: questions.topicId,
       topicName: actTopics.name,
+      correctAnswer: questions.correctAnswer,
     })
     .from(questions)
     .innerJoin(actTopics, eq(questions.topicId, actTopics.id))
@@ -87,6 +87,28 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Practice session not found." }, { status: 404 });
   }
 
+  const [tutorState] = await db
+    .select({
+      hintCount: practiceTutorStates.hintCount,
+      answerRevealed: practiceTutorStates.answerRevealed,
+    })
+    .from(practiceTutorStates)
+    .where(
+      and(
+        eq(practiceTutorStates.userId, userId),
+        eq(practiceTutorStates.sessionId, sessionId),
+        eq(practiceTutorStates.questionId, questionId)
+      )
+    )
+    .limit(1);
+
+  const actuallyCorrect = selectedAnswer === questionRow.correctAnswer;
+  const isCorrect = getEffectivePracticeCorrectness({
+    selectedAnswer,
+    correctAnswer: questionRow.correctAnswer,
+    answerRevealedBeforeSubmit: Boolean(tutorState?.answerRevealed),
+  });
+  const hintCount = tutorState?.hintCount ?? 0;
   const now = new Date();
 
   await db.insert(practiceAnswers).values({
@@ -273,8 +295,25 @@ export async function POST(request: Request) {
     })
     .where(eq(practiceSessions.id, sessionId));
 
+  await db
+    .update(practiceTutorStates)
+    .set({
+      submittedAt: now,
+      updatedAt: now,
+    })
+    .where(
+      and(
+        eq(practiceTutorStates.userId, userId),
+        eq(practiceTutorStates.sessionId, sessionId),
+        eq(practiceTutorStates.questionId, questionId)
+      )
+    );
+
   return NextResponse.json({
     persisted: true,
+    isCorrect,
+    actuallyCorrect,
+    answerRevealedBeforeSubmit: Boolean(tutorState?.answerRevealed),
     answeredCount,
     questionCount: sessionRow.questionCount,
     adaptive: {

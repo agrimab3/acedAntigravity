@@ -672,6 +672,35 @@ export const practiceAnswers = pgTable("practice_answers", {
   submittedAt: timestamp("submitted_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+export const practiceTutorStates = pgTable(
+  "practice_tutor_states",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    sessionId: uuid("session_id")
+      .notNull()
+      .references(() => practiceSessions.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    questionId: uuid("question_id")
+      .notNull()
+      .references(() => questions.id, { onDelete: "cascade" }),
+    hintLevel: integer("hint_level").default(0).notNull(),
+    hintCount: integer("hint_count").default(0).notNull(),
+    answerRevealed: boolean("answer_revealed").default(false).notNull(),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("practice_tutor_states_user_session_question_idx").on(
+      table.userId,
+      table.sessionId,
+      table.questionId
+    ),
+  ]
+);
+
 export const topicMastery = pgTable(
   "topic_mastery",
   {
