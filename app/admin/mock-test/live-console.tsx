@@ -108,6 +108,7 @@ type Overview = {
   seats: {
     paid: number;
     activeHolds: number;
+    activeInvites: number;
     seatsLeft: number;
   };
   waitlist: {
@@ -537,6 +538,7 @@ export default function MockTestLiveConsole({
           </div>
           <div className={styles.statLines}>
             <span>{overview.seats.activeHolds} active checkout holds</span>
+            <span>{overview.seats.activeInvites} active invite holds</span>
             <span>{overview.seats.seatsLeft} seats left</span>
           </div>
         </article>
@@ -595,10 +597,10 @@ export default function MockTestLiveConsole({
         </div>
 
         <div className={styles.actionGrid}>
-          <button type="button" onClick={() => openAction("seat_limit")}>
-            <b>change seat limit</b>
-            <span>current: {overview.test.seatLimit}</span>
-          </button>
+          <div className={styles.todoAction}>
+            <b>seat cap</b>
+            <span>{overview.test.seatLimit} · fixed for this event</span>
+          </div>
           <button type="button" onClick={() => openAction("signups")}>
             <b>{overview.test.signupsPaused ? "resume signups" : "pause signups"}</b>
             <span>paid students are unaffected</span>
@@ -853,7 +855,7 @@ export default function MockTestLiveConsole({
                     value={actionValue}
                     onChange={(event) => setActionValue(event.target.value)}
                   />
-                  <small>The seat limit increases by the number actually invited.</small>
+                  <small>Invites reserve available seats without changing the cap.</small>
                 </label>
               ) : null}
 

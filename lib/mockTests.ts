@@ -20,7 +20,6 @@ export interface MockTestConfig {
   mockTestSlug: string;
   priceUsd: number;
   priceCents: number;
-  seatLimitDefault: number;
   nextTestDateLabel: string;
   sections: MockTestSection[];
 }
@@ -52,7 +51,6 @@ export const MOCK_TEST: MockTestConfig = {
   mockTestSlug: "2026-12-05",
   priceUsd: 2,
   priceCents: 200,
-  seatLimitDefault: 100,
   nextTestDateLabel: "Saturday, Feb 20",
   sections: [
     {

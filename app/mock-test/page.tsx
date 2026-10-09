@@ -8,6 +8,7 @@ import { mockRegistrations, mockTests } from "@/db/schema";
 import { getDb } from "@/lib/db";
 import { getMockTestUser } from "@/lib/mockTest/auth";
 import { getSeatStatusCached } from "@/lib/mockTest/seats";
+import { getStudentSeatDisplay } from "@/lib/mockTest/seat-policy";
 import MockStarMapPreview from "@/components/MockStarMapPreview";
 import Countdown from "./Countdown";
 import {
@@ -69,6 +70,7 @@ export default async function MockTestPage() {
   }
 
   const seatStatus = await getSeatStatusCached(mockTest.id);
+  const seatDisplay = getStudentSeatDisplay(seatStatus.taken, seatStatus.limit);
 
   return (
     <div className={`${styles.pageRoot} ${dmSerif.variable} ${dmSans.variable}`}>
@@ -182,11 +184,7 @@ export default async function MockTestPage() {
 
           {!paid ? (
             <div className={styles.heroSeatCounter}>
-              <SeatCounter
-                limit={seatStatus.limit}
-                remaining={seatStatus.remaining}
-                isFull={seatStatus.isFull}
-              />
+              <SeatCounter display={seatDisplay} />
             </div>
           ) : null}
         </section>
@@ -346,11 +344,7 @@ export default async function MockTestPage() {
 
             {!paid ? (
               <div className={styles.finalSeatCounter}>
-                <SeatCounter
-                  limit={seatStatus.limit}
-                  remaining={seatStatus.remaining}
-                  isFull={seatStatus.isFull}
-                />
+                <SeatCounter display={seatDisplay} />
               </div>
             ) : null}
 

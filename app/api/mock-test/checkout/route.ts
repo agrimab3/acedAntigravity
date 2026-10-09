@@ -4,6 +4,7 @@ import { mockRegistrations, mockTestOpsEvents, mockTests } from "@/db/schema";
 import { getDb } from "@/lib/db";
 import { getMockTestUser } from "@/lib/mockTest/auth";
 import { createCheckout } from "@/lib/mockTest/payments";
+import { isMockTestSignupEnabled, MOCK_TEST_SIGNUPS_SOON_MESSAGE } from "@/lib/mockTest/mode";
 import { createSeatHold, MockTestSeatsFullError } from "@/lib/mockTest/seats";
 import { validateInviteForUser } from "@/lib/mockTest/waitlist";
 import { isMockSignupClosedForZone, NEXT_MOCK, TIME_ZONES } from "@/lib/mockTests";
@@ -16,6 +17,10 @@ type CheckoutBody = {
 };
 
 export async function POST(request: Request) {
+  if (!isMockTestSignupEnabled()) {
+    return NextResponse.json({ error: MOCK_TEST_SIGNUPS_SOON_MESSAGE }, { status: 503 });
+  }
+
   const user = await getMockTestUser();
   const db = getDb();
 

@@ -1,13 +1,11 @@
 import { getAuthSession } from "@/lib/auth";
+import { sanitizeInternalCallbackUrl } from "@/lib/safe-callback";
+import { getMockTestAuthMode } from "@/lib/mockTest/mode";
 
 export { MOCK_TEST_STUDENTS, type MockTestStudentEmail } from "@/lib/mockTest/testStudents";
 
 export function sanitizeMockTestReturnTo(value: string | null | undefined) {
-  if (!value || !value.startsWith("/") || value.startsWith("//")) {
-    return "/mock-test/signup";
-  }
-
-  return value;
+  return sanitizeInternalCallbackUrl(value, "/mock-test/signup");
 }
 
 export async function getMockTestUser() {
@@ -25,22 +23,30 @@ export async function getMockTestUser() {
 
 export function signInUrl(returnTo = "/mock-test/signup") {
   const safeReturnTo = sanitizeMockTestReturnTo(returnTo);
+  const mode = getMockTestAuthMode();
 
-  if (process.env.MOCK_TEST_AUTH_MODE === "google") {
-    // TODO(mock-test-go-live): plug the production Google sign-in entry point in here.
-    return `/?callbackUrl=${encodeURIComponent(safeReturnTo)}`;
+  if (mode === "google") {
+    return `/mock-test/auth/signin?returnTo=${encodeURIComponent(safeReturnTo)}`;
   }
 
-  return `/mock-test/dev/login?returnTo=${encodeURIComponent(safeReturnTo)}`;
+  if (mode === "test") {
+    return `/mock-test/dev/login?returnTo=${encodeURIComponent(safeReturnTo)}`;
+  }
+
+  return "/mock-test/signup";
 }
 
-export function signOutUrl(returnTo = "/mock-test/signup") {
-  const safeReturnTo = sanitizeMockTestReturnTo(returnTo);
+export function signOutUrl(returnTo = "/mock-test") {
+  const safeReturnTo = sanitizeInternalCallbackUrl(returnTo, "/mock-test");
+  const mode = getMockTestAuthMode();
 
-  if (process.env.MOCK_TEST_AUTH_MODE === "google") {
-    // TODO(mock-test-go-live): plug the production Google sign-out entry point in here.
+  if (mode === "google") {
+    return `/mock-test/auth/signout?returnTo=${encodeURIComponent(safeReturnTo)}`;
+  }
+
+  if (mode === "test") {
     return `/mock-test/dev/logout?returnTo=${encodeURIComponent(safeReturnTo)}`;
   }
 
-  return `/mock-test/dev/logout?returnTo=${encodeURIComponent(safeReturnTo)}`;
+  return "/mock-test";
 }

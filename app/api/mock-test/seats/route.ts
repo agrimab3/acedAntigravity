@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { mockTests } from "@/db/schema";
 import { getDb } from "@/lib/db";
 import { getSeatStatusCached } from "@/lib/mockTest/seats";
+import { toPublicSeatStatus } from "@/lib/mockTest/seat-policy";
 import { NEXT_MOCK } from "@/lib/mockTests";
 
 export async function GET() {
@@ -22,11 +23,7 @@ export async function GET() {
   }
 
   const status = await getSeatStatusCached(mockTest.id);
-  const response = NextResponse.json({
-    limit: status.limit,
-    remaining: status.remaining,
-    isFull: status.isFull,
-  });
+  const response = NextResponse.json(toPublicSeatStatus(status.taken, status.limit));
   response.headers.set("Cache-Control", "public, s-maxage=30, stale-while-revalidate=30");
   return response;
 }

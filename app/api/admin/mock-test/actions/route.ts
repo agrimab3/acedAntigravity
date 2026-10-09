@@ -20,6 +20,9 @@ import {
 } from "@/lib/admin/mockTestAdmin";
 import { releaseMockTest } from "@/lib/mockTest/release";
 import { getMockTestServerNow } from "@/lib/mockTest/devClock";
+import { MOCK_TEST_SEAT_CAP } from "@/lib/mockTest/seat-policy";
+import { WAITLIST_INVITE_MS } from "@/lib/mockTest/waitlist-policy";
+import { logWouldSendInviteEmail } from "@/lib/mockTest/waitlist";
 
 const reason = z.string().trim().min(3).max(500);
 const slug = z.string().min(1).max(100);
@@ -205,6 +208,9 @@ export async function POST(request: Request) {
     if (!test) throw new Error("Mock test not found.");
 
     if (input.action === "set_seat_limit") {
+      if (input.seatLimit !== MOCK_TEST_SEAT_CAP) {
+        throw new Error(`The mock-test seat cap is fixed at ${MOCK_TEST_SEAT_CAP}.`);
+      }
       const paidResult = await tx.execute(sql`
         select count(*)::int as paid
         from mock_registrations
@@ -258,15 +264,40 @@ export async function POST(request: Request) {
     }
 
     if (input.action === "invite_waitlist") {
-      const rows = await tx.execute(sql`
-        select id, email
-        from mock_waitlist
-        where mock_test_id=${test.id}
-          and invited_at is null
-        order by created_at asc, id asc
-        limit ${input.count}
-        for update skip locked
+      await tx.execute(sql`select id from mock_tests where id=${test.id} for update`);
+      const inviteCutoff = new Date(now.getTime() - WAITLIST_INVITE_MS);
+      const occupiedResult = await tx.execute(sql`
+        select
+          (
+            select count(*)::int
+            from mock_registrations
+            where mock_test_id=${test.id}
+              and (paid_at is not null or (hold_expires_at is not null and hold_expires_at > ${now}))
+          ) + (
+            select count(*)::int
+            from mock_waitlist
+            where mock_test_id=${test.id}
+              and invited_at is not null
+              and invite_used_at is null
+              and invited_at > ${inviteCutoff}
+          ) as occupied
       `);
+      const occupied = Number((occupiedResult.rows[0] as { occupied?: unknown })?.occupied ?? 0);
+      const available = Math.max(0, MOCK_TEST_SEAT_CAP - occupied);
+      const inviteCount = Math.min(input.count, available);
+
+      const rows = inviteCount > 0
+        ? await tx.execute(sql`
+            select id, email
+            from mock_waitlist
+            where mock_test_id=${test.id}
+              and invited_at is null
+              and invite_used_at is null
+            order by created_at asc, id asc
+            limit ${inviteCount}
+            for update skip locked
+          `)
+        : { rows: [] as unknown[] };
 
       const invitations: Array<{ email: string; link: string }> = [];
       for (const raw of rows.rows as Array<{ id: string; email: string }>) {
@@ -275,15 +306,11 @@ export async function POST(request: Request) {
           .update(mockWaitlist)
           .set({ invitedAt: now, inviteToken: token })
           .where(eq(mockWaitlist.id, raw.id));
+        logWouldSendInviteEmail(raw.email, token);
         invitations.push({
           email: raw.email,
           link: "/mock-test/signup?invite=" + token,
         });
-      }
-
-      const newLimit = test.seatLimit + invitations.length;
-      if (invitations.length > 0) {
-        await tx.update(mockTests).set({ seatLimit: newLimit }).where(eq(mockTests.id, test.id));
       }
 
       await tx.insert(adminAuditLog).values({
@@ -291,8 +318,8 @@ export async function POST(request: Request) {
         action: "invite_waitlist",
         target: test.id,
         details: {
-          before: { seatLimit: test.seatLimit },
-          after: { seatLimit: newLimit, invitedCount: invitations.length },
+          before: { seatLimit: MOCK_TEST_SEAT_CAP, occupied },
+          after: { seatLimit: MOCK_TEST_SEAT_CAP, invitedCount: invitations.length },
           requestedCount: input.count,
           invitedEmails: invitations.map((item) => item.email),
         },
@@ -300,7 +327,7 @@ export async function POST(request: Request) {
         createdAt: now,
       });
 
-      return { invitations, seatLimit: newLimit };
+      return { invitations, seatLimit: MOCK_TEST_SEAT_CAP };
     }
 
     const registrationId = input.registrationId;

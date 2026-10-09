@@ -5,9 +5,9 @@ import { isMockSignupClosedForZone, NEXT_MOCK, TIME_ZONES } from "@/lib/mockTest
 import styles from "./signup.module.css";
 
 type WaitlistCardProps = {
-  limit: number;
   user: { email: string } | null;
   initialJoinedEmail?: string | null;
+  inviteExpired?: boolean;
 };
 
 function getDeviceTimeZone() {
@@ -20,7 +20,11 @@ function getDeviceTimeZone() {
   return TIME_ZONES[0].value;
 }
 
-export default function WaitlistCard({ limit, user, initialJoinedEmail }: WaitlistCardProps) {
+export default function WaitlistCard({
+  user,
+  initialJoinedEmail,
+  inviteExpired = false,
+}: WaitlistCardProps) {
   const [email, setEmail] = useState(user?.email ?? initialJoinedEmail ?? "");
   const [joinedEmail, setJoinedEmail] = useState(initialJoinedEmail ?? "");
   const [busy, setBusy] = useState(false);
@@ -58,9 +62,15 @@ export default function WaitlistCard({ limit, user, initialJoinedEmail }: Waitli
         <h1 className={styles.waitlistHeading}>
           you&apos;re on the <em>list</em>
         </h1>
-        <p className={styles.waitlistCopy}>
-          We&apos;ll email {joinedEmail} if a spot opens.
-        </p>
+        {inviteExpired ? (
+          <p className={styles.waitlistCopy}>
+            This invite expired. You&apos;re back on the waitlist and we&apos;ll email you if another spot opens.
+          </p>
+        ) : (
+          <p className={styles.waitlistCopy}>
+            We&apos;ll email {joinedEmail} if a spot opens.
+          </p>
+        )}
         <p className={styles.waitlistFinePrint}>No payment needed to join the waitlist.</p>
       </section>
     );
@@ -71,10 +81,15 @@ export default function WaitlistCard({ limit, user, initialJoinedEmail }: Waitli
       <h1 className={styles.waitlistHeading}>
         seats are <em>full</em>
       </h1>
-      <p className={styles.waitlistCopy}>
-        All {limit} seats for {NEXT_MOCK.testDateLabel} are taken. Join the waitlist and we&apos;ll
-        email you if a spot opens.
-      </p>
+      {inviteExpired ? (
+        <p className={styles.waitlistCopy}>
+          This invite expired. You&apos;re back on the waitlist and we&apos;ll email you if another spot opens.
+        </p>
+      ) : (
+        <p className={styles.waitlistCopy}>
+          Seats are full for {NEXT_MOCK.testDateLabel}. Join the waitlist and we&apos;ll email you if a spot opens.
+        </p>
+      )}
 
       {closed ? (
         <p className={styles.waitlistClosed}>Signups for {NEXT_MOCK.testDateLabel} are closed.</p>

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import SeatCounter from "@/components/SeatCounter";
+import type { StudentSeatDisplay } from "@/lib/mockTest/seat-policy";
 import {
   MOCK_SECTIONS,
   NEXT_MOCK,
@@ -28,11 +29,7 @@ type SignupFormProps = {
   paymentMode: "test" | "stripe";
   signInHref: string;
   signOutHref: string;
-  seatStatus: {
-    limit: number;
-    remaining: number;
-    isFull: boolean;
-  };
+  seatDisplay: StudentSeatDisplay;
   inviteToken?: string;
   invited?: boolean;
 };
@@ -93,7 +90,7 @@ export default function SignupForm({
   paymentMode,
   signInHref,
   signOutHref,
-  seatStatus,
+  seatDisplay,
   inviteToken,
   invited = false,
 }: SignupFormProps) {
@@ -391,12 +388,7 @@ export default function SignupForm({
           </div>
 
           {!invited ? (
-            <SeatCounter
-              limit={seatStatus.limit}
-              remaining={seatStatus.remaining}
-              isFull={seatStatus.isFull}
-              align="left"
-            />
+            <SeatCounter display={seatDisplay} align="left" />
           ) : null}
 
           <button

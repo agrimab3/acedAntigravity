@@ -3,6 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { getProviders, signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { sanitizeInternalCallbackUrl } from "@/lib/safe-callback";
+
+
+function getHomeCallbackUrl() {
+  if (typeof window === "undefined") return "/onboarding";
+  const requested = new URLSearchParams(window.location.search).get("callbackUrl");
+  return sanitizeInternalCallbackUrl(requested, "/onboarding");
+}
 
 export default function Home() {
   const router = useRouter();
@@ -14,7 +22,7 @@ export default function Home() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace("/onboarding");
+      router.replace(getHomeCallbackUrl());
     }
   }, [router, status]);
 
@@ -96,7 +104,7 @@ export default function Home() {
     try {
       setAuthError(null);
       setIsSigningIn(true);
-      await signIn("google", { callbackUrl: "/onboarding" });
+      await signIn("google", { callbackUrl: getHomeCallbackUrl() });
     } catch (error) {
       console.error("Google sign-in failed", error);
       setAuthError(
@@ -114,7 +122,7 @@ export default function Home() {
       setIsSigningIn(true);
       window.localStorage.removeItem("aced.walkthrough.completed");
       const result = await signIn("local-dev-test-user", {
-        callbackUrl: "/onboarding",
+        callbackUrl: getHomeCallbackUrl(),
         redirect: false,
       });
 
@@ -122,7 +130,7 @@ export default function Home() {
         throw new Error(result.error);
       }
 
-      router.replace(result?.url ?? "/onboarding");
+      router.replace(result?.url ?? getHomeCallbackUrl());
     } catch (error) {
       console.error("Local test sign-in failed", error);
       setAuthError(error instanceof Error ? error.message : "Local test sign-in failed.");

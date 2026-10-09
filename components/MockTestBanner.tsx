@@ -14,12 +14,29 @@ type RegistrationStatus = {
   localReleaseTime?: string;
 };
 
+type PublicSeatStatus = {
+  isFull?: boolean;
+  label?: "limited" | "only" | "almost_full" | "full";
+  remaining?: number | null;
+  text?: string;
+};
+
 export default function MockTestBanner() {
   const [visible, setVisible] = useState(false);
   const [status, setStatus] = useState<RegistrationStatus>({});
+  const [seatStatus, setSeatStatus] = useState<PublicSeatStatus>({});
 
   useEffect(() => {
     let cancelled = false;
+
+    void fetch("/api/mock-test/seats", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : {}))
+      .then((data: PublicSeatStatus) => {
+        if (!cancelled) setSeatStatus(data);
+      })
+      .catch(() => {
+        if (!cancelled) setSeatStatus({});
+      });
 
     void fetch("/api/mock-test/registration-status", { cache: "no-store" })
       .then((response) =>
@@ -107,6 +124,7 @@ export default function MockTestBanner() {
         {!paid ? (
           <div className={styles.secondary}>
             full timed ACT · scores {NEXT_MOCK.resultsLabel.replace(",", "")}
+            {seatStatus.text ? ` · ${seatStatus.text}` : ""}
           </div>
         ) : null}
       </div>

@@ -5,6 +5,7 @@ import { getDb } from "@/lib/db";
 import { getMockTestUser } from "@/lib/mockTest/auth";
 import { normalizeWaitlistEmail } from "@/lib/mockTest/waitlist";
 import { getSeatStatus } from "@/lib/mockTest/seats";
+import { isMockTestSignupEnabled, MOCK_TEST_SIGNUPS_SOON_MESSAGE } from "@/lib/mockTest/mode";
 import { isMockSignupClosedForZone, NEXT_MOCK, TIME_ZONES } from "@/lib/mockTests";
 
 type WaitlistBody = { email?: string; timeZone?: string };
@@ -12,6 +13,10 @@ type WaitlistBody = { email?: string; timeZone?: string };
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: Request) {
+  if (!isMockTestSignupEnabled()) {
+    return NextResponse.json({ error: MOCK_TEST_SIGNUPS_SOON_MESSAGE }, { status: 503 });
+  }
+
   const db = getDb();
   if (!db) return NextResponse.json({ error: "Waitlist unavailable." }, { status: 503 });
 

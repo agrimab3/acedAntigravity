@@ -1,7 +1,10 @@
 import { and, eq, sql } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
-import { mockRegistrations } from "@/db/schema";
+import { mockRegistrations, mockWaitlist } from "@/db/schema";
 import { getDb } from "@/lib/db";
+import { MOCK_TEST_SEAT_CAP } from "@/lib/mockTest/seat-policy";
+import { WAITLIST_INVITE_MS } from "@/lib/mockTest/waitlist-policy";
+import { reconcileWaitlistInvites } from "@/lib/mockTest/waitlist";
 
 const HOLD_MINUTES = 15;
 
@@ -31,24 +34,31 @@ export async function getSeatStatus(mockTestId: string): Promise<SeatStatus> {
   const db = getDb();
   if (!db) throw new Error("Database is not configured.");
 
+  await reconcileWaitlistInvites(mockTestId);
+  const cutoff = new Date(Date.now() - WAITLIST_INVITE_MS);
   const result = await db.execute(sql`
     SELECT
-      mt.seat_limit AS "limit",
-      COUNT(mr.id) FILTER (
-        WHERE mr.paid_at IS NOT NULL
-           OR (mr.hold_expires_at IS NOT NULL AND mr.hold_expires_at > NOW())
-      )::int AS "taken"
-    FROM mock_tests mt
-    LEFT JOIN mock_registrations mr ON mr.mock_test_id = mt.id
-    WHERE mt.id = ${mockTestId}
-    GROUP BY mt.id, mt.seat_limit
+      (
+        SELECT COUNT(*)::int
+        FROM mock_registrations mr
+        WHERE mr.mock_test_id = ${mockTestId}
+          AND (
+            mr.paid_at IS NOT NULL
+            OR (mr.hold_expires_at IS NOT NULL AND mr.hold_expires_at > NOW())
+          )
+      ) + (
+        SELECT COUNT(*)::int
+        FROM mock_waitlist mw
+        WHERE mw.mock_test_id = ${mockTestId}
+          AND mw.invited_at IS NOT NULL
+          AND mw.invite_used_at IS NULL
+          AND mw.invited_at > ${cutoff}
+      ) AS "taken"
   `);
 
-  const row = result.rows[0] as { limit?: unknown; taken?: unknown } | undefined;
-  if (!row) throw new Error("Mock test not found.");
-
-  const limit = toNumber(row.limit);
-  const taken = toNumber(row.taken);
+  const row = result.rows[0] as { taken?: unknown } | undefined;
+  const limit = MOCK_TEST_SEAT_CAP;
+  const taken = Math.min(limit, toNumber(row?.taken));
   const remaining = Math.max(0, limit - taken);
   return { limit, taken, remaining, isFull: remaining <= 0 };
 }
@@ -74,7 +84,7 @@ export async function createSeatHold(input: CreateSeatHoldInput) {
 
   return db.transaction(async (tx) => {
     const lockedTest = await tx.execute(sql`
-      SELECT id, seat_limit
+      SELECT id
       FROM mock_tests
       WHERE id = ${input.mockTestId}
       FOR UPDATE
@@ -102,22 +112,30 @@ export async function createSeatHold(input: CreateSeatHoldInput) {
       existing?.holdExpiresAt && existing.holdExpiresAt.getTime() > now.getTime()
     );
 
-    // Phase 3: set hasValidInvite=true only after validating that the invite
-    // token belongs to the signed-in student email.
     if (!hasActiveHold && !input.hasValidInvite) {
+      const cutoff = new Date(now.getTime() - WAITLIST_INVITE_MS);
       const countResult = await tx.execute(sql`
-        SELECT COUNT(*)::int AS "taken"
-        FROM mock_registrations
-        WHERE mock_test_id = ${input.mockTestId}
-          AND (
-            paid_at IS NOT NULL
-            OR (hold_expires_at IS NOT NULL AND hold_expires_at > NOW())
-          )
+        SELECT
+          (
+            SELECT COUNT(*)::int
+            FROM mock_registrations
+            WHERE mock_test_id = ${input.mockTestId}
+              AND (
+                paid_at IS NOT NULL
+                OR (hold_expires_at IS NOT NULL AND hold_expires_at > ${now})
+              )
+          ) + (
+            SELECT COUNT(*)::int
+            FROM mock_waitlist
+            WHERE mock_test_id = ${input.mockTestId}
+              AND invited_at IS NOT NULL
+              AND invite_used_at IS NULL
+              AND invited_at > ${cutoff}
+          ) AS "taken"
       `);
 
       const taken = toNumber((countResult.rows[0] as { taken?: unknown } | undefined)?.taken);
-      const limit = toNumber((lockedTest.rows[0] as { seat_limit?: unknown }).seat_limit);
-      if (taken >= limit) throw new MockTestSeatsFullError();
+      if (taken >= MOCK_TEST_SEAT_CAP) throw new MockTestSeatsFullError();
     }
 
     const holdExpiresAt = new Date(now.getTime() + HOLD_MINUTES * 60_000);
@@ -143,6 +161,18 @@ export async function createSeatHold(input: CreateSeatHoldInput) {
         },
       })
       .returning({ id: mockRegistrations.id });
+
+    if (input.hasValidInvite) {
+      await tx
+        .update(mockWaitlist)
+        .set({ inviteUsedAt: now })
+        .where(
+          and(
+            eq(mockWaitlist.mockTestId, input.mockTestId),
+            eq(mockWaitlist.userId, input.userId)
+          )
+        );
+    }
 
     return { id: registration.id, alreadyPaid: false as const, holdExpiresAt };
   });

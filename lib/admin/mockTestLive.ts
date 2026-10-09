@@ -3,6 +3,7 @@ import "server-only";
 import { sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { getMockTestServerNow } from "@/lib/mockTest/devClock";
+import { WAITLIST_INVITE_MS } from "@/lib/mockTest/waitlist-policy";
 
 const SECTION_TOTALS = {
   english: 50,
@@ -155,7 +156,12 @@ export async function getMockTestLiveOverview(slug: string) {
     select
       count(*)::int as total,
       count(*) filter (where invited_at is not null)::int as invited,
-      count(*) filter (where invite_used_at is not null)::int as used
+      count(*) filter (where invite_used_at is not null)::int as used,
+      count(*) filter (
+        where invited_at is not null
+          and invite_used_at is null
+          and invited_at > ${new Date(now.getTime() - WAITLIST_INVITE_MS)}
+      )::int as active_invites
     from mock_waitlist
     where mock_test_id=${testId}::uuid
   `);
@@ -579,6 +585,7 @@ export async function getMockTestLiveOverview(slug: string) {
   const paid = numberValue(seats.paid);
   const activeHolds = numberValue(seats.active_holds);
   const seatLimit = numberValue(test.seat_limit);
+  const activeInvites = numberValue(waitlist.active_invites);
 
   return {
     updatedAt: now.toISOString(),
@@ -596,7 +603,8 @@ export async function getMockTestLiveOverview(slug: string) {
     seats: {
       paid,
       activeHolds,
-      seatsLeft: Math.max(0, seatLimit - paid - activeHolds),
+      activeInvites,
+      seatsLeft: Math.max(0, seatLimit - paid - activeHolds - activeInvites),
     },
     waitlist: {
       total: numberValue(waitlist.total),

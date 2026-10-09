@@ -1,13 +1,124 @@
-import { and, eq, isNotNull, isNull } from "drizzle-orm";
+import crypto from "node:crypto";
+import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { mockWaitlist } from "@/db/schema";
 import { getDb } from "@/lib/db";
+import { MOCK_TEST_SEAT_CAP } from "@/lib/mockTest/seat-policy";
+import {
+  isWaitlistInviteExpired,
+  selectWaitlistHandoffCandidates,
+  WAITLIST_INVITE_MS,
+} from "@/lib/mockTest/waitlist-policy";
+
+export { isWaitlistInviteExpired, selectWaitlistHandoffCandidates } from "@/lib/mockTest/waitlist-policy";
 
 export function normalizeWaitlistEmail(email: string) {
   return email.trim().toLowerCase();
 }
 
-export async function getInviteByToken(inviteToken: string | null | undefined) {
-  if (!inviteToken) return null;
+export function logWouldSendInviteEmail(email: string, token: string) {
+  console.info(`[mock-test waitlist] would send invite email to ${email}`, {
+    inviteUrl: `/mock-test/signup?invite=${token}`,
+  });
+}
+
+export async function reconcileWaitlistInvites(mockTestId: string, now = new Date()) {
+  const db = getDb();
+  if (!db) throw new Error("Database is not configured.");
+
+  const result = await db.transaction(async (tx) => {
+    await tx.execute(sql`select id from mock_tests where id=${mockTestId} for update`);
+
+    const expiredRows = await tx.execute(sql`
+      select id, email
+      from mock_waitlist
+      where mock_test_id=${mockTestId}
+        and invited_at is not null
+        and invite_used_at is null
+        and invited_at <= ${new Date(now.getTime() - WAITLIST_INVITE_MS)}
+      order by invited_at asc, id asc
+      for update
+    `);
+    const expired = expiredRows.rows as Array<{ id: string; email: string }>;
+
+    for (const row of expired) {
+      await tx
+        .update(mockWaitlist)
+        .set({ invitedAt: null, createdAt: now })
+        .where(eq(mockWaitlist.id, row.id));
+    }
+
+    const occupiedResult = await tx.execute(sql`
+      select
+        (
+          select count(*)::int
+          from mock_registrations
+          where mock_test_id=${mockTestId}
+            and (
+              paid_at is not null
+              or (hold_expires_at is not null and hold_expires_at > ${now})
+            )
+        ) + (
+          select count(*)::int
+          from mock_waitlist
+          where mock_test_id=${mockTestId}
+            and invited_at is not null
+            and invite_used_at is null
+            and invited_at > ${new Date(now.getTime() - WAITLIST_INVITE_MS)}
+        ) as occupied
+    `);
+    const occupied = Number(
+      (occupiedResult.rows[0] as { occupied?: unknown } | undefined)?.occupied ?? 0
+    );
+    const available = Math.max(0, MOCK_TEST_SEAT_CAP - occupied);
+    if (available <= 0) return { expired, invitations: [] as Array<{ email: string; token: string }> };
+
+    const expiredIds = new Set(expired.map((row) => row.id));
+    const candidatesResult = await tx.execute(sql`
+      select id, email
+      from mock_waitlist
+      where mock_test_id=${mockTestId}
+        and invited_at is null
+        and invite_used_at is null
+      order by created_at asc, id asc
+      for update skip locked
+    `);
+
+    const candidates = selectWaitlistHandoffCandidates(
+      candidatesResult.rows as Array<{ id: string; email: string }>,
+      expiredIds,
+      available
+    );
+
+    const invitations: Array<{ email: string; token: string }> = [];
+    for (const row of candidates) {
+      const token = crypto.randomBytes(24).toString("hex");
+      await tx
+        .update(mockWaitlist)
+        .set({ invitedAt: now, inviteToken: token })
+        .where(eq(mockWaitlist.id, row.id));
+      invitations.push({ email: row.email, token });
+    }
+
+    return { expired, invitations };
+  });
+
+  for (const invitation of result.invitations) {
+    logWouldSendInviteEmail(invitation.email, invitation.token);
+  }
+
+  return result;
+}
+
+export type InviteLookup =
+  | { status: "valid"; invite: { id: string; mockTestId: string; email: string; invitedAt: Date; inviteUsedAt: Date | null } }
+  | { status: "expired"; email: string; mockTestId: string }
+  | { status: "invalid" };
+
+export async function getInviteStatusByToken(
+  inviteToken: string | null | undefined,
+  now = new Date()
+): Promise<InviteLookup> {
+  if (!inviteToken) return { status: "invalid" };
   const db = getDb();
   if (!db) throw new Error("Database is not configured.");
 
@@ -23,9 +134,25 @@ export async function getInviteByToken(inviteToken: string | null | undefined) {
     .where(eq(mockWaitlist.inviteToken, inviteToken))
     .limit(1);
 
-  if (!invite?.invitedAt || invite.inviteUsedAt) return null;
-  // TODO(mock-test-invite-expiry): add a 48-hour invite expiry before launch.
-  return invite;
+  if (!invite || invite.inviteUsedAt) return { status: "invalid" };
+
+  if (!invite.invitedAt || isWaitlistInviteExpired(invite.invitedAt, now)) {
+    await reconcileWaitlistInvites(invite.mockTestId, now);
+    return { status: "expired", email: invite.email, mockTestId: invite.mockTestId };
+  }
+
+  return {
+    status: "valid",
+    invite: {
+      ...invite,
+      invitedAt: invite.invitedAt,
+    },
+  };
+}
+
+export async function getInviteByToken(inviteToken: string | null | undefined) {
+  const lookup = await getInviteStatusByToken(inviteToken);
+  return lookup.status === "valid" ? lookup.invite : null;
 }
 
 export async function validateInviteForUser(input: {
@@ -34,8 +161,10 @@ export async function validateInviteForUser(input: {
   userId: string;
   email: string;
 }) {
-  const invite = await getInviteByToken(input.inviteToken);
-  if (!invite || invite.mockTestId !== input.mockTestId) return null;
+  const lookup = await getInviteStatusByToken(input.inviteToken);
+  if (lookup.status !== "valid") return null;
+  const invite = lookup.invite;
+  if (invite.mockTestId !== input.mockTestId) return null;
   if (normalizeWaitlistEmail(invite.email) !== normalizeWaitlistEmail(input.email)) return null;
 
   const db = getDb();
