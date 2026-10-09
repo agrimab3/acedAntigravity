@@ -1,0 +1,125 @@
+.banner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  margin-top: 1rem;
+  padding: 0.8rem 3rem 0.8rem 1rem;
+  border: 1px solid #2A5547;
+  border-radius: 16px;
+  background: #11202A;
+  color: #EEF1F5;
+  overflow: hidden;
+}
+
+.copy {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+}
+
+.primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #EEF1F5;
+}
+
+.twinkleDot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 999px;
+  background: #5DCAA5;
+  box-shadow: 0 0 8px #5DCAA5;
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+.secondary {
+  font-size: 12px;
+  color: #8D97A6;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  background: #5DCAA5;
+  color: #072019;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.close {
+  position: absolute;
+  top: 50%;
+  right: 0.8rem;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: #8D97A6;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.close:hover {
+  color: #EEF1F5;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.4; transform: scale(0.86); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 640px) {
+  .banner {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 0.8rem;
+    padding: 1rem 2.75rem 1rem 1rem;
+  }
+
+  .copy {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .primary {
+    align-items: flex-start;
+    line-height: 1.45;
+  }
+
+  .secondary {
+    line-height: 1.45;
+  }
+
+  .cta {
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .close {
+    top: 0.8rem;
+    right: 0.75rem;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .twinkleDot {
+    animation: none;
+  }
+}

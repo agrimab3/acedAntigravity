@@ -1,0 +1,222 @@
+.nightSky {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  background: var(--sky-background);
+}
+
+.topGlow {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1400px;
+  height: 640px;
+  background: radial-gradient(ellipse 65% 55% at 50% 0%, rgba(22, 48, 74, 0.42) 0%, rgba(13, 27, 44, 0.18) 50%, transparent 80%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.nebulaTeal {
+  position: absolute;
+  top: 320px;
+  left: 15%;
+  width: 520px;
+  height: 380px;
+  background: radial-gradient(circle, rgba(93, 202, 165, 0.045) 0%, rgba(93, 202, 165, 0.01) 55%, transparent 75%);
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+.nebulaLavender {
+  position: absolute;
+  top: 1100px;
+  right: 12%;
+  width: 580px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(175, 169, 236, 0.04) 0%, rgba(175, 169, 236, 0.01) 50%, transparent 75%);
+  filter: blur(65px);
+  pointer-events: none;
+}
+
+.starLayer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-repeat: repeat;
+  background-size: 900px 900px;
+  will-change: opacity;
+}
+
+/* Layer 1: crisp white stars */
+.starsA {
+  background-image:
+    radial-gradient(1.2px 1.2px at 45px 80px, #ffffff, rgba(255,255,255,0)),
+    radial-gradient(1.5px 1.5px at 180px 240px, #ffffff, rgba(255,255,255,0)),
+    radial-gradient(1px 1px at 320px 110px, #eef1f5, rgba(255,255,255,0)),
+    radial-gradient(2px 2px at 490px 390px, #ffffff, rgba(255,255,255,0)),
+    radial-gradient(1px 1px at 620px 210px, #ffffff, rgba(255,255,255,0)),
+    radial-gradient(1.8px 1.8px at 780px 95px, #ffffff, rgba(255,255,255,0)),
+    radial-gradient(1.2px 1.2px at 850px 340px, #eef1f5, rgba(255,255,255,0)),
+    radial-gradient(1px 1px at 120px 580px, #ffffff, rgba(255,255,255,0)),
+    radial-gradient(2px 2px at 280px 720px, #ffffff, rgba(255,255,255,0)),
+    radial-gradient(1px 1px at 440px 610px, #ffffff, rgba(255,255,255,0)),
+    radial-gradient(1.6px 1.6px at 660px 790px, #ffffff, rgba(255,255,255,0)),
+    radial-gradient(1px 1px at 810px 650px, #eef1f5, rgba(255,255,255,0));
+  opacity: 0.75;
+  animation: twinkleA 4s ease-in-out infinite;
+}
+
+/* Layer 2: soft silver & blue-white stars */
+.starsB {
+  background-image:
+    radial-gradient(1px 1px at 90px 160px, #d2dbe8, rgba(255,255,255,0)),
+    radial-gradient(2px 2px at 230px 60px, #e5edfa, rgba(255,255,255,0)),
+    radial-gradient(1.2px 1.2px at 390px 290px, #ccd6e8, rgba(255,255,255,0)),
+    radial-gradient(1px 1px at 560px 140px, #e5edfa, rgba(255,255,255,0)),
+    radial-gradient(1.5px 1.5px at 710px 420px, #d2dbe8, rgba(255,255,255,0)),
+    radial-gradient(1px 1px at 880px 190px, #e5edfa, rgba(255,255,255,0)),
+    radial-gradient(1.8px 1.8px at 60px 840px, #e5edfa, rgba(255,255,255,0)),
+    radial-gradient(1px 1px at 210px 510px, #ccd6e8, rgba(255,255,255,0)),
+    radial-gradient(1.4px 1.4px at 370px 830px, #e5edfa, rgba(255,255,255,0)),
+    radial-gradient(1px 1px at 530px 540px, #ccd6e8, rgba(255,255,255,0)),
+    radial-gradient(2px 2px at 740px 690px, #e5edfa, rgba(255,255,255,0)),
+    radial-gradient(1.2px 1.2px at 870px 870px, #d2dbe8, rgba(255,255,255,0));
+  opacity: 0.6;
+  animation: twinkleB 5.5s ease-in-out infinite 1.8s;
+}
+
+/* Layer 3: Zodiac constellation colored stars (Teal, Lavender, Amber, Coral) */
+.starsC {
+  background-image:
+    radial-gradient(2.2px 2.2px at 140px 320px, #5DCAA5, rgba(93,202,165,0)),
+    radial-gradient(1.5px 1.5px at 640px 170px, #5DCAA5, rgba(93,202,165,0)),
+    radial-gradient(2.4px 2.4px at 410px 460px, #AFA9EC, rgba(175,169,236,0)),
+    radial-gradient(1.6px 1.6px at 820px 510px, #AFA9EC, rgba(175,169,236,0)),
+    radial-gradient(2.2px 2.2px at 260px 190px, #EF9F27, rgba(239,159,39,0)),
+    radial-gradient(1.5px 1.5px at 750px 830px, #EF9F27, rgba(239,159,39,0)),
+    radial-gradient(2.2px 2.2px at 500px 780px, #F0997B, rgba(240,153,123,0)),
+    radial-gradient(1.6px 1.6px at 190px 680px, #F0997B, rgba(240,153,123,0)),
+    radial-gradient(1.2px 1.2px at 330px 870px, #5DCAA5, rgba(93,202,165,0)),
+    radial-gradient(1.8px 1.8px at 860px 110px, #AFA9EC, rgba(175,169,236,0));
+  opacity: 0.68;
+  animation: twinkleC 7s ease-in-out infinite 3.4s;
+}
+
+@keyframes twinkleA {
+  0%, 100% { opacity: 0.75; transform: scale(1); }
+  50% { opacity: 0.32; transform: scale(0.96); }
+}
+
+@keyframes twinkleB {
+  0%, 100% { opacity: 0.38; }
+  50% { opacity: 0.85; }
+}
+
+@keyframes twinkleC {
+  0%, 100% { opacity: 0.65; transform: scale(1); }
+  50% { opacity: 0.28; transform: scale(0.94); }
+}
+
+
+/* Extra density for the dashboard: tiny, faint background stars only. */
+.starsD {
+  background-image:
+    radial-gradient(1px 1px at 70px 120px, rgba(255,255,255,0.9), transparent),
+    radial-gradient(1px 1px at 155px 360px, rgba(255,255,255,0.75), transparent),
+    radial-gradient(1px 1px at 245px 90px, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1px 1px at 335px 560px, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1px 1px at 430px 250px, rgba(255,255,255,0.82), transparent),
+    radial-gradient(1px 1px at 515px 690px, rgba(255,255,255,0.72), transparent),
+    radial-gradient(1px 1px at 610px 430px, rgba(255,255,255,0.76), transparent),
+    radial-gradient(1px 1px at 705px 150px, rgba(255,255,255,0.84), transparent),
+    radial-gradient(1px 1px at 790px 590px, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1px 1px at 865px 300px, rgba(255,255,255,0.78), transparent);
+  opacity: 0.28;
+  animation: twinkleD 8s ease-in-out infinite 0.8s;
+}
+
+@keyframes twinkleD {
+  0%, 100% { opacity: 0.22; }
+  50% { opacity: 0.6; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .starsA,
+  .starsB,
+  .starsC,
+  .starsD {
+    animation: none !important;
+  }
+}
+
+.calm {
+  background:
+    radial-gradient(900px 420px at 50% 0%, #12263B 0%, transparent 70%),
+    linear-gradient(180deg, #0A1322 0%, #080F1C 40%, #070B14 100%);
+}
+
+.calm .topGlow {
+  opacity: 0.65;
+  filter: blur(28px);
+}
+
+.calm .nebulaTeal,
+.calm .nebulaLavender {
+  opacity: 0.45;
+}
+
+.calm .starsA {
+  opacity: 0.42;
+  animation: calmTwinkleA 8s ease-in-out infinite;
+}
+
+.calm .starsB {
+  opacity: 0.36;
+  animation: calmTwinkleB 7s ease-in-out infinite 1.3s;
+}
+
+.calm .starsC {
+  opacity: 0.38;
+  animation: calmTwinkleC 6.5s ease-in-out infinite 2.1s;
+}
+
+.calm .starsD {
+  opacity: 0.2;
+  animation: calmTwinkleD 8s ease-in-out infinite 0.9s;
+}
+
+@keyframes calmTwinkleA {
+  0%, 100% { opacity: 0.42; }
+  50% { opacity: 0.24; }
+}
+
+@keyframes calmTwinkleB {
+  0%, 100% { opacity: 0.28; }
+  50% { opacity: 0.48; }
+}
+
+@keyframes calmTwinkleC {
+  0%, 100% { opacity: 0.38; }
+  50% { opacity: 0.22; }
+}
+
+@keyframes calmTwinkleD {
+  0%, 100% { opacity: 0.18; }
+  50% { opacity: 0.3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calm .starsA,
+  .calm .starsB,
+  .calm .starsC,
+  .calm .starsD {
+    animation: none !important;
+  }
+}

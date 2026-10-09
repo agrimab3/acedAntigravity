@@ -1,0 +1,81 @@
+.shell {
+  width: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 16%, rgba(74, 128, 178, 0.12), transparent 32%),
+    radial-gradient(circle at 74% 24%, rgba(88, 138, 188, 0.08), transparent 34%),
+    linear-gradient(180deg, #0d1b2a 0%, #081221 44%, #020408 100%);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+}
+
+.map {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 1;
+}
+
+.sectionName {
+  font-family: "DM Sans", Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.constellation {
+  font-family: "DM Serif Display", Georgia, serif;
+  font-size: 15px;
+  font-style: italic;
+  opacity: 0.48;
+}
+
+.scoreTitle {
+  fill: #FFFFFF;
+  opacity: 0.92;
+  font-family: "DM Sans", Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.scoreNumber {
+  fill: #FFFFFF;
+  opacity: 0.90;
+  font-family: "DM Serif Display", Georgia, serif;
+  font-size: 58px;
+  font-style: italic;
+  font-weight: 700;
+}
+
+.scoreSub {
+  fill: #FFFFFF;
+  opacity: 0.18;
+  font-family: "DM Sans", Arial, sans-serif;
+  font-size: 14px;
+}
+
+@media (max-width: 640px) {
+  .shell {
+    border-radius: 18px;
+  }
+
+  .sectionName {
+    font-size: 24px;
+  }
+
+  .constellation {
+    font-size: 17px;
+  }
+
+  .scoreTitle {
+    font-size: 18px;
+  }
+
+  .scoreNumber {
+    font-size: 64px;
+  }
+
+  .scoreSub {
+    font-size: 16px;
+  }
+}

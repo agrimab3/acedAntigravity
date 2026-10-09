@@ -1,0 +1,797 @@
+.pageRoot {
+  position: relative;
+  min-height: 100vh;
+  background-color: var(--sky-base);
+  color: #EEF1F5;
+  overflow-x: hidden;
+  font-family: var(--font-dm-sans, "DM Sans", Arial, sans-serif);
+}
+
+.contentWrapper {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.logo {
+  font-family: var(--font-dm-serif, "DM Serif Display", serif);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #EEF1F5;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+}
+
+.tealDot {
+  color: #5DCAA5;
+  font-style: italic;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.navLink {
+  color: #B4BCC8;
+  text-decoration: none;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  transition: color 0.2s ease;
+}
+
+.navLink:hover {
+  color: #5DCAA5;
+}
+
+.signInPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 1.25rem;
+  border-radius: 999px;
+  border: 1px solid #1E2A3C;
+  background: rgba(15, 24, 38, 0.6);
+  color: #EEF1F5;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.signInPill:hover {
+  border-color: #5DCAA5;
+  background: rgba(93, 202, 165, 0.1);
+  color: #5DCAA5;
+}
+
+/* ==========================================================================
+   Hero Section
+   ========================================================================== */
+
+.heroSection {
+  text-align: center;
+  padding: 4.5rem 0 3.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(93, 202, 165, 0.25);
+  background: rgba(93, 202, 165, 0.08);
+  color: #5DCAA5;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  margin-bottom: 1.75rem;
+}
+
+.twinkleDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #5DCAA5;
+  box-shadow: 0 0 8px #5DCAA5;
+  animation: pulseDot 2s ease-in-out infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.heroHeading {
+  font-family: var(--font-dm-serif, "DM Serif Display", serif);
+  font-weight: 700;
+  font-size: clamp(2.5rem, 6.2vw, 5.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.5rem;
+  color: #EEF1F5;
+}
+
+.heroTealText {
+  color: #5DCAA5;
+  font-style: italic;
+  font-weight: 400;
+  display: inline-block;
+  text-shadow: 0 0 32px rgba(93, 202, 165, 0.35);
+}
+
+.heroParagraph {
+  max-width: 680px;
+  font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+  line-height: 1.65;
+  color: #B4BCC8;
+  margin: 0 0 2.5rem;
+}
+
+/* ==========================================================================
+   Gist Bar
+   ========================================================================== */
+
+.gistBar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 100%;
+  max-width: 980px;
+  background: #0F1826;
+  border: 1px solid #1E2A3C;
+  border-radius: 20px;
+  padding: 0;
+  margin: 0 0 2.5rem;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+
+.gistCell {
+  padding: 1.35rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-right: 1px solid #1E2A3C;
+  background: transparent;
+  transition: background-color 0.2s ease;
+}
+
+.gistCell:last-child {
+  border-right: none;
+}
+
+.gistCellTeal {
+  background: #11202A;
+  border-left: 1px solid #2A5547;
+  border-right: 1px solid #2A5547 !important;
+  box-shadow: inset 0 0 20px rgba(93, 202, 165, 0.08);
+}
+
+.gistLabel {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8D97A6;
+  margin-bottom: 0.4rem;
+}
+
+.gistCellTeal .gistLabel {
+  color: #5DCAA5;
+}
+
+.gistValue {
+  font-family: var(--font-dm-serif, "DM Serif Display", serif);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #EEF1F5;
+  margin: 0 0 0.3rem;
+  letter-spacing: -0.01em;
+}
+
+.gistCellTeal .gistValue {
+  color: #5DCAA5;
+  text-shadow: 0 0 16px rgba(93, 202, 165, 0.35);
+}
+
+.gistSub {
+  font-size: 0.775rem;
+  color: #8D97A6;
+  line-height: 1.35;
+}
+
+.gistCellTeal .gistSub {
+  color: #B4BCC8;
+}
+
+/* ==========================================================================
+   Hero Buttons
+   ========================================================================== */
+
+.heroButtonGroup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.heroSeatCounter {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+}
+
+.finalSeatCounter {
+  margin: -4px 0 22px;
+  display: flex;
+  justify-content: center;
+}
+
+.ctaButtonTeal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.875rem 1.85rem;
+  border-radius: 999px;
+  background: #5DCAA5;
+  color: #072019;
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  box-shadow: 0 0 24px rgba(93, 202, 165, 0.35), 0 8px 20px rgba(0, 0, 0, 0.25);
+  animation: buttonPulse 3s ease-in-out infinite;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ctaButtonTeal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 32px rgba(93, 202, 165, 0.55), 0 12px 28px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes buttonPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(93, 202, 165, 0.3), 0 6px 16px rgba(0, 0, 0, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 34px rgba(93, 202, 165, 0.52), 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.pricePill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: #072019;
+  color: #5DCAA5;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.ctaButtonOutline {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.875rem 1.75rem;
+  border-radius: 999px;
+  border: 1px solid #1E2A3C;
+  background: rgba(15, 24, 38, 0.6);
+  color: #EEF1F5;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.ctaButtonOutline:hover {
+  border-color: #5DCAA5;
+  color: #5DCAA5;
+  background: rgba(93, 202, 165, 0.06);
+}
+
+/* ==========================================================================
+   Star Map Preview Section
+   ========================================================================== */
+
+.starmapSection {
+  position: relative;
+  max-width: 1040px;
+  margin: 3rem auto 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.starmapWrapper {
+  position: relative;
+  width: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  animation: starmapFloat 6s ease-in-out infinite;
+  mask-image: radial-gradient(ellipse 85% 75% at 50% 50%, black 52%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 85% 75% at 50% 50%, black 52%, transparent 100%);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.starmapImage {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+@keyframes starmapFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.starmapBadge {
+  position: absolute;
+  bottom: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1.25rem;
+  border-radius: 999px;
+  border: 1px solid rgba(93, 202, 165, 0.35);
+  background: rgba(7, 11, 20, 0.82);
+  backdrop-filter: blur(12px);
+  color: #5DCAA5;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   General Section Styles
+   ========================================================================== */
+
+.section {
+  padding: 4.5rem 0;
+  scroll-margin-top: 3rem;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.sectionEyebrow {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #5DCAA5;
+  margin-bottom: 0.75rem;
+}
+
+.sectionHeading {
+  font-family: var(--font-dm-serif, "DM Serif Display", serif);
+  font-size: clamp(2rem, 4.2vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: #EEF1F5;
+  margin: 0;
+}
+
+.sectionHeading em {
+  color: #5DCAA5;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.mutedItalic {
+  color: #8D97A6 !important;
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* ==========================================================================
+   How It Works (3 Cards)
+   ========================================================================== */
+
+.howGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.howCard {
+  background: #0F1826;
+  border: 1px solid #1E2A3C;
+  border-radius: 20px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.howCard:hover {
+  transform: translateY(-4px);
+  border-color: #22314A;
+}
+
+.howCardTeal {
+  background: #11202A;
+  border: 1px solid #2A5547;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35), inset 0 0 24px rgba(93, 202, 165, 0.08);
+}
+
+.howCardTeal:hover {
+  border-color: #5DCAA5;
+}
+
+.howCardDate {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8D97A6;
+  margin-bottom: 1rem;
+}
+
+.howCardTeal .howCardDate {
+  color: #5DCAA5;
+}
+
+.howCardTitle {
+  font-family: var(--font-dm-serif, "DM Serif Display", serif);
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #EEF1F5;
+  margin: 0 0 1rem;
+  line-height: 1.25;
+}
+
+.howCardTitle em {
+  color: #5DCAA5;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.howCardBody {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: #B4BCC8;
+  margin: 0;
+}
+
+/* ==========================================================================
+   Sections (4 Columns)
+   ========================================================================== */
+
+.sectionsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.sectionCard {
+  background: #0F1826;
+  border: 1px solid #1E2A3C;
+  border-radius: 20px;
+  padding: 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.sectionCard:hover {
+  transform: translateY(-4px);
+  border-color: #22314A;
+}
+
+.constellationName {
+  font-family: var(--font-dm-serif, "DM Serif Display", serif);
+  font-style: italic;
+  font-size: 0.9375rem;
+  color: #8D97A6;
+  margin-bottom: 0.4rem;
+}
+
+.sectionTitle {
+  font-family: var(--font-dm-serif, "DM Serif Display", serif);
+  font-size: 1.85rem;
+  font-weight: 700;
+  margin: 0 0 0.85rem;
+  letter-spacing: -0.01em;
+}
+
+.sectionTiming {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #EEF1F5;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sectionDesc {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: #8D97A6;
+  margin: 0;
+}
+
+/* ==========================================================================
+   FAQ Section (2 Columns)
+   ========================================================================== */
+
+.faqGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.faqCard {
+  background: #0F1826;
+  border: 1px solid #1E2A3C;
+  border-radius: 20px;
+  padding: 2rem;
+  transition: border-color 0.2s ease;
+}
+
+.faqCard:hover {
+  border-color: #22314A;
+}
+
+.faqQuestion {
+  font-family: var(--font-dm-serif, "DM Serif Display", serif);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #EEF1F5;
+  margin: 0 0 0.85rem;
+}
+
+.faqAnswer {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: #B4BCC8;
+  margin: 0;
+}
+
+/* ==========================================================================
+   Final CTA Card
+   ========================================================================== */
+
+.finalCtaSection {
+  padding: 3rem 0 6rem;
+}
+
+.finalCtaCard {
+  position: relative;
+  background: linear-gradient(180deg, #11202A 0%, #0F1826 65%, #070B14 100%);
+  border: 1px solid #2A5547;
+  border-radius: 28px;
+  padding: 4.5rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+.ctaCardGlow {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 460px;
+  height: 200px;
+  background: radial-gradient(ellipse at center top, rgba(93, 202, 165, 0.28) 0%, rgba(93, 202, 165, 0.05) 50%, transparent 80%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.ctaCardEyebrow {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #5DCAA5;
+  margin-bottom: 1.5rem;
+}
+
+/* Countdown in CTA card */
+.countdownContainer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  background: rgba(7, 11, 20, 0.75);
+  border: 1px solid rgba(93, 202, 165, 0.2);
+  border-radius: 16px;
+  padding: 1rem 1.75rem;
+  margin-bottom: 2.25rem;
+  backdrop-filter: blur(10px);
+}
+
+.countdownBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.countdownValue {
+  font-family: var(--font-dm-serif, "DM Serif Display", serif);
+  font-size: 2rem;
+  font-weight: 700;
+  color: #EEF1F5;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.countdownLabel {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8D97A6;
+}
+
+.countdownDivider {
+  font-size: 1.5rem;
+  color: #5DCAA5;
+  opacity: 0.6;
+  margin-top: -0.5rem;
+}
+
+.finalCtaHeading {
+  font-family: var(--font-dm-serif, "DM Serif Display", serif);
+  font-size: clamp(2.2rem, 4.8vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: #EEF1F5;
+  margin: 0 0 2.25rem;
+  letter-spacing: -0.02em;
+}
+
+.finalCtaHeading em {
+  color: #5DCAA5;
+  font-style: italic;
+  font-weight: 400;
+  text-shadow: 0 0 28px rgba(93, 202, 165, 0.4);
+}
+
+.ctaDisclaimer {
+  font-size: 0.8125rem;
+  color: #8D97A6;
+  margin: 1.5rem 0 0;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
+
+@media (max-width: 960px) {
+  .gistBar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .gistCell:nth-child(2) {
+    border-right: none;
+  }
+
+  .gistCell:nth-child(1),
+  .gistCell:nth-child(2) {
+    border-bottom: 1px solid #1E2A3C;
+  }
+
+  .gistCellTeal {
+    border-left: none;
+    border-top: 1px solid #2A5547;
+    border-bottom: 1px solid #2A5547;
+  }
+
+  .howGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sectionsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .faqGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1.5rem 0;
+  }
+
+  .nav {
+    gap: 1.25rem;
+  }
+
+  .heroSection {
+    padding: 3rem 0 2rem;
+  }
+
+  .gistBar {
+    grid-template-columns: 1fr;
+  }
+
+  .gistCell {
+    border-right: none;
+    border-bottom: 1px solid #1E2A3C;
+  }
+
+  .gistCell:last-child {
+    border-bottom: none;
+  }
+
+  .gistCellTeal {
+    border-left: none;
+    border-right: none !important;
+    border-top: 1px solid #2A5547;
+    border-bottom: 1px solid #2A5547;
+  }
+
+  .sectionsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .countdownContainer {
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+  }
+
+  .countdownValue {
+    font-size: 1.6rem;
+  }
+
+  .finalCtaCard {
+    padding: 3rem 1.25rem;
+  }
+}
+
+/* ==========================================================================
+   Prefers Reduced Motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .twinkleDot {
+    animation: none !important;
+  }
+  .ctaButtonTeal {
+    animation: none !important;
+  }
+  .starmapWrapper {
+    animation: none !important;
+  }
+}

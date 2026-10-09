@@ -1,0 +1,1608 @@
+.page {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  color: #EEF1F5;
+  background:
+    radial-gradient(900px 520px at 50% 8%, #16304A 0%, transparent 70%),
+    linear-gradient(180deg, #0B1526 0%, #081020 42%, #070B14 100%);
+  font-family: var(--font-dm-sans), "DM Sans", system-ui, sans-serif;
+}
+
+.page > *:not(:first-child) {
+  position: relative;
+  z-index: 1;
+}
+
+.transitioningPage {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.screenReaderLive {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.topBar {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.topBar > span {
+  color: #8D97A6;
+  font-size: 13px;
+}
+
+.brand {
+  color: #EEF1F5;
+  font: 700 27px/1 var(--font-playfair), "Playfair Display", serif;
+  letter-spacing: -0.04em;
+  text-decoration: none;
+}
+
+.brand span {
+  color: #5DCAA5;
+}
+
+.centerState {
+  width: min(620px, calc(100% - 40px));
+  min-height: 72vh;
+  margin: 0 auto;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.centerState h1 {
+  margin: 0;
+  font: 700 clamp(42px, 7vw, 72px)/1 var(--font-playfair), "Playfair Display", serif;
+}
+
+.centerState p {
+  margin: 0;
+  color: #B4BCC8;
+  line-height: 1.65;
+}
+
+.didNotTakeStar {
+  color: #5DCAA5;
+  font-size: 44px;
+  text-shadow: 0 0 24px #5DCAA588;
+}
+
+.experienceShell {
+  width: min(1100px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 34px 0 88px;
+}
+
+.heroExperience {
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.headlineSlot {
+  width: 100%;
+  min-height: 126px;
+  position: relative;
+}
+
+.countdownHeadline,
+.scoreHeadline {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  will-change: transform, opacity, filter;
+}
+
+.countdownHeadline {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+.scoreHeadline {
+  opacity: 0;
+  transform: translateY(14px);
+  filter: blur(5px);
+}
+
+.countdownHeadline h1,
+.scoreHeadline h1 {
+  margin: 0;
+  color: #F7F8FA;
+  font: 700 clamp(52px, 8vw, 92px)/0.98 var(--font-playfair), "Playfair Display", serif;
+  letter-spacing: -0.035em;
+}
+
+.countdownHeadline h1 em,
+.scoreHeadline h1 em {
+  color: #5DCAA5;
+}
+
+.countdownHeadline p {
+  margin: 12px 0 0;
+  color: #A9B2BF;
+  font-size: 16px;
+}
+
+.revealStars {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.revealStars span {
+  display: inline-block;
+  font-size: 22px;
+  opacity: 0;
+  transform: scale(0.55);
+}
+
+.heroStage {
+  width: min(500px, 86vw);
+  aspect-ratio: 1;
+  position: relative;
+  margin: 8px auto 8px;
+  contain: layout paint;
+}
+
+.solarSystem,
+.scoreFormation {
+  position: absolute;
+  inset: 0;
+}
+
+.solarSystem {
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0);
+  will-change: transform, opacity, filter;
+}
+
+.ringOuter,
+.ringReading,
+.ringMath,
+.ringEnglish {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  will-change: transform, opacity, filter;
+}
+
+.ringOuter {
+  width: 100%;
+  animation: orbitClockwise 38s linear infinite;
+}
+
+.ringReading {
+  width: 86%;
+  animation: orbitCounter 52s linear infinite;
+}
+
+.ringMath {
+  width: 72%;
+  animation: orbitClockwise 66s linear infinite;
+}
+
+.ringEnglish {
+  width: 58%;
+  animation: orbitCounter 84s linear infinite;
+}
+
+.ringOuter::before,
+.ringReading::before,
+.ringMath::before,
+.ringEnglish::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  transform: scale(1);
+  opacity: 1;
+  will-change: transform, opacity;
+}
+
+.ringOuter::before {
+  border: 1px solid #1A2638;
+}
+
+.ringReading::before {
+  border: 1px dashed #22314A;
+}
+
+.ringMath::before {
+  border: 1px solid #1E2A3C;
+}
+
+.ringEnglish::before {
+  border: 1px dashed #22314A;
+}
+
+.ringOuter > span,
+.ringReading > span,
+.ringMath > span,
+.ringEnglish > span {
+  position: absolute;
+  left: 50%;
+  top: -7px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  will-change: transform, opacity, filter;
+}
+
+.ringOuter > span::after,
+.ringReading > span::after,
+.ringMath > span::after,
+.ringEnglish > span::after {
+  content: "";
+  position: absolute;
+  right: 8px;
+  top: 5px;
+  width: 34px;
+  height: 4px;
+  border-radius: 999px;
+  opacity: 0;
+  transform: scaleX(0.25);
+  transform-origin: right center;
+  filter: blur(1px);
+  will-change: transform, opacity, filter;
+}
+
+.planetScience {
+  background: #F0997B;
+  box-shadow: 0 0 16px #F0997B, 0 0 34px #F0997B88;
+}
+
+.planetScience::after {
+  background: linear-gradient(90deg, transparent, #F0997B);
+}
+
+.planetReading {
+  background: #EF9F27;
+  box-shadow: 0 0 16px #EF9F27, 0 0 34px #EF9F2788;
+}
+
+.planetReading::after {
+  background: linear-gradient(90deg, transparent, #EF9F27);
+}
+
+.planetMath {
+  background: #AFA9EC;
+  box-shadow: 0 0 16px #AFA9EC, 0 0 34px #AFA9EC88;
+}
+
+.planetMath::after {
+  background: linear-gradient(90deg, transparent, #AFA9EC);
+}
+
+.planetEnglish {
+  background: #5DCAA5;
+  box-shadow: 0 0 16px #5DCAA5, 0 0 34px #5DCAA588;
+}
+
+.planetEnglish::after {
+  background: linear-gradient(90deg, transparent, #5DCAA5);
+}
+
+.solarSystemFast .ringOuter {
+  animation-duration: 4s;
+}
+
+.solarSystemFast .ringReading {
+  animation-duration: 5s;
+}
+
+.solarSystemFast .ringMath {
+  animation-duration: 6s;
+}
+
+.solarSystemFast .ringEnglish {
+  animation-duration: 7s;
+}
+
+.solarCore {
+  width: 52%;
+  aspect-ratio: 1;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  border: 1px solid #2A5547;
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 7px;
+  background: radial-gradient(circle at 50% 40%, #16324A 0%, #0A1322 72%);
+  box-shadow: 0 0 42px #5DCAA522, inset 0 0 42px #5DCAA511;
+  filter: brightness(1) drop-shadow(0 0 0 #5DCAA500);
+  animation: coreBreathe 5s ease-in-out infinite;
+  will-change: transform, opacity, filter;
+}
+
+.timerContents {
+  display: grid;
+  place-items: center;
+  gap: 7px;
+  transform: scale(1);
+  opacity: 1;
+  filter: blur(0) brightness(1);
+  will-change: transform, opacity, filter;
+}
+
+.tMinus {
+  color: #8D97A6;
+  font-size: 12px;
+  letter-spacing: 0.24em;
+}
+
+.solarTimer {
+  white-space: nowrap;
+  color: #F7F8FA;
+  font: 700 clamp(34px, 5vw, 54px)/1 var(--font-playfair), "Playfair Display", serif;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.solarTimerFinal {
+  color: #5DCAA5;
+  text-shadow: 0 0 12px #5DCAA588, 0 0 28px #5DCAA544;
+  animation: timerPulse 1s ease-in-out infinite;
+}
+
+.timerSubcopy {
+  color: #A9B2BF;
+  font-size: 14px;
+}
+
+.holdLabel {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 42%);
+  transform: translate(-50%, 8px);
+  color: #B4BCC8;
+  font: italic 700 20px var(--font-playfair), "Playfair Display", serif;
+  opacity: 0;
+  filter: blur(3px);
+  white-space: nowrap;
+  will-change: transform, opacity, filter;
+}
+
+.scoreFormation {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  opacity: 0;
+  transform: scale(0.92) translateY(8px);
+  filter: blur(8px);
+  will-change: transform, opacity, filter;
+}
+
+.cardEyebrow {
+  margin-bottom: 8px;
+  color: #5DCAA5;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+}
+
+.compositePlaceholder {
+  width: 220px;
+  height: 220px;
+}
+
+.compositeRingWrap {
+  width: 220px;
+  height: 220px;
+  position: relative;
+}
+
+.compositeRing {
+  width: 220px;
+  height: 220px;
+  overflow: visible;
+  transform: rotate(-90deg);
+}
+
+.ringTrack,
+.ringProgress {
+  fill: none;
+  stroke-width: 8;
+}
+
+.ringTrack {
+  stroke: #1E2A3C;
+  opacity: 0;
+  transition: opacity 0.22s ease-out;
+}
+
+.ringProgress {
+  stroke: #5DCAA5;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 8px #5DCAA5);
+  transition: stroke-dashoffset 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.compositeRingValue {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+}
+
+.compositeNumber {
+  color: #EEF1F5;
+  font: italic 800 92px/0.86 var(--font-playfair), "Playfair Display", serif;
+  letter-spacing: -0.06em;
+}
+
+.compositeRingValue span:last-child {
+  margin-top: 10px;
+  color: #8D97A6;
+  font-size: 15px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.35s ease-out 0.35s, transform 0.35s ease-out 0.35s;
+}
+
+.shockwave {
+  width: 52%;
+  aspect-ratio: 1;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border: 1px solid #5DCAA5;
+  border-radius: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(1);
+  will-change: transform, opacity, filter;
+  pointer-events: none;
+}
+
+.heroFooterSlot {
+  min-height: 78px;
+  width: 100%;
+  position: relative;
+}
+
+.countdownFooter,
+.scoreFooter {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  will-change: transform, opacity, filter;
+}
+
+.countdownFooter {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+.scoreFooter {
+  color: #A9B2BF;
+  font-size: 14px;
+  opacity: 0;
+  transform: translateY(8px);
+  filter: blur(3px);
+}
+
+.releaseTimeLine {
+  color: #EEF1F5;
+  font: 700 26px/1.2 var(--font-playfair), "Playfair Display", serif;
+}
+
+.releaseTimeLine span {
+  margin-left: 4px;
+  color: #8D97A6;
+  font: 400 16px/1.2 var(--font-dm-sans), "DM Sans", sans-serif;
+}
+
+.studentCountLine {
+  margin-top: 10px;
+  color: #8D97A6;
+  font-size: 14px;
+}
+
+.devJumpButton,
+.replayButton {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid #8A5A20;
+  border-radius: 999px;
+  background: #21170B;
+  color: #EF9F27;
+  font: 700 13px var(--font-dm-sans), "DM Sans", sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.devJumpButton {
+  margin-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.postHeroContent {
+  width: min(1100px, 100%);
+  margin: 10px auto 0;
+}
+
+.percentileCard,
+.sectionCard,
+.brightestCard,
+.nextStarCard,
+.resultsBottom {
+  opacity: 0;
+  transform: translateY(18px);
+  filter: blur(4px);
+  will-change: transform, opacity, filter;
+}
+
+.percentileCard {
+  min-height: 236px;
+  padding: 22px 24px 18px;
+  border: 1px solid #1E2A3C;
+  border-radius: 24px;
+  background: #0F1826;
+}
+
+.percentileCard h2 {
+  margin: 0;
+  color: #EEF1F5;
+  font-size: 16px;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.percentileCard h2 strong {
+  color: #5DCAA5;
+  font: 700 26px var(--font-playfair), "Playfair Display", serif;
+}
+
+.histogram {
+  height: 142px;
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(36, 1fr);
+  align-items: end;
+  gap: 3px;
+  border-bottom: 1px solid #22314A;
+  overflow: visible;
+}
+
+.histogramColumn {
+  height: 100%;
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr 18px;
+  align-items: end;
+  min-width: 0;
+  overflow: visible;
+}
+
+.histogramColumn > span {
+  width: 100%;
+  height: var(--bar-height);
+  min-height: 3px;
+  align-self: end;
+  border-radius: 4px 4px 0 0;
+  background: #38536C;
+  transform: scaleY(0);
+  transform-origin: bottom;
+  opacity: 0.9;
+  will-change: transform, opacity, filter;
+}
+
+.histogramColumn > .currentBar {
+  background: #5DCAA5;
+  filter: drop-shadow(0 0 8px #5DCAA577);
+}
+
+.histogramColumn small {
+  color: #6F7A8A;
+  font-size: 9px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.youTag {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--bar-height) + 21px);
+  transform: translate(-50%, -18px) scale(0.8);
+  padding: 4px 7px;
+  border: 1px solid #5DCAA566;
+  border-radius: 999px;
+  background: #112A25;
+  color: #5DCAA5;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+  opacity: 0;
+  filter: blur(2px);
+  z-index: 3;
+  will-change: transform, opacity, filter;
+}
+
+.chartLegend {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  color: #6F7A8A;
+  font-size: 11px;
+}
+
+.privateRankCopy {
+  min-height: 188px;
+  display: grid;
+  place-content: center;
+  gap: 8px;
+}
+
+.privateRankCopy h2 {
+  font-size: 18px;
+}
+
+.privateRankCopy p {
+  margin: 0;
+  color: #A9B2BF;
+  font-size: 15px;
+}
+
+.sectionCardsRow {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sectionCard {
+  min-width: 0;
+  padding: 16px 16px 15px;
+  border: 1px solid #1E2A3C;
+  border-top-width: 3px;
+  border-radius: 20px;
+  background: #0F1826;
+}
+
+.constellation {
+  color: #8D97A6;
+  font: italic 14px var(--font-playfair), "Playfair Display", serif;
+}
+
+.sectionCard h3 {
+  margin: 3px 0 9px;
+  font: 700 20px/1 var(--font-playfair), "Playfair Display", serif;
+}
+
+.sectionScore {
+  display: block;
+  color: #EEF1F5;
+  font: 800 46px/1 var(--font-playfair), "Playfair Display", serif;
+  letter-spacing: -0.04em;
+}
+
+.sectionCard p {
+  margin: 8px 0 0;
+  color: #8D97A6;
+  font-size: 13px;
+}
+
+.insightGrid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.brightestCard,
+.nextStarCard {
+  min-height: 150px;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 14px;
+  border-radius: 24px;
+}
+
+.brightestCard {
+  border: 1px solid #5A4318;
+  background: #1E1708;
+}
+
+.nextStarCard {
+  border: 1px solid #553126;
+  background: #1E100C;
+}
+
+.insightStar,
+.insightStarDim {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.insightStar {
+  animation: insightTwinkle 3.4s ease-in-out infinite;
+}
+
+.insightStarDim {
+  opacity: 0.45;
+}
+
+.insightLabel {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.brightestCard h2,
+.nextStarCard h2 {
+  margin: 6px 0 6px;
+  color: #EEF1F5;
+  font: 700 26px/1.1 var(--font-playfair), "Playfair Display", serif;
+}
+
+.brightestCard p,
+.nextStarCard p {
+  margin: 0;
+  color: #A9B2BF;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.practiceLink {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.resultsBottom {
+  padding-top: 24px;
+  text-align: center;
+}
+
+.bottomActions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.primaryButton,
+.outlineButton {
+  min-height: 48px;
+  padding: 14px 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.primaryButton {
+  background: #5DCAA5;
+  color: #072019;
+}
+
+.outlineButton {
+  border: 1px solid #2A5547;
+  color: #EEF1F5;
+  background: transparent;
+}
+
+.resultsBottom .primaryButton {
+  min-height: 54px;
+  padding: 18px 32px;
+  font-size: 18px;
+}
+
+.resultsBottom p {
+  margin: 14px 0 6px;
+  color: #8D97A6;
+  font-size: 14px;
+}
+
+.resultsBottom small {
+  color: #6F7A8A;
+  font-size: 12px;
+}
+
+.sectionSpark {
+  position: fixed !important;
+  z-index: 90 !important;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: var(--spark-color);
+  opacity: 0;
+  filter: drop-shadow(0 0 7px var(--spark-color));
+  pointer-events: none;
+  will-change: transform, opacity, filter;
+  animation: sparkFlight 0.52s cubic-bezier(0.22, 0.78, 0.32, 1) var(--spark-delay) forwards;
+}
+
+.sectionSpark::after {
+  content: "";
+  position: absolute;
+  right: 3px;
+  top: 2px;
+  width: 30px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--spark-color));
+  transform-origin: right center;
+}
+
+.fullScreenGlow,
+.backgroundFlash {
+  position: fixed !important;
+  inset: 0;
+  z-index: 80 !important;
+  pointer-events: none;
+}
+
+.fullScreenGlow {
+  background: radial-gradient(circle at 50% 40%, #FFFFFF 0%, #5DCAA566 18%, transparent 58%);
+  opacity: 0;
+  animation: screenGlow 0.35s ease-out forwards;
+}
+
+.backgroundFlash {
+  background: radial-gradient(circle at 50% 40%, #5DCAA533 0%, transparent 64%);
+  opacity: 0;
+  animation: screenGlow 0.6s ease-out forwards;
+}
+
+.skyBrighten {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  filter: brightness(1);
+  animation: skyBrighten 0.6s ease-out forwards;
+}
+
+.shortTransition .countdownHeadline,
+.shortTransition .timerContents,
+.shortTransition .countdownFooter {
+  opacity: 0;
+}
+
+/* ZERO — flash the clock, then remove all timer text. */
+.page[data-phase="zero"] .solarTimer {
+  animation: zeroDigitFlash 0.3s ease-out forwards;
+}
+
+.page[data-phase="zero"] .tMinus,
+.page[data-phase="zero"] .timerSubcopy {
+  animation: zeroTextFade 0.3s ease-out forwards;
+}
+
+/* CONVERGE — orbit paths fade while the planets spiral toward the core. */
+.page[data-phase="converge"] .countdownHeadline,
+.page[data-phase="converge"] .countdownFooter,
+.page[data-phase="hold"] .countdownHeadline,
+.page[data-phase="hold"] .countdownFooter,
+.page[data-phase="ignite"] .countdownHeadline,
+.page[data-phase="ignite"] .countdownFooter,
+.page[data-phase="form"] .countdownHeadline,
+.page[data-phase="form"] .countdownFooter,
+.page[data-phase="sections"] .countdownHeadline,
+.page[data-phase="sections"] .countdownFooter,
+.page[data-phase="rank"] .countdownHeadline,
+.page[data-phase="rank"] .countdownFooter,
+.page[data-phase="rest"] .countdownHeadline,
+.page[data-phase="rest"] .countdownFooter,
+.page[data-phase="done"] .countdownHeadline,
+.page[data-phase="done"] .countdownFooter {
+  opacity: 0;
+  transform: translateY(-8px);
+  filter: blur(5px);
+}
+
+.page[data-phase="converge"] .ringOuter::before,
+.page[data-phase="converge"] .ringReading::before,
+.page[data-phase="converge"] .ringMath::before,
+.page[data-phase="converge"] .ringEnglish::before {
+  animation: ringConverge 0.8s ease-in forwards;
+}
+
+.page[data-phase="converge"] .ringOuter {
+  animation: convergeOuter 0.8s ease-in forwards;
+}
+
+.page[data-phase="converge"] .ringReading {
+  animation: convergeReading 0.8s ease-in forwards;
+}
+
+.page[data-phase="converge"] .ringMath {
+  animation: convergeMath 0.8s ease-in forwards;
+}
+
+.page[data-phase="converge"] .ringEnglish {
+  animation: convergeEnglish 0.8s ease-in forwards;
+}
+
+.page[data-phase="converge"] .ringOuter > span::after,
+.page[data-phase="converge"] .ringReading > span::after,
+.page[data-phase="converge"] .ringMath > span::after,
+.page[data-phase="converge"] .ringEnglish > span::after {
+  animation: trailAppear 0.8s ease-in forwards;
+}
+
+.page[data-phase="converge"] .solarCore {
+  animation: coreConverge 0.8s ease-in forwards;
+}
+
+/* HOLD — keep four colored bodies spinning tight around the bright core. */
+.page[data-phase="hold"] .ringOuter::before,
+.page[data-phase="hold"] .ringReading::before,
+.page[data-phase="hold"] .ringMath::before,
+.page[data-phase="hold"] .ringEnglish::before {
+  transform: scale(0.4);
+  opacity: 0;
+}
+
+.page[data-phase="hold"] .ringOuter {
+  animation: holdOuter 1.6s linear infinite;
+}
+
+.page[data-phase="hold"] .ringReading {
+  animation: holdReading 1.35s linear infinite reverse;
+}
+
+.page[data-phase="hold"] .ringMath {
+  animation: holdMath 1.15s linear infinite;
+}
+
+.page[data-phase="hold"] .ringEnglish {
+  animation: holdEnglish 0.95s linear infinite reverse;
+}
+
+.page[data-phase="hold"] .ringOuter > span::after,
+.page[data-phase="hold"] .ringReading > span::after,
+.page[data-phase="hold"] .ringMath > span::after,
+.page[data-phase="hold"] .ringEnglish > span::after {
+  opacity: 0.72;
+  transform: scaleX(1);
+}
+
+.page[data-phase="hold"] .solarCore {
+  animation: holdCore 1.25s ease-in-out infinite;
+}
+
+.page[data-phase="hold"] .timerContents {
+  opacity: 0;
+  transform: scale(0.9);
+  filter: blur(5px);
+}
+
+.page[data-phase="hold"] .holdLabel {
+  animation: holdLabelIn 0.35s ease-out forwards;
+}
+
+/* IGNITE — planets collapse, core flashes, shockwave and screen glow fire once. */
+.page[data-phase="ignite"] .ringOuter,
+.page[data-phase="ignite"] .ringReading,
+.page[data-phase="ignite"] .ringMath,
+.page[data-phase="ignite"] .ringEnglish {
+  animation: planetMerge 0.35s ease-in forwards;
+}
+
+.page[data-phase="ignite"] .ringOuter::before,
+.page[data-phase="ignite"] .ringReading::before,
+.page[data-phase="ignite"] .ringMath::before,
+.page[data-phase="ignite"] .ringEnglish::before {
+  opacity: 0;
+}
+
+.page[data-phase="ignite"] .solarCore {
+  animation: igniteCore 0.35s ease-out forwards;
+}
+
+.page[data-phase="ignite"] .timerContents,
+.page[data-phase="ignite"] .holdLabel {
+  opacity: 0;
+  filter: blur(8px);
+}
+
+.page[data-phase="ignite"] .shockwave {
+  animation: shockwave 0.35s ease-out forwards;
+}
+
+/* FORM THE SCORE — the core becomes the ring without changing its center. */
+.page[data-phase="form"] .solarSystem,
+.page[data-phase="sections"] .solarSystem,
+.page[data-phase="rank"] .solarSystem,
+.page[data-phase="rest"] .solarSystem,
+.page[data-phase="done"] .solarSystem {
+  opacity: 0;
+  transform: scale(0.96);
+  filter: blur(8px);
+}
+
+.page[data-phase="form"] .scoreFormation {
+  animation: scoreForm 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.page[data-phase="form"] .ringTrack,
+.page[data-phase="sections"] .ringTrack,
+.page[data-phase="rank"] .ringTrack,
+.page[data-phase="rest"] .ringTrack,
+.page[data-phase="done"] .ringTrack {
+  opacity: 1;
+}
+
+.page[data-phase="form"] .compositeRingValue span:last-child,
+.page[data-phase="sections"] .compositeRingValue span:last-child,
+.page[data-phase="rank"] .compositeRingValue span:last-child,
+.page[data-phase="rest"] .compositeRingValue span:last-child,
+.page[data-phase="done"] .compositeRingValue span:last-child {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page[data-phase="form"] .scoreHeadline {
+  animation: headlineForm 0.9s ease-out forwards;
+}
+
+.page[data-phase="form"] .scoreHeadline .revealStar1 {
+  animation: revealStarIn 0.32s ease-out 0.05s forwards;
+}
+
+.page[data-phase="form"] .scoreHeadline .revealStar2 {
+  animation: revealStarIn 0.32s ease-out 0.16s forwards;
+}
+
+.page[data-phase="form"] .scoreHeadline .revealStar3 {
+  animation: revealStarIn 0.32s ease-out 0.27s forwards;
+}
+
+.page[data-phase="form"] .scoreHeadline .revealStar4 {
+  animation: revealStarIn 0.32s ease-out 0.38s forwards;
+}
+
+.page[data-phase="form"] .scoreFooter {
+  animation: footerForm 0.45s ease-out 0.38s forwards;
+}
+
+.page[data-phase="sections"] .scoreHeadline,
+.page[data-phase="rank"] .scoreHeadline,
+.page[data-phase="rest"] .scoreHeadline,
+.page[data-phase="done"] .scoreHeadline,
+.page[data-phase="sections"] .scoreFormation,
+.page[data-phase="rank"] .scoreFormation,
+.page[data-phase="rest"] .scoreFormation,
+.page[data-phase="done"] .scoreFormation,
+.page[data-phase="sections"] .scoreFooter,
+.page[data-phase="rank"] .scoreFooter,
+.page[data-phase="rest"] .scoreFooter,
+.page[data-phase="done"] .scoreFooter {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+.page[data-phase="sections"] .scoreFormation {
+  animation: ringSettle 0.26s ease-out forwards;
+}
+
+.page[data-phase="sections"] .revealStars span,
+.page[data-phase="rank"] .revealStars span,
+.page[data-phase="rest"] .revealStars span,
+.page[data-phase="done"] .revealStars span {
+  opacity: 1;
+  transform: scale(1);
+  animation: starTwinkle 3.2s ease-in-out infinite;
+}
+
+/* SECTION LANDINGS */
+.page[data-phase="sections"] .sectionCard {
+  animation: sectionLand 0.52s cubic-bezier(0.22, 1, 0.36, 1) var(--section-delay) forwards;
+}
+
+.page[data-phase="rank"] .sectionCard,
+.page[data-phase="rest"] .sectionCard,
+.page[data-phase="done"] .sectionCard {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* RANK */
+.page[data-phase="rank"] .percentileCard {
+  animation: rankRise 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.page[data-phase="rank"] .histogramColumn > span {
+  animation: barGrow 0.42s ease-out var(--bar-delay) forwards;
+}
+
+.page[data-phase="rank"] .youTag {
+  animation: tagDrop 0.38s cubic-bezier(0.22, 1.4, 0.36, 1) 0.34s forwards;
+}
+
+.page[data-phase="rest"] .percentileCard,
+.page[data-phase="done"] .percentileCard {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+.page[data-phase="rest"] .histogramColumn > span,
+.page[data-phase="done"] .histogramColumn > span {
+  transform: scaleY(1);
+  opacity: 0.9;
+}
+
+.page[data-phase="rest"] .youTag,
+.page[data-phase="done"] .youTag {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+  filter: blur(0);
+}
+
+/* REST */
+.page[data-phase="rest"] .brightestCard {
+  animation: restRise 0.48s ease-out 0.02s forwards;
+}
+
+.page[data-phase="rest"] .nextStarCard {
+  animation: restRise 0.48s ease-out 0.12s forwards;
+}
+
+.page[data-phase="rest"] .resultsBottom {
+  animation: restRise 0.48s ease-out 0.22s forwards;
+}
+
+.page[data-phase="done"] .brightestCard,
+.page[data-phase="done"] .nextStarCard,
+.page[data-phase="done"] .resultsBottom {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+.page[data-phase="done"] .scoreHeadline,
+.page[data-phase="done"] .scoreFormation,
+.page[data-phase="done"] .scoreFooter {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+@keyframes orbitClockwise {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes orbitCounter {
+  from { transform: translate(-50%, -50%) rotate(360deg); }
+  to { transform: translate(-50%, -50%) rotate(0deg); }
+}
+
+@keyframes coreBreathe {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); filter: brightness(1) drop-shadow(0 0 0 #5DCAA500); }
+  50% { transform: translate(-50%, -50%) scale(1.015); filter: brightness(1.08) drop-shadow(0 0 16px #5DCAA522); }
+}
+
+@keyframes timerPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+@keyframes zeroDigitFlash {
+  0% { opacity: 1; transform: scale(1); filter: brightness(1); }
+  45% { opacity: 1; transform: scale(1.035); filter: brightness(2.6); }
+  100% { opacity: 0; transform: scale(0.9); filter: blur(5px) brightness(1.5); }
+}
+
+@keyframes zeroTextFade {
+  0% { opacity: 1; transform: scale(1); filter: blur(0); }
+  100% { opacity: 0; transform: scale(0.92); filter: blur(4px); }
+}
+
+@keyframes ringConverge {
+  from { transform: scale(1); opacity: 1; }
+  to { transform: scale(0.4); opacity: 0; }
+}
+
+@keyframes convergeOuter {
+  from { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+  to { transform: translate(-50%, -50%) rotate(510deg) scale(0.58); }
+}
+
+@keyframes convergeReading {
+  from { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
+  to { transform: translate(-50%, -50%) rotate(-240deg) scale(0.67); }
+}
+
+@keyframes convergeMath {
+  from { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+  to { transform: translate(-50%, -50%) rotate(440deg) scale(0.8); }
+}
+
+@keyframes convergeEnglish {
+  from { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
+  to { transform: translate(-50%, -50%) rotate(-180deg) scale(1); }
+}
+
+@keyframes trailAppear {
+  0% { opacity: 0; transform: scaleX(0.25); filter: blur(2px); }
+  35% { opacity: 0.8; transform: scaleX(1); filter: blur(1px); }
+  100% { opacity: 0.32; transform: scaleX(0.55); filter: blur(2px); }
+}
+
+@keyframes coreConverge {
+  from { transform: translate(-50%, -50%) scale(1); filter: brightness(1) drop-shadow(0 0 0 #5DCAA500); }
+  to { transform: translate(-50%, -50%) scale(1.1); filter: brightness(1.35) drop-shadow(0 0 24px #5DCAA555); }
+}
+
+@keyframes holdOuter {
+  from { transform: translate(-50%, -50%) rotate(510deg) scale(0.58); }
+  to { transform: translate(-50%, -50%) rotate(870deg) scale(0.58); }
+}
+
+@keyframes holdReading {
+  from { transform: translate(-50%, -50%) rotate(-240deg) scale(0.67); }
+  to { transform: translate(-50%, -50%) rotate(120deg) scale(0.67); }
+}
+
+@keyframes holdMath {
+  from { transform: translate(-50%, -50%) rotate(440deg) scale(0.8); }
+  to { transform: translate(-50%, -50%) rotate(800deg) scale(0.8); }
+}
+
+@keyframes holdEnglish {
+  from { transform: translate(-50%, -50%) rotate(-180deg) scale(1); }
+  to { transform: translate(-50%, -50%) rotate(180deg) scale(1); }
+}
+
+@keyframes holdCore {
+  0%, 100% { transform: translate(-50%, -50%) scale(1.08); filter: brightness(1.25) drop-shadow(0 0 22px #5DCAA544); }
+  50% { transform: translate(-50%, -50%) scale(1.12); filter: brightness(1.5) drop-shadow(0 0 34px #5DCAA566); }
+}
+
+@keyframes holdLabelIn {
+  from { opacity: 0; transform: translate(-50%, 8px); filter: blur(3px); }
+  to { opacity: 1; transform: translate(-50%, 0); filter: blur(0); }
+}
+
+@keyframes planetMerge {
+  from { opacity: 1; filter: brightness(1) blur(0); }
+  to { transform: translate(-50%, -50%) rotate(720deg) scale(0.02); opacity: 0; filter: brightness(2.5) blur(2px); }
+}
+
+@keyframes igniteCore {
+  0% { transform: translate(-50%, -50%) scale(1.1); filter: brightness(1.4) drop-shadow(0 0 24px #5DCAA555); }
+  48% { transform: translate(-50%, -50%) scale(1.18); filter: brightness(3.2) drop-shadow(0 0 46px #FFFFFFAA); }
+  100% { transform: translate(-50%, -50%) scale(1.04); filter: brightness(1.75) drop-shadow(0 0 32px #5DCAA577); }
+}
+
+@keyframes shockwave {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; filter: blur(0); }
+  100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; filter: blur(2px); }
+}
+
+@keyframes screenGlow {
+  0% { opacity: 0; }
+  46% { opacity: 0.2; }
+  100% { opacity: 0; }
+}
+
+@keyframes skyBrighten {
+  0%, 100% { filter: brightness(1); }
+  45% { filter: brightness(1.65); }
+}
+
+@keyframes scoreForm {
+  0% { opacity: 0; transform: scale(0.92) translateY(8px); filter: blur(8px); }
+  70% { opacity: 1; transform: scale(1.015) translateY(0); filter: blur(0); }
+  100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+}
+
+@keyframes headlineForm {
+  from { opacity: 0; transform: translateY(14px); filter: blur(5px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+@keyframes revealStarIn {
+  0% { opacity: 0; transform: scale(0.55); filter: blur(3px); }
+  70% { opacity: 1; transform: scale(1.16); filter: blur(0); }
+  100% { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+
+@keyframes footerForm {
+  from { opacity: 0; transform: translateY(8px); filter: blur(3px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+@keyframes ringSettle {
+  0% { opacity: 1; transform: scale(1.04); filter: drop-shadow(0 0 18px #5DCAA555); }
+  100% { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 0 #5DCAA500); }
+}
+
+@keyframes starTwinkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.48; transform: scale(0.86); }
+}
+
+@keyframes sparkFlight {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.7);
+    filter: brightness(1.4) drop-shadow(0 0 8px var(--spark-color));
+  }
+  14% {
+    opacity: 1;
+  }
+  48% {
+    opacity: 1;
+    transform: translate(var(--spark-mid-x), var(--spark-mid-y)) scale(1);
+    filter: brightness(1.8) drop-shadow(0 0 12px var(--spark-color));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--spark-end-x), var(--spark-end-y)) scale(0.65);
+    filter: brightness(2.1) drop-shadow(0 0 16px var(--spark-color));
+  }
+}
+
+@keyframes sectionLand {
+  0% { opacity: 0; transform: translateY(18px); filter: blur(4px) drop-shadow(0 0 0 var(--section-color)); }
+  72% { opacity: 1; transform: translateY(-2px); filter: blur(0) drop-shadow(0 0 12px var(--section-color)); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0) drop-shadow(0 0 0 var(--section-color)); }
+}
+
+@keyframes rankRise {
+  from { opacity: 0; transform: translateY(18px); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+@keyframes barGrow {
+  from { transform: scaleY(0); opacity: 0.4; }
+  to { transform: scaleY(1); opacity: 0.9; }
+}
+
+@keyframes tagDrop {
+  0% { opacity: 0; transform: translate(-50%, -18px) scale(0.8); filter: blur(2px); }
+  72% { opacity: 1; transform: translate(-50%, 4px) scale(1.04); filter: blur(0); }
+  100% { opacity: 1; transform: translate(-50%, 0) scale(1); filter: blur(0); }
+}
+
+@keyframes restRise {
+  from { opacity: 0; transform: translateY(18px); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+@keyframes insightTwinkle {
+  0%, 100% { opacity: 0.6; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+@media (max-width: 760px) {
+  .topBar {
+    padding: 22px 16px 0;
+  }
+
+  .topBar > span {
+    max-width: 58%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: right;
+    font-size: 11px;
+  }
+
+  .experienceShell {
+    width: min(100% - 24px, 1100px);
+    padding-top: 24px;
+  }
+
+  .headlineSlot {
+    min-height: 116px;
+  }
+
+  .countdownHeadline h1,
+  .scoreHeadline h1 {
+    font-size: clamp(44px, 13vw, 64px);
+  }
+
+  .countdownHeadline p {
+    max-width: 340px;
+    font-size: 14px;
+  }
+
+  .heroStage {
+    width: min(500px, 92vw);
+  }
+
+  .tMinus {
+    font-size: 10px;
+  }
+
+  .solarTimer {
+    font-size: clamp(28px, 8vw, 40px);
+  }
+
+  .timerSubcopy {
+    font-size: 12px;
+  }
+
+  .releaseTimeLine {
+    font-size: 22px;
+  }
+
+  .releaseTimeLine span {
+    font-size: 14px;
+  }
+
+  .sectionCardsRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .insightGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .histogram {
+    gap: 2px;
+  }
+
+  .devJumpButton,
+  .primaryButton,
+  .replayButton {
+    width: 100%;
+  }
+
+  .bottomActions {
+    display: grid;
+  }
+}
+
+@media (max-width: 520px) {
+  .headlineSlot {
+    min-height: 104px;
+  }
+
+  .heroStage {
+    width: min(460px, 94vw);
+  }
+
+  .solarCore {
+    width: 56%;
+  }
+
+  .scoreHeadline .revealStars {
+    margin-bottom: 8px;
+  }
+
+  .compositeNumber {
+    font-size: 80px;
+  }
+
+  .percentileCard {
+    padding-inline: 14px;
+  }
+
+  .histogram {
+    gap: 1px;
+  }
+
+  .sectionCard {
+    padding: 14px 12px;
+  }
+
+  .sectionScore {
+    font-size: 40px;
+  }
+
+  .brightestCard,
+  .nextStarCard {
+    grid-template-columns: 34px 1fr;
+    padding: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ringOuter,
+  .ringReading,
+  .ringMath,
+  .ringEnglish,
+  .solarCore,
+  .solarTimerFinal,
+  .insightStar,
+  .revealStars span,
+  .sectionSpark,
+  .shockwave,
+  .fullScreenGlow,
+  .backgroundFlash,
+  .skyBrighten {
+    animation: none !important;
+  }
+
+  .page[data-phase="rest"] .solarSystem,
+  .page[data-phase="done"] .solarSystem {
+    opacity: 0 !important;
+  }
+
+  .page[data-phase="rest"] .countdownHeadline,
+  .page[data-phase="done"] .countdownHeadline,
+  .page[data-phase="rest"] .countdownFooter,
+  .page[data-phase="done"] .countdownFooter {
+    opacity: 0 !important;
+  }
+
+  .page[data-phase="rest"] .scoreHeadline,
+  .page[data-phase="rest"] .scoreFormation,
+  .page[data-phase="rest"] .scoreFooter,
+  .page[data-phase="done"] .scoreHeadline,
+  .page[data-phase="done"] .scoreFormation,
+  .page[data-phase="done"] .scoreFooter,
+  .page[data-phase="rest"] .percentileCard,
+  .page[data-phase="rest"] .sectionCard,
+  .page[data-phase="rest"] .brightestCard,
+  .page[data-phase="rest"] .nextStarCard,
+  .page[data-phase="rest"] .resultsBottom,
+  .page[data-phase="done"] .percentileCard,
+  .page[data-phase="done"] .sectionCard,
+  .page[data-phase="done"] .brightestCard,
+  .page[data-phase="done"] .nextStarCard,
+  .page[data-phase="done"] .resultsBottom {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
+  }
+
+  .ringProgress {
+    transition: none !important;
+  }
+
+  .histogramColumn > span {
+    transform: scaleY(1) !important;
+    animation: none !important;
+  }
+
+  .youTag {
+    opacity: 1 !important;
+    transform: translate(-50%, 0) scale(1) !important;
+    filter: none !important;
+    animation: none !important;
+  }
+}

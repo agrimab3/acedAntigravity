@@ -1,0 +1,241 @@
+.pageRoot {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--sky-base);
+  color: #EEF1F5;
+  font-family: var(--font-dev-sans, "DM Sans", Arial, sans-serif);
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  min-height: calc(100vh - 42px);
+  display: grid;
+  place-items: center;
+  padding: 56px 20px 72px;
+  box-sizing: border-box;
+}
+
+.card {
+  width: min(760px, 100%);
+  box-sizing: border-box;
+  padding: 44px;
+  border: 1px solid #22314A;
+  border-radius: 30px;
+  background: rgba(15, 24, 38, 0.94);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(12px);
+}
+
+.eyebrow {
+  margin-bottom: 14px;
+  color: #5DCAA5;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+}
+
+.heading {
+  margin: 0;
+  color: #F7F8FA;
+  font-family: var(--font-dev-serif, "Playfair Display", serif);
+  font-size: clamp(42px, 7vw, 66px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+}
+
+.heading em {
+  color: #5DCAA5;
+  font-style: italic;
+  font-weight: 600;
+  text-shadow: 0 0 32px rgba(93, 202, 165, 0.24);
+}
+
+.copy {
+  max-width: 570px;
+  margin: 18px 0 30px;
+  color: #A9B2BF;
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+.studentList {
+  display: grid;
+  gap: 14px;
+}
+
+.studentButton {
+  width: 100%;
+  min-height: 78px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 15px 18px;
+  border: 1px solid #24344A;
+  border-radius: 18px;
+  background: #131C2B;
+  color: #EEF1F5;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 160ms ease, transform 160ms ease, background 160ms ease;
+}
+
+.studentButton:hover:not(:disabled),
+.studentButton:focus-visible:not(:disabled) {
+  border-color: #5DCAA5;
+  background: #11202A;
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.studentButton:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.initialCircle {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #5DCAA5;
+  color: #072019;
+  font-size: 18px;
+  font-weight: 800;
+  box-shadow: 0 0 18px rgba(93, 202, 165, 0.2);
+}
+
+.studentText {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.studentText strong {
+  font-size: 18px;
+}
+
+.studentText span {
+  color: #8D97A6;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.arrow {
+  margin-left: auto;
+  color: #5DCAA5;
+  font-size: 22px;
+}
+
+.cancelLink {
+  display: inline-block;
+  margin-top: 24px;
+  color: #8D97A6;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.cancelLink:hover {
+  color: #C9CFD8;
+}
+
+.statusCard {
+  width: min(620px, 100%);
+  box-sizing: border-box;
+  padding: 38px;
+  border: 1px solid #22314A;
+  border-radius: 28px;
+  background: rgba(15, 24, 38, 0.94);
+  text-align: center;
+}
+
+.statusCard h1 {
+  margin: 0 0 10px;
+  font-family: var(--font-dev-serif, "Playfair Display", serif);
+  font-size: 40px;
+}
+
+.statusCard p {
+  margin: 0;
+  color: #A9B2BF;
+}
+
+@media (max-width: 640px) {
+  .content {
+    padding: 38px 14px 48px;
+  }
+
+  .card {
+    padding: 30px 20px;
+    border-radius: 24px;
+  }
+
+  .studentButton {
+    min-height: 72px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .studentButton {
+    transition: none;
+  }
+}
+
+.checkoutSummary {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 24px;
+  padding: 18px;
+  border: 1px solid #24344A;
+  border-radius: 18px;
+  background: #131C2B;
+}
+
+.checkoutSummary div {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.checkoutSummary span {
+  color: #8D97A6;
+  font-size: 14px;
+}
+
+.checkoutSummary strong {
+  color: #EEF1F5;
+  font-size: 14px;
+  text-align: right;
+}
+
+.testPayButton {
+  width: 100%;
+  min-height: 58px;
+  border: 0;
+  border-radius: 999px;
+  background: #5DCAA5;
+  color: #072019;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 0 24px rgba(93, 202, 165, 0.28);
+}
+
+.testPayButton:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.errorText {
+  margin: 14px 0 0;
+  color: #F0997B;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}

@@ -1,0 +1,40 @@
+.footer {
+  width: 100%;
+  position: relative;
+  z-index: 100;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: #070B14;
+  padding: 1.5rem 1.25rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  text-align: center;
+  font-family: "DM Sans", Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.copyright {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #8D97A6;
+}
+
+.notice {
+  margin: 0;
+  max-width: 680px;
+  font-size: 0.7rem;
+  line-height: 1.45;
+  color: rgba(141, 151, 166, 0.72);
+}
+
+@media (max-width: 640px) {
+  .footer {
+    padding: 1.25rem 1rem 1.5rem;
+  }
+
+  .notice {
+    max-width: 34rem;
+    font-size: 0.68rem;
+  }
+}

@@ -1,0 +1,14 @@
+.banner {
+  position: relative;
+  z-index: 50;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 16px;
+  background: #EF9F27;
+  color: #1A1206;
+  text-align: center;
+  font-family: "DM Sans", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.035em;
+}
