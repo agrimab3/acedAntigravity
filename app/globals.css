@@ -3,6 +3,10 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --sky-base: #070B14;
+  --sky-glow: radial-gradient(900px 500px at 50% 0%, #16304A 0%, transparent 70%);
+  --sky-fade: linear-gradient(180deg, #0B1526 0%, #081020 40%, #070B14 100%);
+  --sky-background: var(--sky-glow), var(--sky-fade);
 }
 
 @theme inline {

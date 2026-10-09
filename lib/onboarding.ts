@@ -15,14 +15,32 @@ export const ACT_TEST_DATE_OPTIONS = [
 ] as const;
 
 export const ONBOARDING_EXTRA_TEST_DATE_OPTIONS = [
-  { value: "not-scheduled", label: "Not scheduled yet" },
-  { value: "just-exploring", label: "I'm just exploring" },
+  { value: "not-scheduled", label: "I'm not sure yet" },
 ] as const;
 
-export const ONBOARDING_TEST_DATE_OPTIONS = [
-  ...ACT_TEST_DATE_OPTIONS,
-  ...ONBOARDING_EXTRA_TEST_DATE_OPTIONS,
-] as const;
+const LEGACY_ONBOARDING_TEST_DATE_VALUES = new Set(["just-exploring"]);
+
+export type OnboardingTestDateOption = {
+  value: string;
+  label: string;
+};
+
+function toCalendarDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+export function getUpcomingActTestDateOptions(now = new Date()): OnboardingTestDateOption[] {
+  const today = toCalendarDate(now);
+
+  return ACT_TEST_DATE_OPTIONS.filter((option) => option.value >= today);
+}
+
+export function getOnboardingTestDateOptions(now = new Date()): OnboardingTestDateOption[] {
+  return [...getUpcomingActTestDateOptions(now), ...ONBOARDING_EXTRA_TEST_DATE_OPTIONS];
+}
 
 export const ONBOARDING_GRADE_OPTIONS = [
   { value: "8", label: "8th grade" },
@@ -34,7 +52,7 @@ export const ONBOARDING_GRADE_OPTIONS = [
 ] as const;
 
 export type OnboardingGrade = (typeof ONBOARDING_GRADE_OPTIONS)[number]["value"];
-export type OnboardingTestDateValue = (typeof ONBOARDING_TEST_DATE_OPTIONS)[number]["value"];
+export type OnboardingTestDateValue = string;
 
 export type OnboardingProfile = {
   email: string;
@@ -52,7 +70,7 @@ export type OnboardingApiResponse = {
   isComplete: boolean;
   profile: OnboardingProfile;
   gradeOptions: typeof ONBOARDING_GRADE_OPTIONS;
-  testDateOptions: typeof ONBOARDING_TEST_DATE_OPTIONS;
+  testDateOptions: OnboardingTestDateOption[];
   actDatesSourceUrl: string;
 };
 
@@ -61,9 +79,18 @@ export function isValidOnboardingGrade(value: string | null | undefined): value 
 }
 
 export function isValidOnboardingTestDate(
-  value: string | null | undefined
+  value: string | null | undefined,
+  now = new Date()
 ): value is OnboardingTestDateValue {
-  return ONBOARDING_TEST_DATE_OPTIONS.some((option) => option.value === value);
+  return getOnboardingTestDateOptions(now).some((option) => option.value === value);
+}
+
+function isKnownOnboardingTestDate(value: string | null | undefined) {
+  return (
+    ACT_TEST_DATE_OPTIONS.some((option) => option.value === value) ||
+    ONBOARDING_EXTRA_TEST_DATE_OPTIONS.some((option) => option.value === value) ||
+    (typeof value === "string" && LEGACY_ONBOARDING_TEST_DATE_VALUES.has(value))
+  );
 }
 
 export function isOnboardingComplete(profile: {
@@ -75,7 +102,7 @@ export function isOnboardingComplete(profile: {
   return Boolean(
     profile.preferredName?.trim() &&
       isValidOnboardingGrade(profile.gradeLevel) &&
-      isValidOnboardingTestDate(profile.actTestDate) &&
+      isKnownOnboardingTestDate(profile.actTestDate) &&
       typeof profile.hasRecommendations === "boolean"
   );
 }

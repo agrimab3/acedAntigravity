@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "./providers";
+import TrademarkDisclaimer from "@/components/TrademarkDisclaimer";
 
 export const metadata: Metadata = {
   title: "Aced",
@@ -16,6 +17,7 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
+        <TrademarkDisclaimer />
       </body>
     </html>
   );

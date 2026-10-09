@@ -2,8 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { signOut, useSession } from "next-auth/react";
-import FirstTimeWalkthrough from "@/app/dashboard/first-time-walkthrough";
+import { getProviders, signOut, useSession } from "next-auth/react";
+import FirstTimeWalkthrough, { type WalkthroughTargetKey } from "@/app/dashboard/first-time-walkthrough";
+import MockTestBanner from "@/components/MockTestBanner";
+import NightSky from "@/components/NightSky";
+import MockTestNavTab from "@/components/MockTestNavTab";
 import { getTopicByName } from "@/lib/act-taxonomy";
 import { getDisplayFirstName } from "@/lib/onboarding";
 import { useOnboardingState } from "@/lib/use-onboarding-state";
@@ -40,9 +43,6 @@ const W = 1400;
 const H = 700;
 const BASE_STAR_COLOR = "#F4F0E8";
 const BASE_CORE_COLOR = "#FFFDF8";
-const DASHBOARD_GALAXY_BACKGROUND =
-  "radial-gradient(circle at 18% 16%, rgba(74, 128, 178, 0.12), transparent 32%), radial-gradient(circle at 74% 24%, rgba(88, 138, 188, 0.08), transparent 34%), radial-gradient(circle at 52% 72%, rgba(120, 136, 182, 0.06), transparent 40%), linear-gradient(180deg,#0d1b2a 0%,#081221 44%,#020408 100%)";
-
 const SECS: Section[] = [
   {
     key: "english",
@@ -224,60 +224,6 @@ function getTopicContext(sectionKey: SectionKey, topic: string) {
   return getTopicByName(sectionKey, topic)?.officialCategory ?? null;
 }
 
-function seededValue(seed: number) {
-  const value = Math.sin(seed * 999.913) * 10000;
-  return value - Math.floor(value);
-}
-
-function buildDashboardAmbientStars(count: number) {
-  const columns = 11;
-  const rows = Math.ceil(count / columns);
-
-  return Array.from({ length: count }, (_, index) => {
-    const seed = index + 1;
-    const variant = index % 3;
-    const column = index % columns;
-    const row = Math.floor(index / columns);
-    const leftBase = ((column + 0.5) / columns) * 100;
-    const topBase = ((row + 0.5) / rows) * 100;
-
-    return {
-      id: index,
-      left: `${clampPercent(leftBase + (seededValue(seed) - 0.5) * 8, 2, 98)}%`,
-      top: `${clampPercent(topBase + (seededValue(seed + 20) - 0.5) * 10, 2, 98)}%`,
-      size: 0.7 + seededValue(seed + 40) * 2.2,
-      opacity: 0.08 + seededValue(seed + 60) * 0.34,
-      duration: 7 + seededValue(seed + 80) * 10,
-      delay: seededValue(seed + 100) * 6,
-      animationName:
-        variant === 0
-          ? "dashboardStarFloatA"
-          : variant === 1
-            ? "dashboardStarFloatB"
-            : "dashboardStarFloatC",
-    };
-  });
-}
-
-function buildDashboardAmbientGlows(count: number) {
-  return Array.from({ length: count }, (_, index) => {
-    const seed = index + 201;
-    return {
-      id: index,
-      left: `${8 + seededValue(seed) * 84}%`,
-      top: `${6 + seededValue(seed + 20) * 88}%`,
-      size: 120 + seededValue(seed + 40) * 220,
-      opacity: 0.04 + seededValue(seed + 60) * 0.08,
-      duration: 16 + seededValue(seed + 80) * 16,
-      delay: seededValue(seed + 100) * 5,
-    };
-  });
-}
-
-function clampPercent(value: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, value));
-}
-
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
@@ -323,8 +269,12 @@ function toRgba(
 function getTopicMasteryPct(
   dashboardSummary: DashboardSummary | null,
   sectionKey: SectionKey,
-  topicName: string | null
+  topicName: string | null,
+  preview: MasteryPreview
 ) {
+  if (preview && preview.sectionKey === sectionKey && preview.topicName === topicName) {
+    return preview.masteryPct;
+  }
   if (!dashboardSummary || !topicName) {
     return 0;
   }
@@ -339,7 +289,8 @@ function getTopicMasteryPct(
 function getLineMasteryPct(
   dashboardSummary: DashboardSummary | null,
   section: Section,
-  line: [number, number]
+  line: [number, number],
+  preview: MasteryPreview
 ) {
   const topicNames = line
     .map((pointIndex) => getPointTopic(section, pointIndex))
@@ -350,7 +301,7 @@ function getLineMasteryPct(
   }
 
   const total = topicNames.reduce(
-    (sum, topicName) => sum + getTopicMasteryPct(dashboardSummary, section.key, topicName),
+    (sum, topicName) => sum + getTopicMasteryPct(dashboardSummary, section.key, topicName, preview),
     0
   );
 
@@ -384,17 +335,17 @@ function getStarVisualState({
   const haloColor = interactive
     ? mixColor("#FFFFFF", sectionColor, 0.16 + mastery * 0.16)
     : hexToRgb(sectionColor);
-  const baseRadius = interactive ? 5.2 + mastery * 2.8 : 3.45;
+  const baseRadius = interactive ? 4.8 + mastery * 5.5 : 3.45;
   const radiusBoost = hovered ? 1.5 : selected ? 1.1 : 0;
   const radius = baseRadius + radiusBoost + (interactive ? pulse * 0.35 : 0);
-  const haloRadius = interactive ? 16 + mastery * 18 + pulse * 3 + (hovered || selected ? 7 : 0) : 7;
-  const haloAlpha = interactive ? 0.16 + mastery * 0.42 + (hovered || selected ? 0.12 : 0) : 0;
-  const ringAlpha = interactive ? 0.18 + mastery * 0.4 + (hovered || selected ? 0.16 : 0) : 0;
+  const haloRadius = interactive ? 14 + mastery * 30 + pulse * 3 + (hovered || selected ? 7 : 0) : 7;
+  const haloAlpha = interactive ? 0.1 + mastery * 0.62 + (hovered || selected ? 0.12 : 0) : 0;
+  const ringAlpha = interactive ? 0.12 + mastery * 0.62 + (hovered || selected ? 0.16 : 0) : 0;
   const bodyAlpha = interactive ? (0.72 + mastery * 0.28) * twinkle : 0.94 * twinkle;
   const coreRadius = interactive ? 1.15 + mastery * 0.95 : 1.22;
   const coreAlpha = interactive ? 0.76 + mastery * 0.24 : 1;
-  const lineAlpha = 0.2 + mastery * 0.25;
-  const lineWidth = 1.35 + mastery * 1.2;
+  const lineAlpha = 0.12 + mastery * 0.64;
+  const lineWidth = 1 + mastery * 2;
   const mastered = masteryPct >= 95;
   const shimmerStrength = mastered ? 0.3 + 0.7 * pulse : 0;
 
@@ -449,7 +400,17 @@ type DashboardSummary = {
     scoreExplanation: string;
     totalAnswered: number;
   }>;
+  practiceTestSignal: {
+    completedSectionTests: number;
+    completedFullTests: number;
+  };
 };
+
+type MasteryPreview = {
+  sectionKey: SectionKey;
+  topicName: string;
+  masteryPct: number;
+} | null;
 
 export default function Dashboard() {
   const router = useRouter();
@@ -473,27 +434,70 @@ export default function Dashboard() {
   const filtersRef = useRef<HTMLDivElement>(null);
   const universeRef = useRef<HTMLDivElement>(null);
   const walkthroughInitRef = useRef(false);
+  const scoreCountUpStartedAtRef = useRef<number | null>(null);
+  const scoreCountUpCompleteRef = useRef(false);
   const stateRef = useRef({
     activeSec: "all" as SectionKey | "all",
     selected: null as Hit,
     hovered: null as Hit,
   });
-  const ambientStars = useMemo(
-    () => buildDashboardAmbientStars(92),
-    []
-  );
-  const ambientGlows = useMemo(
-    () => buildDashboardAmbientGlows(7),
-    []
-  );
   const [walkthroughOpen, setWalkthroughOpen] = useState(false);
+  const [walkthroughStep, setWalkthroughStep] = useState<WalkthroughTargetKey | null>(null);
+  const [walkthroughFilterPreview, setWalkthroughFilterPreview] = useState<SectionKey | null>(null);
   const [savingWalkthrough, setSavingWalkthrough] = useState(false);
+  const [summaryError, setSummaryError] = useState(false);
+  const [devBackToLoginAvailable, setDevBackToLoginAvailable] = useState(false);
+  const [summaryRefreshToken, setSummaryRefreshToken] = useState(0);
+  const [masteryPreview, setMasteryPreview] = useState<MasteryPreview>(null);
+  const [previewSkill, setPreviewSkill] = useState({
+    sectionKey: "english" as SectionKey,
+    topicName: SECS[0].topics[0],
+  });
+  const previewSkills = useMemo(
+    () =>
+      SECS.flatMap((section) =>
+        section.topics.map((topicName) => ({ sectionKey: section.key, topicName }))
+      ),
+    []
+  );
+
+  useEffect(() => {
+    if (!walkthroughOpen || walkthroughStep !== "filters") {
+      setWalkthroughFilterPreview(null);
+      return;
+    }
+
+    const sections: SectionKey[] = ["english", "math", "reading", "science"];
+    let index = 0;
+    setWalkthroughFilterPreview(sections[index]);
+
+    const interval = window.setInterval(() => {
+      index = (index + 1) % sections.length;
+      setWalkthroughFilterPreview(sections[index]);
+    }, 1100);
+
+    return () => window.clearInterval(interval);
+  }, [walkthroughOpen, walkthroughStep]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.replace("/");
     }
   }, [router, status]);
+
+  useEffect(() => {
+    const hostname = window.location.hostname;
+    const isLocalHost = hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+
+    if (!isLocalHost) {
+      setDevBackToLoginAvailable(false);
+      return;
+    }
+
+    void getProviders().then((providers) => {
+      setDevBackToLoginAvailable(Boolean(providers?.["local-dev-test-user"]));
+    });
+  }, []);
 
   useEffect(() => {
     stateRef.current.activeSec = activeSec;
@@ -514,14 +518,18 @@ export default function Dashboard() {
     if (status !== "authenticated") return;
 
     let active = true;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 6000);
 
     const loadSummary = async () => {
       try {
         const res = await fetch("/api/dashboard/summary", {
           cache: "no-store",
+          signal: controller.signal,
         });
 
         if (!res.ok) {
+          if (active) setSummaryError(true);
           return;
         }
 
@@ -529,9 +537,17 @@ export default function Dashboard() {
 
         if (active) {
           setDashboardSummary(data);
+          setSummaryError(false);
         }
       } catch (error) {
-        console.error("Failed to load dashboard summary", error);
+        if (active) {
+          setSummaryError(true);
+        }
+        if (!(error instanceof DOMException && error.name === "AbortError")) {
+          console.error("Failed to load dashboard summary", error);
+        }
+      } finally {
+        clearTimeout(timer);
       }
     };
 
@@ -539,6 +555,26 @@ export default function Dashboard() {
 
     return () => {
       active = false;
+      controller.abort();
+      clearTimeout(timer);
+    };
+  }, [status, summaryRefreshToken]);
+
+  useEffect(() => {
+    if (status !== "authenticated") return;
+
+    const refreshSummary = () => setSummaryRefreshToken((current) => current + 1);
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") refreshSummary();
+    };
+
+    window.addEventListener("focus", refreshSummary);
+    window.addEventListener("pageshow", refreshSummary);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      window.removeEventListener("focus", refreshSummary);
+      window.removeEventListener("pageshow", refreshSummary);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, [status]);
 
@@ -607,7 +643,7 @@ export default function Dashboard() {
             x: e.clientX - canvasEl.getBoundingClientRect().left + 14,
             y: e.clientY - canvasEl.getBoundingClientRect().top - 10,
             topicName,
-            masteryPct: getTopicMasteryPct(dashboardSummary, sec.key, topicName),
+            masteryPct: getTopicMasteryPct(dashboardSummary, sec.key, topicName, masteryPreview),
           });
           return;
         }
@@ -645,7 +681,21 @@ export default function Dashboard() {
 
       SECS.forEach((sec, si) => {
         const active = sectionFilter === "all" || sectionFilter === sec.key;
-        const alpha = active ? 1 : 0.06;
+        const walkthroughFocused =
+          walkthroughOpen &&
+          walkthroughStep === "filters" &&
+          walkthroughFilterPreview === sec.key;
+        const walkthroughFiltering =
+          walkthroughOpen &&
+          walkthroughStep === "filters" &&
+          walkthroughFilterPreview !== null;
+        const alpha = walkthroughFiltering
+          ? walkthroughFocused
+            ? 1
+            : 0.055
+          : active
+            ? 1
+            : 0.06;
         const dx = Math.sin(t * 0.18 + si * 1.3) * 5;
         const dy = Math.cos(t * 0.14 + si * 1.1) * 4;
 
@@ -659,7 +709,7 @@ export default function Dashboard() {
         ctx.fill();
 
         sec.lines.forEach(([a, b]) => {
-          const lineMastery = getLineMasteryPct(dashboardSummary, sec, [a, b]);
+          const lineMastery = getLineMasteryPct(dashboardSummary, sec, [a, b], masteryPreview);
           const lineVisual = getStarVisualState({
             sectionColor: sec.color,
             masteryPct: lineMastery,
@@ -688,9 +738,14 @@ export default function Dashboard() {
           const isHover = hovered?.si === si && hovered?.pi === pi;
           const isSelected = currentSelection?.si === si && currentSelection?.pi === pi;
           const isInteractive = point.topicIndex !== undefined;
+          const isWalkthroughStar =
+            walkthroughOpen &&
+            walkthroughStep === "universe" &&
+            si === 0 &&
+            point.topicIndex === 0;
           const topicName = getPointTopic(sec, pi);
           const masteryPct = isInteractive
-            ? getTopicMasteryPct(dashboardSummary, sec.key, topicName)
+            ? getTopicMasteryPct(dashboardSummary, sec.key, topicName, masteryPreview)
             : 0;
           const twinkle = 0.8 + 0.2 * Math.sin(t * 1.1 + pi * 1.7 + si * 0.9);
           const pulse = isInteractive ? 0.82 + 0.18 * Math.sin(t * 2.2 + pi * 1.3 + si) : 1;
@@ -754,7 +809,7 @@ export default function Dashboard() {
 
           ctx.globalAlpha = alpha * visual.bodyAlpha;
           ctx.shadowColor = isInteractive ? toRgba(visual.bodyColor, 0.95) : toRgba(sec.color, 0.9);
-          ctx.shadowBlur = isHover || isSelected ? 34 : isInteractive ? 10 + visual.mastery * 20 : 11;
+          ctx.shadowBlur = isHover || isSelected ? 38 : isInteractive ? 8 + visual.mastery * 34 : 11;
           ctx.fillStyle = toRgba(visual.bodyColor, 1);
           ctx.beginPath();
           ctx.arc(resolved.x + dx, resolved.y + dy, visual.radius, 0, Math.PI * 2);
@@ -766,6 +821,36 @@ export default function Dashboard() {
           ctx.beginPath();
           ctx.arc(resolved.x + dx, resolved.y + dy, visual.coreRadius, 0, Math.PI * 2);
           ctx.fill();
+
+          if (isWalkthroughStar) {
+            const guidePulse = 0.5 + 0.5 * Math.sin(t * 3.4);
+            ctx.globalAlpha = 0.55 + guidePulse * 0.32;
+            ctx.strokeStyle = "rgba(255,255,255,0.96)";
+            ctx.lineWidth = 1.6;
+            ctx.shadowColor = sec.color;
+            ctx.shadowBlur = 22 + guidePulse * 18;
+            ctx.beginPath();
+            ctx.arc(
+              resolved.x + dx,
+              resolved.y + dy,
+              visual.radius + 11 + guidePulse * 4,
+              0,
+              Math.PI * 2
+            );
+            ctx.stroke();
+            ctx.globalAlpha = 0.18 + guidePulse * 0.12;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(
+              resolved.x + dx,
+              resolved.y + dy,
+              visual.radius + 22 + guidePulse * 7,
+              0,
+              Math.PI * 2
+            );
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+          }
 
           if (isSelected) {
             const selectedPulse = 0.5 + 0.5 * Math.sin(t * 3.2);
@@ -828,49 +913,118 @@ export default function Dashboard() {
         ctx.globalAlpha = 1;
       });
 
-      ctx.globalAlpha = 0.09;
-      ctx.strokeStyle = "#fff";
-      ctx.lineWidth = 0.85;
+      const hasPracticeData = Boolean(
+        dashboardSummary &&
+          (dashboardSummary.topicSummaries.some((topic) => topic.totalAnswered > 0) ||
+            dashboardSummary.practiceTestSignal.completedSectionTests > 0 ||
+            dashboardSummary.practiceTestSignal.completedFullTests > 0)
+      );
+      const hasPriorScore = onboardingData?.profile.previousActScore !== null &&
+        onboardingData?.profile.previousActScore !== undefined;
+      const isNewUserBaseline = Boolean(dashboardSummary) && !hasPracticeData && !hasPriorScore;
+
+      const estimateWalkthroughActive = walkthroughOpen && walkthroughStep === "estimate";
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const walkthroughRingPulse = estimateWalkthroughActive ? 0.5 + 0.5 * Math.sin(t * 1.55) : 0;
+      const innerRingRadius = 122 + walkthroughRingPulse * 10;
+      const outerRingRadius = 158 + walkthroughRingPulse * 18;
+      const calmBreath = reduceMotion ? 0.45 : 0.475 + 0.125 * Math.sin((Math.PI * 2 * t) / 6);
+
+      ctx.globalAlpha = isNewUserBaseline ? 0.3 : estimateWalkthroughActive ? 0.28 : calmBreath;
+      ctx.strokeStyle = isNewUserBaseline ? "#A8D4FF" : "#DDF9EF";
+      ctx.shadowColor = isNewUserBaseline ? "transparent" : "rgba(93,202,165,0.22)";
+      ctx.shadowBlur = isNewUserBaseline ? 0 : 5;
+      ctx.lineWidth = isNewUserBaseline ? 1.2 : estimateWalkthroughActive ? 1.05 : 0.85;
       ctx.beginPath();
-      ctx.arc(W / 2, H / 2, 122, 0, Math.PI * 2);
+      ctx.arc(W / 2, H / 2, innerRingRadius, 0, Math.PI * 2);
       ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      ctx.globalAlpha = isNewUserBaseline ? 0.3 : estimateWalkthroughActive ? 0.28 : 0.15;
+      ctx.strokeStyle = isNewUserBaseline ? "#A8D4FF" : "#fff";
+      ctx.setLineDash(isNewUserBaseline ? [4, 8] : []);
       ctx.beginPath();
-      ctx.arc(W / 2, H / 2, 158, 0, Math.PI * 2);
+      ctx.arc(W / 2, H / 2, outerRingRadius, 0, Math.PI * 2);
       ctx.stroke();
+      ctx.setLineDash([]);
+
+      for (let i = 0; i < 18; i += 1) {
+        const angle = (Math.PI * 2 * i) / 18 + t * (i % 2 === 0 ? 0.012 : -0.009);
+        const orbit = 136 + (i % 4) * 13 + walkthroughRingPulse * (i % 3);
+        const x = W / 2 + Math.cos(angle) * orbit;
+        const y = H / 2 + Math.sin(angle) * orbit;
+        const twinkle = 0.34 + 0.34 * (0.5 + 0.5 * Math.sin(t * 2 + i * 1.7));
+        ctx.globalAlpha = twinkle * (estimateWalkthroughActive ? 0.8 : 0.42);
+        ctx.fillStyle = i % 3 === 0 ? "#A8D4FF" : "#FFFFFF";
+        ctx.beginPath();
+        ctx.arc(x, y, i % 5 === 0 ? 1.4 : 0.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
       const activeSectionKey = stateRef.current.activeSec;
       const centerSectionSummary =
         activeSectionKey !== "all"
           ? dashboardSummary?.sectionSummaries.find((summary) => summary.sectionKey === activeSectionKey)
           : null;
-      const centerScoreLabel =
-        centerSectionSummary?.estimatedScore?.toString() ??
-        dashboardSummary?.compositeEstimatedScore?.toString() ??
-        "--";
+      const centerScoreTarget = centerSectionSummary?.estimatedScore ??
+        dashboardSummary?.compositeEstimatedScore ??
+        null;
+      let centerScoreLabel = isNewUserBaseline ? "—" : centerScoreTarget?.toString() ?? "…";
+
+      if (
+        activeSectionKey === "all" &&
+        centerScoreTarget !== null &&
+        !isNewUserBaseline &&
+        !scoreCountUpCompleteRef.current
+      ) {
+        if (reduceMotion) {
+          scoreCountUpCompleteRef.current = true;
+        } else {
+          if (scoreCountUpStartedAtRef.current === null) {
+            scoreCountUpStartedAtRef.current = ts;
+          }
+          const elapsed = ts - scoreCountUpStartedAtRef.current;
+          const progress = Math.min(1, elapsed / 1200);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          centerScoreLabel = Math.round(centerScoreTarget * eased).toString();
+          if (progress >= 1) {
+            scoreCountUpCompleteRef.current = true;
+          }
+        }
+      }
       const centerScoreTitle =
-        activeSectionKey !== "all"
+        isNewUserBaseline
+          ? "YOUR ACT ESTIMATE"
+          : activeSectionKey !== "all"
           ? `ESTIMATED ${activeSectionKey.toUpperCase()} SCORE`
           : "ESTIMATED ACT SCORE";
       const centerScoreLabelText =
         formatVisibleEstimateLabel(
           centerSectionSummary?.scoreLabel ?? dashboardSummary?.scoreLabel ?? ""
         );
-      const centerSubtitle =
-        activeSectionKey !== "all"
+      const centerSubtitle = isNewUserBaseline
+        ? "practice to calibrate"
+        : activeSectionKey !== "all"
           ? `${activeSectionKey} section`
           : "out of 36";
-      ctx.globalAlpha = 0.92;
-      ctx.fillStyle = "#FFFFFF";
+      ctx.globalAlpha = isNewUserBaseline ? 0.82 : 0.92;
+      ctx.fillStyle = isNewUserBaseline ? "#DCEBFF" : "#FFFFFF";
       ctx.font = "700 17px sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(centerScoreTitle, W / 2, H / 2 - 40);
-      ctx.globalAlpha = 0.88;
+      ctx.globalAlpha = isNewUserBaseline ? 0.7 : 0.88;
       ctx.font = "italic bold 58px serif";
       ctx.fillText(centerScoreLabel, W / 2, H / 2 + 16);
-      ctx.globalAlpha = 0.16;
+      ctx.globalAlpha = isNewUserBaseline ? 0.52 : 0.16;
       ctx.font = "14px sans-serif";
       ctx.fillText(centerSubtitle, W / 2, H / 2 + 48);
-      if (dashboardSummary && centerScoreLabelText) {
+      if (isNewUserBaseline) {
+        ctx.globalAlpha = 0.54;
+        ctx.fillStyle = "#8BB9FF";
+        ctx.font = "700 11px sans-serif";
+        ctx.fillText("BASELINE · NO PRACTICE YET", W / 2, H / 2 + 74);
+      } else if (dashboardSummary && centerScoreLabelText) {
         ctx.globalAlpha = 0.3;
+        ctx.fillStyle = "#FFFFFF";
         ctx.font = "12px sans-serif";
         ctx.fillText(
           `${centerScoreLabelText} · estimate improves as you practice`,
@@ -890,7 +1044,15 @@ export default function Dashboard() {
       canvasEl.removeEventListener("click", onClick);
       canvasEl.removeEventListener("mouseleave", onLeave);
     };
-  }, [dashboardSummary, status]);
+  }, [
+    dashboardSummary,
+    masteryPreview,
+    onboardingData?.profile.previousActScore,
+    status,
+    walkthroughOpen,
+    walkthroughStep,
+    walkthroughFilterPreview,
+  ]);
 
   useEffect(() => {
     if (status !== "authenticated" || onboardingLoading || !onboardingData?.isComplete) {
@@ -903,7 +1065,10 @@ export default function Dashboard() {
 
     walkthroughInitRef.current = true;
 
-    if (typeof window !== "undefined" && window.localStorage.getItem("aced.walkthrough.completed") === "1") {
+    if (
+      onboardingData.profile.walkthroughCompletedAt ||
+      (typeof window !== "undefined" && window.localStorage.getItem("aced.walkthrough.completed") === "1")
+    ) {
       return;
     }
 
@@ -918,8 +1083,29 @@ export default function Dashboard() {
     await signOut({ callbackUrl: "/" });
   };
 
+  const handleReplayWalkthrough = () => {
+    window.localStorage.removeItem("aced.walkthrough.completed");
+    setWalkthroughOpen(true);
+  };
+
+  const handleResetOnboarding = async () => {
+    const response = await fetch("/api/onboarding/reset", { method: "POST" });
+
+    if (!response.ok) {
+      return;
+    }
+
+    window.localStorage.removeItem("aced.walkthrough.completed");
+    setWalkthroughOpen(false);
+    setWalkthroughStep(null);
+    router.replace("/onboarding");
+    router.refresh();
+  };
+
   const handleCloseWalkthrough = async () => {
     setWalkthroughOpen(false);
+    setWalkthroughStep(null);
+    setWalkthroughFilterPreview(null);
     setSavingWalkthrough(true);
 
     try {
@@ -960,7 +1146,7 @@ export default function Dashboard() {
     return (
       <div
         style={{
-          background: DASHBOARD_GALAXY_BACKGROUND,
+          background: "var(--sky-background)",
           minHeight: "100vh",
           color: "rgba(255,255,255,0.5)",
           display: "flex",
@@ -975,14 +1161,15 @@ export default function Dashboard() {
   }
 
   const firstName = getDisplayFirstName({
-    preferredName: onboardingData?.profile.preferredName,
-    googleName: session?.user?.name ?? onboardingData?.profile.googleName,
+    preferredName: onboardingData?.profile?.preferredName,
+    googleName: session?.user?.name ?? onboardingData?.profile?.googleName,
   });
 
   return (
     <div
       style={{
         minHeight: "100vh",
+        background: "var(--sky-base)",
         color: "#fff",
         fontFamily: "DM Sans,sans-serif",
         position: "relative",
@@ -994,99 +1181,15 @@ export default function Dashboard() {
         rel="stylesheet"
       />
       <style>{`
-        @keyframes dashboardStarFloatA {
-          0% { transform: translate3d(0, 0, 0) scale(0.92); opacity: 0.12; }
-          50% { transform: translate3d(12px, -10px, 0) scale(1.08); opacity: 0.68; }
-          100% { transform: translate3d(0, 0, 0) scale(0.92); opacity: 0.12; }
+        @keyframes scoreOrbit {
+          to { transform: translate(-50%, -50%) rotate(360deg); }
         }
-        @keyframes dashboardStarFloatB {
-          0% { transform: translate3d(0, 0, 0) scale(0.94); opacity: 0.1; }
-          50% { transform: translate3d(-10px, -7px, 0) scale(1.04); opacity: 0.6; }
-          100% { transform: translate3d(0, 0, 0) scale(0.94); opacity: 0.1; }
-        }
-        @keyframes dashboardStarFloatC {
-          0% { transform: translate3d(0, 0, 0) scale(0.9); opacity: 0.1; }
-          50% { transform: translate3d(8px, -14px, 0) scale(1.06); opacity: 0.62; }
-          100% { transform: translate3d(0, 0, 0) scale(0.9); opacity: 0.1; }
-        }
-        @keyframes dashboardNebulaFloat {
-          0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.38; }
-          50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.72; }
-          100% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.38; }
+        @media (prefers-reduced-motion: reduce) {
+          .score-orbit { animation: none !important; }
         }
       `}</style>
 
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          minHeight: "100%",
-          pointerEvents: "none",
-          zIndex: 0,
-          background: DASHBOARD_GALAXY_BACKGROUND,
-        }}
-      />
-
-      <div style={{ position: "absolute", inset: 0, minHeight: "100%", pointerEvents: "none", zIndex: 1 }}>
-        {ambientGlows.map((glow) => (
-          <span
-            key={`ambient-glow-${glow.id}`}
-            style={{
-              position: "absolute",
-              left: glow.left,
-              top: glow.top,
-              width: `${glow.size}px`,
-              height: `${glow.size}px`,
-              borderRadius: "999px",
-              transform: "translate(-50%, -50%)",
-              background:
-                glow.id % 3 === 0
-                  ? "radial-gradient(circle, rgba(112, 188, 222, 0.12) 0%, rgba(112, 188, 222, 0.03) 48%, transparent 78%)"
-                  : glow.id % 3 === 1
-                    ? "radial-gradient(circle, rgba(176, 188, 236, 0.1) 0%, rgba(176, 188, 236, 0.025) 48%, transparent 80%)"
-                    : "radial-gradient(circle, rgba(146, 196, 187, 0.09) 0%, rgba(146, 196, 187, 0.02) 50%, transparent 80%)",
-              opacity: glow.opacity * 0.7,
-              filter: "blur(24px)",
-              animation: `dashboardNebulaFloat ${glow.duration}s ease-in-out ${glow.delay}s infinite`,
-              display: "block",
-            }}
-          />
-        ))}
-        {ambientStars.map((star) => (
-          <span
-            key={`ambient-star-${star.id}`}
-            style={{
-              position: "absolute",
-              left: star.left,
-              top: star.top,
-              width: `${star.size}px`,
-              height: `${star.size}px`,
-              borderRadius: "999px",
-              background: "rgba(255,255,255,0.96)",
-              opacity: star.opacity,
-              boxShadow:
-                star.size > 2
-                  ? "0 0 18px rgba(255,255,255,0.46), 0 0 30px rgba(255,255,255,0.16)"
-                  : "0 0 10px rgba(255,255,255,0.32)",
-              animation: `${star.animationName} ${star.duration}s ease-in-out ${star.delay}s infinite`,
-              willChange: "transform, opacity",
-              display: "block",
-            }}
-          />
-        ))}
-      </div>
-
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          minHeight: "100%",
-          pointerEvents: "none",
-          zIndex: 2,
-          background:
-            "radial-gradient(circle at 50% 24%, rgba(5, 12, 24, 0.08), transparent 20%), linear-gradient(180deg, rgba(5,12,24,0.2) 0%, rgba(5,12,24,0.12) 22%, rgba(5,12,24,0.08) 48%, rgba(5,12,24,0.1) 68%, rgba(5,12,24,0.16) 100%)",
-        }}
-      />
+      <NightSky density="more" shootingZone="upper" />
 
       <div
         style={{
@@ -1153,16 +1256,31 @@ export default function Dashboard() {
               ref={practiceTestsButtonRef}
               onClick={() => router.push("/practice-tests")}
               style={{
-                background: "transparent",
-                border: "none",
-                color: "rgba(255,255,255,0.78)",
+                background:
+                  walkthroughOpen && walkthroughStep === "practiceTests"
+                    ? "rgba(255,255,255,0.08)"
+                    : "transparent",
+                border:
+                  walkthroughOpen && walkthroughStep === "practiceTests"
+                    ? "1px solid rgba(255,255,255,0.58)"
+                    : "1px solid transparent",
+                color:
+                  walkthroughOpen && walkthroughStep === "practiceTests"
+                    ? "#fff"
+                    : "rgba(255,255,255,0.78)",
                 fontSize: "17px",
                 fontWeight: 500,
                 cursor: "pointer",
-                padding: "6px 4px",
+                padding: "8px 14px",
                 position: "relative",
+                borderRadius: "18px",
+                boxShadow:
+                  walkthroughOpen && walkthroughStep === "practiceTests"
+                    ? "0 0 0 2px rgba(175,169,236,0.18), 0 0 28px rgba(175,169,236,0.34), 0 0 72px rgba(93,202,165,0.18)"
+                    : "none",
                 textShadow: "0 0 14px rgba(255,255,255,0.18)",
                 fontFamily: "DM Sans,sans-serif",
+                transition: "background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease",
               }}
             >
               <span
@@ -1186,16 +1304,31 @@ export default function Dashboard() {
               ref={progressButtonRef}
               onClick={() => router.push("/progress")}
               style={{
-                background: "transparent",
-                border: "none",
-                color: "rgba(255,255,255,0.78)",
+                background:
+                  walkthroughOpen && walkthroughStep === "progress"
+                    ? "rgba(255,255,255,0.08)"
+                    : "transparent",
+                border:
+                  walkthroughOpen && walkthroughStep === "progress"
+                    ? "1px solid rgba(255,255,255,0.58)"
+                    : "1px solid transparent",
+                color:
+                  walkthroughOpen && walkthroughStep === "progress"
+                    ? "#fff"
+                    : "rgba(255,255,255,0.78)",
                 fontSize: "17px",
                 fontWeight: 500,
                 cursor: "pointer",
-                padding: "6px 4px",
+                padding: "8px 14px",
                 position: "relative",
+                borderRadius: "18px",
+                boxShadow:
+                  walkthroughOpen && walkthroughStep === "progress"
+                    ? "0 0 0 2px rgba(175,169,236,0.18), 0 0 28px rgba(175,169,236,0.34), 0 0 72px rgba(93,202,165,0.18)"
+                    : "none",
                 textShadow: "0 0 14px rgba(255,255,255,0.18)",
                 fontFamily: "DM Sans,sans-serif",
+                transition: "background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease",
               }}
             >
               <span
@@ -1215,17 +1348,122 @@ export default function Dashboard() {
               />
               <span style={{ position: "relative", zIndex: 1 }}>progress</span>
             </button>
+            <MockTestNavTab />
           </div>
           <div style={{ display: "flex", gap: "1rem", alignItems: "center", justifySelf: "end" }}>
-            <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)" }}>
+            <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.68)" }}>
               {session?.user?.email}
             </span>
+            {devBackToLoginAvailable && (
+              <>
+                <div style={{ display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
+                  <select
+                    value={`${previewSkill.sectionKey}::${previewSkill.topicName}`}
+                    onChange={(event) => {
+                      const [sectionKey, topicName] = event.target.value.split("::");
+                      setPreviewSkill({ sectionKey: sectionKey as SectionKey, topicName });
+                    }}
+                    style={{
+                      maxWidth: "154px",
+                      padding: "3px 5px",
+                      borderRadius: "7px",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      background: "rgba(5,12,24,0.56)",
+                      color: "rgba(255,255,255,0.68)",
+                      fontSize: "10px",
+                    }}
+                    aria-label="Skill to preview"
+                  >
+                    {previewSkills.map((skill) => (
+                      <option key={`${skill.sectionKey}-${skill.topicName}`} value={`${skill.sectionKey}::${skill.topicName}`}>
+                        {skill.sectionKey} · {skill.topicName}
+                      </option>
+                    ))}
+                  </select>
+                  {[0, 25, 50, 75, 100].map((masteryPct) => (
+                    <button
+                      key={masteryPct}
+                      onClick={() => setMasteryPreview({ ...previewSkill, masteryPct })}
+                      style={{
+                        background: masteryPreview?.sectionKey === previewSkill.sectionKey &&
+                          masteryPreview?.topicName === previewSkill.topicName &&
+                          masteryPreview.masteryPct === masteryPct
+                          ? "rgba(93,202,165,0.2)"
+                          : "transparent",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        color: "rgba(255,255,255,0.68)",
+                        borderRadius: "7px",
+                        padding: "3px 5px",
+                        fontSize: "10px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {masteryPct}%
+                    </button>
+                  ))}
+                  {masteryPreview && (
+                    <button
+                      onClick={() => setMasteryPreview(null)}
+                      style={{
+                        background: "transparent",
+                        border: "none",
+                        color: "rgba(255,255,255,0.68)",
+                        padding: "3px 2px",
+                        fontSize: "10px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      clear preview
+                    </button>
+                  )}
+                </div>
+                <button
+                  onClick={() => void handleResetOnboarding()}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: "rgba(255,255,255,0.68)",
+                    padding: "4px 2px",
+                    fontSize: "11px",
+                    cursor: "pointer",
+                  }}
+                >
+                  reset onboarding
+                </button>
+                <button
+                  onClick={handleReplayWalkthrough}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: "rgba(255,255,255,0.68)",
+                    padding: "4px 2px",
+                    fontSize: "11px",
+                    cursor: "pointer",
+                  }}
+                >
+                  replay walkthrough
+                </button>
+                <button
+                  onClick={handleSignOut}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: "rgba(255,255,255,0.68)",
+                    padding: "4px 2px",
+                    fontSize: "11px",
+                    cursor: "pointer",
+                  }}
+                >
+                  back to login
+                </button>
+              </>
+            )}
             <button
               onClick={handleSignOut}
               style={{
                 background: "transparent",
                 border: "0.5px solid rgba(255,255,255,0.18)",
-                color: "rgba(255,255,255,0.45)",
+                color: "rgba(255,255,255,0.68)",
                 padding: "6px 16px",
                 borderRadius: "20px",
                 fontSize: "12px",
@@ -1248,8 +1486,10 @@ export default function Dashboard() {
         >
           ready to <em style={{ color: "#1D9E75" }}>ace it,</em> {firstName}?
         </h1>
-        <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)", marginBottom: "1rem" }}>
-          your universe is waiting - click any bright star
+        <p style={{ fontSize: "13px", color: summaryError ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0.3)", marginBottom: "1rem" }}>
+          {summaryError
+            ? "displaying base star chart · score updates will reconnect automatically"
+            : "your universe is waiting - click any bright star"}
         </p>
 
         <div ref={filtersRef} style={{ display: "flex", gap: "6px", marginBottom: "0", flexWrap: "wrap" }}>
@@ -1267,18 +1507,48 @@ export default function Dashboard() {
                 fontSize: "12px",
                 fontWeight: 500,
                 cursor: "pointer",
-                background: activeSec === section ? "rgba(255,255,255,0.1)" : "transparent",
-                border:
+                background:
+                  (walkthroughOpen &&
+                    walkthroughStep === "filters" &&
+                    walkthroughFilterPreview === section) ||
                   activeSec === section
-                    ? "0.5px solid rgba(255,255,255,0.25)"
+                    ? "rgba(255,255,255,0.12)"
+                    : "transparent",
+                border:
+                  (walkthroughOpen &&
+                    walkthroughStep === "filters" &&
+                    walkthroughFilterPreview === section) ||
+                  activeSec === section
+                    ? "0.5px solid rgba(255,255,255,0.32)"
                     : "0.5px solid rgba(255,255,255,0.08)",
-                color: activeSec === section ? "#fff" : "rgba(255,255,255,0.35)",
+                color:
+                  (walkthroughOpen &&
+                    walkthroughStep === "filters" &&
+                    walkthroughFilterPreview === section) ||
+                  activeSec === section
+                    ? "#fff"
+                    : "rgba(255,255,255,0.35)",
+                boxShadow:
+                  walkthroughOpen &&
+                  walkthroughStep === "filters" &&
+                  walkthroughFilterPreview === section
+                    ? "0 0 22px rgba(255,255,255,0.18)"
+                    : "none",
+                transform:
+                  walkthroughOpen &&
+                  walkthroughStep === "filters" &&
+                  walkthroughFilterPreview === section
+                    ? "translateY(-1px) scale(1.035)"
+                    : "none",
+                transition: "all 220ms ease",
               }}
             >
               {section}
             </button>
           ))}
         </div>
+
+        <MockTestBanner />
       </div>
 
         <div
@@ -1301,6 +1571,36 @@ export default function Dashboard() {
           }}
         />
         <canvas ref={canvasRef} style={{ width: "100%", display: "block", border: "none", outline: "none", position: "relative", zIndex: 0 }} />
+        <div
+          className="score-orbit"
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            width: "22.5714%",
+            aspectRatio: "1",
+            transform: "translate(-50%, -50%)",
+            transformOrigin: "center",
+            animation: "scoreOrbit 60s linear infinite",
+            pointerEvents: "none",
+            zIndex: 1,
+          }}
+        >
+          <span
+            style={{
+              position: "absolute",
+              top: "-2px",
+              left: "50%",
+              width: "4px",
+              height: "4px",
+              borderRadius: "999px",
+              background: "#5DCAA5",
+              boxShadow: "0 0 8px rgba(93,202,165,0.9), 0 0 16px rgba(93,202,165,0.45)",
+              transform: "translateX(-50%)",
+            }}
+          />
+        </div>
         {hoverTooltip && (
           <div
             style={{
@@ -1318,7 +1618,7 @@ export default function Dashboard() {
               whiteSpace: "nowrap",
             }}
           >
-            <div style={{ fontSize: "10px", letterSpacing: ".06em", textTransform: "uppercase", color: "rgba(255,255,255,0.34)", marginBottom: "3px" }}>
+            <div style={{ fontSize: "10px", letterSpacing: ".06em", textTransform: "uppercase", color: "rgba(255,255,255,0.68)", marginBottom: "3px" }}>
               mastery
             </div>
             <div style={{ fontSize: "12px", color: "#fff" }}>
@@ -1337,7 +1637,7 @@ export default function Dashboard() {
               justifyContent: "center",
               height: "80px",
               fontSize: "12px",
-              color: "rgba(255,255,255,0.18)",
+              color: "rgba(255,255,255,0.68)",
               letterSpacing: ".06em",
             }}
           >
@@ -1404,7 +1704,7 @@ export default function Dashboard() {
                 >
                   {selectedTopicSummary?.masteryPct ?? 0}%
                 </div>
-                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>mastery</div>
+                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.68)" }}>mastery</div>
               </div>
             </div>
             {selectedTopicSummary && (
@@ -1430,7 +1730,7 @@ export default function Dashboard() {
                       fontSize: "10px",
                       letterSpacing: ".06em",
                       textTransform: "uppercase",
-                      color: "rgba(255,255,255,0.34)",
+                      color: "rgba(255,255,255,0.68)",
                       marginBottom: "4px",
                     }}
                   >
@@ -1447,11 +1747,11 @@ export default function Dashboard() {
                     {selectedTopicSummary.estimatedScore}/36
                   </div>
                   {formatVisibleEstimateLabel(selectedTopicSummary.scoreLabel) ? (
-                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>
+                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.68)", marginTop: "4px" }}>
                       {formatVisibleEstimateLabel(selectedTopicSummary.scoreLabel)} · estimate improves as you practice
                     </div>
                   ) : (
-                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>
+                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.68)", marginTop: "4px" }}>
                       estimate improves as you practice
                     </div>
                   )}
@@ -1471,7 +1771,7 @@ export default function Dashboard() {
                         fontSize: "10px",
                         letterSpacing: ".06em",
                         textTransform: "uppercase",
-                        color: "rgba(255,255,255,0.34)",
+                        color: "rgba(255,255,255,0.68)",
                         marginBottom: "4px",
                       }}
                     >
@@ -1488,11 +1788,11 @@ export default function Dashboard() {
                       {selectedSectionSummary.estimatedScore}/36
                     </div>
                     {formatVisibleEstimateLabel(selectedSectionSummary.scoreLabel) ? (
-                      <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>
+                      <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.68)", marginTop: "4px" }}>
                         {formatVisibleEstimateLabel(selectedSectionSummary.scoreLabel)}
                       </div>
                     ) : (
-                      <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px" }}>
+                      <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.68)", marginTop: "4px" }}>
                         estimate improves as you practice
                       </div>
                     )}
@@ -1535,7 +1835,7 @@ export default function Dashboard() {
             <div
               style={{
                 fontSize: "13px",
-                color: "rgba(255,255,255,0.45)",
+                color: "rgba(255,255,255,0.68)",
                 padding: "10px 14px",
                 background: "rgba(255,255,255,0.04)",
                 borderRadius: "10px",
@@ -1587,6 +1887,73 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+      <div
+        style={{
+          position: "fixed",
+          left: "50%",
+          bottom: "16px",
+          transform: "translateX(-50%)",
+          zIndex: 50,
+          display: "flex",
+          gap: "8px",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          padding: "8px",
+          borderRadius: "16px",
+          background: "rgba(3,7,14,0.86)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          backdropFilter: "blur(12px)",
+          boxShadow: "0 12px 40px rgba(0,0,0,0.28)",
+          maxWidth: "calc(100vw - 24px)",
+        }}
+      >
+        <button
+          onClick={() => router.push("/admin/review")}
+          style={{
+            padding: "9px 13px",
+            borderRadius: "999px",
+            border: "1px solid rgba(255,255,255,0.18)",
+            background: "rgba(255,255,255,0.05)",
+            color: "rgba(255,255,255,0.86)",
+            cursor: "pointer",
+            fontFamily: "DM Sans,sans-serif",
+            fontSize: "12px",
+          }}
+        >
+          admin review
+        </button>
+        <button
+          onClick={() => router.push("/admin/mock-test-forms")}
+          style={{
+            padding: "9px 13px",
+            borderRadius: "999px",
+            border: "1px solid rgba(255,255,255,0.18)",
+            background: "rgba(255,255,255,0.05)",
+            color: "rgba(255,255,255,0.86)",
+            cursor: "pointer",
+            fontFamily: "DM Sans,sans-serif",
+            fontSize: "12px",
+          }}
+        >
+          mock test forms
+        </button>
+        <button
+          onClick={() => router.push("/mock-test/run")}
+          style={{
+            padding: "9px 13px",
+            borderRadius: "999px",
+            border: "1px solid rgba(255,255,255,0.18)",
+            background: "rgba(255,255,255,0.05)",
+            color: "rgba(255,255,255,0.86)",
+            cursor: "pointer",
+            fontFamily: "DM Sans,sans-serif",
+            fontSize: "12px",
+          }}
+        >
+          mock test run
+        </button>
+      </div>
+
       <FirstTimeWalkthrough
         open={walkthroughOpen}
         saving={savingWalkthrough}
@@ -1596,6 +1963,7 @@ export default function Dashboard() {
         filtersRef={filtersRef}
         practiceTestsRef={practiceTestsButtonRef}
         progressRef={progressButtonRef}
+        onStepChange={setWalkthroughStep}
       />
       <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}`}</style>
     </div>

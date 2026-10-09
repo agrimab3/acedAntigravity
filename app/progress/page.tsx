@@ -4,9 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useOnboardingState } from "@/lib/use-onboarding-state";
-
-const PROGRESS_GALAXY_BACKGROUND =
-  "radial-gradient(circle at 18% 16%, rgba(74, 128, 178, 0.12), transparent 32%), radial-gradient(circle at 74% 24%, rgba(88, 138, 188, 0.08), transparent 34%), radial-gradient(circle at 52% 72%, rgba(120, 136, 182, 0.06), transparent 40%), linear-gradient(180deg,#0d1b2a 0%,#081221 44%,#020408 100%)";
+import MockTestNavTab from "@/components/MockTestNavTab";
+import NightSky from "@/components/NightSky";
 
 const SECTION_ACCENTS: Record<string, string> = {
   english: "#5DCAA5",
@@ -227,8 +226,8 @@ export default function ProgressPage() {
       <div
         style={{
           minHeight: "100vh",
-          background: PROGRESS_GALAXY_BACKGROUND,
-          color: "rgba(255,255,255,0.46)",
+          background: "var(--sky-background)",
+          color: "rgba(255,255,255,0.68)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -248,7 +247,7 @@ export default function ProgressPage() {
     <div
       style={{
         minHeight: "100vh",
-        background: PROGRESS_GALAXY_BACKGROUND,
+        background: "var(--sky-base)",
         color: "#fff",
         fontFamily: "DM Sans,sans-serif",
         position: "relative",
@@ -258,6 +257,7 @@ export default function ProgressPage() {
         href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap"
         rel="stylesheet"
       />
+      <NightSky />
       {historyFeedback ? (
         <div
           style={{
@@ -287,7 +287,7 @@ export default function ProgressPage() {
           {historyFeedback.message}
         </div>
       ) : null}
-      <div style={{ padding: "1.5rem", maxWidth: "1240px", margin: "0 auto" }}>
+      <div style={{ padding: "1.5rem", maxWidth: "1240px", margin: "0 auto", position: "relative", zIndex: 1 }}>
         <nav
           style={{
             display: "grid",
@@ -352,9 +352,10 @@ export default function ProgressPage() {
                 <span style={{ position: "relative", zIndex: 1 }}>{item.label}</span>
               </button>
             ))}
+            <MockTestNavTab />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", justifySelf: "end" }}>
-            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.28)" }}>
+            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.68)" }}>
               {session?.user?.email}
             </span>
             <button
@@ -408,7 +409,7 @@ export default function ProgressPage() {
                   <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "30px", color: "#F4F0E8", marginBottom: "4px" }}>
                     {item.value}
                   </div>
-                  <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>{item.label}</div>
+                  <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.68)" }}>{item.label}</div>
                 </div>
               ))}
             </div>
@@ -416,7 +417,7 @@ export default function ProgressPage() {
             <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.05fr) minmax(340px, 0.95fr)", gap: "18px", alignItems: "start" }}>
               <div style={{ display: "grid", gap: "16px" }}>
                 <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.035)", border: "0.5px solid rgba(255,255,255,0.08)", padding: "1.1rem" }}>
-                  <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", marginBottom: "10px" }}>section progress</div>
+                  <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.68)", marginBottom: "10px" }}>section progress</div>
                   <div style={{ display: "grid", gap: "10px" }}>
                     {progress.sectionProgress.map((section) => (
                       <div
@@ -432,7 +433,7 @@ export default function ProgressPage() {
                           <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px", color: SECTION_ACCENTS[section.sectionKey] ?? "#fff", textTransform: "capitalize" }}>
                             {section.sectionKey}
                           </div>
-                          <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>
+                          <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.68)" }}>
                             {section.completedDrills} drills
                           </div>
                         </div>
@@ -448,7 +449,7 @@ export default function ProgressPage() {
                 </section>
 
                 <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.035)", border: "0.5px solid rgba(255,255,255,0.08)", padding: "1.1rem" }}>
-                  <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", marginBottom: "10px" }}>recent drills</div>
+                  <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.68)", marginBottom: "10px" }}>recent drills</div>
                   <div style={{ display: "grid", gap: "10px" }}>
                     {progress.recentDrills.length === 0 ? (
                       <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)", lineHeight: 1.7 }}>
@@ -468,7 +469,7 @@ export default function ProgressPage() {
                               <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "24px", color: SECTION_ACCENTS[drill.sectionKey] ?? "#fff" }}>
                                 {drill.accuracyPct}%
                               </div>
-                              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>accuracy</div>
+                              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.68)" }}>accuracy</div>
                             </div>
                           </div>
                           <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.52)" }}>
@@ -485,7 +486,7 @@ export default function ProgressPage() {
               </div>
 
               <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.035)", border: "0.5px solid rgba(255,255,255,0.08)", padding: "1.1rem" }}>
-                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", marginBottom: "10px" }}>saved test history</div>
+                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.68)", marginBottom: "10px" }}>saved test history</div>
                 <div style={{ display: "grid", gap: "10px" }}>
                   {progress.recentTests.length === 0 ? (
                     <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)", lineHeight: 1.7 }}>
@@ -505,7 +506,7 @@ export default function ProgressPage() {
                         <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: "8px", alignItems: "flex-start" }}>
                           <div>
                             <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px" }}>{test.title}</div>
-                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>
+                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.68)" }}>
                               {formatHistoryTimestamp(test.completedAt)}
                             </div>
                           </div>
@@ -514,7 +515,7 @@ export default function ProgressPage() {
                               <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "24px", color: "#F4F0E8" }}>
                                 {test.estimatedScore ? `${test.estimatedScore}/36` : "--"}
                               </div>
-                              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>
+                              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.68)" }}>
                                 {test.format === "full" ? "composite estimate" : "section estimate"}
                               </div>
                             </div>
@@ -657,7 +658,7 @@ export default function ProgressPage() {
             <div style={{ color: "rgba(255,255,255,0.68)", lineHeight: 1.7, fontSize: "14px", marginBottom: "1rem" }}>
               This will remove this score and its saved test history from your account.
             </div>
-            <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.42)", marginBottom: "1.1rem" }}>
+            <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.68)", marginBottom: "1.1rem" }}>
               {deleteTarget.title}
             </div>
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>

@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { RefObject } from "react";
 
-type WalkthroughTargetKey =
+export type WalkthroughTargetKey =
   | "welcome"
   | "universe"
   | "estimate"
@@ -26,12 +26,45 @@ type SpotlightRect = {
   radius: number;
 };
 
+type ChromePosition = {
+  top?: number;
+  left?: number | string;
+  right?: number;
+  bottom?: number;
+  transform?: string;
+};
+
 type FirstTimeWalkthroughProps = WalkthroughRefs & {
   firstName: string;
   open: boolean;
   saving?: boolean;
   onClose: () => void;
+  onStepChange?: (stepId: WalkthroughTargetKey) => void;
 };
+
+function WalkthroughMask({ spotlightRect }: { spotlightRect: SpotlightRect | null }) {
+  const dimStyle = {
+    position: "fixed" as const,
+    background: "rgba(2, 6, 15, 0.48)",
+    pointerEvents: "auto" as const,
+  };
+
+  if (!spotlightRect) {
+    return <div style={{ ...dimStyle, inset: 0 }} />;
+  }
+
+  const right = spotlightRect.left + spotlightRect.width;
+  const bottom = spotlightRect.top + spotlightRect.height;
+
+  return (
+    <>
+      <div style={{ ...dimStyle, top: 0, left: 0, right: 0, height: spotlightRect.top }} />
+      <div style={{ ...dimStyle, top: spotlightRect.top, left: 0, width: spotlightRect.left, height: spotlightRect.height }} />
+      <div style={{ ...dimStyle, top: spotlightRect.top, left: right, right: 0, height: spotlightRect.height }} />
+      <div style={{ ...dimStyle, top: bottom, left: 0, right: 0, bottom: 0 }} />
+    </>
+  );
+}
 
 type WalkthroughStep = {
   id: WalkthroughTargetKey;
@@ -136,6 +169,40 @@ function getSpotlightRect(stepId: WalkthroughTargetKey, refs: WalkthroughRefs): 
   return inflateRect(universeRect, 16, 32);
 }
 
+function overlaps(a: DOMRect, b: SpotlightRect | DOMRect, gap = 12) {
+  const bRight = b.left + b.width;
+  const bBottom = b.top + b.height;
+  return !(a.right + gap <= b.left || a.left >= bRight + gap || a.bottom + gap <= b.top || a.top >= bBottom + gap);
+}
+
+function rectForPosition(position: ChromePosition, width: number, height: number) {
+  const left = typeof position.left === "number"
+    ? position.left
+    : typeof position.right === "number"
+      ? window.innerWidth - position.right - width
+      : (window.innerWidth - width) / 2;
+  const top = typeof position.top === "number"
+    ? position.top
+    : typeof position.bottom === "number"
+      ? window.innerHeight - position.bottom - height
+      : (window.innerHeight - height) / 2;
+  return new DOMRect(left, top, width, height);
+}
+
+function chooseSafePosition(
+  width: number,
+  height: number,
+  target: SpotlightRect | null,
+  avoid: DOMRect | null,
+  candidates: ChromePosition[]
+) {
+  if (!target) return candidates[0];
+  return candidates.find((candidate) => {
+    const rect = rectForPosition(candidate, width, height);
+    return !overlaps(rect, target) && (!avoid || !overlaps(rect, avoid));
+  }) ?? candidates[0];
+}
+
 export default function FirstTimeWalkthrough({
   firstName,
   open,
@@ -145,9 +212,22 @@ export default function FirstTimeWalkthrough({
   filtersRef,
   practiceTestsRef,
   progressRef,
+  onStepChange,
 }: FirstTimeWalkthroughProps) {
   const [stepIndex, setStepIndex] = useState(0);
   const [spotlightRect, setSpotlightRect] = useState<SpotlightRect | null>(null);
+  const walkthroughProgressRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [progressPosition, setProgressPosition] = useState<ChromePosition>({
+    top: 26,
+    left: "50%",
+    transform: "translateX(-50%)",
+  });
+  const [cardPosition, setCardPosition] = useState<ChromePosition>({
+    left: "50%",
+    bottom: 28,
+    transform: "translateX(-50%)",
+  });
 
   const refs = useMemo(
     () => ({ universeRef, filtersRef, practiceTestsRef, progressRef }),
@@ -159,19 +239,84 @@ export default function FirstTimeWalkthrough({
       return;
     }
 
+    onStepChange?.(WALKTHROUGH_STEPS[stepIndex].id);
+  }, [onStepChange, open, stepIndex]);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const stepId = WALKTHROUGH_STEPS[stepIndex].id;
     const updateSpotlight = () => {
-      setSpotlightRect(getSpotlightRect(WALKTHROUGH_STEPS[stepIndex].id, refs));
+      setSpotlightRect(getSpotlightRect(stepId, refs));
     };
 
     updateSpotlight();
+
+    // Keep nav target frames visually locked while the page scrolls. Re-measure
+    // them on resize only; the walkthrough chrome should not drift with scroll.
+    if (stepId === "practiceTests" || stepId === "progress") {
+      window.addEventListener("resize", updateSpotlight);
+      return () => window.removeEventListener("resize", updateSpotlight);
+    }
+
     window.addEventListener("resize", updateSpotlight);
     window.addEventListener("scroll", updateSpotlight, true);
-
     return () => {
       window.removeEventListener("resize", updateSpotlight);
       window.removeEventListener("scroll", updateSpotlight, true);
     };
   }, [open, refs, stepIndex]);
+
+  useLayoutEffect(() => {
+    if (!open) return;
+
+    const progressRect = walkthroughProgressRef.current?.getBoundingClientRect();
+    const cardRect = cardRef.current?.getBoundingClientRect();
+    if (!progressRect || !cardRect) return;
+
+    const progressCandidates: ChromePosition[] = [
+      { top: 24, left: "50%", transform: "translateX(-50%)" },
+      { top: 24, left: 24 },
+      { top: 24, right: 24 },
+      { bottom: 24, left: 24 },
+      { bottom: 24, right: 24 },
+    ];
+    const nextProgress = chooseSafePosition(
+      progressRect.width,
+      progressRect.height,
+      spotlightRect,
+      null,
+      progressCandidates
+    );
+    const nextProgressRect = rectForPosition(nextProgress, progressRect.width, progressRect.height);
+    const cardCandidates: ChromePosition[] = [
+      { left: "50%", bottom: 28, transform: "translateX(-50%)" },
+      { right: 24, bottom: 24 },
+      { left: 24, bottom: 24 },
+      { left: 24, top: 104 },
+      { right: 24, top: 104 },
+    ];
+    const nextCard = chooseSafePosition(
+      cardRect.width,
+      cardRect.height,
+      spotlightRect,
+      nextProgressRect,
+      cardCandidates
+    );
+
+    const frame = window.requestAnimationFrame(() => {
+      setProgressPosition((current) =>
+        JSON.stringify(current) === JSON.stringify(nextProgress) ? current : nextProgress
+      );
+      setCardPosition((current) =>
+        JSON.stringify(current) === JSON.stringify(nextCard) ? current : nextCard
+      );
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [open, spotlightRect, stepIndex, walkthroughProgressRef]);
 
   if (!open) {
     return null;
@@ -179,7 +324,6 @@ export default function FirstTimeWalkthrough({
 
   const step = WALKTHROUGH_STEPS[stepIndex];
   const isLastStep = stepIndex === WALKTHROUGH_STEPS.length - 1;
-
   return (
     <>
       <style>{`
@@ -189,8 +333,18 @@ export default function FirstTimeWalkthrough({
           100% { transform: scale(0.985); opacity: 0.78; }
         }
         @keyframes walkthroughCardFade {
-          from { opacity: 0; transform: translateY(18px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @media (max-width: 720px) {
+          .walkthrough-card-shell {
+            left: 16px !important;
+            right: 16px !important;
+            top: auto !important;
+            bottom: 16px !important;
+            width: auto !important;
+            transform: none !important;
+          }
         }
       `}</style>
 
@@ -199,19 +353,12 @@ export default function FirstTimeWalkthrough({
           position: "fixed",
           inset: 0,
           zIndex: 60,
-          pointerEvents: "auto",
+          pointerEvents: "none",
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "rgba(2, 6, 15, 0.74)",
-            backdropFilter: "blur(10px)",
-          }}
-        />
+        <WalkthroughMask spotlightRect={spotlightRect} />
 
-        {spotlightRect ? (
+        {spotlightRect && step.id !== "practiceTests" && step.id !== "progress" ? (
           <div
             style={{
               position: "fixed",
@@ -221,9 +368,9 @@ export default function FirstTimeWalkthrough({
               height: spotlightRect.height,
               borderRadius: `${spotlightRect.radius}px`,
               boxShadow:
-                "0 0 0 9999px rgba(2, 6, 15, 0.72), 0 0 0 1px rgba(255,255,255,0.14), 0 0 36px rgba(175,169,236,0.22), 0 0 84px rgba(93,202,165,0.16)",
-              border: "1px solid rgba(255,255,255,0.2)",
-              background: "rgba(255,255,255,0.03)",
+                "0 0 0 2px rgba(255,255,255,0.2), 0 0 34px rgba(175,169,236,0.34), 0 0 92px rgba(93,202,165,0.26)",
+              border: "1px solid rgba(255,255,255,0.5)",
+              background: "transparent",
               animation: "walkthroughFramePulse 2.8s ease-in-out infinite",
               pointerEvents: "none",
             }}
@@ -231,12 +378,12 @@ export default function FirstTimeWalkthrough({
         ) : null}
 
         <div
+          ref={walkthroughProgressRef}
           style={{
             position: "fixed",
-            top: 26,
-            left: "50%",
-            transform: "translateX(-50%)",
+            ...progressPosition,
             zIndex: 62,
+            pointerEvents: "auto",
             display: "flex",
             alignItems: "center",
             gap: "12px",
@@ -270,14 +417,18 @@ export default function FirstTimeWalkthrough({
         </div>
 
         <div
+          className="walkthrough-card-shell"
+          ref={cardRef}
           style={{
             position: "fixed",
-            left: "50%",
-            bottom: 28,
-            transform: "translateX(-50%)",
-            width: "min(680px, calc(100vw - 32px))",
+            ...cardPosition,
+            width: step.id === "universe" || step.id === "estimate"
+              ? "min(390px, calc(100vw - 48px))"
+              : "min(680px, calc(100vw - 32px))",
+            maxHeight: "calc(100vh - 124px)",
             zIndex: 62,
             animation: "walkthroughCardFade 320ms ease both",
+            pointerEvents: "auto",
           }}
           key={step.id}
         >
@@ -288,7 +439,9 @@ export default function FirstTimeWalkthrough({
                 "linear-gradient(180deg, rgba(11, 21, 38, 0.94) 0%, rgba(6, 12, 23, 0.96) 100%)",
               border: "1px solid rgba(255,255,255,0.08)",
               boxShadow: "0 24px 100px rgba(0,0,0,0.36)",
-              padding: "24px 24px 22px",
+              padding: "22px 22px 20px",
+              maxHeight: "calc(100vh - 124px)",
+              overflowY: "auto",
             }}
           >
             <div

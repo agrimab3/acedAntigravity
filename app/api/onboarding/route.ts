@@ -9,8 +9,8 @@ import {
   isOnboardingComplete,
   isValidOnboardingGrade,
   isValidOnboardingTestDate,
+  getOnboardingTestDateOptions,
   ONBOARDING_GRADE_OPTIONS,
-  ONBOARDING_TEST_DATE_OPTIONS,
 } from "@/lib/onboarding";
 
 const onboardingPayloadSchema = z.object({
@@ -47,6 +47,7 @@ export async function GET() {
       previousActScore: users.previousActScore,
       hasRecommendations: users.hasRecommendations,
       onboardingCompletedAt: users.onboardingCompletedAt,
+      walkthroughCompletedAt: users.walkthroughCompletedAt,
     })
     .from(users)
     .where(eq(users.id, session.user.id))
@@ -61,10 +62,10 @@ export async function GET() {
     profile: {
       ...user,
       onboardingCompletedAt: user.onboardingCompletedAt?.toISOString() ?? null,
-      walkthroughCompletedAt: null,
+      walkthroughCompletedAt: user.walkthroughCompletedAt?.toISOString() ?? null,
     },
     gradeOptions: ONBOARDING_GRADE_OPTIONS,
-    testDateOptions: ONBOARDING_TEST_DATE_OPTIONS,
+    testDateOptions: getOnboardingTestDateOptions(),
     actDatesSourceUrl: ACT_TEST_DATES_SOURCE_URL,
   });
 }
@@ -117,8 +118,9 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   const session = await getAuthSession();
+  const db = getDb();
 
-  if (!session?.user?.id) {
+  if (!session?.user?.id || !db) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
@@ -129,5 +131,11 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Invalid walkthrough payload." }, { status: 400 });
   }
 
-  return NextResponse.json({ ok: true });
+  const now = new Date();
+  await db
+    .update(users)
+    .set({ walkthroughCompletedAt: now, updatedAt: now })
+    .where(eq(users.id, session.user.id));
+
+  return NextResponse.json({ ok: true, walkthroughCompletedAt: now.toISOString() });
 }

@@ -152,6 +152,7 @@ export async function fetchPracticeTestSectionQuestions({
         .where(
           and(
             eq(questions.status, "published"),
+            eq(questions.usageScope, "practice"),
             eq(questions.sectionKey, sectionKey),
             eq(actTopics.sectionKey, sectionKey),
             eq(actTopics.isActive, true)
@@ -188,6 +189,7 @@ export async function fetchPracticeTestSectionQuestions({
         .where(
           and(
             eq(questions.status, "published"),
+            eq(questions.usageScope, "practice"),
             eq(questions.sectionKey, sectionKey),
             eq(actTopics.sectionKey, sectionKey),
             eq(actTopics.isActive, true)

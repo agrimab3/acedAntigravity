@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import type { CSSProperties, ReactNode } from "react";
 import {
-  ACT_TEST_DATE_OPTIONS,
   ACT_TEST_DATES_SOURCE_URL,
 } from "@/lib/onboarding";
 import { useOnboardingState } from "@/lib/use-onboarding-state";
@@ -20,15 +19,6 @@ const GRADE_OPTIONS = [
   { label: "Sophomore", value: "10", accent: STEP_ACCENTS[1] },
   { label: "Junior", value: "11", accent: STEP_ACCENTS[2] },
   { label: "Senior", value: "12", accent: STEP_ACCENTS[3] },
-] as const;
-
-const TEST_DATE_OPTIONS = [
-  { ...ACT_TEST_DATE_OPTIONS.find((option) => option.value === "2026-06-13")!, accent: STEP_ACCENTS[0] },
-  { ...ACT_TEST_DATE_OPTIONS.find((option) => option.value === "2026-07-11")!, accent: STEP_ACCENTS[1] },
-  { ...ACT_TEST_DATE_OPTIONS.find((option) => option.value === "2026-09-19")!, accent: STEP_ACCENTS[2] },
-  { ...ACT_TEST_DATE_OPTIONS.find((option) => option.value === "2026-10-17")!, accent: STEP_ACCENTS[3] },
-  { ...ACT_TEST_DATE_OPTIONS.find((option) => option.value === "2026-12-12")!, accent: "#8BB9FF" },
-  { label: "I'm not sure yet", value: "not-scheduled", accent: "rgba(255,255,255,0.84)" },
 ] as const;
 
 type StepIndex = 0 | 1 | 2 | 3;
@@ -257,6 +247,7 @@ export default function OnboardingPage() {
   const progressWidth = `${((step + 1) / 4) * 100}%`;
   const selectedGrade = gradeLevel;
   const selectedTestDate = actTestDate;
+  const testDateOptions = data?.testDateOptions ?? [];
 
   return (
     <main
@@ -509,12 +500,17 @@ export default function OnboardingPage() {
                   when are you <em style={{ fontStyle: "italic", color: "#FFE4B4" }}>taking the ACT?</em>
                 </StepHeading>
                 <div style={pillGridStyle}>
-                  {TEST_DATE_OPTIONS.map((option) => (
+                  {testDateOptions.map((option, index) => (
                     <button
                       key={option.value}
                       type="button"
                       onClick={() => handleDateSelect(option.value)}
-                      style={getPillStyle(selectedTestDate === option.value, option.accent)}
+                      style={getPillStyle(
+                        selectedTestDate === option.value,
+                        option.value === "not-scheduled"
+                          ? "rgba(255,255,255,0.84)"
+                          : STEP_ACCENTS[index % STEP_ACCENTS.length]
+                      )}
                     >
                       {option.label}
                     </button>

@@ -6,10 +6,13 @@ import {
   useEffect,
   useEffectEvent,
   useMemo,
+  useRef,
   useState,
   type CSSProperties,
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import DesmosPanel from "@/components/DesmosPanel";
+import desmosPanelStyles from "@/components/DesmosPanel.module.css";
 import { useSession } from "next-auth/react";
 import {
   getPracticeTestMode,
@@ -948,6 +951,8 @@ function PracticeTestRunContent() {
   const [timeSpentByQuestion, setTimeSpentByQuestion] = useState<Record<string, number>>({});
   const [questionStartedAtMs, setQuestionStartedAtMs] = useState<number | null>(null);
   const [showCalculator, setShowCalculator] = useState(false);
+  const [calculatorStorageId, setCalculatorStorageId] = useState<string | null>(null);
+  const calculatorButtonRef = useRef<HTMLButtonElement>(null);
   const [report, setReport] = useState<CompletionReport | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [loadError, setLoadError] = useState<RunnerLoadError | null>(null);
@@ -968,6 +973,25 @@ function PracticeTestRunContent() {
       router.replace("/");
     }
   }, [router, status]);
+
+  useEffect(() => {
+    if (!mode) {
+      setCalculatorStorageId(null);
+      return;
+    }
+
+    const key = "aced-practice-desmos-run:" + mode.key;
+    try {
+      let storageId = window.sessionStorage.getItem(key);
+      if (!storageId) {
+        storageId = crypto.randomUUID();
+        window.sessionStorage.setItem(key, storageId);
+      }
+      setCalculatorStorageId(storageId);
+    } catch {
+      setCalculatorStorageId("practice-" + mode.key);
+    }
+  }, [mode]);
 
   useEffect(() => {
     if (!mode) {
@@ -1066,6 +1090,44 @@ function PracticeTestRunContent() {
   }, [mode]);
 
   const currentSection = sections[currentSectionIndex] ?? null;
+
+  useEffect(() => {
+    if (currentSection?.sectionKey !== "math") {
+      setShowCalculator(false);
+    }
+  }, [currentSection?.sectionKey]);
+
+  useEffect(() => {
+    if (
+      phase !== "running" ||
+      currentSection?.sectionKey !== "math" ||
+      !mode?.includesDesmos
+    ) {
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const insideCalculator = Boolean(
+        target?.closest("[data-desmos-calculator], [data-desmos-panel]")
+      );
+      const typingTarget =
+        target?.isContentEditable ||
+        target?.tagName === "INPUT" ||
+        target?.tagName === "TEXTAREA" ||
+        target?.tagName === "SELECT";
+
+      if (insideCalculator || typingTarget) return;
+      if (event.key.toLowerCase() !== "c") return;
+
+      event.preventDefault();
+      setShowCalculator((current) => !current);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [phase, currentSection?.sectionKey, mode?.includesDesmos]);
+
   const currentQuestionIndex = currentQuestionIndices[currentSectionIndex] ?? 0;
   const currentQuestion = currentSection?.questions[currentQuestionIndex] ?? null;
   const currentQuestionKey = currentSection ? keyFor(currentSectionIndex, currentQuestionIndex) : null;
@@ -2467,7 +2529,13 @@ function PracticeTestRunContent() {
         href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap"
         rel="stylesheet"
       />
-      <div style={{ maxWidth: "1240px", margin: "0 auto", position: "relative", zIndex: 1 }}>
+      <div
+        className={
+          desmosPanelStyles.shiftHost +
+          (showCalculator ? " " + desmosPanelStyles.shiftHostOpen : "")
+        }
+        style={{ maxWidth: "1240px", margin: "0 auto", position: "relative", zIndex: 1 }}
+      >
         <nav style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
           <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px" }}>
             Aced<em style={{ color: "#1D9E75" }}>.</em>
@@ -2628,33 +2696,31 @@ function PracticeTestRunContent() {
               })}
             </div>
 
-            {currentSection.sectionKey === "math" && mode.includesDesmos && showCalculator ? (
+            {currentSection.sectionKey === "math" && mode.includesDesmos ? (
               <div style={{ marginBottom: "1rem" }}>
-                <div
+                <button
+                  ref={calculatorButtonRef}
+                  type="button"
+                  onClick={() => setShowCalculator((current) => !current)}
+                  aria-expanded={showCalculator}
+                  aria-controls="practice-desmos-panel"
                   style={{
-                    borderRadius: "18px",
-                    overflow: "hidden",
-                    border: "0.5px solid rgba(255,255,255,0.1)",
-                    background: "rgba(4, 10, 18, 0.88)",
-                    boxShadow: "0 18px 42px rgba(0,0,0,0.26)",
+                    minHeight: "44px",
+                    padding: "10px 16px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    borderRadius: "999px",
+                    border: "1px solid #3B3870",
+                    background: "#16152B",
+                    color: "#CFCBF5",
+                    cursor: "pointer",
+                    fontWeight: 700,
                   }}
                 >
-                  <div
-                    style={{
-                      padding: "10px 12px",
-                      fontSize: "11px",
-                      color: "rgba(255,255,255,0.52)",
-                      borderBottom: "0.5px solid rgba(255,255,255,0.08)",
-                    }}
-                  >
-                    Desmos Graphing Calculator
-                  </div>
-                  <iframe
-                    title="Desmos Graphing Calculator"
-                    src="https://www.desmos.com/calculator"
-                    style={{ width: "100%", height: "540px", border: "none", display: "block" }}
-                  />
-                </div>
+                  <span aria-hidden="true">▦</span>
+                  {showCalculator ? "hide calculator" : "calculator"}
+                </button>
               </div>
             ) : null}
 
@@ -2802,23 +2868,6 @@ function PracticeTestRunContent() {
               >
                 open questions
               </button>
-              {currentSection.sectionKey === "math" && mode.includesDesmos ? (
-                <button
-                  type="button"
-                  onClick={() => setShowCalculator((current) => !current)}
-                  style={{
-                    width: "100%",
-                    padding: "11px 12px",
-                    borderRadius: "12px",
-                    border: `0.5px solid ${topMeta.accentColor}36`,
-                    background: showCalculator ? `${topMeta.accentColor}16` : "rgba(255,255,255,0.04)",
-                    color: showCalculator ? topMeta.accentColor : "rgba(255,255,255,0.82)",
-                    cursor: "pointer",
-                  }}
-                >
-                  {showCalculator ? "hide calculator" : "open calculator"}
-                </button>
-              ) : null}
             </div>
 
             {flaggedQuestionIndices.length > 0 && (
@@ -2894,6 +2943,22 @@ function PracticeTestRunContent() {
           </aside>
         </div>
       </div>
+
+      {currentSection.sectionKey === "math" && mode.includesDesmos ? (
+        <DesmosPanel
+          id="practice-desmos-panel"
+          isOpen={showCalculator}
+          onClose={() => setShowCalculator(false)}
+          storageKey={
+            "aced-desmos:practice:" +
+            (calculatorStorageId ?? sessionId ?? mode.key) +
+            ":math"
+          }
+          returnFocusRef={calculatorButtonRef}
+          variant="practice"
+        />
+      ) : null}
+
       <QuestionMapDrawer
         open={questionMapOpen}
         section={currentSection}

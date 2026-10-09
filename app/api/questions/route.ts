@@ -240,6 +240,7 @@ export async function GET(request: Request) {
       const whereClause = topic
         ? and(
             eq(questions.status, "published"),
+            eq(questions.usageScope, "practice"),
             eq(questions.sectionKey, section),
             eq(actTopics.sectionKey, section),
             inArray(actTopics.name, practiceScopeTopicNames),
@@ -247,6 +248,7 @@ export async function GET(request: Request) {
           )
         : and(
             eq(questions.status, "published"),
+            eq(questions.usageScope, "practice"),
             eq(questions.sectionKey, section),
             eq(actTopics.sectionKey, section),
             eq(questions.difficulty, difficulty)

@@ -18,27 +18,49 @@ export function useOnboardingState(
   const router = useRouter();
   const [data, setData] = useState<OnboardingApiResponse | null>(null);
   const [loading, setLoading] = useState(status === "authenticated");
+  const redirectIfIncomplete = options.redirectIfIncomplete;
+  const redirectIfCompleteTo = options.redirectIfCompleteTo;
 
   useEffect(() => {
+    let active = true;
+    let abortController: AbortController | null = null;
+
     if (status === "loading") {
       setLoading(true);
-      return;
+      return () => {
+        active = false;
+      };
     }
 
     if (status !== "authenticated") {
       setLoading(false);
       setData(null);
-      return;
+      return () => {
+        active = false;
+      };
     }
-
-    let active = true;
 
     const load = async () => {
       setLoading(true);
+      abortController = new AbortController();
+      const signal = abortController.signal;
+
+      const timeoutId = setTimeout(() => {
+        abortController?.abort();
+      }, 5000);
 
       try {
-        const res = await fetch("/api/onboarding", { cache: "no-store" });
+        const res = await fetch("/api/onboarding", {
+          cache: "no-store",
+          signal,
+        });
+
+        clearTimeout(timeoutId);
+
         if (!res.ok) {
+          if (res.status === 401 && redirectIfIncomplete) {
+            router.replace("/");
+          }
           return;
         }
 
@@ -50,18 +72,23 @@ export function useOnboardingState(
 
         setData(nextData);
 
-        if (!nextData.isComplete && options.redirectIfIncomplete) {
-          router.replace(options.redirectIfIncomplete);
+        if (!nextData.isComplete && redirectIfIncomplete) {
+          router.replace(redirectIfIncomplete);
           return;
         }
 
-        if (nextData.isComplete && options.redirectIfCompleteTo) {
-          router.replace(options.redirectIfCompleteTo);
+        if (nextData.isComplete && redirectIfCompleteTo) {
+          router.replace(redirectIfCompleteTo);
           return;
         }
       } catch (error) {
-        console.error("Failed to load onboarding state", error);
+        if (error instanceof DOMException && error.name === "AbortError") {
+          console.warn("Onboarding state fetch timed out after 5s.");
+        } else {
+          console.error("Failed to load onboarding state", error);
+        }
       } finally {
+        clearTimeout(timeoutId);
         if (active) {
           setLoading(false);
         }
@@ -72,8 +99,9 @@ export function useOnboardingState(
 
     return () => {
       active = false;
+      abortController?.abort();
     };
-  }, [options.redirectIfCompleteTo, options.redirectIfIncomplete, router, status]);
+  }, [redirectIfCompleteTo, redirectIfIncomplete, router, status]);
 
   return { data, loading };
 }

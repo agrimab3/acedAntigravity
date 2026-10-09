@@ -8,6 +8,8 @@ import {
   PRACTICE_TEST_MODES,
   SECTION_TESTS,
 } from "@/lib/practice-tests";
+import MockTestNavTab from "@/components/MockTestNavTab";
+import NightSky from "@/components/NightSky";
 import { useOnboardingState } from "@/lib/use-onboarding-state";
 
 function formatDuration(minutes: number) {
@@ -18,60 +20,6 @@ function formatDuration(minutes: number) {
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
   return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
-}
-
-function seededValue(seed: number) {
-  const value = Math.sin(seed * 999.913) * 10000;
-  return value - Math.floor(value);
-}
-
-function buildPracticeTestAmbientStars(count: number) {
-  const columns = 10;
-  const rows = Math.ceil(count / columns);
-
-  return Array.from({ length: count }, (_, index) => {
-    const seed = index + 1;
-    const variant = index % 3;
-    const column = index % columns;
-    const row = Math.floor(index / columns);
-    const leftBase = ((column + 0.5) / columns) * 100;
-    const topBase = ((row + 0.5) / rows) * 100;
-
-    return {
-      id: index,
-      left: `${clampPercent(leftBase + (seededValue(seed) - 0.5) * 8, 2, 98)}%`,
-      top: `${clampPercent(topBase + (seededValue(seed + 20) - 0.5) * 10, 3, 97)}%`,
-      size: 0.7 + seededValue(seed + 40) * 2.2,
-      opacity: 0.08 + seededValue(seed + 60) * 0.34,
-      duration: 7 + seededValue(seed + 80) * 10,
-      delay: seededValue(seed + 100) * 6,
-      animationName:
-        variant === 0
-          ? "practiceTestStarFloatA"
-          : variant === 1
-            ? "practiceTestStarFloatB"
-            : "practiceTestStarFloatC",
-    };
-  });
-}
-
-function buildPracticeTestAmbientGlows(count: number) {
-  return Array.from({ length: count }, (_, index) => {
-    const seed = index + 101;
-    return {
-      id: index,
-      left: `${6 + seededValue(seed) * 88}%`,
-      top: `${8 + seededValue(seed + 20) * 82}%`,
-      size: 120 + seededValue(seed + 40) * 220,
-      opacity: 0.04 + seededValue(seed + 60) * 0.08,
-      duration: 16 + seededValue(seed + 80) * 16,
-      delay: seededValue(seed + 100) * 5,
-    };
-  });
-}
-
-function clampPercent(value: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, value));
 }
 
 const SECTION_TEST_TOPIC_COPY: Record<string, string> = {
@@ -89,9 +37,6 @@ const FULL_TEST_TOPIC_COPY: Record<string, string> = {
   "full-with-science": "English, Math, Reading, Science.",
   "full-core": "English, Math, Reading.",
 };
-
-const PRACTICE_TEST_GALAXY_BACKGROUND =
-  "radial-gradient(circle at 18% 16%, rgba(74, 128, 178, 0.12), transparent 32%), radial-gradient(circle at 74% 24%, rgba(88, 138, 188, 0.08), transparent 34%), radial-gradient(circle at 52% 72%, rgba(120, 136, 182, 0.06), transparent 40%), linear-gradient(180deg,#0d1b2a 0%,#081221 44%,#020408 100%)";
 
 function topModeAccent(modeKey: string) {
   return (
@@ -116,6 +61,7 @@ export default function PracticeTestsPage() {
     },
   ]);
   const [historyLoading, setHistoryLoading] = useState(true);
+  const [historyError, setHistoryError] = useState<string | null>(null);
   const [history, setHistory] = useState<
     Array<{
       sessionId: string;
@@ -146,14 +92,6 @@ export default function PracticeTestsPage() {
     SECTION_TEST_TOPIC_COPY[selectedMode.key] ??
     FULL_TEST_TOPIC_COPY[selectedMode.key] ??
     selectedMode.description;
-  const backgroundStars = useMemo(
-    () => buildPracticeTestAmbientStars(78),
-    []
-  );
-  const backgroundGlows = useMemo(
-    () => buildPracticeTestAmbientGlows(8),
-    []
-  );
 
   useEffect(() => {
     setAiMessages([
@@ -185,6 +123,7 @@ export default function PracticeTestsPage() {
 
     const loadHistory = async () => {
       setHistoryLoading(true);
+      setHistoryError(null);
 
       try {
         const res = await fetch("/api/practice-tests/history", {
@@ -192,6 +131,9 @@ export default function PracticeTestsPage() {
         });
 
         if (!res.ok) {
+          if (active) {
+            setHistoryError("Your recent test history is unavailable right now. You can still start a new practice test.");
+          }
           return;
         }
 
@@ -202,6 +144,9 @@ export default function PracticeTestsPage() {
         }
       } catch (error) {
         console.error("Failed to load practice test history", error);
+        if (active) {
+          setHistoryError("Your recent test history is unavailable right now. You can still start a new practice test.");
+        }
       } finally {
         if (active) {
           setHistoryLoading(false);
@@ -220,9 +165,9 @@ export default function PracticeTestsPage() {
     return (
       <div
         style={{
-          background: PRACTICE_TEST_GALAXY_BACKGROUND,
+          background: "var(--sky-background)",
           minHeight: "100vh",
-          color: "rgba(255,255,255,0.45)",
+          color: "rgba(255,255,255,0.68)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -289,6 +234,7 @@ export default function PracticeTestsPage() {
     <div
       style={{
         minHeight: "100vh",
+        background: "var(--sky-base)",
         color: "#fff",
         fontFamily: "DM Sans,sans-serif",
         position: "relative",
@@ -300,26 +246,6 @@ export default function PracticeTestsPage() {
         rel="stylesheet"
       />
       <style>{`
-        @keyframes practiceTestStarFloatA {
-          0% { transform: translate3d(0, 0, 0) scale(0.92); opacity: 0.12; }
-          50% { transform: translate3d(12px, -10px, 0) scale(1.08); opacity: 0.68; }
-          100% { transform: translate3d(0, 0, 0) scale(0.92); opacity: 0.12; }
-        }
-        @keyframes practiceTestStarFloatB {
-          0% { transform: translate3d(0, 0, 0) scale(0.94); opacity: 0.1; }
-          50% { transform: translate3d(-10px, -7px, 0) scale(1.04); opacity: 0.6; }
-          100% { transform: translate3d(0, 0, 0) scale(0.94); opacity: 0.1; }
-        }
-        @keyframes practiceTestStarFloatC {
-          0% { transform: translate3d(0, 0, 0) scale(0.9); opacity: 0.1; }
-          50% { transform: translate3d(8px, -14px, 0) scale(1.06); opacity: 0.62; }
-          100% { transform: translate3d(0, 0, 0) scale(0.9); opacity: 0.1; }
-        }
-        @keyframes practiceTestNebulaPulse {
-          0% { transform: scale(0.94); opacity: 0.35; }
-          50% { transform: scale(1.05); opacity: 0.7; }
-          100% { transform: scale(0.94); opacity: 0.35; }
-        }
         @media (max-width: 960px) {
           .practice-tests-layout {
             grid-template-columns: 1fr !important;
@@ -329,74 +255,7 @@ export default function PracticeTestsPage() {
           }
         }
       `}</style>
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          pointerEvents: "none",
-          zIndex: 0,
-          background: PRACTICE_TEST_GALAXY_BACKGROUND,
-        }}
-      />
-      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1 }}>
-        {backgroundGlows.map((glow) => (
-          <span
-            key={`glow-${glow.id}`}
-            style={{
-              position: "absolute",
-              left: glow.left,
-              top: glow.top,
-              width: `${glow.size}px`,
-              height: `${glow.size}px`,
-              transform: "translate(-50%, -50%)",
-              borderRadius: "999px",
-              background:
-                glow.id % 3 === 0
-                  ? "radial-gradient(circle, rgba(112, 188, 222, 0.12) 0%, rgba(112, 188, 222, 0.03) 48%, transparent 78%)"
-                  : glow.id % 3 === 1
-                    ? "radial-gradient(circle, rgba(176, 188, 236, 0.1) 0%, rgba(176, 188, 236, 0.025) 48%, transparent 80%)"
-                    : "radial-gradient(circle, rgba(146, 196, 187, 0.09) 0%, rgba(146, 196, 187, 0.02) 50%, transparent 80%)",
-              opacity: glow.opacity * 0.7,
-              filter: "blur(24px)",
-              animation: `practiceTestNebulaPulse ${glow.duration}s ease-in-out ${glow.delay}s infinite`,
-              display: "block",
-            }}
-          />
-        ))}
-        {backgroundStars.map((star) => (
-          <span
-            key={`ambient-star-${star.id}`}
-            style={{
-              position: "absolute",
-              left: star.left,
-              top: star.top,
-              width: `${star.size}px`,
-              height: `${star.size}px`,
-              borderRadius: "999px",
-              background: "rgba(255,255,255,0.96)",
-              opacity: star.opacity,
-              boxShadow:
-                star.size > 2
-                  ? "0 0 18px rgba(255,255,255,0.46), 0 0 30px rgba(255,255,255,0.16)"
-                  : "0 0 10px rgba(255,255,255,0.32)",
-              animation: `${star.animationName} ${star.duration}s ease-in-out ${star.delay}s infinite`,
-              willChange: "transform, opacity",
-              display: "block",
-            }}
-          />
-        ))}
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          pointerEvents: "none",
-          zIndex: 2,
-          background:
-            "radial-gradient(circle at 50% 26%, rgba(5, 12, 24, 0.08), transparent 20%), linear-gradient(180deg, rgba(5,12,24,0.2) 0%, rgba(5,12,24,0.12) 22%, rgba(5,12,24,0.08) 48%, rgba(5,12,24,0.1) 68%, rgba(5,12,24,0.16) 100%)",
-        }}
-      />
-
+      <NightSky />
       <div style={{ padding: "1.5rem 1.5rem 2.5rem", maxWidth: "1240px", margin: "0 auto", position: "relative", zIndex: 3 }}>
         <nav
           style={{
@@ -514,9 +373,10 @@ export default function PracticeTestsPage() {
               />
               <span style={{ position: "relative", zIndex: 1 }}>progress</span>
             </button>
+            <MockTestNavTab />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", justifySelf: "end" }}>
-            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.28)" }}>
+            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.68)" }}>
               {session?.user?.email}
             </span>
             <button
@@ -581,7 +441,7 @@ export default function PracticeTestsPage() {
                 padding: "1.2rem",
               }}
             >
-              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginBottom: "0.9rem" }}>
+              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.68)", marginBottom: "0.9rem" }}>
                 section tests
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "12px" }}>
@@ -621,9 +481,9 @@ export default function PracticeTestsPage() {
                             <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px", color: mode.accentColor }}>
                               {mode.shortLabel}
                             </div>
-                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>{mode.constellation}</div>
+                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.68)" }}>{mode.constellation}</div>
                           </div>
-                          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.42)", textAlign: "right" }}>
+                          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.68)", textAlign: "right" }}>
                             <div>{mode.questionCount} questions</div>
                             <div>{formatDuration(mode.durationMinutes)}</div>
                           </div>
@@ -683,7 +543,7 @@ export default function PracticeTestsPage() {
                 padding: "1.2rem",
               }}
             >
-              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginBottom: "0.9rem" }}>
+              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.68)", marginBottom: "0.9rem" }}>
                 full test modes
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "12px" }}>
@@ -723,9 +583,9 @@ export default function PracticeTestsPage() {
                             <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px", color: mode.accentColor }}>
                               {mode.shortLabel}
                             </div>
-                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>{mode.constellation}</div>
+                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.68)" }}>{mode.constellation}</div>
                           </div>
-                          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.42)", textAlign: "right" }}>
+                          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.68)", textAlign: "right" }}>
                             <div>{mode.questionCount} questions</div>
                             <div>{formatDuration(mode.durationMinutes)}</div>
                           </div>
@@ -785,12 +645,25 @@ export default function PracticeTestsPage() {
                 padding: "1.2rem",
               }}
             >
-              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginBottom: "0.9rem" }}>
+              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.68)", marginBottom: "0.9rem" }}>
                 recent test history
               </div>
               {historyLoading ? (
-                <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>
+                <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.68)" }}>
                   loading recent timed runs...
+                </div>
+              ) : historyError ? (
+                <div
+                  role="status"
+                  style={{
+                    fontSize: "13px",
+                    color: "rgba(255,255,255,0.58)",
+                    lineHeight: 1.7,
+                    borderLeft: "2px solid rgba(240, 153, 123, 0.7)",
+                    paddingLeft: "0.8rem",
+                  }}
+                >
+                  {historyError}
                 </div>
               ) : history.length === 0 ? (
                 <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)", lineHeight: 1.7 }}>
@@ -822,7 +695,7 @@ export default function PracticeTestsPage() {
                           <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "24px", marginBottom: "4px" }}>
                             {entry.title}
                           </div>
-                          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>
+                          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.68)" }}>
                             {entry.completedAt
                               ? new Date(entry.completedAt).toLocaleString([], {
                                   month: "short",
@@ -837,7 +710,7 @@ export default function PracticeTestsPage() {
                           <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "28px", color: selectedMode.accentColor }}>
                             {entry.compositeEstimatedScore ? `${entry.compositeEstimatedScore}/36` : "--"}
                           </div>
-                          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.34)" }}>
+                          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.68)" }}>
                             {entry.format === "full" ? "composite estimate" : "section estimate"}
                           </div>
                         </div>
@@ -861,7 +734,7 @@ export default function PracticeTestsPage() {
                             <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "20px", color: "#fff" }}>
                               {item.value}
                             </div>
-                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.32)" }}>{item.label}</div>
+                            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.68)" }}>{item.label}</div>
                           </div>
                         ))}
                       </div>
@@ -969,7 +842,7 @@ export default function PracticeTestsPage() {
                     <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "24px", color: selectedMode.accentColor }}>
                       {item.value}
                     </div>
-                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.32)" }}>{item.label}</div>
+                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.68)" }}>{item.label}</div>
                   </div>
                 ))}
               </div>
@@ -1021,10 +894,10 @@ export default function PracticeTestsPage() {
                 padding: "1rem",
               }}
             >
-              <div style={{ fontSize: "10px", letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,0.34)", marginBottom: "6px" }}>
+              <div style={{ fontSize: "10px", letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,0.68)", marginBottom: "6px" }}>
                 ask your AI tutor
               </div>
-              <div style={{ fontSize: "12px", lineHeight: 1.6, color: "rgba(255,255,255,0.46)", marginBottom: "0.85rem" }}>
+              <div style={{ fontSize: "12px", lineHeight: 1.6, color: "rgba(255,255,255,0.68)", marginBottom: "0.85rem" }}>
                 Ask for test-day strategy, section pacing tips, or which stars to focus on next.
               </div>
               <div

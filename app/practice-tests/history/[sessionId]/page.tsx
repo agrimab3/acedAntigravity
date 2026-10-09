@@ -4,6 +4,7 @@ import { Fragment, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useOnboardingState } from "@/lib/use-onboarding-state";
+import MockTestNavTab from "@/components/MockTestNavTab";
 
 const REVIEW_GALAXY_BACKGROUND =
   "radial-gradient(circle at 18% 16%, rgba(74, 128, 178, 0.12), transparent 32%), radial-gradient(circle at 74% 24%, rgba(88, 138, 188, 0.08), transparent 34%), radial-gradient(circle at 52% 72%, rgba(120, 136, 182, 0.06), transparent 40%), linear-gradient(180deg,#0d1b2a 0%,#081221 44%,#020408 100%)";
@@ -315,6 +316,7 @@ export default function PracticeTestHistoryDetailPage() {
                 <span style={{ position: "relative", zIndex: 1 }}>{item.label}</span>
               </button>
             ))}
+            <MockTestNavTab />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", justifySelf: "end" }}>
             <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.28)" }}>

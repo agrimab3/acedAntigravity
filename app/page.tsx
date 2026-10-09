@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { signIn, useSession } from "next-auth/react";
+import { getProviders, signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
@@ -9,6 +9,7 @@ export default function Home() {
   const { status } = useSession();
   const [authError, setAuthError] = useState<string | null>(null);
   const [isSigningIn, setIsSigningIn] = useState(false);
+  const [devLoginAvailable, setDevLoginAvailable] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -16,6 +17,12 @@ export default function Home() {
       router.replace("/onboarding");
     }
   }, [router, status]);
+
+  useEffect(() => {
+    void getProviders().then((providers) => {
+      setDevLoginAvailable(Boolean(providers?.["local-dev-test-user"]));
+    });
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -97,6 +104,28 @@ export default function Home() {
           ? error.message
           : "Google sign-in is not configured yet. Add AUTH_GOOGLE_ID, AUTH_GOOGLE_SECRET, and AUTH_SECRET to continue."
       );
+      setIsSigningIn(false);
+    }
+  }
+
+  async function handleDevLogin() {
+    try {
+      setAuthError(null);
+      setIsSigningIn(true);
+      window.localStorage.removeItem("aced.walkthrough.completed");
+      const result = await signIn("local-dev-test-user", {
+        callbackUrl: "/onboarding",
+        redirect: false,
+      });
+
+      if (result?.error) {
+        throw new Error(result.error);
+      }
+
+      router.replace(result?.url ?? "/onboarding");
+    } catch (error) {
+      console.error("Local test sign-in failed", error);
+      setAuthError(error instanceof Error ? error.message : "Local test sign-in failed.");
       setIsSigningIn(false);
     }
   }
@@ -240,6 +269,28 @@ export default function Home() {
           {isSigningIn ? "connecting..." : "continue with google"}
         </button>
 
+        {devLoginAvailable && (
+          <button
+            onClick={handleDevLogin}
+            disabled={isSigningIn}
+            style={{
+              background: "transparent",
+              border: "1px solid rgba(255,255,255,0.28)",
+              color: "#ffffff",
+              padding: "12px 26px",
+              borderRadius: "12px",
+              fontSize: "14px",
+              fontWeight: 500,
+              cursor: isSigningIn ? "wait" : "pointer",
+              opacity: isSigningIn ? 0.7 : 1,
+              fontFamily: "'DM Sans', sans-serif",
+              marginBottom: "1rem",
+            }}
+          >
+            Continue as Test User
+          </button>
+        )}
+
         <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.25)" }}>
           beta
         </p>
@@ -257,6 +308,7 @@ export default function Home() {
             {authError}
           </p>
         )}
+
       </div>
     </main>
   );
