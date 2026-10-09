@@ -10,6 +10,7 @@ import {
 } from "react";
 import DesmosPanel from "@/components/DesmosPanel";
 import NightSky from "@/components/NightSky";
+import QuestionContent from "@/components/question-content/QuestionContent";
 import {
   MOCK_SECTIONS,
   NEXT_MOCK,
@@ -1653,7 +1654,7 @@ export default function MockTestRunner({
               {currentQuestion.questionSetTitle ? (
                 <h2>{currentQuestion.questionSetTitle}</h2>
               ) : null}
-              <div className={styles.passageText}>{currentQuestion.passage}</div>
+              <div className={styles.passageText}><QuestionContent text={currentQuestion.passage ?? ""} questionNumber={session.section.key === "english" ? currentQuestion.position : undefined} activeUnderline={session.section.key === "english"} /></div>
             </article>
           ) : null}
 
@@ -1703,7 +1704,7 @@ export default function MockTestRunner({
                 </div>
 
                 {currentQuestion.question_text ? (
-                  <div className={styles.questionText}>{currentQuestion.question_text}</div>
+                  <div className={styles.questionText}><QuestionContent text={currentQuestion.question_text} questionNumber={session.section.key === "english" ? currentQuestion.position : undefined} activeUnderline={session.section.key === "english"} /></div>
                 ) : null}
 
                 <fieldset className={styles.choiceFieldset}>
@@ -1737,7 +1738,7 @@ export default function MockTestRunner({
                       />
                       <span className={styles.choiceLetter}>{letter}</span>
                       <span className={styles.choiceText}>
-                        {currentQuestion.choices[letter]}
+                        <QuestionContent text={currentQuestion.choices[letter]} />
                       </span>
                     </label>
                   ))}

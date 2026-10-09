@@ -1881,7 +1881,7 @@ export default function Dashboard() {
                   color: "rgba(255,255,255,0.7)",
                   fontFamily: "DM Sans,sans-serif",
                 }}
-                onClick={() => router.push("/progress")}
+                onClick={() => router.push("/practice/review")}
               >
                 review missed →
               </button>

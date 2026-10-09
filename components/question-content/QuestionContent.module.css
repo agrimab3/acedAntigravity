@@ -1,0 +1,42 @@
+.underline {
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  text-decoration-color: currentColor;
+}
+
+.activeUnderline {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  border-radius: 5px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.questionNumber {
+  margin-left: 4px;
+  font-family: var(--font-dm-sans), "DM Sans", sans-serif;
+  font-size: 0.7em;
+  font-weight: 800;
+  line-height: 1;
+  color: currentColor;
+  text-decoration: none;
+}
+
+.mathInline {
+  display: inline;
+  font-family: "Times New Roman", Cambria, "Cambria Math", serif;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  white-space: normal;
+}
+
+.mathBlock {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0.5em 0;
+  padding: 0.25em 0;
+  font-family: "Times New Roman", Cambria, "Cambria Math", serif;
+  font-style: italic;
+  font-size: 1.05em;
+  overflow-wrap: anywhere;
+}

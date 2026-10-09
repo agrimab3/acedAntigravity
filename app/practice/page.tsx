@@ -1,10 +1,11 @@
 "use client";
 
-import { Fragment, Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { getTopicByName, type SectionKey } from "@/lib/act-taxonomy";
 import { useOnboardingState } from "@/lib/use-onboarding-state";
+import QuestionContent from "@/components/question-content/QuestionContent";
 import {
   formatDifficultyBand,
   normalizeDifficultyBand,
@@ -43,32 +44,6 @@ const SECTION_META: Record<string, { color: string; constellation: string }> = {
   reading: { color: '#EF9F27', constellation: 'Virgo' },
   science: { color: '#F0997B', constellation: 'Sagittarius' },
 };
-
-function renderFormattedText(text: string) {
-  const normalized = text
-    .replace(/<u>(.*?)<\/u>/gi, "[underline]$1[/underline]")
-    .replace(/__(.*?)__/g, "[underline]$1[/underline]");
-  const lines = normalized.split("\n");
-
-  return lines.map((line, lineIndex) => {
-    const segments = line.split(/(\[underline\].*?\[\/underline\])/g);
-
-    return (
-      <Fragment key={`${line}-${lineIndex}`}>
-        {segments.map((segment, segmentIndex) => {
-          const match = segment.match(/^\[underline\](.*?)\[\/underline\]$/);
-
-          if (match) {
-            return <u key={`${segment}-${segmentIndex}`}>{match[1]}</u>;
-          }
-
-          return <Fragment key={`${segment}-${segmentIndex}`}>{segment}</Fragment>;
-        })}
-        {lineIndex < lines.length - 1 ? <br /> : null}
-      </Fragment>
-    );
-  });
-}
 
 function getIntroTutorMessage(topic: string, officialCategory?: string) {
   const context = officialCategory ? `${topic} in ${officialCategory}` : topic;
@@ -560,7 +535,7 @@ function PracticeContent() {
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button onClick={() => router.push('/dashboard')} style={{ flex: 1, padding: '12px', borderRadius: '10px', fontSize: '13px', cursor: 'pointer', background: meta.color, border: 'none', color: '#fff', fontFamily: 'DM Sans,sans-serif' }}>back to universe</button>
-            {missed.length > 0 && <button style={{ flex: 1, padding: '12px', borderRadius: '10px', fontSize: '13px', cursor: 'pointer', background: 'transparent', border: '0.5px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.7)', fontFamily: 'DM Sans,sans-serif' }}>review {missed.length} missed →</button>}
+            {missed.length > 0 && <button onClick={() => router.push(practiceSessionId ? `/practice/review?sessionId=${practiceSessionId}` : "/practice/review")} style={{ flex: 1, padding: '12px', borderRadius: '10px', fontSize: '13px', cursor: 'pointer', background: 'transparent', border: '0.5px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.7)', fontFamily: 'DM Sans,sans-serif' }}>review {missed.length} missed →</button>}
           </div>
         </div>
       </div>
@@ -656,7 +631,7 @@ function PracticeContent() {
                   PASSAGE / SETUP
                 </div>
                 <div style={{ fontSize: '15px', lineHeight: 1.85, color: 'rgba(255,255,255,0.84)', whiteSpace: 'pre-wrap', maxWidth: '780px' }}>
-                  {renderFormattedText(q.passage)}
+                  <QuestionContent text={q.passage} questionNumber={section === "english" ? qIndex + 1 : undefined} activeUnderline={section === "english"} />
                 </div>
                 <div style={{ height: '1px', background: 'linear-gradient(90deg, rgba(255,255,255,0.16), rgba(255,255,255,0))', marginTop: '16px' }} />
               </div>
@@ -690,7 +665,7 @@ function PracticeContent() {
                   textShadow: '0 8px 30px rgba(0,0,0,0.18)',
                 }}
               >
-                {renderFormattedText(q.question_text)}
+                <QuestionContent text={q.question_text} questionNumber={section === "english" ? qIndex + 1 : undefined} activeUnderline={section === "english"} />
               </div>
             </div>
 
@@ -719,7 +694,7 @@ function PracticeContent() {
                 return (
                   <div key={letter} onClick={() => handlePick(letter)} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '12px', border: `0.5px solid ${borderColor}`, background: bg, cursor: submitted ? 'default' : 'pointer', opacity, transition: 'all .15s' }}>
                     <div style={{ width: '26px', height: '26px', borderRadius: '7px', border: `0.5px solid ${letterBorder}`, background: letterBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 500, color: letterColor, flexShrink: 0, transition: 'all .15s' }}>{letter}</div>
-                    <div style={{ fontSize: '13px', lineHeight: 1.45, color: 'rgba(255,255,255,0.82)' }}>{renderFormattedText(q.choices[letter])}</div>
+                    <div style={{ fontSize: '13px', lineHeight: 1.45, color: 'rgba(255,255,255,0.82)' }}><QuestionContent text={q.choices[letter]} /></div>
                   </div>
                 );
               })}
@@ -761,7 +736,7 @@ function PracticeContent() {
 
               <div ref={msgsRef} style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '8px', minHeight: '360px', maxHeight: '520px', overflowY: 'auto' }}>
                 {aiMessages.map((m, i) => (
-                  <div key={i} style={{ fontSize: '12px', lineHeight: 1.6, padding: '8px 10px', borderRadius: '10px', background: m.role === 'bot' ? 'rgba(93,202,165,0.08)' : 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.72)', alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '92%' }}>{m.text}</div>
+                  <div key={i} style={{ fontSize: '12px', lineHeight: 1.6, padding: '8px 10px', borderRadius: '10px', background: m.role === 'bot' ? 'rgba(93,202,165,0.08)' : 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.72)', alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '92%' }}><QuestionContent text={m.text} /></div>
                 ))}
                 {aiLoading && <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', padding: '8px 10px' }}>thinking...</div>}
                 {!submitted && aiMessages.length <= 1 && (

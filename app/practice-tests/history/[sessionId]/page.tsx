@@ -1,10 +1,11 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useOnboardingState } from "@/lib/use-onboarding-state";
 import MockTestNavTab from "@/components/MockTestNavTab";
+import QuestionContent from "@/components/question-content/QuestionContent";
 
 const REVIEW_GALAXY_BACKGROUND =
   "radial-gradient(circle at 18% 16%, rgba(74, 128, 178, 0.12), transparent 32%), radial-gradient(circle at 74% 24%, rgba(88, 138, 188, 0.08), transparent 34%), radial-gradient(circle at 52% 72%, rgba(120, 136, 182, 0.06), transparent 40%), linear-gradient(180deg,#0d1b2a 0%,#081221 44%,#020408 100%)";
@@ -27,32 +28,6 @@ function formatHistoryTimestamp(value: string | null) {
     year: "numeric",
     hour: "numeric",
     minute: "2-digit",
-  });
-}
-
-function renderFormattedText(text: string) {
-  const normalized = text
-    .replace(/<u>(.*?)<\/u>/gi, "[underline]$1[/underline]")
-    .replace(/__(.*?)__/g, "[underline]$1[/underline]");
-  const lines = normalized.split("\n");
-
-  return lines.map((line, lineIndex) => {
-    const segments = line.split(/(\[underline\].*?\[\/underline\])/g);
-
-    return (
-      <Fragment key={`${line}-${lineIndex}`}>
-        {segments.map((segment, segmentIndex) => {
-          const match = segment.match(/^\[underline\](.*?)\[\/underline\]$/);
-
-          if (match) {
-            return <u key={`${segment}-${segmentIndex}`}>{match[1]}</u>;
-          }
-
-          return <Fragment key={`${segment}-${segmentIndex}`}>{segment}</Fragment>;
-        })}
-        {lineIndex < lines.length - 1 ? <br /> : null}
-      </Fragment>
-    );
   });
 }
 
@@ -482,11 +457,11 @@ export default function PracticeTestHistoryDetailPage() {
                       </div>
                       {item.question.passage && (
                         <div style={{ fontSize: "12px", lineHeight: 1.7, color: "rgba(255,255,255,0.5)", marginBottom: "10px" }}>
-                          {renderFormattedText(item.question.passage)}
+                          <QuestionContent text={item.question.passage} questionNumber={item.sectionKey === "english" ? item.questionOrder + 1 : undefined} />
                         </div>
                       )}
                       <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "20px", lineHeight: 1.55, marginBottom: "10px" }}>
-                        {renderFormattedText(item.question.question_text)}
+                        <QuestionContent text={item.question.question_text} questionNumber={item.sectionKey === "english" ? item.questionOrder + 1 : undefined} />
                       </div>
                       <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.54)", marginBottom: "8px" }}>
                         You chose {item.selectedAnswer}. Correct answer: {item.correctAnswer}.

@@ -1,0 +1,360 @@
+.page {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  color: #f5f7fa;
+  background:
+    radial-gradient(900px 520px at 50% 0%, #122a42 0%, transparent 72%),
+    linear-gradient(180deg, #091321 0%, #050a13 48%, #02050a 100%);
+  font-family: var(--font-dm-sans), "DM Sans", sans-serif;
+}
+
+.shell {
+  position: relative;
+  z-index: 1;
+  width: min(1080px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 42px 0 96px;
+}
+
+.header {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.backButton {
+  width: fit-content;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 999px;
+  background: rgba(255,255,255,.04);
+  color: rgba(255,255,255,.72);
+  padding: 8px 12px;
+  cursor: pointer;
+  font: 600 12px var(--font-dm-sans), "DM Sans", sans-serif;
+}
+
+.eyebrow,
+.label,
+.tutorTitle {
+  color: rgba(255,255,255,.42);
+  font-size: 11px;
+  letter-spacing: .12em;
+  font-weight: 700;
+}
+
+.header h1 {
+  margin: 6px 0 4px;
+  font: 700 clamp(34px, 6vw, 62px)/1 var(--font-playfair), "Playfair Display", serif;
+}
+
+.header p {
+  margin: 0;
+  color: rgba(255,255,255,.58);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.filter,
+.filterActive {
+  border-radius: 999px;
+  padding: 8px 13px;
+  font: 600 12px var(--font-dm-sans), "DM Sans", sans-serif;
+  cursor: pointer;
+}
+
+.filter {
+  color: rgba(255,255,255,.56);
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.1);
+}
+
+.filterActive {
+  color: #fff;
+  background: color-mix(in srgb, var(--filter-color, #5dcaa5) 18%, rgba(255,255,255,.05));
+  border: 1px solid color-mix(in srgb, var(--filter-color, #5dcaa5) 55%, transparent);
+}
+
+.error,
+.empty {
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 20px;
+  background: rgba(255,255,255,.035);
+  padding: 28px;
+  color: rgba(255,255,255,.62);
+}
+
+.empty {
+  display: grid;
+  gap: 6px;
+  text-align: center;
+}
+
+.empty strong {
+  color: #fff;
+  font: 700 24px var(--font-playfair), "Playfair Display", serif;
+}
+
+.list {
+  display: grid;
+  gap: 18px;
+}
+
+.card {
+  border: 1px solid color-mix(in srgb, var(--section-color) 28%, rgba(255,255,255,.08));
+  border-radius: 24px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--section-color) 6%, #101722), #0a101a);
+  padding: 22px;
+  box-shadow: 0 24px 70px rgba(0,0,0,.25);
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.cardTop > div {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.cardTop time,
+.topic {
+  color: rgba(255,255,255,.38);
+  font-size: 11px;
+}
+
+.sectionPill {
+  border: 1px solid color-mix(in srgb, var(--section-color) 50%, transparent);
+  border-radius: 999px;
+  padding: 4px 8px;
+  color: var(--section-color);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.passage {
+  margin-bottom: 18px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.035);
+  color: rgba(255,255,255,.78);
+  font-size: 14px;
+  line-height: 1.8;
+  max-height: 430px;
+  overflow: auto;
+}
+
+.label {
+  margin-bottom: 8px;
+}
+
+.question {
+  margin-bottom: 16px;
+  font: 600 clamp(20px, 3vw, 27px)/1.55 var(--font-playfair), "Playfair Display", serif;
+}
+
+.choices {
+  display: grid;
+  gap: 8px;
+}
+
+.choice {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 11px 12px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  background: rgba(255,255,255,.025);
+  color: rgba(255,255,255,.76);
+  text-align: left;
+  font: 500 13px/1.5 var(--font-dm-sans), "DM Sans", sans-serif;
+}
+
+button.choice {
+  cursor: pointer;
+}
+
+.choice b {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  border: 1px solid rgba(255,255,255,.14);
+  color: rgba(255,255,255,.74);
+  font-size: 11px;
+}
+
+.choiceRight {
+  border-color: rgba(93,202,165,.55);
+  background: rgba(93,202,165,.09);
+}
+
+.choiceWrong {
+  border-color: rgba(240,153,123,.5);
+  background: rgba(240,153,123,.08);
+}
+
+.choicePicked {
+  border-color: var(--section-color);
+  background: color-mix(in srgb, var(--section-color) 12%, transparent);
+}
+
+.choiceTag {
+  color: rgba(255,255,255,.46);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.explanation,
+.tutor,
+.retryBox {
+  margin-top: 16px;
+  padding: 15px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.035);
+  color: rgba(255,255,255,.72);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.primary,
+.secondary,
+.tutorInputRow button {
+  min-height: 40px;
+  border-radius: 999px;
+  padding: 9px 14px;
+  cursor: pointer;
+  font: 700 12px var(--font-dm-sans), "DM Sans", sans-serif;
+}
+
+.primary {
+  border: 0;
+  color: #071017;
+  background: var(--section-color);
+}
+
+.secondary {
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.68);
+  background: transparent;
+}
+
+.primary:disabled,
+.tutorInputRow button:disabled {
+  cursor: not-allowed;
+  opacity: .5;
+}
+
+.retryTitle {
+  margin-bottom: 10px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.retryWrong {
+  margin-top: 10px;
+  color: #f0997b;
+  font-size: 12px;
+}
+
+.tutor {
+  border: 1px solid color-mix(in srgb, var(--section-color) 24%, rgba(255,255,255,.06));
+}
+
+.tutorTitle {
+  color: var(--section-color);
+  margin-bottom: 8px;
+}
+
+.tutorMessage {
+  margin: 7px 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.04);
+}
+
+.tutorInputRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.tutorInputRow input {
+  min-width: 0;
+  flex: 1;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.1);
+  background: rgba(0,0,0,.18);
+  color: #fff;
+  padding: 10px 12px;
+  outline: none;
+  font: 500 12px var(--font-dm-sans), "DM Sans", sans-serif;
+}
+
+.tutorInputRow button {
+  border: 0;
+  background: var(--section-color);
+  color: #071017;
+}
+
+@media (max-width: 680px) {
+  .shell {
+    width: min(100% - 20px, 1080px);
+    padding-top: 24px;
+  }
+
+  .card {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .cardTop {
+    align-items: flex-start;
+  }
+
+  .question {
+    font-size: 20px;
+  }
+
+  .choice {
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+
+  .choiceTag {
+    grid-column: 2;
+  }
+
+  .tutorInputRow {
+    display: grid;
+  }
+
+  .tutorInputRow button {
+    width: 100%;
+  }
+}

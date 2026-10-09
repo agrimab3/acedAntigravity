@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Fragment,
   Suspense,
   useEffect,
   useEffectEvent,
@@ -12,6 +11,7 @@ import {
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import DesmosPanel from "@/components/DesmosPanel";
+import QuestionContent from "@/components/question-content/QuestionContent";
 import desmosPanelStyles from "@/components/DesmosPanel.module.css";
 import { useSession } from "next-auth/react";
 import {
@@ -434,32 +434,6 @@ function formatCountdown(totalSeconds: number) {
   }
 
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-}
-
-function renderFormattedText(text: string) {
-  const normalized = text
-    .replace(/<u>(.*?)<\/u>/gi, "[underline]$1[/underline]")
-    .replace(/__(.*?)__/g, "[underline]$1[/underline]");
-  const lines = normalized.split("\n");
-
-  return lines.map((line, lineIndex) => {
-    const segments = line.split(/(\[underline\].*?\[\/underline\])/g);
-
-    return (
-      <Fragment key={`${line}-${lineIndex}`}>
-        {segments.map((segment, segmentIndex) => {
-          const match = segment.match(/^\[underline\](.*?)\[\/underline\]$/);
-
-          if (match) {
-            return <u key={`${segment}-${segmentIndex}`}>{match[1]}</u>;
-          }
-
-          return <Fragment key={`${segment}-${segmentIndex}`}>{segment}</Fragment>;
-        })}
-        {lineIndex < lines.length - 1 ? <br /> : null}
-      </Fragment>
-    );
-  });
 }
 
 function keyFor(sectionIndex: number, questionIndex: number) {
@@ -2433,11 +2407,11 @@ function PracticeTestRunContent() {
                     </div>
                     {item.question.passage && (
                       <div style={{ fontSize: "12px", lineHeight: 1.7, color: "rgba(255,255,255,0.54)", marginBottom: "10px" }}>
-                        {renderFormattedText(item.question.passage)}
+                        <QuestionContent text={item.question.passage} questionNumber={item.sectionKey === "english" ? item.questionOrder + 1 : undefined} />
                       </div>
                     )}
                     <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "20px", lineHeight: 1.55, marginBottom: "10px" }}>
-                      {renderFormattedText(item.question.question_text)}
+                      <QuestionContent text={item.question.question_text} questionNumber={item.sectionKey === "english" ? item.questionOrder + 1 : undefined} />
                     </div>
                     <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.62)", marginBottom: "8px" }}>
                       You chose {item.selectedAnswer}. Correct answer: {item.correctAnswer}.
@@ -2622,7 +2596,7 @@ function PracticeTestRunContent() {
                   PASSAGE / SETUP
                 </div>
                 <div style={{ fontSize: "15px", lineHeight: 1.85, color: "rgba(255,255,255,0.84)", maxWidth: "800px" }}>
-                  {renderFormattedText(currentQuestion.passage)}
+                  <QuestionContent text={currentQuestion.passage} questionNumber={currentSection.sectionKey === "english" ? currentQuestionIndex + 1 : undefined} activeUnderline={currentSection.sectionKey === "english"} />
                 </div>
                 <div style={{ height: "1px", background: "linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0))", marginTop: "16px" }} />
               </div>
@@ -2641,7 +2615,7 @@ function PracticeTestRunContent() {
                   maxWidth: "840px",
                 }}
               >
-                {renderFormattedText(currentQuestion.question_text)}
+                <QuestionContent text={currentQuestion.question_text} questionNumber={currentSection.sectionKey === "english" ? currentQuestionIndex + 1 : undefined} activeUnderline={currentSection.sectionKey === "english"} />
               </div>
             </div>
 
@@ -2686,7 +2660,7 @@ function PracticeTestRunContent() {
                       {letter}
                     </div>
                     <div style={{ fontSize: "13px", lineHeight: 1.55 }}>
-                      {renderFormattedText(currentQuestion.choices[letter])}
+                      <QuestionContent text={currentQuestion.choices[letter]} />
                     </div>
                   </button>
                 );
