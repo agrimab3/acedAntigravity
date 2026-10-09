@@ -1,4 +1,6 @@
 import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
 import { and, eq, sql } from "drizzle-orm";
 import { Resend } from "resend";
 import { mockEmailOutbox, mockWaitlist } from "@/db/schema";
@@ -7,6 +9,7 @@ import {
   getMockReminderAt,
   MOCK_EMAIL_FROM,
   MOCK_EMAIL_MAX_ATTEMPTS,
+  MOCK_EMAIL_SUPPORT,
   resolveEmailDeliveryTarget,
 } from "@/lib/mockTest/email-policy";
 import {
@@ -16,11 +19,33 @@ import {
   renderTomorrowReminder,
   renderWaitlistInvite,
   renderWaitlistJoined,
+  MOCK_EMAIL_HEADER_TOKEN,
+  type MockEmailType,
   type RenderedMockEmail,
 } from "@/lib/mockTest/email-templates";
 import { WAITLIST_INVITE_MS } from "@/lib/mockTest/waitlist-policy";
 
 const CLAIM_STALE_MS = 10 * 60_000;
+
+const MOCK_EMAIL_HEADER_FILES: Record<MockEmailType, string> = {
+  registration_confirmed: "header-in.gif",
+  tomorrow_reminder: "header-tomorrow.gif",
+  waitlist_invite: "header-seat-open.gif",
+  waitlist_joined: "header-waitlist.gif",
+  payment_refunded: "header-refund.gif",
+  scores_released: "header-scores.gif",
+};
+
+export function getMockEmailHeaderFilename(type: MockEmailType) {
+  return MOCK_EMAIL_HEADER_FILES[type];
+}
+
+export function getMockEmailHeaderSource(type: MockEmailType, nodeEnv = process.env.NODE_ENV) {
+  const filename = getMockEmailHeaderFilename(type);
+  return nodeEnv === "production"
+    ? `${getMockEmailSiteBaseUrl()}/email/${filename}`
+    : "cid:aced-header";
+}
 
 export function getMockEmailSiteBaseUrl() {
   return (process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000").replace(/\/$/, "");
@@ -90,6 +115,7 @@ export async function queueRegistrationConfirmedEmails(registrationId: string) {
   const mockTestId = String(row.mock_test_id);
   const paidAt = new Date(String(row.paid_at));
   const mockTestUrl = `${getMockEmailSiteBaseUrl()}/mock-test`;
+  const calendarUrl = `${getMockEmailSiteBaseUrl()}/api/mock-test/calendar?timeZone=${encodeURIComponent(timeZone)}`;
 
   await queueMockEmail({
     mockTestId,
@@ -97,7 +123,7 @@ export async function queueRegistrationConfirmedEmails(registrationId: string) {
     uniqueKey: `registration_confirmed:${registrationId}`,
     recipientEmail,
     scheduledAt: paidAt,
-    rendered: renderRegistrationConfirmed({ timeZone, mockTestUrl }),
+    rendered: renderRegistrationConfirmed({ timeZone, calendarUrl }),
   });
 
   const reminderAt = getMockReminderAt(timeZone);
@@ -108,7 +134,7 @@ export async function queueRegistrationConfirmedEmails(registrationId: string) {
       uniqueKey: `tomorrow_reminder:${registrationId}`,
       recipientEmail,
       scheduledAt: reminderAt,
-      rendered: renderTomorrowReminder({ timeZone, mockTestUrl }),
+      rendered: renderTomorrowReminder({ mockTestUrl }),
     });
   }
 }
@@ -159,7 +185,7 @@ export async function queueWaitlistJoinedEmail(waitlistId: string) {
     uniqueKey: `waitlist_joined:${row.id}`,
     recipientEmail: row.email,
     scheduledAt: row.createdAt,
-    rendered: renderWaitlistJoined(),
+    rendered: renderWaitlistJoined({ practiceUrl: `${getMockEmailSiteBaseUrl()}/dashboard` }),
   });
 }
 
@@ -278,17 +304,36 @@ export async function processMockEmailOutbox(now = new Date()) {
       nodeEnv: process.env.NODE_ENV,
       testRecipient: process.env.EMAIL_TEST_TO,
     });
-    const attachments = Array.isArray(row.attachments)
+    const storedAttachments = Array.isArray(row.attachments)
       ? (row.attachments as Array<{ filename: string; content: string; contentType?: string }>)
       : [];
+    const emailType = String(row.email_type) as MockEmailType;
+    const headerSource = getMockEmailHeaderSource(emailType);
+    const html = String(row.html_body).replace(MOCK_EMAIL_HEADER_TOKEN, headerSource);
+    const attachments: Array<{
+      filename: string;
+      content: string | Buffer;
+      contentType?: string;
+      contentId?: string;
+    }> = [...storedAttachments];
+    if (process.env.NODE_ENV !== "production") {
+      const filename = getMockEmailHeaderFilename(emailType);
+      attachments.push({
+        filename,
+        content: fs.readFileSync(path.join(process.cwd(), "public", "email", filename)),
+        contentType: "image/gif",
+        contentId: "aced-header",
+      });
+    }
 
     try {
       const response = await resend.emails.send(
         {
-          from: MOCK_EMAIL_FROM,
+          from: `Aced <${MOCK_EMAIL_FROM}>`,
+          replyTo: MOCK_EMAIL_SUPPORT,
           to: target.to,
           subject: target.subject,
-          html: String(row.html_body),
+          html,
           text: String(row.text_body),
           attachments,
         },

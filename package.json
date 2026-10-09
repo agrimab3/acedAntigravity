@@ -44,6 +44,7 @@
     "zod": "^4.1.11"
   },
   "devDependencies": {
+    "@napi-rs/canvas": "^1.0.10",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/pg": "^8.20.0",
@@ -52,6 +53,7 @@
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.2",
+    "gif-encoder-2": "^1.0.5",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
