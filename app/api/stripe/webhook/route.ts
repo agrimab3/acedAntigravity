@@ -93,10 +93,6 @@ export async function POST(request: Request) {
       const session = event.data.object as Stripe.Checkout.Session;
       const id = session.metadata?.registrationId;
       if (id) await releaseExpiredCheckoutHold(id, session.id);
-    } else if (event.type === "payment_intent.payment_failed") {
-      const intent = event.data.object as Stripe.PaymentIntent;
-      const id = intent.metadata?.registrationId;
-      if (id) await releaseExpiredCheckoutHold(id, null);
     }
 
     return NextResponse.json({ received: true });

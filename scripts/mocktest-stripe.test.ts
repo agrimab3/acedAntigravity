@@ -61,6 +61,22 @@ test("expired Checkout Session releases only the matching unpaid hold", () => {
   );
 });
 
+
+test("declined card keeps the seat hold until Checkout expires", () => {
+  const route = readFileSync(
+    new URL("../app/api/stripe/webhook/route.ts", import.meta.url),
+    "utf8"
+  );
+
+  assert.match(route, /checkout\.session\.expired/);
+  assert.doesNotMatch(route, /payment_intent\.payment_failed/);
+
+  assert.equal(
+    shouldReleaseCheckoutHoldOnExpiredEvent(null, "cs_current", "cs_current"),
+    true
+  );
+});
+
 test("completed Checkout must be paid and exactly $2 USD", () => {
   assert.equal(
     isExpectedMockCheckoutPayment({
