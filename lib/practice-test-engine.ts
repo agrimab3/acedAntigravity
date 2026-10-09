@@ -2,7 +2,6 @@ import { and, eq, sql } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { actTopics, questionExposures, questions, questionSets } from "@/db/schema";
 import type * as schema from "@/db/schema";
-import { buildMockQuestions, type PracticeQuestion } from "@/lib/mock-questions";
 import { hydrateQuestionSetContext, validateQuestionSetLink } from "@/lib/question-sets";
 import { normalizeQuestionRow, type NormalizedQuestionRow } from "@/lib/question-utils";
 import {
@@ -20,8 +19,7 @@ export type PracticeTestSectionPayload = {
   title: string;
   questionCount: number;
   durationMinutes: number;
-  questions: Array<PracticeQuestion | NormalizedQuestionRow>;
-  usesMockFill: boolean;
+  questions: NormalizedQuestionRow[];
   availableCount: number;
 };
 
@@ -60,40 +58,6 @@ function logQuestionSetMismatch({
   });
 }
 
-export function buildSectionMockQuestions(
-  section: PracticeTestSectionKey,
-  limit: number
-) {
-  const safeLimit = Math.max(limit, 1);
-  const topicRotation = {
-    english: ["Organization & Flow", "Transitions & Cohesion", "Punctuation", "Grammar & Usage"],
-    math: ["Algebra", "Functions", "Geometry", "Statistics & Probability"],
-    reading: ["Literary Narrative", "Social Science", "Humanities", "Natural Science"],
-    science: ["Data Representation", "Research Summaries", "Conflicting Viewpoints"],
-  }[section];
-
-  const mocks: PracticeQuestion[] = [];
-  let rotationIndex = 0;
-
-  while (mocks.length < safeLimit) {
-    const topicName = topicRotation[rotationIndex % topicRotation.length] ?? "Core Skills";
-    const batchSize = Math.min(10, safeLimit - mocks.length);
-    const batch = buildMockQuestions(section, topicName, batchSize, "medium");
-    const startIndex = mocks.length;
-
-    batch.forEach((question, batchIndex) => {
-      mocks.push({
-        ...question,
-        id: `section-${section}-mock-${startIndex + batchIndex + 1}`,
-      });
-    });
-
-    rotationIndex += 1;
-  }
-
-  return mocks.slice(0, safeLimit);
-}
-
 export async function fetchPracticeTestSectionQuestions({
   db,
   userId,
@@ -111,15 +75,11 @@ export async function fetchPracticeTestSectionQuestions({
   const title = modeSection?.label ?? sectionKey;
 
   if (!db) {
-    return {
+    console.error("[practice-test-engine] Database unavailable", {
       sectionKey,
-      title,
-      questionCount: count,
-      durationMinutes: modeSection?.durationMinutes ?? Math.ceil(count),
-      questions: buildSectionMockQuestions(sectionKey, count),
-      usesMockFill: true,
-      availableCount: 0,
-    };
+      requested: count,
+    });
+    throw new Error("This test isn't available right now. Try a different one.");
   }
 
   const rows = userId
@@ -259,16 +219,22 @@ export async function fetchPracticeTestSectionQuestions({
   });
 
   const selected = Array.from(normalized.values()).slice(0, count);
-  const missingCount = Math.max(0, count - selected.length);
-  const mockFill = missingCount > 0 ? buildSectionMockQuestions(sectionKey, missingCount) : [];
+
+  if (selected.length < count) {
+    console.error("[practice-test-engine] Not enough real questions for practice test section", {
+      sectionKey,
+      requested: count,
+      available: selected.length,
+    });
+    throw new Error("This test isn't available right now. Try a different one.");
+  }
 
   return {
     sectionKey,
     title,
     questionCount: count,
     durationMinutes: modeSection?.durationMinutes ?? Math.ceil(count),
-    questions: [...selected, ...mockFill],
-    usesMockFill: mockFill.length > 0,
+    questions: selected,
     availableCount: selected.length,
   };
 }
@@ -296,6 +262,5 @@ export async function buildPracticeTestPayload({
   return {
     mode,
     sections,
-    usesMockFill: sections.some((section) => section.usesMockFill),
   };
 }

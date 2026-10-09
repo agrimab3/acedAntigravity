@@ -39,7 +39,6 @@ export async function GET(request: Request) {
     title: mode.title,
     format: mode.format,
     scienceOptional: mode.scienceOptional,
-    usesMockFill: payload.usesMockFill,
     sections: payload.sections,
   });
 }

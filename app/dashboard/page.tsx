@@ -449,6 +449,8 @@ export default function Dashboard() {
   const [devBackToLoginAvailable, setDevBackToLoginAvailable] = useState(false);
   const [summaryRefreshToken, setSummaryRefreshToken] = useState(0);
   const [masteryPreview, setMasteryPreview] = useState<MasteryPreview>(null);
+  const effectiveMasteryPreview =
+    process.env.NODE_ENV === "development" ? masteryPreview : null;
   const [previewSkill, setPreviewSkill] = useState({
     sectionKey: "english" as SectionKey,
     topicName: SECS[0].topics[0],
@@ -643,7 +645,7 @@ export default function Dashboard() {
             x: e.clientX - canvasEl.getBoundingClientRect().left + 14,
             y: e.clientY - canvasEl.getBoundingClientRect().top - 10,
             topicName,
-            masteryPct: getTopicMasteryPct(dashboardSummary, sec.key, topicName, masteryPreview),
+            masteryPct: getTopicMasteryPct(dashboardSummary, sec.key, topicName, effectiveMasteryPreview),
           });
           return;
         }
@@ -709,7 +711,7 @@ export default function Dashboard() {
         ctx.fill();
 
         sec.lines.forEach(([a, b]) => {
-          const lineMastery = getLineMasteryPct(dashboardSummary, sec, [a, b], masteryPreview);
+          const lineMastery = getLineMasteryPct(dashboardSummary, sec, [a, b], effectiveMasteryPreview);
           const lineVisual = getStarVisualState({
             sectionColor: sec.color,
             masteryPct: lineMastery,
@@ -745,7 +747,7 @@ export default function Dashboard() {
             point.topicIndex === 0;
           const topicName = getPointTopic(sec, pi);
           const masteryPct = isInteractive
-            ? getTopicMasteryPct(dashboardSummary, sec.key, topicName, masteryPreview)
+            ? getTopicMasteryPct(dashboardSummary, sec.key, topicName, effectiveMasteryPreview)
             : 0;
           const twinkle = 0.8 + 0.2 * Math.sin(t * 1.1 + pi * 1.7 + si * 0.9);
           const pulse = isInteractive ? 0.82 + 0.18 * Math.sin(t * 2.2 + pi * 1.3 + si) : 1;
@@ -1046,7 +1048,7 @@ export default function Dashboard() {
     };
   }, [
     dashboardSummary,
-    masteryPreview,
+    effectiveMasteryPreview,
     onboardingData?.profile.previousActScore,
     status,
     walkthroughOpen,
@@ -1354,7 +1356,7 @@ export default function Dashboard() {
             <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.68)" }}>
               {session?.user?.email}
             </span>
-            {devBackToLoginAvailable && (
+            {process.env.NODE_ENV === "development" && devBackToLoginAvailable && (
               <>
                 <div style={{ display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
                   <select

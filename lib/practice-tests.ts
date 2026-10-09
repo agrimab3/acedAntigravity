@@ -51,7 +51,7 @@ export const SECTION_TESTS: PracticeTestMode[] = [
     durationMinutes: 50,
     accentColor: "#AFA9EC",
     constellation: "Aquarius",
-    description: "ACT math pacing with room for calculator support and future Desmos integration.",
+    description: "ACT math pacing with a built-in graphing calculator.",
     includesDesmos: true,
     scienceOptional: false,
     sections: [{ key: "math", label: "Math", questionCount: 45, durationMinutes: 50 }],

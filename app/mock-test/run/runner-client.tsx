@@ -738,31 +738,6 @@ export default function MockTestRunner({
     load,
   ]);
 
-  const startNextSection = useCallback(async () => {
-    if (!session || session.status !== "break" || busy) return;
-    setBusy(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/mock-test/session/start-next", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId: session.sessionId }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Could not start next section.");
-      setSession(data.session);
-      writeSessionCache(data.session);
-      if (data.session?.serverNow) {
-        setServerOffsetMs(new Date(data.session.serverNow).getTime() - Date.now());
-      }
-      setActiveIndex(0);
-      window.requestAnimationFrame(() => choiceRefs.current[0]?.focus());
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not start next section.");
-    } finally {
-      setBusy(false);
-    }
-  }, [session, busy]);
 
   useEffect(() => {
     if (!session || (session.status !== "break" && session.status !== "transition")) return;
@@ -1473,20 +1448,9 @@ export default function MockTestRunner({
                   {session.break.nextSection.durationMinutes} min
                 </p>
               </div>
-              {allowDevReset ? (
-                <button
-                  type="button"
-                  className={styles.breakStartButton}
-                  disabled={busy}
-                  onClick={() => void startNextSection()}
-                >
-                  {busy ? "starting…" : "DEV: start reading early →"}
-                </button>
-              ) : (
-                <span className={styles.breakRequiredNote}>
-                  full 10-minute break required
-                </span>
-              )}
+              <span className={styles.breakRequiredNote}>
+                full 10-minute break required
+              </span>
             </div>
           </div>
 

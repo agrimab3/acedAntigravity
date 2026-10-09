@@ -47,7 +47,6 @@ export async function POST(request: Request) {
       mode: mode.key,
       format: mode.format,
       title: mode.title,
-      usesMockFill: payload.usesMockFill,
       sections: payload.sections,
     });
   }
@@ -100,7 +99,7 @@ export async function POST(request: Request) {
         sessionId,
         sectionRunId: sectionIdByOrder.get(sectionIndex)!,
         userId,
-        questionId: question.id.startsWith("mock-") || question.id.startsWith("section-") ? null : question.id,
+        questionId: question.id,
         questionOrder: questionIndex,
         topicName: question.topic,
         correctAnswer: question.correct_answer,
@@ -127,16 +126,7 @@ export async function POST(request: Request) {
   );
 
   const realQuestionIds = Array.from(
-    new Set(
-      payload.sections.flatMap((section) =>
-        section.questions
-          .filter(
-            (question) =>
-              !question.id.startsWith("mock-") && !question.id.startsWith("section-")
-          )
-          .map((question) => question.id)
-      )
-    )
+    new Set(payload.sections.flatMap((section) => section.questions.map((question) => question.id)))
   );
 
   if (realQuestionIds.length > 0) {
@@ -170,7 +160,6 @@ export async function POST(request: Request) {
     mode: mode.key,
     format: mode.format,
     title: mode.title,
-    usesMockFill: payload.usesMockFill,
     sections: payload.sections.map((section, index) => ({
       ...section,
       sectionRunId: sectionIdByOrder.get(index) ?? null,

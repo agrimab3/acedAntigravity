@@ -105,6 +105,7 @@ function PracticeContent() {
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [questionsLoading, setQuestionsLoading] = useState(true);
+  const [questionsError, setQuestionsError] = useState<string | null>(null);
   const [practiceSessionId, setPracticeSessionId] = useState<string | null>(null);
   const [targetDifficulty, setTargetDifficulty] = useState("medium");
   const [adaptiveStatus, setAdaptiveStatus] = useState<AdaptiveStatus>({
@@ -166,6 +167,7 @@ function PracticeContent() {
     setQuestionTimings([]);
     setAiMessages([{ role: "bot", text: getIntroTutorMessage(topic, officialCategory) }]);
     setQuestionsLoading(true);
+    setQuestionsError(null);
 
     const fetchQuestions = async () => {
       try {
@@ -186,6 +188,7 @@ function PracticeContent() {
           cache: "no-store",
         });
         const data = (await res.json()) as {
+          error?: string;
           questions?: Question[];
           sessionId?: string | null;
           adaptive?: {
@@ -195,6 +198,10 @@ function PracticeContent() {
             direction?: "up" | "down" | "steady";
           };
         };
+
+        if (!res.ok) {
+          throw new Error(data.error || "We couldn't load questions right now. Try again in a minute.");
+        }
 
         if (!active) return;
         setQuestions(sortQuestionsTowardDifficulty(data.questions ?? [], data.adaptive?.targetDifficulty ?? "medium"));
@@ -211,6 +218,7 @@ function PracticeContent() {
         console.error("Failed to fetch questions", error);
         if (!active) return;
         setQuestions([]);
+        setQuestionsError("We couldn't load questions right now. Try again in a minute.");
         setPracticeSessionId(null);
         setTargetDifficulty("medium");
       } finally {
@@ -444,10 +452,10 @@ function PracticeContent() {
       <div style={{ background: 'linear-gradient(180deg,#0d1b2a,#060d1e,#020408)', minHeight: '100vh', color: '#fff', fontFamily: 'DM Sans,sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
         <div style={{ maxWidth: '520px', textAlign: 'center' }}>
           <div style={{ fontFamily: 'DM Serif Display,serif', fontSize: '30px', marginBottom: '10px' }}>
-            no questions yet
+            questions unavailable
           </div>
-          <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: '14px', lineHeight: 1.7, marginBottom: '1.5rem' }}>
-            This topic does not have database-backed questions yet. Once the `aced` database is seeded, this page will pull live content automatically.
+          <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: '14px', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+            {questionsError ?? "We couldn't load questions right now. Try again in a minute."}
           </div>
           <button onClick={() => router.push('/dashboard')} style={{ padding: '12px 18px', borderRadius: '10px', border: 'none', background: meta.color, color: '#fff', fontFamily: 'DM Sans,sans-serif', cursor: 'pointer' }}>
             back to universe

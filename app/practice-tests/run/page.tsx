@@ -50,7 +50,6 @@ type RunnerSection = {
   questionCount: number;
   durationMinutes: number;
   questions: TestQuestion[];
-  usesMockFill: boolean;
   availableCount: number;
 };
 
@@ -540,7 +539,6 @@ function normalizeRunnerSection(value: unknown): RunnerSection | null {
       typeof section.title === "string" &&
       typeof section.questionCount === "number" &&
       typeof section.durationMinutes === "number" &&
-      typeof section.usesMockFill === "boolean" &&
       typeof section.availableCount === "number"
     )
   ) {
@@ -554,7 +552,6 @@ function normalizeRunnerSection(value: unknown): RunnerSection | null {
     questionCount: section.questionCount,
     durationMinutes: section.durationMinutes,
     questions,
-    usesMockFill: section.usesMockFill,
     availableCount: section.availableCount,
   };
 }
@@ -1071,7 +1068,7 @@ function PracticeTestRunContent() {
         console.error("Failed to create practice test session", error);
         if (!active) return;
         setLoadError({
-          message: "Unable to load this practice test. Try again.",
+          message: "This test isn't available right now. Try a different one.",
           detail: error instanceof Error ? error.message : "Unknown runner initialization error.",
         });
         setSections([]);
@@ -1815,7 +1812,7 @@ function PracticeTestRunContent() {
               { value: totalQuestionCount, label: "questions" },
               { value: formatDurationLabel(mode.durationMinutes), label: "timer" },
               { value: mode.includesDesmos ? "calculator" : "focus mode", label: "tools" },
-              { value: sections.some((section) => section.usesMockFill) ? "mixed bank" : "live bank", label: "question set" },
+              { value: "live bank", label: "question set" },
             ].map((item) => (
               <div
                 key={item.label}

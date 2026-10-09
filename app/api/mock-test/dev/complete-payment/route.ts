@@ -8,7 +8,7 @@ import { markRegistrationPaid } from "@/lib/mockTest/payments";
 import { NEXT_MOCK } from "@/lib/mockTests";
 
 export async function POST(request: Request) {
-  if (getMockTestPaymentMode() !== "test" || isUnsafeProductionMockTestMode()) {
+  if (process.env.NODE_ENV === "production" || getMockTestPaymentMode() !== "test" || isUnsafeProductionMockTestMode()) {
     return NextResponse.json({ error: "Test checkout is disabled." }, { status: 404 });
   }
 

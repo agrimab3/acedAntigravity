@@ -23,7 +23,6 @@ import {
 } from "@/lib/act-taxonomy";
 import { getAuthSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
-import { buildMockQuestions } from "@/lib/mock-questions";
 import { hydrateQuestionSetContext, validateQuestionSetLink } from "@/lib/question-sets";
 import { normalizeQuestionRow, type NormalizedQuestionRow } from "@/lib/question-utils";
 
@@ -89,6 +88,17 @@ export async function GET(request: Request) {
   const { section, topic, difficulty, limit } = parsed.data;
   const db = getDb();
   const session = await getAuthSession();
+
+  if (!db) {
+    console.error("[questions-api] Database unavailable while loading practice questions", {
+      section,
+      topic: topic ?? null,
+    });
+    return NextResponse.json(
+      { error: "We couldn't load questions right now. Try again in a minute." },
+      { status: 503 }
+    );
+  }
   const userId = session?.user?.id || null;
   let targetDifficulty = "easy";
   let adaptiveFeedback = buildAdaptiveFeedback({
@@ -99,7 +109,7 @@ export async function GET(request: Request) {
   let topicId: string | null = null;
   let practiceScopeTopicNames = topic ? [topic] : [];
 
-  if (db) {
+  try {
     if (topic) {
       practiceScopeTopicNames = getPracticeScopeTopics(section as SectionKey, topic).map(
         (topicDefinition) => topicDefinition.name
@@ -436,18 +446,26 @@ export async function GET(request: Request) {
         },
       });
     }
-  }
 
-  return NextResponse.json({
-    questions: buildMockQuestions(section, topic ?? "", limit, targetDifficulty),
-    source: "mock",
-    sessionId: null,
-    adaptive: {
-      targetDifficulty,
-      label: adaptiveFeedback.label,
-      description: adaptiveFeedback.description,
-      direction: adaptiveFeedback.direction,
-      source: "mock",
-    },
-  });
+    console.error("[questions-api] No real practice questions available", {
+      section,
+      topic: topic ?? null,
+      difficulty: difficulty ?? null,
+      requested: limit,
+    });
+    return NextResponse.json(
+      { error: "We couldn't load questions right now. Try again in a minute." },
+      { status: 503 }
+    );
+  } catch (error) {
+    console.error("[questions-api] Failed to load real practice questions", {
+      section,
+      topic: topic ?? null,
+      error,
+    });
+    return NextResponse.json(
+      { error: "We couldn't load questions right now. Try again in a minute." },
+      { status: 503 }
+    );
+  }
 }
