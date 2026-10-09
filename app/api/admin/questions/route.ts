@@ -1,9 +1,9 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { actTopics, questions, questionSets } from "@/db/schema";
+import { actTopics, questionExposures, questions, questionSets } from "@/db/schema";
 import { getAdminSession } from "@/lib/admin";
 import { getDb } from "@/lib/db";
 import { resolveEffectivePassage } from "@/lib/question-sets";
@@ -15,6 +15,7 @@ const MAX_REREVIEW_BATCH = 24;
 const listSchema = z.object({
   status: z.enum(["draft", "published", "rejected"]).optional(),
   section: z.enum(["english", "math", "reading", "science"]).optional(),
+  usageScope: z.enum(["practice", "mock_reserve", "retired"]).optional(),
   topic: z.string().trim().optional(),
   qualityFilter: z.enum(["all", "blocked", "warning", "clean"]).default("all"),
   sort: z.enum(["blocked-first", "highest-risk", "newest"]).default("newest"),
@@ -104,6 +105,7 @@ export async function GET(request: Request) {
   const parsed = listSchema.safeParse({
     status: url.searchParams.get("status") ?? undefined,
     section: url.searchParams.get("section") ?? undefined,
+    usageScope: url.searchParams.get("usageScope") ?? undefined,
     topic: url.searchParams.get("topic") ?? undefined,
     qualityFilter: url.searchParams.get("qualityFilter") ?? "all",
     sort:
@@ -124,6 +126,10 @@ export async function GET(request: Request) {
 
   if (parsed.data.section) {
     filters.push(eq(questions.sectionKey, parsed.data.section));
+  }
+
+  if (parsed.data.usageScope) {
+    filters.push(eq(questions.usageScope, parsed.data.usageScope));
   }
 
   if (parsed.data.topic) {
@@ -148,6 +154,7 @@ export async function GET(request: Request) {
       explanation: questions.explanation,
       source: questions.source,
       generationModel: questions.generationModel,
+      usageScope: questions.usageScope,
       status: questions.status,
       reviewNotes: questions.reviewNotes,
       reviewedAt: questions.reviewedAt,
@@ -244,6 +251,104 @@ export async function GET(request: Request) {
   });
 }
 
+async function validateMockReservePromotion(
+  db: NonNullable<ReturnType<typeof getDb>>,
+  questionIds: string[]
+) {
+  const rows = await db
+    .select({
+      id: questions.id,
+      usageScope: questions.usageScope,
+      status: questions.status,
+      sectionKey: questions.sectionKey,
+      topicName: actTopics.name,
+      difficulty: questions.difficulty,
+      prompt: questions.prompt,
+      passage: questions.passage,
+      questionSetId: questions.questionSetId,
+      questionSetContent: questionSets.content,
+      choices: questions.choices,
+      correctAnswer: questions.correctAnswer,
+      explanation: questions.explanation,
+      exposureCount: sql<number>`count(${questionExposures.id})`,
+    })
+    .from(questions)
+    .innerJoin(actTopics, eq(questions.topicId, actTopics.id))
+    .leftJoin(questionSets, eq(questions.questionSetId, questionSets.id))
+    .leftJoin(questionExposures, eq(questionExposures.questionId, questions.id))
+    .where(inArray(questions.id, questionIds))
+    .groupBy(
+      questions.id,
+      actTopics.name,
+      questionSets.content
+    );
+
+  const reserveRows = rows.filter((row) => row.usageScope === "mock_reserve");
+  if (reserveRows.length === 0) return null;
+
+  for (const row of reserveRows) {
+    if (Number(row.exposureCount) > 0) {
+      return `Mock-reserve question ${row.id} has already been exposed to a student and cannot be published.`;
+    }
+
+    const qualityReview = reviewQuestionQuality({
+      id: row.id,
+      section: row.sectionKey,
+      topic: row.topicName,
+      difficulty: row.difficulty,
+      passage: resolveEffectivePassage({
+        passage: row.passage,
+        questionSetContent: row.questionSetContent,
+      }),
+      question_text: row.prompt,
+      choices: row.choices,
+      correct_answer: row.correctAnswer,
+      explanation: row.explanation,
+    });
+
+    if (
+      qualityReview.blockingFlags.length > 0 ||
+      qualityReview.warningFlags.length > 0 ||
+      !qualityReview.shouldServe
+    ) {
+      return `Mock-reserve question ${row.id} is not clean enough to publish. Resolve every blocking flag and warning first.`;
+    }
+  }
+
+  const selectedIds = new Set(questionIds);
+  const setIds = Array.from(
+    new Set(
+      reserveRows
+        .map((row) => row.questionSetId)
+        .filter((value): value is string => Boolean(value))
+    )
+  );
+
+  for (const questionSetId of setIds) {
+    const siblings = await db
+      .select({
+        id: questions.id,
+        status: questions.status,
+        usageScope: questions.usageScope,
+      })
+      .from(questions)
+      .where(eq(questions.questionSetId, questionSetId));
+
+    const reserveSiblings = siblings.filter(
+      (row) => row.usageScope === "mock_reserve" && row.status !== "rejected"
+    );
+    const missingSibling = reserveSiblings.find(
+      (row) => row.status !== "published" && !selectedIds.has(row.id)
+    );
+
+    if (missingSibling) {
+      return "Mock-reserve Reading/Science sets must be published as a complete set. Select every non-rejected child in the set together.";
+    }
+  }
+
+  return null;
+}
+
 export async function PATCH(request: Request) {
   const session = await getAdminSession();
   const db = getDb();
@@ -256,6 +361,16 @@ export async function PATCH(request: Request) {
 
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid review update." }, { status: 400 });
+  }
+
+  const questionIds =
+    parsed.data.mode === "bulk" ? parsed.data.questionIds : [parsed.data.questionId];
+
+  if (parsed.data.status === "published") {
+    const reservePromotionError = await validateMockReservePromotion(db, questionIds);
+    if (reservePromotionError) {
+      return NextResponse.json({ error: reservePromotionError }, { status: 409 });
+    }
   }
 
   const now = new Date();

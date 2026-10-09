@@ -119,7 +119,8 @@ export async function getAdminQuestionHealthReport() {
         fingerprint: questions.fingerprint,
       })
       .from(questions)
-      .innerJoin(actTopics, eq(questions.topicId, actTopics.id)),
+      .innerJoin(actTopics, eq(questions.topicId, actTopics.id))
+      .where(eq(questions.usageScope, "practice")),
   ]);
 
   const activeTopics = topicRows.filter((topic) => topic.isActive);

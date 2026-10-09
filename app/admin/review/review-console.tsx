@@ -55,6 +55,7 @@ type ReviewQuestion = {
   explanation: string;
   source: string;
   generationModel: string | null;
+  usageScope: "practice" | "mock_reserve" | "retired";
   status: string;
   reviewNotes: string | null;
   reviewedAt: string | null;
@@ -136,6 +137,7 @@ type GenerationDebugEntry = {
 
 const sectionOptions = ["all", "english", "math", "reading", "science"] as const;
 const statusOptions = ["draft", "published", "rejected"] as const;
+const usageScopeOptions = ["practice", "mock_reserve", "retired"] as const;
 const reviewQualityOptions = ["all", "blocked", "warning", "clean"] as const;
 const reviewSortOptions = ["blocked-first", "highest-risk", "newest"] as const;
 const bulkScopeOptions = ["math-reading", "current-filter", "all-sections"] as const;
@@ -271,6 +273,7 @@ export default function ReviewConsole() {
   const [questions, setQuestions] = useState<ReviewQuestion[]>([]);
   const [activeSection, setActiveSection] = useState<(typeof sectionOptions)[number]>("all");
   const [activeStatus, setActiveStatus] = useState<(typeof statusOptions)[number]>("draft");
+  const [activeUsageScope, setActiveUsageScope] = useState<(typeof usageScopeOptions)[number]>("practice");
   const [activeTopic, setActiveTopic] = useState("all");
   const [reviewQualityFilter, setReviewQualityFilter] = useState<(typeof reviewQualityOptions)[number]>("all");
   const [reviewSort, setReviewSort] = useState<(typeof reviewSortOptions)[number]>("blocked-first");
@@ -412,6 +415,7 @@ export default function ReviewConsole() {
     try {
       const params = new URLSearchParams({
         status: activeStatus,
+        usageScope: activeUsageScope,
         limit: "24",
         qualityFilter: reviewQualityFilter,
         sort: reviewSort,
@@ -456,7 +460,7 @@ export default function ReviewConsole() {
 
   useEffect(() => {
     handleLoadQuestions();
-  }, [activeSection, activeStatus, activeTopic, reviewQualityFilter, reviewSort]);
+  }, [activeSection, activeStatus, activeUsageScope, activeTopic, reviewQualityFilter, reviewSort]);
 
   async function bulkFillCriticalTopics() {
     const approxRequestedChildCount = bulkRequestedChildCount * bulkTopicCount;
@@ -842,6 +846,36 @@ export default function ReviewConsole() {
                 </option>
               ))}
             </select>
+
+            <select
+              value={activeUsageScope}
+              onChange={(event) =>
+                setActiveUsageScope(event.target.value as (typeof usageScopeOptions)[number])
+              }
+              style={selectStyle}
+            >
+              {usageScopeOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option === "mock_reserve" ? "mock reserve" : option}
+                </option>
+              ))}
+            </select>
+
+            {activeUsageScope === "mock_reserve" ? (
+              <div
+                style={{
+                  padding: "10px 12px",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(93,202,165,0.22)",
+                  background: "rgba(93,202,165,0.06)",
+                  color: "rgba(220,255,243,0.78)",
+                  fontSize: "12px",
+                  lineHeight: 1.5,
+                }}
+              >
+                reserve publish rule: zero exposures, no deterministic warnings, and complete Reading/Science sets only
+              </div>
+            ) : null}
 
             <select value={activeTopic} onChange={(event) => setActiveTopic(event.target.value)} style={selectStyle}>
               <option value="all">all topics</option>
@@ -1463,6 +1497,7 @@ export default function ReviewConsole() {
                             />
                           </label>
                           <Badge text={question.difficulty} />
+                          <Badge text={question.usageScope === "mock_reserve" ? "mock reserve" : question.usageScope} subtle />
                           <Badge text={question.status} subtle />
                           <Badge
                             text={
