@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { mockWaitlist } from "@/db/schema";
 import { getDb } from "@/lib/db";
+import { queueWaitlistInviteEmail } from "@/lib/mockTest/email-outbox";
 import { MOCK_TEST_SEAT_CAP } from "@/lib/mockTest/seat-policy";
 import {
   isWaitlistInviteExpired,
@@ -13,12 +14,6 @@ export { isWaitlistInviteExpired, selectWaitlistHandoffCandidates } from "@/lib/
 
 export function normalizeWaitlistEmail(email: string) {
   return email.trim().toLowerCase();
-}
-
-export function logWouldSendInviteEmail(email: string, token: string) {
-  console.info(`[mock-test waitlist] would send invite email to ${email}`, {
-    inviteUrl: `/mock-test/signup?invite=${token}`,
-  });
 }
 
 export async function reconcileWaitlistInvites(mockTestId: string, now = new Date()) {
@@ -70,7 +65,7 @@ export async function reconcileWaitlistInvites(mockTestId: string, now = new Dat
       (occupiedResult.rows[0] as { occupied?: unknown } | undefined)?.occupied ?? 0
     );
     const available = Math.max(0, MOCK_TEST_SEAT_CAP - occupied);
-    if (available <= 0) return { expired, invitations: [] as Array<{ email: string; token: string }> };
+    if (available <= 0) return { expired, invitations: [] as Array<{ id: string; email: string; token: string; invitedAt: Date }> };
 
     const expiredIds = new Set(expired.map((row) => row.id));
     const candidatesResult = await tx.execute(sql`
@@ -89,21 +84,32 @@ export async function reconcileWaitlistInvites(mockTestId: string, now = new Dat
       available
     );
 
-    const invitations: Array<{ email: string; token: string }> = [];
+    const invitations: Array<{ id: string; email: string; token: string; invitedAt: Date }> = [];
     for (const row of candidates) {
       const token = crypto.randomBytes(24).toString("hex");
       await tx
         .update(mockWaitlist)
         .set({ invitedAt: now, inviteToken: token })
         .where(eq(mockWaitlist.id, row.id));
-      invitations.push({ email: row.email, token });
+      invitations.push({ id: row.id, email: row.email, token, invitedAt: now });
     }
 
     return { expired, invitations };
   });
 
   for (const invitation of result.invitations) {
-    logWouldSendInviteEmail(invitation.email, invitation.token);
+    try {
+      await queueWaitlistInviteEmail({
+        waitlistId: invitation.id,
+        invitedAt: invitation.invitedAt,
+        token: invitation.token,
+      });
+    } catch (error) {
+      console.error("[mock-test email] failed to queue waitlist invite", {
+        waitlistId: invitation.id,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   }
 
   return result;

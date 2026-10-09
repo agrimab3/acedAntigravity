@@ -77,7 +77,6 @@ try {
   for (const invitation of invitations) {
     console.log(`${invitation.email}  ${invitation.link}`);
   }
-  // TODO(mock-test-emails): send each invite email here when email delivery is built.
 } catch (error) {
   await client.query("ROLLBACK");
   console.error(error);

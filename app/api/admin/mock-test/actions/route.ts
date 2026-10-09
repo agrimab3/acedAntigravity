@@ -22,7 +22,11 @@ import { releaseMockTest } from "@/lib/mockTest/release";
 import { getMockTestServerNow } from "@/lib/mockTest/devClock";
 import { MOCK_TEST_SEAT_CAP } from "@/lib/mockTest/seat-policy";
 import { WAITLIST_INVITE_MS } from "@/lib/mockTest/waitlist-policy";
-import { logWouldSendInviteEmail } from "@/lib/mockTest/waitlist";
+import {
+  processMockEmailOutbox,
+  queueWaitlistInviteEmail,
+  reconcileMockTestEmailOutbox,
+} from "@/lib/mockTest/email-outbox";
 
 const reason = z.string().trim().min(3).max(500);
 const slug = z.string().min(1).max(100);
@@ -172,6 +176,15 @@ export async function POST(request: Request) {
         })
         .where(eq(adminAuditLog.id, audit.id));
 
+      try {
+        await reconcileMockTestEmailOutbox(input.slug);
+        await processMockEmailOutbox(now);
+      } catch (emailError) {
+        console.error("[mock-test email] manual release email pass failed; cron will retry", {
+          error: emailError instanceof Error ? emailError.message : String(emailError),
+        });
+      }
+
       return NextResponse.json({ ok: true, result });
     } catch (error) {
       await db
@@ -299,17 +312,19 @@ export async function POST(request: Request) {
           `)
         : { rows: [] as unknown[] };
 
-      const invitations: Array<{ email: string; link: string }> = [];
+      const invitations: Array<{ waitlistId: string; email: string; link: string; token: string; invitedAt: Date }> = [];
       for (const raw of rows.rows as Array<{ id: string; email: string }>) {
         const token = crypto.randomBytes(24).toString("hex");
         await tx
           .update(mockWaitlist)
           .set({ invitedAt: now, inviteToken: token })
           .where(eq(mockWaitlist.id, raw.id));
-        logWouldSendInviteEmail(raw.email, token);
         invitations.push({
+          waitlistId: raw.id,
           email: raw.email,
           link: "/mock-test/signup?invite=" + token,
+          token,
+          invitedAt: now,
         });
       }
 
@@ -530,6 +545,31 @@ export async function POST(request: Request) {
 
     throw new Error("Unsupported admin action.");
   });
+
+    if (input.action === "invite_waitlist") {
+      const invitations =
+        (result as {
+          invitations?: Array<{
+            waitlistId: string;
+            invitedAt: Date;
+            token: string;
+          }>;
+        }).invitations ?? [];
+      for (const invitation of invitations) {
+        try {
+          await queueWaitlistInviteEmail({
+            waitlistId: invitation.waitlistId,
+            invitedAt: invitation.invitedAt,
+            token: invitation.token,
+          });
+        } catch (error) {
+          console.error("[mock-test email] failed to queue admin waitlist invite", {
+            waitlistId: invitation.waitlistId,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      }
+    }
 
     return NextResponse.json({ ok: true, result });
   } catch (error) {

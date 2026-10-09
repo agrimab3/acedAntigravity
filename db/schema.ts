@@ -340,6 +340,45 @@ export const mockStripeEvents = pgTable(
   ]
 );
 
+export const mockEmailOutbox = pgTable(
+  "mock_email_outbox",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    mockTestId: uuid("mock_test_id")
+      .notNull()
+      .references(() => mockTests.id, { onDelete: "cascade" }),
+    registrationId: uuid("registration_id").references(() => mockRegistrations.id, {
+      onDelete: "cascade",
+    }),
+    sourceKey: text("source_key"),
+    emailType: text("email_type").notNull(),
+    uniqueKey: text("unique_key").notNull(),
+    recipientEmail: text("recipient_email").notNull(),
+    scheduledAt: timestamp("scheduled_at", { withTimezone: true }).notNull(),
+    subject: text("subject").notNull(),
+    htmlBody: text("html_body").notNull(),
+    textBody: text("text_body").notNull(),
+    attachments: jsonb("attachments")
+      .$type<Array<{ filename: string; content: string; contentType?: string }>>()
+      .default([])
+      .notNull(),
+    attempts: integer("attempts").default(0).notNull(),
+    lastAttemptAt: timestamp("last_attempt_at", { withTimezone: true }),
+    lockedAt: timestamp("locked_at", { withTimezone: true }),
+    lockToken: text("lock_token"),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    providerMessageId: text("provider_message_id"),
+    lastError: text("last_error"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("mock_email_outbox_unique_key_idx").on(table.uniqueKey),
+    index("mock_email_outbox_due_idx").on(table.sentAt, table.scheduledAt),
+    index("mock_email_outbox_registration_idx").on(table.registrationId),
+  ]
+);
+
 export const mockTestClientPresence = pgTable(
   "mock_test_client_presence",
   {
@@ -391,6 +430,7 @@ export const mockWaitlist = pgTable(
       .references(() => mockTests.id, { onDelete: "cascade" }),
     email: text("email").notNull(),
     userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+    timeZone: text("time_zone"),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     invitedAt: timestamp("invited_at", { withTimezone: true }),
     inviteToken: text("invite_token"),

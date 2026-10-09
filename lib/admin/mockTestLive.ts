@@ -566,6 +566,30 @@ export async function getMockTestLiveOverview(slug: string) {
     });
   }
 
+  const failedEmailResult = await db.execute(sql`
+    select id, registration_id, recipient_email, email_type, attempts, last_error
+    from mock_email_outbox
+    where mock_test_id=${testId}::uuid
+      and sent_at is null
+      and attempts >= 5
+    order by updated_at desc
+    limit 20
+  `);
+  for (const row of failedEmailResult.rows as Array<Record<string, unknown>>) {
+    alerts.unshift({
+      id: "email-failed:" + String(row.id),
+      type: "email_delivery_failed",
+      severity: "problem",
+      label:
+        "EMAIL FAILED 5× · " +
+        String(row.email_type) +
+        " · " +
+        String(row.recipient_email),
+      registrationId: row.registration_id ? String(row.registration_id) : undefined,
+      email: String(row.recipient_email),
+    });
+  }
+
   if (String(test.status) !== "released") {
     const latestReleaseFailure = events.find((event) => event.kind === "release_failed");
     if (latestReleaseFailure) {

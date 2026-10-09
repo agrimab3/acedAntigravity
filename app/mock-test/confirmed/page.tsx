@@ -141,7 +141,6 @@ export default async function MockTestConfirmedPage() {
               you&apos;re <em>in.</em>
             </h1>
 
-            {/* TODO(mock-test-emails): change this line when ticket emails are available. */}
             <p className={styles.celebrationCopy}>
               See you {NEXT_MOCK.testDateLabel}. Your ticket is saved to your Aced account.
             </p>

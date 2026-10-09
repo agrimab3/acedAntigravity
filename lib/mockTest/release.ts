@@ -415,12 +415,6 @@ export async function releaseMockTest({
 
     await client.query("commit");
 
-    for (const student of students) {
-      console.info(
-        `[mock-test release] would send scores-are-out email to ${student.email}`
-      );
-    }
-
     return {
       released: true,
       alreadyReleased: false,

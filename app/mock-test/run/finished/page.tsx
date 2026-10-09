@@ -248,9 +248,8 @@ export default async function MockTestFinishedPage({
                 <p>Your star map brightens, and the dim stars show exactly what to practice before {NEXT_MOCK.actDateLabel}.</p>
               </article>
             </div>
-            {/* TODO(mock-test-emails): update this line when result emails are available. */}
             <p className={styles.restLine}>
-              Your results will be waiting on your Aced dashboard. Rest up tonight.
+              We’ll email you when your results are ready. They’ll also be waiting on your Aced dashboard. Rest up tonight.
             </p>
           </section>
         </div>

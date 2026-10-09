@@ -5,6 +5,10 @@ import { mockStripeEvents, mockTestOpsEvents } from "@/db/schema";
 import { getDb } from "@/lib/db";
 import { getStripe } from "@/lib/mockTest/stripe";
 import {
+  queuePaymentRefundedEmail,
+  queueRegistrationConfirmedEmails,
+} from "@/lib/mockTest/email-outbox";
+import {
   hasStripeWebhookSignature,
   isExpectedMockCheckoutPayment,
   shouldProcessStripeEventClaim,
@@ -88,6 +92,9 @@ export async function POST(request: Request) {
           email: result.email,
           mockTestId: result.mockTestId,
         });
+        await queuePaymentRefundedEmail(id);
+      } else if (result.status === "paid") {
+        await queueRegistrationConfirmedEmails(id);
       }
     } else if (event.type === "checkout.session.expired") {
       const session = event.data.object as Stripe.Checkout.Session;

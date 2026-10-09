@@ -119,11 +119,15 @@ export async function recordNoSeatRefund(input:{registrationId:string;paymentInt
   const db=getDb(); if(!db) throw new Error("Database is not configured.");
   const now=new Date();
   await db.transaction(async tx=>{
+    const [registration] = await tx
+      .select({ timeZone: mockRegistrations.timeZone })
+      .from(mockRegistrations)
+      .where(eq(mockRegistrations.id, input.registrationId))
+      .limit(1);
     await tx.update(mockRegistrations).set({paidAt:null,holdExpiresAt:null,stripePaymentIntentId:input.paymentIntentId,stripeCheckoutSessionId:input.checkoutSessionId ?? undefined,stripeRefundId:input.refundId,refundedAt:now,refundReason:"seat_unavailable",updatedAt:now}).where(eq(mockRegistrations.id,input.registrationId));
-    await tx.insert(mockWaitlist).values({mockTestId:input.mockTestId,email:input.email.toLowerCase(),createdAt:new Date(0)}).onConflictDoUpdate({target:[mockWaitlist.mockTestId,mockWaitlist.email],set:{createdAt:new Date(0),invitedAt:null,inviteToken:null,inviteUsedAt:null}});
+    await tx.insert(mockWaitlist).values({mockTestId:input.mockTestId,email:input.email.toLowerCase(),timeZone:registration?.timeZone ?? null,createdAt:new Date(0)}).onConflictDoUpdate({target:[mockWaitlist.mockTestId,mockWaitlist.email],set:{timeZone:registration?.timeZone ?? null,createdAt:new Date(0),invitedAt:null,inviteToken:null,inviteUsedAt:null}});
     await tx.insert(mockTestOpsEvents).values({mockTestId:input.mockTestId,registrationId:input.registrationId,kind:"payment_refunded_no_seat",details:{refundId:input.refundId,paymentIntentId:input.paymentIntentId},createdAt:now});
   });
-  console.info(`[mock-test payment] would send email to ${input.email}`);
 }
 
 export async function releaseExpiredCheckoutHold(

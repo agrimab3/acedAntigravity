@@ -4,6 +4,7 @@ import { mockTests, mockWaitlist } from "@/db/schema";
 import { getDb } from "@/lib/db";
 import { getMockTestUser } from "@/lib/mockTest/auth";
 import { normalizeWaitlistEmail } from "@/lib/mockTest/waitlist";
+import { queueWaitlistJoinedEmail } from "@/lib/mockTest/email-outbox";
 import { getSeatStatus } from "@/lib/mockTest/seats";
 import { isMockTestSignupEnabled, MOCK_TEST_SIGNUPS_SOON_MESSAGE } from "@/lib/mockTest/mode";
 import { isMockSignupClosedForZone, NEXT_MOCK, TIME_ZONES } from "@/lib/mockTests";
@@ -63,12 +64,22 @@ export async function POST(request: Request) {
       mockTestId: mockTest.id,
       email,
       userId: user?.id ?? null,
+      timeZone,
     })
     .onConflictDoUpdate({
       target: [mockWaitlist.mockTestId, mockWaitlist.email],
-      set: { userId: user?.id ?? null },
+      set: { userId: user?.id ?? null, timeZone },
     })
-    .returning({ email: mockWaitlist.email });
+    .returning({ id: mockWaitlist.id, email: mockWaitlist.email });
+
+  try {
+    await queueWaitlistJoinedEmail(entry.id);
+  } catch (error) {
+    console.error("[mock-test email] failed to queue waitlist joined email", {
+      waitlistId: entry.id,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 
   return NextResponse.json({ joined: true, email: entry.email });
 }

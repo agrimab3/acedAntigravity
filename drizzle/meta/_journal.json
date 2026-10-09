@@ -176,6 +176,13 @@
       "when": 1791577178366,
       "tag": "0024_yummy_guardian",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1791585066673,
+      "tag": "0025_sudden_owl",
+      "breakpoints": true
     }
   ]
 }
