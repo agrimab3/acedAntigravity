@@ -14,6 +14,7 @@ import {
 import { getTopicByName, isTopicInPracticeScope, type SectionKey } from "@/lib/act-taxonomy";
 import { getAuthSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import { consumeRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import { generateTutorAiText, hasTutorAiProvider } from "@/lib/tutor-ai";
 import {
   buildFallbackTutorReply,
@@ -73,6 +74,14 @@ export async function POST(req: Request) {
 
   if (!userId || !db) {
     return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+  }
+
+  const tutorLimit = consumeRateLimit(`tutor:${userId}`, RATE_LIMITS.tutor);
+  if (!tutorLimit.allowed) {
+    return NextResponse.json(
+      { error: "Take a quick break, the tutor will be back in a bit ✦" },
+      { status: 429, headers: { "Retry-After": String(tutorLimit.retryAfterSeconds) } }
+    );
   }
 
   const { message, questionId, sessionId, action } = parsed.data;

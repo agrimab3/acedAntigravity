@@ -8,6 +8,7 @@ import { queueWaitlistJoinedEmail } from "@/lib/mockTest/email-outbox";
 import { getSeatStatus } from "@/lib/mockTest/seats";
 import { isMockTestSignupEnabled, MOCK_TEST_SIGNUPS_SOON_MESSAGE } from "@/lib/mockTest/mode";
 import { isMockSignupClosedForZone, NEXT_MOCK, TIME_ZONES } from "@/lib/mockTests";
+import { consumeRateLimit, rateLimitIdentity, RATE_LIMITS } from "@/lib/rate-limit";
 
 type WaitlistBody = { email?: string; timeZone?: string };
 
@@ -28,6 +29,14 @@ export async function POST(request: Request) {
 
   if (!EMAIL_RE.test(email)) {
     return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
+  }
+  const waitlistKey = user?.id ?? rateLimitIdentity(email);
+  const waitlistLimit = consumeRateLimit(`waitlist:${waitlistKey}`, RATE_LIMITS.waitlist);
+  if (!waitlistLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many signup tries. Give it a minute and try again ✦" },
+      { status: 429, headers: { "Retry-After": String(waitlistLimit.retryAfterSeconds) } }
+    );
   }
 
   if (user && normalizeWaitlistEmail(user.email) !== email) {

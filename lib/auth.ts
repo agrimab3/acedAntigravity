@@ -5,6 +5,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { getDb } from "@/lib/db";
 import { userIdentities, users } from "@/db/schema";
 import { MOCK_TEST_DEV_PROVIDER_ID, MOCK_TEST_STUDENTS } from "@/lib/mockTest/testStudents";
+import { captureAcedError } from "@/lib/monitoring";
 
 export const DEV_LOGIN_PROVIDER_ID = MOCK_TEST_DEV_PROVIDER_ID;
 const DEV_TEST_USER = {
@@ -144,6 +145,12 @@ const googleProviderReady =
   Boolean(process.env.AUTH_GOOGLE_ID) && Boolean(process.env.AUTH_GOOGLE_SECRET);
 
 export const authOptions: NextAuthOptions = {
+  logger: {
+    error(code, metadata) {
+      captureAcedError(new Error(`NextAuth error: ${code}`), "google-sign-in");
+      console.error("[auth] NextAuth error", code, metadata instanceof Error ? metadata.message : "");
+    },
+  },
   secret: process.env.AUTH_SECRET,
   session: {
     strategy: "jwt",

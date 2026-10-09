@@ -24,6 +24,7 @@ import {
   type RenderedMockEmail,
 } from "@/lib/mockTest/email-templates";
 import { WAITLIST_INVITE_MS } from "@/lib/mockTest/waitlist-policy";
+import { captureAcedError } from "@/lib/monitoring";
 
 const CLAIM_STALE_MS = 10 * 60_000;
 
@@ -353,6 +354,7 @@ export async function processMockEmailOutbox(now = new Date()) {
         .where(and(eq(mockEmailOutbox.id, String(row.id)), eq(mockEmailOutbox.lockToken, lockToken)));
       summary.sent += 1;
     } catch (error) {
+      captureAcedError(error, "email-outbox");
       await db
         .update(mockEmailOutbox)
         .set({

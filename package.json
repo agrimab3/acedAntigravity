@@ -30,9 +30,13 @@
     "mocktest:seed-results": "node --experimental-strip-types --env-file=.env scripts/mocktest-seed-results.mjs",
     "test:mocktest-scoring": "node --test --experimental-strip-types scripts/mocktest-scoring.test.ts",
     "mocktest:admin-busy": "node --env-file=.env scripts/mocktest-admin-busy.mjs",
-    "check:secrets": "node scripts/check-secrets.mjs"
+    "check:secrets": "node scripts/check-secrets.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
+    "test:all": "node scripts/run-all-tests.mjs"
   },
   "dependencies": {
+    "@sentry/nextjs": "^11.6.0",
+    "@sentry/node": "^11.6.0",
     "drizzle-orm": "^0.45.2",
     "next": "16.2.2",
     "next-auth": "^4.24.13",

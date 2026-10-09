@@ -8,6 +8,7 @@ import { isMockTestSignupEnabled, MOCK_TEST_SIGNUPS_SOON_MESSAGE } from "@/lib/m
 import { createSeatHold, MockTestSeatsFullError } from "@/lib/mockTest/seats";
 import { validateInviteForUser } from "@/lib/mockTest/waitlist";
 import { isMockSignupClosedForZone, NEXT_MOCK, TIME_ZONES } from "@/lib/mockTests";
+import { consumeRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 type CheckoutBody = {
   timeZone?: string;
@@ -26,6 +27,13 @@ export async function POST(request: Request) {
 
   if (!user || !db) {
     return NextResponse.json({ error: "Please sign in before checking out." }, { status: 401 });
+  }
+  const checkoutLimit = consumeRateLimit(`checkout:${user.id}`, RATE_LIMITS.checkout);
+  if (!checkoutLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many signup tries. Give it a minute and try again ✦" },
+      { status: 429, headers: { "Retry-After": String(checkoutLimit.retryAfterSeconds) } }
+    );
   }
 
   let body: CheckoutBody;

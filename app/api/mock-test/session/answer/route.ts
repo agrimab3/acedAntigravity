@@ -12,6 +12,7 @@ import { getMockTestUser } from "@/lib/mockTest/auth";
 import { getMockTestServerNow } from "@/lib/mockTest/devClock";
 import { getPaidMockRegistration } from "@/lib/mockTest/runner";
 import { classifyMockAnswerSync } from "@/lib/mockTest/offlineSync";
+import { captureAcedError } from "@/lib/monitoring";
 
 const answerSchema = z.object({
   questionId: z.string().uuid(),
@@ -56,7 +57,8 @@ export async function PATCH(request: Request) {
   const accepted: Resolution[] = [];
   const rejected: Resolution[] = [];
 
-  await db.transaction(async (tx) => {
+  try {
+    await db.transaction(async (tx) => {
     const [session] = await tx
       .select({ id: mockTestSessions.id })
       .from(mockTestSessions)
@@ -209,6 +211,11 @@ export async function PATCH(request: Request) {
       }
     }
   });
+
+  } catch (error) {
+    captureAcedError(error, "mock-answer-save", user.id);
+    throw error;
+  }
 
   return NextResponse.json({
     accepted,

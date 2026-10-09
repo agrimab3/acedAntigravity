@@ -10,6 +10,7 @@ import {
 import { getDb } from "@/lib/db";
 import { getMockTestUser } from "@/lib/mockTest/auth";
 import { getMockTestServerNow } from "@/lib/mockTest/devClock";
+import { captureAcedError } from "@/lib/monitoring";
 import {
   canBypassMockEventWindow,
   getMockBreakDurationSeconds,
@@ -62,7 +63,9 @@ export async function POST(request: Request) {
 
   const now = getMockTestServerNow();
 
-  const result = await db.transaction(async (tx) => {
+  let result;
+  try {
+    result = await db.transaction(async (tx) => {
     await tx.execute(sql`select id from mock_test_sessions where id = ${parsed.data.sessionId} for update`);
 
     const [session] = await tx
@@ -178,6 +181,11 @@ export async function POST(request: Request) {
 
     return { completed: false as const, sessionId: session.id };
   });
+
+  } catch (error) {
+    captureAcedError(error, "mock-section-submit", user.id);
+    throw error;
+  }
 
   if ("error" in result) {
     return NextResponse.json({ error: result.error }, { status: result.status });

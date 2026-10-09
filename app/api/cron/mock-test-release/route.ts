@@ -7,6 +7,7 @@ import {
 } from "@/lib/mockTest/email-outbox";
 import { releaseMockTest } from "@/lib/mockTest/release";
 import { NEXT_MOCK } from "@/lib/mockTests";
+import { captureAcedError } from "@/lib/monitoring";
 
 export async function GET(request: Request) {
   const authorization = request.headers.get("authorization");
@@ -31,6 +32,7 @@ export async function GET(request: Request) {
       now,
     });
   } catch (error) {
+    captureAcedError(error, "score-release");
     releaseError = error instanceof Error ? error.message : String(error);
     console.error("[mock-test release cron] release attempt failed", {
       error: releaseError,

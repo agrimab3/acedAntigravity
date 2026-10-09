@@ -1,38 +1,21 @@
+import "server-only";
 import { getAuthSession } from "@/lib/auth";
-
-const REPO_ADMIN_EMAILS = ["agrima.b3@gmail.com"];
 
 function getAdminEmailSet() {
   return new Set(
-    [...REPO_ADMIN_EMAILS, ...(process.env.ADMIN_EMAILS || "").split(",")]
+    (process.env.ADMIN_EMAILS || "")
+      .split(",")
       .map((value) => value.trim().toLowerCase())
       .filter(Boolean)
   );
 }
 
 export function isAdminEmail(email?: string | null) {
-  if (!email) {
-    return false;
-  }
-
-  const normalized = email.trim().toLowerCase();
-
-  if (
-    process.env.NODE_ENV !== "production" &&
-    (normalized === "local-test-user@aced.local" || normalized.endsWith("@aced.test"))
-  ) {
-    return true;
-  }
-
-  return getAdminEmailSet().has(normalized);
+  if (!email) return false;
+  return getAdminEmailSet().has(email.trim().toLowerCase());
 }
 
 export async function getAdminSession() {
   const session = await getAuthSession();
-
-  if (!isAdminEmail(session?.user?.email)) {
-    return null;
-  }
-
-  return session;
+  return isAdminEmail(session?.user?.email) ? session : null;
 }

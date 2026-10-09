@@ -4,6 +4,7 @@ import type Stripe from "stripe";
 import { mockStripeEvents, mockTestOpsEvents } from "@/db/schema";
 import { getDb } from "@/lib/db";
 import { getStripe } from "@/lib/mockTest/stripe";
+import { captureAcedError } from "@/lib/monitoring";
 import {
   queuePaymentRefundedEmail,
   queueRegistrationConfirmedEmails,
@@ -104,6 +105,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ received: true });
   } catch (error) {
+    captureAcedError(error, "stripe-webhook");
     await db.delete(mockStripeEvents).where(eq(mockStripeEvents.eventId, event.id));
     if (registrationId) {
       try {
