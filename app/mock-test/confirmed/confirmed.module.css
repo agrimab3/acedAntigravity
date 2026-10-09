@@ -241,6 +241,34 @@
   background: rgba(9, 17, 29, 0.35);
 }
 
+.devResetSignupWrap {
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+
+.devResetSignupButton {
+  min-height: 40px;
+  padding: 9px 14px;
+  border: 1px dashed #f0997b88;
+  border-radius: 999px;
+  background: rgba(240, 153, 123, 0.06);
+  color: #f3b19a;
+  font: 700 12px var(--font-dm-sans), "DM Sans", sans-serif;
+  cursor: pointer;
+}
+
+.devResetSignupButton:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.devResetSignupWrap span {
+  color: #f0997b;
+  font-size: 12px;
+}
+
 .calendarButton:focus-visible,
 .exploreButton:focus-visible,
 .refreshButton:focus-visible,

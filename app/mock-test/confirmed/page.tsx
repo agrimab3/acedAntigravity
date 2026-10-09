@@ -17,6 +17,8 @@ import {
 } from "@/lib/mockTests";
 import AddToCalendar from "./AddToCalendar";
 import WaitingForPayment from "./WaitingForPayment";
+import DevResetSignupButton from "./DevResetSignupButton";
+import { canBypassMockEventWindow } from "@/lib/mockTest/runner";
 import styles from "./confirmed.module.css";
 
 const playfair = Playfair_Display({
@@ -182,6 +184,7 @@ export default async function MockTestConfirmedPage() {
             <Link href="/dashboard" className={styles.exploreButton}>
               explore Aced while you wait
             </Link>
+            {canBypassMockEventWindow() ? <DevResetSignupButton /> : null}
           </section>
 
           <section className={styles.tips}>
