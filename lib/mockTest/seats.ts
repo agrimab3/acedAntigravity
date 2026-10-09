@@ -6,7 +6,7 @@ import { MOCK_TEST_SEAT_CAP } from "@/lib/mockTest/seat-policy";
 import { WAITLIST_INVITE_MS } from "@/lib/mockTest/waitlist-policy";
 import { reconcileWaitlistInvites } from "@/lib/mockTest/waitlist";
 
-const HOLD_MINUTES = 15;
+export const MOCK_TEST_CHECKOUT_HOLD_MINUTES = 30;
 
 export type SeatStatus = {
   limit: number;
@@ -138,7 +138,7 @@ export async function createSeatHold(input: CreateSeatHoldInput) {
       if (taken >= MOCK_TEST_SEAT_CAP) throw new MockTestSeatsFullError();
     }
 
-    const holdExpiresAt = new Date(now.getTime() + HOLD_MINUTES * 60_000);
+    const holdExpiresAt = new Date(now.getTime() + MOCK_TEST_CHECKOUT_HOLD_MINUTES * 60_000);
     const [registration] = await tx
       .insert(mockRegistrations)
       .values({

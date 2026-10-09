@@ -28,8 +28,7 @@ export const MOCK_SECTION_ORDER = ["english", "math", "reading", "science"] as c
 export function canBypassMockEventWindow() {
   return (
     process.env.NODE_ENV !== "production" &&
-    getMockTestAuthMode() === "test" &&
-    getMockTestPaymentMode() === "test"
+    (getMockTestAuthMode() === "test" || getMockTestPaymentMode() === "test")
   );
 }
 

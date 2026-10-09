@@ -33,11 +33,11 @@ export default function WaitingForPayment() {
         {!timedOut ? (
           <>
             <span className={styles.spinnerDot} aria-hidden="true" />
-            <p>finishing up your payment…</p>
+            <p>Confirming your payment…</p>
           </>
         ) : (
           <>
-            <p>This is taking longer than usual. Refresh the page, or contact us.</p>
+            <p>Your payment is processing. We&apos;ll email you when it&apos;s confirmed.</p>
             <button
               type="button"
               className={styles.refreshButton}

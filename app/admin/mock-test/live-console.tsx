@@ -28,8 +28,12 @@ type Student = {
   registrationId: string;
   email: string;
   timeZone: string;
-  paymentStatus: "yes" | "test" | "no";
+  paymentStatus: "yes" | "test" | "no" | "refunded";
   paymentReference: string | null;
+  stripePaymentIntentId: string | null;
+  stripeRefundId: string | null;
+  refundedAt: string | null;
+  refundReason: string | null;
   paidAt: string | null;
   registeredAt: string;
   startedAt: string | null;
@@ -632,8 +636,8 @@ export default function MockTestLiveConsole({
             </span>
           </button>
           <div className={styles.todoAction}>
-            <b>refund in Stripe</b>
-            <span>TODO · Stripe is not live yet</span>
+            <b>Stripe refunds</b>
+            <span>automatic no-seat refunds appear in each student row</span>
           </div>
         </div>
 
@@ -1098,7 +1102,10 @@ export default function MockTestLiveConsole({
                 <h3>registration</h3>
                 <dl className={styles.detailList}>
                   <div><dt>payment</dt><dd>{selected.paymentStatus}</dd></div>
-                  <div><dt>reference</dt><dd>{selected.paymentReference ?? "—"}</dd></div>
+                  <div><dt>Stripe payment</dt><dd>{selected.stripePaymentIntentId ?? selected.paymentReference ?? "—"}</dd></div>
+                  <div><dt>refund</dt><dd>{selected.stripeRefundId ?? "—"}</dd></div>
+                  <div><dt>refunded</dt><dd>{selected.refundedAt ? pacific(selected.refundedAt) : "—"}</dd></div>
+                  <div><dt>refund reason</dt><dd>{selected.refundReason ?? "—"}</dd></div>
                   <div><dt>invite used</dt><dd>{selected.inviteUsed ? "yes" : "no"}</dd></div>
                   <div><dt>invited</dt><dd>{selected.invitedAt ? pacific(selected.invitedAt) + " · " + relative(selected.invitedAt, nowMs) : "—"}</dd></div>
                   <div><dt>recent clients</dt><dd>{selected.recentClients}</dd></div>

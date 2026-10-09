@@ -169,6 +169,13 @@
       "when": 1791561992673,
       "tag": "0023_same_korg",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1791577178366,
+      "tag": "0024_yummy_guardian",
+      "breakpoints": true
     }
   ]
 }

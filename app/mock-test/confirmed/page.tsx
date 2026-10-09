@@ -60,6 +60,8 @@ export default async function MockTestConfirmedPage() {
       id: mockRegistrations.id,
       timeZone: mockRegistrations.timeZone,
       paidAt: mockRegistrations.paidAt,
+      refundedAt: mockRegistrations.refundedAt,
+      refundReason: mockRegistrations.refundReason,
     })
     .from(mockRegistrations)
     .innerJoin(mockTests, eq(mockRegistrations.mockTestId, mockTests.id))
@@ -73,6 +75,25 @@ export default async function MockTestConfirmedPage() {
 
   if (!registration) {
     redirect("/mock-test/signup");
+  }
+
+  if (registration.refundedAt && registration.refundReason === "seat_unavailable") {
+    return (
+      <div className={`${styles.pageRoot} ${playfair.variable} ${dmSans.variable}`}>
+        <NightSky />
+        <main className={styles.waitingShell}>
+          <div className={styles.waitingCard} role="status">
+            <p>
+              Your payment was refunded because the seat hold had expired and the test filled up.
+              You&apos;re at the top of the waitlist now, and we&apos;ll email you if another spot opens.
+            </p>
+            <Link href="/mock-test" className={styles.exploreButton}>
+              back to mock test
+            </Link>
+          </div>
+        </main>
+      </div>
+    );
   }
 
   if (!registration.paidAt) {

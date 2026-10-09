@@ -39,8 +39,12 @@ export type MockAdminStudent = {
   registrationId: string;
   email: string;
   timeZone: string;
-  paymentStatus: "yes" | "test" | "no";
+  paymentStatus: "yes" | "test" | "no" | "refunded";
   paymentReference: string | null;
+  stripePaymentIntentId: string | null;
+  stripeRefundId: string | null;
+  refundedAt: string | null;
+  refundReason: string | null;
   paidAt: string | null;
   registeredAt: string;
   startedAt: string | null;
@@ -195,6 +199,9 @@ export async function getMockTestLiveOverview(slug: string) {
       mr.start_override_until,
       mr.stripe_payment_intent_id,
       mr.stripe_checkout_session_id,
+      mr.stripe_refund_id,
+      mr.refunded_at,
+      mr.refund_reason,
       mr.created_at as registered_at,
       mr.started_at,
       mr.finished_at,
@@ -476,11 +483,13 @@ export async function getMockTestLiveOverview(slug: string) {
       : raw.stripe_checkout_session_id
         ? String(raw.stripe_checkout_session_id)
         : null;
-    const paymentStatus: MockAdminStudent["paymentStatus"] = raw.paid_at
-      ? paymentReference?.startsWith("test_payment_")
-        ? "test"
-        : "yes"
-      : "no";
+    const paymentStatus: MockAdminStudent["paymentStatus"] = raw.refunded_at
+      ? "refunded"
+      : raw.paid_at
+        ? paymentReference?.startsWith("test_payment_")
+          ? "test"
+          : "yes"
+        : "no";
 
     const currentSectionKey = raw.current_section_key
       ? String(raw.current_section_key)
@@ -496,6 +505,10 @@ export async function getMockTestLiveOverview(slug: string) {
       timeZone: String(raw.time_zone),
       paymentStatus,
       paymentReference,
+      stripePaymentIntentId: raw.stripe_payment_intent_id ? String(raw.stripe_payment_intent_id) : null,
+      stripeRefundId: raw.stripe_refund_id ? String(raw.stripe_refund_id) : null,
+      refundedAt: iso(raw.refunded_at),
+      refundReason: raw.refund_reason ? String(raw.refund_reason) : null,
       paidAt: iso(raw.paid_at),
       registeredAt: iso(raw.registered_at) ?? now.toISOString(),
       startedAt: iso(raw.started_at),

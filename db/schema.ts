@@ -141,6 +141,9 @@ export const mockRegistrations = pgTable(
     marketingOptIn: boolean("marketing_opt_in").default(false).notNull(),
     stripeCheckoutSessionId: text("stripe_checkout_session_id"),
     stripePaymentIntentId: text("stripe_payment_intent_id"),
+    stripeRefundId: text("stripe_refund_id"),
+    refundedAt: timestamp("refunded_at", { withTimezone: true }),
+    refundReason: text("refund_reason"),
     paidAt: timestamp("paid_at", { withTimezone: true }),
     holdExpiresAt: timestamp("hold_expires_at", { withTimezone: true }),
     startOverrideUntil: timestamp("start_override_until", { withTimezone: true }),
@@ -158,6 +161,7 @@ export const mockRegistrations = pgTable(
   (table) => [
     uniqueIndex("mock_registrations_test_user_idx").on(table.mockTestId, table.userId),
     uniqueIndex("mock_registrations_checkout_session_idx").on(table.stripeCheckoutSessionId),
+    uniqueIndex("mock_registrations_payment_intent_idx").on(table.stripePaymentIntentId),
     check(
       "mock_registrations_time_zone_allowed_ck",
       sql`${table.timeZone} in (
@@ -317,6 +321,22 @@ export const mockTestOpsEvents = pgTable(
     index("mock_test_ops_events_test_created_idx").on(table.mockTestId, table.createdAt),
     index("mock_test_ops_events_registration_idx").on(table.registrationId),
     index("mock_test_ops_events_kind_idx").on(table.kind),
+  ]
+);
+
+export const mockStripeEvents = pgTable(
+  "mock_stripe_events",
+  {
+    eventId: text("event_id").primaryKey(),
+    eventType: text("event_type").notNull(),
+    registrationId: uuid("registration_id").references(() => mockRegistrations.id, {
+      onDelete: "set null",
+    }),
+    processedAt: timestamp("processed_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("mock_stripe_events_registration_idx").on(table.registrationId),
+    index("mock_stripe_events_type_idx").on(table.eventType),
   ]
 );
 

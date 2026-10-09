@@ -109,7 +109,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ url: "/mock-test/confirmed" });
     }
 
-    const checkout = await createCheckout(registration);
+    const checkout = await createCheckout({ id: registration.id, email: user.email, origin: new URL(request.url).origin });
     return NextResponse.json(checkout);
   } catch (error) {
     if (error instanceof MockTestSeatsFullError) {
