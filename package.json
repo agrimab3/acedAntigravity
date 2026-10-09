@@ -6,7 +6,7 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "npm run check:secrets && eslint",
     "test:question-review": "node --test --experimental-strip-types scripts/question-review.test.ts",
     "test:provider-resilience": "node --test scripts/content-generation-resilience.test.mjs",
     "db:generate": "drizzle-kit generate",
@@ -15,7 +15,8 @@
     "db:seed": "node --env-file=.env scripts/seed-core.mjs",
     "questions:generate": "node --env-file=.env generate-questions.mjs",
     "content:backlog": "node --env-file=.env scripts/run-content-backlog.mjs",
-    "content:critical": "node --experimental-specifier-resolution=node --env-file=.env scripts/fill-critical-backlog.mts"
+    "content:critical": "node --experimental-specifier-resolution=node --env-file=.env scripts/fill-critical-backlog.mts",
+    "check:secrets": "node scripts/check-secrets.mjs"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",

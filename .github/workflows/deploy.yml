@@ -18,5 +18,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check tracked files for secrets
+        run: npm run check:secrets
+
       - name: Deploy on VPS
         run: bash scripts/deploy-vps.sh
