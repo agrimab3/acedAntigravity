@@ -979,6 +979,30 @@ export default function MockTestRunner({
     return index >= 0 ? index + 1 : 1;
   }, [session, currentQuestion]);
 
+  async function bypassDevBreak() {
+    if (!allowDevReset || busy) return;
+
+    setBusy(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/mock-test/dev/bypass-break", {
+        method: "POST",
+      });
+      const data = await response.json();
+
+      if (!response.ok || !data.advanced) {
+        throw new Error(data.error || "Could not bypass the DEV break.");
+      }
+
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not bypass the DEV break.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function resetDevTest() {
     if (!allowDevReset || busy) return;
     setBusy(true);
@@ -1449,9 +1473,20 @@ export default function MockTestRunner({
                   {session.break.nextSection.durationMinutes} min
                 </p>
               </div>
-              <span className={styles.breakRequiredNote}>
-                full 10-minute break required
-              </span>
+              {allowDevReset ? (
+                <button
+                  type="button"
+                  className={styles.breakStartButton}
+                  disabled={busy}
+                  onClick={() => void bypassDevBreak()}
+                >
+                  {busy ? "starting reading…" : "DEV: bypass break →"}
+                </button>
+              ) : (
+                <span className={styles.breakRequiredNote}>
+                  full 10-minute break required
+                </span>
+              )}
             </div>
           </div>
 

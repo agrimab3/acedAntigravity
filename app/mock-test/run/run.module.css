@@ -1667,6 +1667,24 @@
   text-align: right;
 }
 
+.breakStartButton {
+  min-height: 42px;
+  padding: 10px 16px;
+  border: 1px dashed rgba(240, 153, 123, 0.55);
+  border-radius: 999px;
+  background: rgba(240, 153, 123, 0.08);
+  color: #F3B19A;
+  font-family: var(--font-dm-sans), "DM Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.breakStartButton:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
 @keyframes submitSpin {
   to {
     transform: rotate(360deg);
