@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+set -euo pipefail
+node --env-file-if-exists=.env.local --env-file-if-exists=.env --experimental-strip-types scripts/mocktest-release-rehearsal.mjs

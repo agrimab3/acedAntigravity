@@ -553,6 +553,20 @@ export async function getMockTestLiveOverview(slug: string) {
     });
   }
 
+  if (String(test.status) !== "released") {
+    const latestReleaseFailure = events.find((event) => event.kind === "release_failed");
+    if (latestReleaseFailure) {
+      const details = (latestReleaseFailure.details ?? {}) as Record<string, unknown>;
+      const message = String(details.error ?? "unknown release error");
+      alerts.unshift({
+        id: "release-job-failed",
+        type: "release_job_failed",
+        severity: "problem",
+        label: "Score release failed · " + message,
+      });
+    }
+  }
+
   if (
     String(test.status) !== "released" &&
     now.getTime() >= releaseAt.getTime() + 10 * 60_000
@@ -561,7 +575,7 @@ export async function getMockTestLiveOverview(slug: string) {
       id: "release-job-late",
       type: "release_job_late",
       severity: "problem",
-      label: "Release job hasn't run",
+      label: "SCORES RELEASE OVERDUE · not released by 2:10 PM PT",
     });
   }
 

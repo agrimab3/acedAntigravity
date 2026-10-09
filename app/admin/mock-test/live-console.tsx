@@ -504,7 +504,17 @@ export default function MockTestLiveConsole({
       </div>
 
       {overview.alerts.length > 0 ? (
-        <section className={styles.alertPanel} aria-labelledby="alerts-title">
+        <section
+          className={styles.alertPanel}
+          data-critical={
+            overview.alerts.some((alert) =>
+              ["release_job_late", "release_job_failed"].includes(alert.type)
+            )
+              ? "true"
+              : undefined
+          }
+          aria-labelledby="alerts-title"
+        >
           <div className={styles.panelHeading}>
             <div>
               <div className={styles.label}>ALERTS</div>

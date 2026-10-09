@@ -13,6 +13,7 @@ import {
 import { getDb } from "@/lib/db";
 import { getMockTestUser } from "@/lib/mockTest/auth";
 import { getMockTestServerNow } from "@/lib/mockTest/devClock";
+import { shouldRevealMockResults } from "@/lib/mockTest/release-policy";
 import {
   canBypassMockEventWindow,
   getPaidMockRegistration,
@@ -76,8 +77,11 @@ export async function GET(request: Request) {
     : getMockTestServerNow();
 
   if (
-    now.getTime() < releaseAt.getTime() ||
-    mockTest.status !== "released"
+    !shouldRevealMockResults({
+      status: mockTest.status,
+      now,
+      releaseAt,
+    })
   ) {
     return NextResponse.json({
       released: false,

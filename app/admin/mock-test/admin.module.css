@@ -305,6 +305,17 @@
   border-color: #4F3B20;
 }
 
+.alertPanel[data-critical="true"] {
+  border: 2px solid #B94A3C;
+  background: #24110F;
+  box-shadow: 0 0 0 1px rgba(240, 153, 123, 0.15), 0 18px 60px rgba(185, 74, 60, 0.18);
+}
+
+.alertPanel[data-critical="true"] .panelHeading h2 {
+  color: #F0997B;
+  font-size: 24px;
+}
+
 .panelHeading,
 .studentsHeader {
   display: flex;

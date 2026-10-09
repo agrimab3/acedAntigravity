@@ -10,6 +10,18 @@ PM2_APP_NAME="aced-web"
 APP_PORT="3005"
 HEALTHCHECK_URL="http://127.0.0.1:${APP_PORT}/api/health"
 
+install_mock_release_cron() {
+  local marker="# ACED_MOCK_TEST_RELEASE_CRON"
+  local cron_line="*/5 * * * * /usr/bin/flock -n /tmp/aced-mocktest-release.lock ${CURRENT_DIR}/scripts/run-mocktest-release-cron.sh >> /var/log/aced-mocktest-release.log 2>&1 ${marker}"
+  local existing
+  existing="$(crontab -l 2>/dev/null || true)"
+  {
+    printf '%s\n' "${existing}" | grep -vF "${marker}" || true
+    printf '%s\n' "${cron_line}"
+  } | sed '/^$/d' | crontab -
+  echo "Installed idempotent mock-test release cron (every 5 minutes)."
+}
+
 mkdir -p "${CURRENT_DIR}" "${SHARED_DIR}"
 
 if [[ ! -f "${RUN_ENV_FILE}" ]]; then
@@ -43,6 +55,7 @@ source "${RUN_ENV_FILE}"
 set +a
 
 npm run db:migrate
+node scripts/check-mocktest-production-release-state.mjs
 
 pm2 describe "${PM2_APP_NAME}" >/dev/null 2>&1 || pm2 start ecosystem.config.cjs --only "${PM2_APP_NAME}"
 pm2 restart "${PM2_APP_NAME}" --update-env
@@ -50,6 +63,8 @@ pm2 restart "${PM2_APP_NAME}" --update-env
 for attempt in {1..30}; do
   if curl --silent --fail "${HEALTHCHECK_URL}" >/dev/null; then
     echo "Health check passed on attempt ${attempt}: ${HEALTHCHECK_URL}"
+    chmod +x "${CURRENT_DIR}/scripts/run-mocktest-release-cron.sh"
+    install_mock_release_cron
     pm2 save
     exit 0
   fi

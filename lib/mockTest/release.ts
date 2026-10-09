@@ -6,7 +6,12 @@ import {
   estimateActScaleScore,
   type MockSectionKey,
 } from "./scoring.ts";
-import { MOCK_OFFLINE_SYNC_WINDOW_MINUTES } from "../mockTests.ts";
+import {
+  buildMockReleaseSchedule,
+  canFinalizeMockSessionForRelease,
+  getMockReleaseGate,
+  type ReleaseSectionRun,
+} from "./release-policy.ts";
 
 const { Pool } = pg;
 const SECTION_KEYS: MockSectionKey[] = ["english", "math", "reading", "science"];
@@ -29,11 +34,60 @@ type TopicStat = {
 type StudentScore = {
   registrationId: string;
   sessionId: string;
+  email: string;
   sectionStats: Record<MockSectionKey, { correct: number; total: number }>;
   sectionScores: Record<MockSectionKey, number>;
   composite: number;
   topics: Map<string, TopicStat>;
 };
+
+type DbReleaseSectionRun = ReleaseSectionRun & {
+  id: string;
+};
+
+function asDate(value: unknown) {
+  if (!value) return null;
+  const date = value instanceof Date ? value : new Date(String(value));
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function errorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
+}
+
+async function recordReleaseFailure(
+  client: pg.PoolClient,
+  slug: string,
+  error: unknown,
+  now: Date
+) {
+  try {
+    const testResult = await client.query(
+      "select id from mock_tests where slug=$1 limit 1",
+      [slug]
+    );
+    const testId = testResult.rows[0]?.id;
+    if (!testId) return;
+
+    await client.query(
+      `insert into mock_test_ops_events
+        (mock_test_id,kind,details,created_at)
+       values($1,'release_failed',$2::jsonb,$3)`,
+      [
+        testId,
+        JSON.stringify({
+          error: errorMessage(error).slice(0, 800),
+        }),
+        now,
+      ]
+     );
+  } catch (recordError) {
+    console.error("[mock-test release] could not record release failure", {
+      slug,
+      error: errorMessage(recordError),
+    });
+  }
+}
 
 export async function releaseMockTest({
   connectionString,
@@ -58,13 +112,19 @@ export async function releaseMockTest({
 
     if (!test) throw new Error(`Mock test ${slug} not found.`);
 
-    if (test.status === "released") {
+    const releaseAt = new Date(test.results_release_at);
+    const gate = getMockReleaseGate({
+      status: String(test.status),
+      now,
+      releaseAt,
+    });
+
+    if (gate === "already_released") {
       await client.query("commit");
       return { released: true, alreadyReleased: true, slug, studentCount: null };
     }
 
-    const releaseAt = new Date(test.results_release_at);
-    if (now.getTime() < releaseAt.getTime()) {
+    if (gate === "not_due") {
       await client.query("commit");
       return {
         released: false,
@@ -82,59 +142,140 @@ export async function releaseMockTest({
          mts.registration_id,
          mts.form_id,
          mts.status as session_status,
-         (select max(sr.deadline_at) from mock_test_section_runs sr where sr.session_id=mts.id) as final_deadline,
-         mf.version as form_version
+         mts.started_at as session_started_at,
+         mf.version as form_version,
+         u.email
        from mock_test_sessions mts
        inner join mock_registrations mr on mr.id=mts.registration_id
+       inner join users u on u.id=mr.user_id
        inner join mock_test_forms mf on mf.id=mts.form_id
        where mr.mock_test_id=$1
-         and (
-           mts.status='completed'
-           or (
-             (select count(*) from mock_test_section_runs sr where sr.session_id=mts.id)=4
-             and not exists (
-               select 1
-               from mock_test_section_runs sr
-               where sr.session_id=mts.id
-                 and (sr.deadline_at is null or sr.deadline_at > $2)
-             )
-           )
-         )
-         and not exists (
-           select 1
-           from mock_test_section_runs sr
-           where sr.session_id=mts.id
-             and (
-               sr.deadline_at is null
-               or (
-                 sr.outbox_cleared_at is null
-                 and sr.deadline_at + ($4::int * interval '1 minute') > $2
-               )
-             )
-         )
-         and ($3::boolean = true or mf.version <> 'DEV')
+         and ($2::boolean = true or mf.version <> 'DEV')
        order by mts.started_at, mts.id
        for update of mts, mr`,
-      [test.id, now, includeDev, MOCK_OFFLINE_SYNC_WINDOW_MINUTES]
-    );
+      [test.id, includeDev]
+     );
+
+    const sessionsWithRuns: Array<{
+      session: Record<string, unknown>;
+      runs: DbReleaseSectionRun[];
+    }> = [];
+
+    for (const session of sessionResult.rows as Array<Record<string, unknown>>) {
+      const runsResult = await client.query(
+        `select
+           id,
+           section_order,
+           time_limit_seconds,
+           started_at,
+           deadline_at,
+           completed_at,
+           outbox_cleared_at
+         from mock_test_section_runs
+         where session_id=$1
+         order by section_order
+         for update`,
+        [session.session_id]
+      );
+
+      const runs = runsResult.rows.map((row) => ({
+        id: String(row.id),
+        sectionOrder: Number(row.section_order),
+        timeLimitSeconds: Number(row.time_limit_seconds),
+        startedAt: asDate(row.started_at),
+        deadlineAt: asDate(row.deadline_at),
+        completedAt: asDate(row.completed_at),
+        outboxClearedAt: asDate(row.outbox_cleared_at),
+      }));
+
+      if (runs.length !== 4) {
+        throw new Error(
+          `Session ${session.session_id} has ${runs.length}/4 section runs.`
+        );
+      }
+
+      sessionsWithRuns.push({ session, runs });
+    }
+
+    const pending = sessionsWithRuns.filter(({ session, runs }) => {
+      const startedAt = asDate(session.session_started_at);
+      if (!startedAt) return true;
+
+      return !canFinalizeMockSessionForRelease({
+        now,
+        sessionStartedAt: startedAt,
+        sessionCompleted: session.session_status === "completed",
+        runs,
+      });
+    });
+
+    if (pending.length > 0) {
+      await client.query("commit");
+      return {
+        released: false,
+        alreadyReleased: false,
+        slug,
+        reason: "sessions_pending",
+        pendingSessionCount: pending.length,
+        releaseAt: releaseAt.toISOString(),
+        now: now.toISOString(),
+      };
+    }
 
     const students: StudentScore[] = [];
+    let finalizedSessionCount = 0;
 
-    for (const session of sessionResult.rows) {
+    for (const { session, runs } of sessionsWithRuns) {
+      const sessionStartedAt = asDate(session.session_started_at);
+      if (!sessionStartedAt) {
+        throw new Error(`Session ${session.session_id} has no start time.`);
+      }
+
+      const schedule = buildMockReleaseSchedule(sessionStartedAt, runs);
+      for (const run of runs) {
+        const planned = schedule.find(
+          (entry) => entry.sectionOrder === run.sectionOrder
+        );
+        if (!planned) {
+          throw new Error(
+            `Session ${session.session_id} is missing planned section ${run.sectionOrder}.`
+          );
+        }
+
+        await client.query(
+          `update mock_test_section_runs
+           set started_at=coalesce(started_at,$2),
+               deadline_at=coalesce(deadline_at,$3),
+               completed_at=coalesce(completed_at,$3),
+               updated_at=$4
+           where id=$1`,
+          [run.id, planned.startedAt, planned.deadlineAt, now]
+         );
+      }
+
+      const finalDeadline =
+        schedule[schedule.length - 1]?.deadlineAt ?? sessionStartedAt;
+
       if (session.session_status !== "completed") {
-        const finishedAt = session.final_deadline ? new Date(session.final_deadline) : now;
         await client.query(
           `update mock_test_sessions
-           set status='completed', completed_at=coalesce(completed_at,$2), updated_at=$2
+           set status='completed',
+               current_section_order=3,
+               current_break_after=null,
+               break_started_at=null,
+               break_ends_at=null,
+               completed_at=coalesce(completed_at,$2),
+               updated_at=$3
            where id=$1`,
-          [session.session_id, finishedAt]
+          [session.session_id, finalDeadline, now]
         );
         await client.query(
           `update mock_registrations
-           set finished_at=coalesce(finished_at,$2), updated_at=$2
+           set finished_at=coalesce(finished_at,$2), updated_at=$3
            where id=$1`,
-          [session.registration_id, finishedAt]
+          [session.registration_id, finalDeadline, now]
         );
+        finalizedSessionCount += 1;
       }
 
       const answerResult = await client.query(
@@ -167,7 +308,7 @@ export async function releaseMockTest({
       for (const row of answerResult.rows) {
         const sectionKey = row.section_key as MockSectionKey;
         if (!(sectionKey in sectionStats)) {
-          throw new Error(`Unexpected mock section ${row.section_key}.`);
+          throw new Error(`Unintended mock section ${row.section_key}.`);
         }
 
         const isCorrect =
@@ -204,8 +345,9 @@ export async function releaseMockTest({
       });
 
       students.push({
-        registrationId: session.registration_id,
-        sessionId: session.session_id,
+        registrationId: String(session.registration_id),
+        sessionId: String(session.session_id),
+        email: String(session.email),
         sectionStats,
         sectionScores,
         composite,
@@ -273,17 +415,30 @@ export async function releaseMockTest({
 
     await client.query("commit");
 
+    for (const student of students) {
+      console.info(
+        `[mock-test release] would send scores-are-out email to ${student.email}`
+      );
+    }
+
     return {
       released: true,
       alreadyReleased: false,
       slug,
       studentCount: students.length,
+      finalizedSessionCount,
       distribution,
     };
   } catch (error) {
     try {
       await client.query("rollback");
     } catch {}
+
+    console.error("[mock-test release] release failed", {
+      slug,
+      error: errorMessage(error),
+    });
+    await recordReleaseFailure(client, slug, error, now);
     throw error;
   } finally {
     client.release();
