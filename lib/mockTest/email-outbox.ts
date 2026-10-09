@@ -148,7 +148,7 @@ export async function queuePaymentRefundedEmail(registrationId: string) {
     uniqueKey: `payment_refunded:${registrationId}`,
     recipientEmail: String(row.email),
     scheduledAt: new Date(String(row.refunded_at)),
-    rendered: renderPaymentRefunded(),
+    rendered: renderPaymentRefunded({ practiceUrl: `${getMockEmailSiteBaseUrl()}/dashboard` }),
   });
 }
 

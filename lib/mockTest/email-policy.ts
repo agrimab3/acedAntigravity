@@ -84,6 +84,18 @@ export function getMockReminderAt(timeZone: string) {
   });
 }
 
+export function getFriendlyMockTimeZoneName(timeZone: string) {
+  const names: Record<string, string> = {
+    "America/Los_Angeles": "Pacific",
+    "America/Denver": "Mountain",
+    "America/Chicago": "Central",
+    "America/New_York": "Eastern",
+    "America/Anchorage": "Alaska",
+    "Pacific/Honolulu": "Hawaii",
+  };
+  return names[timeZone] || timeZone;
+}
+
 export function formatMockEmailTime(date: Date, timeZone: string) {
   return new Intl.DateTimeFormat("en-US", {
     timeZone,
