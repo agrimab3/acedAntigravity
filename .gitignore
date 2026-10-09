@@ -45,3 +45,29 @@ google Oauth/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# scratch / temp files
+tmp_*
+.claude/
+
+# local audit, forensic and evaluation reports
+*-audit-*.md
+*-review-*.md
+*-summary-*.md
+*-calibration-*.md
+*-diagnosis-*.md
+*-diagnostic.md
+*-report-*.md
+*-report.md
+*-forensic-*.md
+*-batch-*.md
+*-hardening-*.md
+*-inventory-*.md
+*-alignment-*.md
+*-key-*.md
+*-key.md
+*-blind.md
+*-fix-*.md
+*-rerun-*.md
+*-comparison-*.md
+*-validation-*.md

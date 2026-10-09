@@ -1,0 +1,2 @@
+ALTER TABLE "mock_registrations" ADD COLUMN "start_override_until" timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "mock_tests" ADD COLUMN "signups_paused" boolean DEFAULT false NOT NULL;
