@@ -779,15 +779,17 @@ function PracticeContent() {
 
               {!submitted && (
                 <div style={{ display: 'flex', gap: '8px', padding: '10px 14px 0', flexWrap: 'wrap' }}>
-                  <button
-                    type="button"
-                    disabled={aiLoading}
-                    onClick={() => void sendAI("hint", "give me a hint")}
-                    style={{ border: '0.5px solid rgba(255,255,255,0.14)', borderRadius: '999px', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.76)', padding: '6px 10px', fontSize: '11px', cursor: aiLoading ? 'default' : 'pointer', fontFamily: 'DM Sans,sans-serif' }}
-                  >
-                    Hint
-                  </button>
-                  {tutorHintLevel >= 1 && !answerRevealedBeforeSubmit && (
+                  {tutorHintLevel < 3 && (
+                    <button
+                      type="button"
+                      disabled={aiLoading}
+                      onClick={() => void sendAI("hint", "give me a hint")}
+                      style={{ border: '0.5px solid rgba(255,255,255,0.14)', borderRadius: '999px', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.76)', padding: '6px 10px', fontSize: '11px', cursor: aiLoading ? 'default' : 'pointer', fontFamily: 'DM Sans,sans-serif' }}
+                    >
+                      Hint
+                    </button>
+                  )}
+                  {tutorHintLevel >= 3 && !answerRevealedBeforeSubmit && (
                     <button
                       type="button"
                       disabled={aiLoading}

@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   buildFallbackTutorReply,
+  buildSafePreSubmissionReply,
   decideTutorTurn,
   detectTutorLeak,
   getEffectivePracticeCorrectness,
+  guardPreSubmissionTutorReply,
   looksIncompleteTutorReply,
 } from "../lib/tutor-guard.ts";
 
@@ -56,7 +58,7 @@ for (const message of [
   });
 }
 
-test("three hint requests stay at hint level 1 and never auto-reveal", () => {
+test("three hint requests advance through levels 1, 2, and 3 without auto-reveal", () => {
   let hintLevel = 0;
 
   for (let index = 0; index < 3; index += 1) {
@@ -69,17 +71,68 @@ test("three hint requests stay at hint level 1 and never auto-reveal", () => {
 
     assert.equal(decision.phase, "hint");
     assert.equal(decision.revealAnswer, false);
-    assert.equal(decision.nextHintLevel, 1);
+    assert.equal(decision.nextHintLevel, index + 1);
 
     const reply = buildFallbackTutorReply({
       section: "math",
       topic: "Algebra",
       phase: decision.phase,
       submitted: false,
+      hintLevel: decision.nextHintLevel,
     });
     assertNoLeak(reply);
     hintLevel = decision.nextHintLevel;
   }
+});
+
+
+test("fallback hints 1, 2, and 3 are all different", () => {
+  const hints = [1, 2, 3].map((hintLevel) =>
+    buildSafePreSubmissionReply({
+      section: "math",
+      topic: "Algebra",
+      phase: "hint",
+      hintLevel,
+    })
+  );
+
+  assert.equal(new Set(hints).size, 3);
+  hints.forEach(assertNoLeak);
+});
+
+test("mocked AI reply that leaks the answer is blocked", () => {
+  const guard = guardPreSubmissionTutorReply({
+    reply: "The answer is C because that punctuation joins the clauses.",
+    correctAnswer,
+    correctChoiceText,
+    explanation,
+    choices: {
+      A: "Use a comma.",
+      B: "Use a colon.",
+      C: correctChoiceText,
+      D: "Use no punctuation.",
+    },
+  });
+
+  assert.equal(guard.blocked, true);
+  assert.equal(guard.reason, "correct-letter");
+});
+
+test("leak detector blocks eliminating every wrong choice", () => {
+  const reason = detectTutorLeak({
+    reply: "Rule out A, eliminate B, and rule out D.",
+    correctAnswer,
+    correctChoiceText,
+    explanation,
+    choices: {
+      A: "Use a comma.",
+      B: "Use a colon.",
+      C: correctChoiceText,
+      D: "Use no punctuation.",
+    },
+  });
+
+  assert.equal(reason, "all-wrong-choices-eliminated");
 });
 
 test("show answer is blocked before any hint", () => {
@@ -112,7 +165,7 @@ test("show answer reveals only after at least one hint", () => {
 
   assert.equal(decision.phase, "reveal");
   assert.equal(decision.revealAnswer, true);
-  assert.equal(decision.nextHintLevel, 2);
+  assert.equal(decision.nextHintLevel, 1);
 
   const reply = buildFallbackTutorReply({
     section: "english",

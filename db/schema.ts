@@ -687,6 +687,7 @@ export const practiceTutorStates = pgTable(
       .references(() => questions.id, { onDelete: "cascade" }),
     hintLevel: integer("hint_level").default(0).notNull(),
     hintCount: integer("hint_count").default(0).notNull(),
+    hintHistory: jsonb("hint_history").$type<string[]>().default([]).notNull(),
     answerRevealed: boolean("answer_revealed").default(false).notNull(),
     submittedAt: timestamp("submitted_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),

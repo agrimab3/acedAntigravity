@@ -1,0 +1,1 @@
+ALTER TABLE "practice_tutor_states" ADD COLUMN "hint_history" jsonb DEFAULT '[]'::jsonb NOT NULL;

@@ -162,6 +162,13 @@
       "when": 1791560621372,
       "tag": "0022_simple_talisman",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1791561992673,
+      "tag": "0023_same_korg",
+      "breakpoints": true
     }
   ]
 }

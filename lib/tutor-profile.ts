@@ -81,6 +81,9 @@ type TutorPromptContext = {
   targetDifficulty?: string;
   mode: "general" | "hint" | "review";
   choices?: Record<string, string>;
+  hintLevel?: number;
+  priorHints?: string[];
+  strictPreSubmit?: boolean;
   correctAnswer?: string;
   explanation?: string;
 };
@@ -89,20 +92,44 @@ export function buildTutorInstructions(
   profile: Awaited<ReturnType<typeof getActiveTutorProfile>>,
   context: TutorPromptContext
 ) {
+  const preSubmit = context.mode !== "review";
+  const hintLevel = Math.max(0, Math.min(3, context.hintLevel ?? 0));
+  const priorHints = context.priorHints ?? [];
+  const choiceContext = context.choices
+    ? `\nChoices:\n${Object.entries(context.choices)
+        .map(([letter, text]) => `${letter}. ${text}`)
+        .join("\n")}`
+    : "";
   const reviewContext =
     context.mode === "review"
-      ? `
-- Choices: ${JSON.stringify(context.choices ?? {})}
-- Correct answer: ${context.correctAnswer || "unknown"}
-- Canonical explanation: ${context.explanation || "not available"}`
+      ? `\nCorrect answer: ${context.correctAnswer || "unknown"}\nCanonical explanation: ${context.explanation || "not available"}`
+      : "";
+  const priorHintContext =
+    preSubmit && priorHints.length > 0
+      ? `\nHints already shown to the student:\n${priorHints
+          .map((hint, index) => `${index + 1}. ${hint}`)
+          .join("\n")}`
       : "";
 
-  const modeRules =
-    context.mode === "review"
-      ? `The student has already submitted. You may identify the correct answer and use the canonical explanation freely.`
-      : context.mode === "hint"
-        ? `Give one specific hint about the key idea or rule. Do not name, confirm, or reveal the correct answer. Do not quote an answer choice as the answer.`
-        : `Give a general strategy or guiding question. Do not judge any answer choice, name the correct answer, or provide a full solution.`;
+  let modeRules =
+    "Answer the student's question directly and briefly. You may explain a concept or strategy, but do not say which answer choice is right or wrong.";
+
+  if (context.mode === "hint") {
+    modeRules =
+      hintLevel <= 1
+        ? "Give Hint 1: identify the key idea or rule being tested in THIS question. Be specific to the wording or setup, but do not solve it."
+        : hintLevel === 2
+          ? "Give Hint 2: point the student to the exact phrase, sentence, graph feature, equation part, or condition they should inspect next. Do not repeat Hint 1 and do not identify the correct choice."
+          : "Give Hint 3: walk through only the first concrete reasoning step for THIS question. Do not repeat earlier hints, do not finish the solution, and do not identify the correct choice.";
+  } else if (context.mode === "review") {
+    modeRules =
+      "The student has already submitted. You may identify the correct answer and use the canonical explanation freely.";
+  }
+
+  const strictRules =
+    preSubmit && context.strictPreSubmit
+      ? `\nSTRICT RETRY RULES:\n- A previous draft was blocked by the safety checker.\n- Do not name any answer letter as correct, best, right, or the answer.\n- Do not quote any answer choice as the answer.\n- Do not eliminate multiple choices in a way that leaves only one possible choice.\n- Do not repeat any prior hint.\n- Give only the requested concept explanation or hint.`
+      : "";
 
   return `
 ${profile.systemPrompt}
@@ -115,19 +142,20 @@ Current context:
 - Current target difficulty: ${context.targetDifficulty || "unknown"}
 - Student session accuracy so far: ${context.studentAccuracyPct ?? 0}%
 - Tutor mode: ${context.mode}
-${reviewContext}
+- Hint stage: ${hintLevel}
 
-Question:
-${context.question}
+Question / passage / figure text:
+${context.question}${choiceContext}${reviewContext}${priorHintContext}
 
 Hard response rules:
 - ${modeRules}
+- ${preSubmit ? "The correct answer and canonical explanation have deliberately NOT been provided to you. Never infer or claim that you know which choice is correct." : "The student has submitted, so full review is allowed."}
+- Never confirm or deny a student's proposed choice before submission.
+- Never repeat a hint already shown to the student.
 - Keep the tone short, friendly, calm, and encouraging.
 - Use confident plain English suitable for a high school student.
 - Prefer one or two short sentences before submission.
-- Use collaborative language like "let's" and "try this" when useful.
-- Never pretend the student has submitted when they have not.
-- Avoid filler, pep-talk fluff, and long intros.
 - Always return complete sentences.
+${strictRules}
 `.trim();
 }

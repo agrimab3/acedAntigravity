@@ -7,18 +7,20 @@ import {
   practiceSessions,
   practiceTutorStates,
   questions,
+  questionSets,
   topicSkillState,
   type ChoiceMap,
 } from "@/db/schema";
 import { getTopicByName, isTopicInPracticeScope, type SectionKey } from "@/lib/act-taxonomy";
 import { getAuthSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
-import { generateGeminiText, hasGeminiApiKey } from "@/lib/gemini";
+import { generateTutorAiText, hasTutorAiProvider } from "@/lib/tutor-ai";
 import {
   buildFallbackTutorReply,
   buildSafePreSubmissionReply,
   decideTutorTurn,
-  detectTutorLeak,
+  guardPreSubmissionTutorReply,
+  isRepeatedTutorHint,
   looksIncompleteTutorReply,
   type TutorAction,
 } from "@/lib/tutor-guard";
@@ -41,12 +43,22 @@ function normalizeTutorReply(reply: string) {
 
 function buildQuestionText({
   passage,
+  questionSetContent,
   prompt,
 }: {
   passage: string | null;
+  questionSetContent: string | null;
   prompt: string;
 }) {
-  return passage ? `Passage:\n${passage}\n\nQuestion:\n${prompt}` : prompt;
+  const parts: string[] = [];
+  if (questionSetContent) {
+    parts.push(`Passage / figure / stimulus:\n${questionSetContent}`);
+  }
+  if (passage && passage !== questionSetContent) {
+    parts.push(`Passage / context:\n${passage}`);
+  }
+  parts.push(`Question:\n${prompt}`);
+  return parts.join("\n\n");
 }
 
 export async function POST(req: Request) {
@@ -77,9 +89,11 @@ export async function POST(req: Request) {
       choices: questions.choices,
       correctAnswer: questions.correctAnswer,
       explanation: questions.explanation,
+      questionSetContent: questionSets.content,
     })
     .from(questions)
     .innerJoin(actTopics, eq(questions.topicId, actTopics.id))
+    .leftJoin(questionSets, eq(questions.questionSetId, questionSets.id))
     .where(and(eq(questions.id, questionId), eq(questions.status, "published")))
     .limit(1);
 
@@ -115,6 +129,7 @@ export async function POST(req: Request) {
       questionId,
       hintLevel: 0,
       hintCount: 0,
+      hintHistory: [],
       answerRevealed: false,
     })
     .onConflictDoNothing({
@@ -129,6 +144,7 @@ export async function POST(req: Request) {
     .select({
       hintLevel: practiceTutorStates.hintLevel,
       hintCount: practiceTutorStates.hintCount,
+      hintHistory: practiceTutorStates.hintHistory,
       answerRevealed: practiceTutorStates.answerRevealed,
       submittedAt: practiceTutorStates.submittedAt,
     })
@@ -157,6 +173,7 @@ export async function POST(req: Request) {
   const submitted = Boolean(submittedAnswer?.submittedAt || state?.submittedAt);
   const currentHintLevel = state?.hintLevel ?? 0;
   const currentHintCount = state?.hintCount ?? 0;
+  const priorHints = Array.isArray(state?.hintHistory) ? state.hintHistory : [];
   const decision = decideTutorTurn({
     message,
     action: action as TutorAction,
@@ -190,6 +207,29 @@ export async function POST(req: Request) {
   const correctChoiceText = choices[correctAnswer] ?? "";
   const officialCategory =
     getTopicByName(questionRow.section as SectionKey, questionRow.topic)?.officialCategory;
+  const questionText = buildQuestionText({
+    passage: questionRow.passage,
+    questionSetContent: questionRow.questionSetContent,
+    prompt: questionRow.prompt,
+  });
+
+  const persistHint = async (reply: string) => {
+    if (!decision.incrementHintCount) return;
+    const nextHistory = [...priorHints, reply].slice(-3);
+    await db
+      .update(practiceTutorStates)
+      .set({
+        hintHistory: nextHistory,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(practiceTutorStates.userId, userId),
+          eq(practiceTutorStates.sessionId, sessionId),
+          eq(practiceTutorStates.questionId, questionId)
+        )
+      );
+  };
 
   if (decision.phase === "choice_check") {
     return NextResponse.json({
@@ -230,48 +270,18 @@ export async function POST(req: Request) {
         correctAnswer: questionRow.correctAnswer,
         explanation: questionRow.explanation,
       }),
-      hintLevel: 2,
+      hintLevel: decision.nextHintLevel,
       hintCount: nextHintCount,
       answerRevealed: true,
       submitted: false,
     });
   }
 
-  if (!submitted) {
-    const safeReply = buildSafePreSubmissionReply({
-      section: questionRow.section,
-      topic: questionRow.topic,
-      phase: decision.phase === "hint" ? "hint" : "general",
-    });
-    const leakReason = detectTutorLeak({
-      reply: safeReply,
-      correctAnswer: questionRow.correctAnswer,
-      correctChoiceText,
-      explanation: questionRow.explanation,
-    });
-
-    if (leakReason) {
-      console.error("[tutor-guard] Deterministic pre-submission reply failed leak check", {
-        userId,
-        sessionId,
-        questionId,
-        phase: decision.phase,
-        reason: leakReason,
-      });
-      return NextResponse.json({
-        reply: "Let's focus on the rule or evidence this question is testing before choosing an answer.",
-        guarded: true,
-        hintLevel: decision.nextHintLevel,
-        hintCount: nextHintCount,
-        answerRevealed,
-        submitted: false,
-      });
-    }
-
+  if (!submitted && decision.phase === "hint" && currentHintLevel >= 3) {
     return NextResponse.json({
-      reply: safeReply,
-      hintLevel: decision.nextHintLevel,
-      hintCount: nextHintCount,
+      reply: "You've got all three hints. Try the question now, or use Show answer if you want the full solution.",
+      hintLevel: 3,
+      hintCount: currentHintCount,
       answerRevealed,
       submitted: false,
     });
@@ -298,22 +308,19 @@ export async function POST(req: Request) {
   }
 
   const mode = submitted ? "review" : decision.phase === "hint" ? "hint" : "general";
-  const questionText = buildQuestionText({
-    passage: questionRow.passage,
-    prompt: questionRow.prompt,
-  });
-
   const fallbackReply = buildFallbackTutorReply({
     section: questionRow.section,
     topic: questionRow.topic,
     phase: submitted ? "review" : decision.phase,
     submitted,
     requestedAnswerWithoutHint: decision.answerRequestBlocked,
+    hintLevel: decision.nextHintLevel,
     correctAnswer: submitted ? questionRow.correctAnswer : undefined,
     explanation: submitted ? questionRow.explanation : undefined,
   });
 
-  if (!hasGeminiApiKey()) {
+  if (!hasTutorAiProvider()) {
+    await persistHint(fallbackReply);
     return NextResponse.json({
       reply: fallbackReply,
       fallback: true,
@@ -325,86 +332,137 @@ export async function POST(req: Request) {
     });
   }
 
-  try {
-    const reply = await generateGeminiText({
-      systemInstruction: buildTutorInstructions(profile, {
-        section: questionRow.section,
-        topic: questionRow.topic,
-        officialCategory,
-        question: questionText,
-        difficulty: questionRow.difficulty,
-        studentAccuracyPct: parsed.data.sessionAccuracyPct,
-        targetDifficulty: recommendedDifficulty,
-        mode,
-        choices: submitted ? choices : undefined,
-        correctAnswer: submitted ? questionRow.correctAnswer : undefined,
-        explanation: submitted ? questionRow.explanation : undefined,
-      }),
-      prompt: `Student message: ${message}`,
-      maxOutputTokens: 512,
-      temperature: 0.35,
+  const buildInstruction = (strictPreSubmit: boolean) =>
+    buildTutorInstructions(profile, {
+      section: questionRow.section,
+      topic: questionRow.topic,
+      officialCategory,
+      question: questionText,
+      difficulty: questionRow.difficulty,
+      studentAccuracyPct: parsed.data.sessionAccuracyPct,
+      targetDifficulty: recommendedDifficulty,
+      mode,
+      choices,
+      hintLevel: decision.nextHintLevel,
+      priorHints,
+      strictPreSubmit,
+      correctAnswer: submitted ? questionRow.correctAnswer : undefined,
+      explanation: submitted ? questionRow.explanation : undefined,
     });
 
-    const normalizedReply = normalizeTutorReply(reply);
+  let activeProvider: "gemini" | "groq" | undefined;
+  const generateReply = async (strictPreSubmit: boolean) => {
+    const result = await generateTutorAiText({
+      systemInstruction: buildInstruction(strictPreSubmit),
+      prompt: `Student message: ${message}`,
+      maxOutputTokens: submitted ? 512 : 320,
+      temperature: submitted ? 0.35 : 0.25,
+    });
+    activeProvider = result.provider;
+    return normalizeTutorReply(result.text);
+  };
+
+  try {
+    let normalizedReply = await generateReply(false);
+
     if (!normalizedReply || normalizedReply.length < 12) {
-      throw new Error("Gemini returned an empty tutor response.");
-    }
-
-    if (looksIncompleteTutorReply(normalizedReply)) {
-      console.error("[tutor-guard] Replaced incomplete tutor reply", {
-        userId,
-        sessionId,
-        questionId,
-        phase: decision.phase,
-        submitted,
-      });
-
-      return NextResponse.json({
-        reply: submitted
-          ? fallbackReply
-          : buildSafePreSubmissionReply({
-              section: questionRow.section,
-              topic: questionRow.topic,
-              phase: decision.phase === "hint" ? "hint" : "general",
-            }),
-        guarded: true,
-        hintLevel: decision.nextHintLevel,
-        hintCount: nextHintCount,
-        answerRevealed,
-        submitted,
-      });
+      throw new Error("Tutor AI returned an empty response.");
     }
 
     if (!submitted) {
-      const leakReason = detectTutorLeak({
+      const firstGuard = guardPreSubmissionTutorReply({
         reply: normalizedReply,
         correctAnswer: questionRow.correctAnswer,
         correctChoiceText,
         explanation: questionRow.explanation,
+        choices,
       });
+      const firstRepeated =
+        decision.phase === "hint" && isRepeatedTutorHint(normalizedReply, priorHints);
+      const firstIncomplete = looksIncompleteTutorReply(normalizedReply);
 
-      if (leakReason) {
-        console.error("[tutor-guard] Blocked pre-submission answer leak", {
+      if (firstGuard.blocked || firstRepeated || firstIncomplete) {
+        console.error("[tutor-guard] Blocked pre-submission tutor reply", {
           userId,
           sessionId,
           questionId,
           phase: decision.phase,
-          reason: leakReason,
+          hintLevel: decision.nextHintLevel,
+          reason:
+            firstGuard.reason ??
+            (firstRepeated ? "repeated-hint" : firstIncomplete ? "incomplete-reply" : "unknown"),
+          attempt: 1,
         });
 
-        return NextResponse.json({
-          reply: buildSafePreSubmissionReply({
+        normalizedReply = await generateReply(true);
+
+        const retryGuard = guardPreSubmissionTutorReply({
+          reply: normalizedReply,
+          correctAnswer: questionRow.correctAnswer,
+          correctChoiceText,
+          explanation: questionRow.explanation,
+          choices,
+        });
+        const retryRepeated =
+          decision.phase === "hint" && isRepeatedTutorHint(normalizedReply, priorHints);
+        const retryIncomplete =
+          !normalizedReply || normalizedReply.length < 12 || looksIncompleteTutorReply(normalizedReply);
+
+        if (retryGuard.blocked || retryRepeated || retryIncomplete) {
+          console.error("[tutor-guard] Blocked pre-submission tutor retry", {
+            userId,
+            sessionId,
+            questionId,
+            phase: decision.phase,
+            hintLevel: decision.nextHintLevel,
+            reason:
+              retryGuard.reason ??
+              (retryRepeated
+                ? "repeated-hint"
+                : retryIncomplete
+                  ? "incomplete-reply"
+                  : "unknown"),
+            attempt: 2,
+          });
+
+          const safeReply = buildSafePreSubmissionReply({
             section: questionRow.section,
             topic: questionRow.topic,
             phase: decision.phase === "hint" ? "hint" : "general",
-          }),
-          guarded: true,
-          hintLevel: decision.nextHintLevel,
-          hintCount: nextHintCount,
-          answerRevealed,
-          submitted: false,
-        });
+            hintLevel: decision.nextHintLevel,
+          });
+          await persistHint(safeReply);
+
+          return NextResponse.json({
+            reply: safeReply,
+            guarded: true,
+            fallback: true,
+            hintLevel: decision.nextHintLevel,
+            hintCount: nextHintCount,
+            answerRevealed,
+            submitted: false,
+          });
+        }
       }
+
+      await persistHint(normalizedReply);
+      return NextResponse.json({
+        reply: normalizedReply,
+        hintLevel: decision.nextHintLevel,
+        hintCount: nextHintCount,
+        answerRevealed,
+        submitted: false,
+        provider: activeProvider,
+      });
+    }
+
+    if (looksIncompleteTutorReply(normalizedReply)) {
+      console.error("[tutor-guard] Replaced incomplete post-submission tutor reply", {
+        userId,
+        sessionId,
+        questionId,
+      });
+      normalizedReply = fallbackReply;
     }
 
     return NextResponse.json({
@@ -412,19 +470,23 @@ export async function POST(req: Request) {
       hintLevel: decision.nextHintLevel,
       hintCount: nextHintCount,
       answerRevealed,
-      submitted,
+      submitted: true,
+      provider: activeProvider,
     });
   } catch (error) {
     console.error("Tutor request failed", {
       userId,
       sessionId,
       questionId,
-      error,
+      submitted,
+      error: error instanceof Error ? error.message : String(error),
     });
 
+    await persistHint(fallbackReply);
     return NextResponse.json({
       reply: fallbackReply,
       fallback: true,
+      provider: "local-fallback",
       hintLevel: decision.nextHintLevel,
       hintCount: nextHintCount,
       answerRevealed,

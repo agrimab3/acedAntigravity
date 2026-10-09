@@ -3,7 +3,7 @@ export type TutorPhase = "general" | "hint" | "reveal" | "review" | "choice_chec
 
 export type TutorTurnDecision = {
   phase: TutorPhase;
-  nextHintLevel: 0 | 1 | 2;
+  nextHintLevel: 0 | 1 | 2 | 3;
   incrementHintCount: boolean;
   revealAnswer: boolean;
   answerRequestBlocked: boolean;
@@ -46,7 +46,7 @@ export function decideTutorTurn({
   if (submitted) {
     return {
       phase: "review",
-      nextHintLevel: Math.max(0, Math.min(2, hintLevel)) as 0 | 1 | 2,
+      nextHintLevel: Math.max(0, Math.min(3, hintLevel)) as 0 | 1 | 2 | 3,
       incrementHintCount: false,
       revealAnswer: false,
       answerRequestBlocked: false,
@@ -54,9 +54,19 @@ export function decideTutorTurn({
   }
 
   if (action === "hint" || HINT_REQUEST_PATTERNS.some((pattern) => pattern.test(message))) {
+    if (hintLevel >= 3) {
+      return {
+        phase: "hint",
+        nextHintLevel: 3,
+        incrementHintCount: false,
+        revealAnswer: false,
+        answerRequestBlocked: false,
+      };
+    }
+
     return {
       phase: "hint",
-      nextHintLevel: 1,
+      nextHintLevel: Math.min(3, Math.max(1, hintLevel + 1)) as 1 | 2 | 3,
       incrementHintCount: true,
       revealAnswer: false,
       answerRequestBlocked: false,
@@ -66,7 +76,7 @@ export function decideTutorTurn({
   if (CHOICE_CHECK_PATTERNS.some((pattern) => pattern.test(message))) {
     return {
       phase: "choice_check",
-      nextHintLevel: Math.min(1, Math.max(0, hintLevel)) as 0 | 1,
+      nextHintLevel: Math.min(3, Math.max(0, hintLevel)) as 0 | 1 | 2 | 3,
       incrementHintCount: false,
       revealAnswer: false,
       answerRequestBlocked: false,
@@ -81,7 +91,7 @@ export function decideTutorTurn({
     if (hintLevel >= 1) {
       return {
         phase: "reveal",
-        nextHintLevel: 2,
+        nextHintLevel: Math.max(1, Math.min(3, hintLevel)) as 1 | 2 | 3,
         incrementHintCount: false,
         revealAnswer: true,
         answerRequestBlocked: false,
@@ -98,8 +108,8 @@ export function decideTutorTurn({
   }
 
   return {
-    phase: hintLevel >= 1 ? "hint" : "general",
-    nextHintLevel: hintLevel >= 1 ? 1 : 0,
+    phase: "general",
+    nextHintLevel: Math.max(0, Math.min(3, hintLevel)) as 0 | 1 | 2 | 3,
     incrementHintCount: false,
     revealAnswer: false,
     answerRequestBlocked: false,
@@ -147,11 +157,13 @@ export function detectTutorLeak({
   correctAnswer,
   correctChoiceText,
   explanation,
+  choices,
 }: {
   reply: string;
   correctAnswer: string;
   correctChoiceText: string;
   explanation: string;
+  choices?: Record<string, string>;
 }) {
   const letter = correctAnswer.toUpperCase().replace(/[^A-D]/g, "");
   const answerPatterns = [
@@ -174,7 +186,44 @@ export function detectTutorLeak({
     return "canonical-explanation";
   }
 
+  if (choices) {
+    const eliminated = new Set<string>();
+    for (const choiceLetter of Object.keys(choices)) {
+      const eliminationPatterns = [
+        new RegExp(`\\b(?:eliminate|rule out|cross out|discard)\\s+(?:choice\\s+|option\\s+)?${choiceLetter}\\b`, "i"),
+        new RegExp(`\\b(?:choice\\s+|option\\s+)?${choiceLetter}\\s+(?:is|looks|seems)\\s+(?:wrong|incorrect|not right)\\b`, "i"),
+        new RegExp(`\\b${choiceLetter}\\s+(?:doesn't|does not|cannot|can't)\\s+(?:work|fit|match|apply)\\b`, "i"),
+      ];
+      if (eliminationPatterns.some((pattern) => pattern.test(reply))) {
+        eliminated.add(choiceLetter.toUpperCase());
+      }
+    }
+
+    const incorrectLetters = Object.keys(choices)
+      .map((letter) => letter.toUpperCase())
+      .filter((letter) => letter !== correctAnswer.toUpperCase());
+    const allIncorrectEliminated =
+      incorrectLetters.length > 0 && incorrectLetters.every((letter) => eliminated.has(letter));
+    if (allIncorrectEliminated) {
+      return "all-wrong-choices-eliminated";
+    }
+  }
+
   return null;
+}
+
+export function guardPreSubmissionTutorReply(args: {
+  reply: string;
+  correctAnswer: string;
+  correctChoiceText: string;
+  explanation: string;
+  choices?: Record<string, string>;
+}) {
+  const reason = detectTutorLeak(args);
+  return {
+    blocked: Boolean(reason),
+    reason,
+  };
 }
 
 export function buildSafePreSubmissionReply({
@@ -182,11 +231,13 @@ export function buildSafePreSubmissionReply({
   topic,
   phase,
   requestedAnswerWithoutHint = false,
+  hintLevel = 1,
 }: {
   section: string;
   topic?: string;
   phase: "general" | "hint" | "choice_check";
   requestedAnswerWithoutHint?: boolean;
+  hintLevel?: number;
 }) {
   if (phase === "choice_check") {
     return "Tell me what makes that choice fit the question. If you're ready to check it, submit your answer.";
@@ -200,6 +251,33 @@ export function buildSafePreSubmissionReply({
 
   if (phase === "hint") {
     const normalizedTopic = (topic || "").toLowerCase();
+    const level = Math.max(1, Math.min(3, hintLevel));
+
+    if (level === 2) {
+      if (section === "math") {
+        return `Hint 2: look at the exact condition or equation in${focus} and identify which term directly controls the quantity being asked for.`;
+      }
+      if (section === "reading") {
+        return `Hint 2: find the exact sentence in${focus} that answers the question most directly, and ignore ideas the passage never states.`;
+      }
+      if (section === "science") {
+        return `Hint 2: focus on the exact row, axis, or experimental condition in${focus} that matches the question before comparing values.`;
+      }
+      return `Hint 2: focus on the exact words immediately around the underlined part in${focus}; decide what grammatical job each side is doing.`;
+    }
+
+    if (level >= 3) {
+      if (section === "math") {
+        return `Hint 3: write the first equation or relationship for${focus} and simplify just that first step before checking the choices.`;
+      }
+      if (section === "reading") {
+        return `Hint 3: paraphrase the relevant sentence from${focus} in your own words first; then compare that meaning with the choices.`;
+      }
+      if (section === "science") {
+        return `Hint 3: state the trend or comparison from${focus} in one sentence before you look at the answer choices.`;
+      }
+      return `Hint 3: test the sentence structure in${focus} with the simplest version of the rule first, then compare the choices.`;
+    }
 
     if (section === "math") {
       if (normalizedTopic.includes("algebra")) {
@@ -247,6 +325,25 @@ export function buildSafePreSubmissionReply({
   return "Start by identifying the exact grammar, punctuation, or organization rule being tested. Then compare each choice against that rule.";
 }
 
+export function isRepeatedTutorHint(reply: string, priorHints: string[]) {
+  const normalize = (value: string) =>
+    value.toLowerCase().replace(/[^a-z0-9]+/g, " ").replace(/\s+/g, " ").trim();
+  const normalizedReply = normalize(reply);
+  if (!normalizedReply) return true;
+
+  return priorHints.some((hint) => {
+    const normalizedHint = normalize(hint);
+    if (!normalizedHint) return false;
+    if (normalizedHint === normalizedReply) return true;
+
+    const replyWords = new Set(normalizedReply.split(" ").filter(Boolean));
+    const hintWords = new Set(normalizedHint.split(" ").filter(Boolean));
+    const intersection = [...replyWords].filter((word) => hintWords.has(word)).length;
+    const union = new Set([...replyWords, ...hintWords]).size;
+    return union > 0 && intersection / union >= 0.82;
+  });
+}
+
 export function getEffectivePracticeCorrectness({
   selectedAnswer,
   correctAnswer,
@@ -265,6 +362,7 @@ export function buildFallbackTutorReply({
   phase,
   submitted,
   requestedAnswerWithoutHint = false,
+  hintLevel = 1,
   correctAnswer,
   explanation,
 }: {
@@ -273,6 +371,7 @@ export function buildFallbackTutorReply({
   phase: TutorPhase;
   submitted: boolean;
   requestedAnswerWithoutHint?: boolean;
+  hintLevel?: number;
   correctAnswer?: string;
   explanation?: string;
 }) {
@@ -295,5 +394,6 @@ export function buildFallbackTutorReply({
     topic,
     phase: phase === "choice_check" ? "choice_check" : phase === "hint" ? "hint" : "general",
     requestedAnswerWithoutHint,
+    hintLevel,
   });
 }
