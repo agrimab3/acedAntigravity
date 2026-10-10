@@ -42,6 +42,7 @@ export default async function MockTestAdminPage({
             <p>signed in as {session.user?.email}</p>
           </div>
           <div className={styles.headerActions}>
+            <Link className={styles.backLink} href="/admin/feedback">Feedback</Link>
             {process.env.NODE_ENV !== "production" ? (
               <Link
                 className={styles.previewButton}

@@ -1,4 +1,6 @@
 "use client";
+import FeedbackForm from "@/components/FeedbackForm";
+import TutorMessage from "@/components/TutorMessage";
 
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -533,6 +535,7 @@ function PracticeContent() {
           <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', padding: '12px 14px', background: 'rgba(255,255,255,0.04)', borderRadius: '10px', borderLeft: `2px solid ${meta.color}`, marginBottom: '1.5rem' }}>
             your star got brighter ✦ keep practicing to light it up fully
           </div>
+          <FeedbackForm source="practice_session" contextId={practiceSessionId} compact />
           <div style={{ display: 'flex', gap: '8px' }}>
             <button onClick={() => router.push('/dashboard')} style={{ flex: 1, padding: '12px', borderRadius: '10px', fontSize: '13px', cursor: 'pointer', background: meta.color, border: 'none', color: '#fff', fontFamily: 'DM Sans,sans-serif' }}>back to universe</button>
             {missed.length > 0 && <button onClick={() => router.push(practiceSessionId ? `/practice/review?sessionId=${practiceSessionId}` : "/practice/review")} style={{ flex: 1, padding: '12px', borderRadius: '10px', fontSize: '13px', cursor: 'pointer', background: 'transparent', border: '0.5px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.7)', fontFamily: 'DM Sans,sans-serif' }}>review {missed.length} missed →</button>}
@@ -576,6 +579,7 @@ function PracticeContent() {
             </div>
             {adaptiveStatus.description}
           </div>
+          <FeedbackForm source="practice_session" contextId={practiceSessionId} compact />
           <div style={{ display: 'flex', gap: '8px' }}>
             <button onClick={() => router.push('/dashboard')} style={{ flex: 1, padding: '12px', borderRadius: '10px', fontSize: '13px', cursor: 'pointer', background: 'transparent', border: '0.5px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.7)', fontFamily: 'DM Sans,sans-serif' }}>
               back
@@ -736,7 +740,7 @@ function PracticeContent() {
 
               <div ref={msgsRef} style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '8px', minHeight: '360px', maxHeight: '520px', overflowY: 'auto' }}>
                 {aiMessages.map((m, i) => (
-                  <div key={i} style={{ fontSize: '12px', lineHeight: 1.6, padding: '8px 10px', borderRadius: '10px', background: m.role === 'bot' ? 'rgba(93,202,165,0.08)' : 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.72)', alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '92%' }}><QuestionContent text={m.text} /></div>
+                  <div key={i} style={{ fontSize: '12px', lineHeight: 1.6, padding: '8px 10px', borderRadius: '10px', background: m.role === 'bot' ? 'rgba(93,202,165,0.08)' : 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.72)', alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '92%' }}><TutorMessage text={m.text} /></div>
                 ))}
                 {aiLoading && <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', padding: '8px 10px' }}>thinking...</div>}
                 {!submitted && aiMessages.length <= 1 && (

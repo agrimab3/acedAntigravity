@@ -1,3 +1,4 @@
+import FeedbackForm from "@/components/FeedbackForm";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -226,6 +227,8 @@ export default async function MockTestFinishedPage({
               No scores or right/wrong yet. Everything unlocks together on Sunday.
             </p>
           </section>
+
+          <FeedbackForm source="mock_test" contextId={session.id} />
 
           <section className={styles.unlockSection}>
             <h2>

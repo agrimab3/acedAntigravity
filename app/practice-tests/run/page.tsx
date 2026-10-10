@@ -10,6 +10,7 @@ import {
   type CSSProperties,
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import FeedbackForm from "@/components/FeedbackForm";
 import DesmosPanel from "@/components/DesmosPanel";
 import QuestionContent from "@/components/question-content/QuestionContent";
 import desmosPanelStyles from "@/components/DesmosPanel.module.css";
@@ -2426,6 +2427,7 @@ function PracticeTestRunContent() {
           </section>
 
           <div style={{ display: "grid", gap: "10px", maxWidth: "380px" }}>
+            <FeedbackForm source="practice_test" contextId={report.sessionId} compact />
             {report.sessionId ? (
               <button
                 onClick={() => router.push(`/practice-tests/history/${report.sessionId}`)}

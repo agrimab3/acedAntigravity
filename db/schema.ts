@@ -855,3 +855,21 @@ export const practiceTestAnswers = pgTable(
   },
   (table) => [uniqueIndex("practice_test_answers_section_question_order_idx").on(table.sectionRunId, table.questionOrder)]
 );
+
+export const feedback = pgTable("feedback", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+  source: text("source").$type<"mock_test" | "practice_session" | "practice_test" | "page_footer">().notNull(),
+  contextId: text("context_id"),
+  pagePath: text("page_path").notNull(),
+  rating: integer("rating"),
+  tags: text("tags").array(),
+  message: text("message"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  check("feedback_source_ck", sql`${table.source} in ('mock_test','practice_session','practice_test','page_footer')`),
+  check("feedback_rating_ck", sql`${table.rating} is null or ${table.rating} between 1 and 5`),
+  check("feedback_message_length_ck", sql`${table.message} is null or char_length(${table.message}) <= 1000`),
+  check("feedback_nonempty_ck", sql`${table.rating} is not null or coalesce(array_length(${table.tags},1),0) > 0 or nullif(trim(${table.message}),'') is not null`),
+  uniqueIndex("feedback_user_context_idx").on(table.userId, table.contextId).where(sql`${table.userId} is not null and ${table.contextId} is not null`),
+]);
