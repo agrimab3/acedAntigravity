@@ -1,4 +1,5 @@
 "use client";
+import TutorMessage from "@/components/TutorMessage";
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -393,7 +394,7 @@ function ReviewContent() {
                       <div className={styles.tutorTitle}>AI tutor · review mode</div>
                       {(tutorMessages[item.questionId] ?? []).map((message, index) => (
                         <div key={index} className={styles.tutorMessage}>
-                          <QuestionContent text={message} />
+                          <TutorMessage text={message} />
                         </div>
                       ))}
                       <div className={styles.tutorInputRow}>
