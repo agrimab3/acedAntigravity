@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_ROOT="/root/apps/aced"
+APP_ROOT="/home/ubuntu/apps/aced"
 RUN_ENV_FILE="${APP_ROOT}/shared/.env"
 
 if [[ ! -f "${RUN_ENV_FILE}" ]]; then

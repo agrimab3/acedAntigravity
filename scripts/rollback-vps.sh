@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_ROOT="/root/apps/aced"
+APP_ROOT="/home/ubuntu/apps/aced"
 CURRENT="${APP_ROOT}/current"
 PREVIOUS="${APP_ROOT}/previous"
 PM2_APP_NAME="aced-web"

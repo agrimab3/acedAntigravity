@@ -1,14 +1,16 @@
 name: Deploy
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch or commit to deploy"
+        required: true
+        default: "backup-oct9"
 
 concurrency:
   group: aced-production
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   checks:
@@ -48,9 +50,11 @@ jobs:
       NEXT_PUBLIC_SENTRY_DSN: ""
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24.11.0
           cache: npm
       - run: npm ci
       - run: npm run check:secrets
@@ -61,10 +65,30 @@ jobs:
 
   deploy:
     needs: checks
-    runs-on: [self-hosted, linux, x64, aced, vps]
-    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Deploy on VPS
-        run: bash scripts/deploy-vps.sh
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - name: Configure SSH
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/aced-deploy
+          chmod 600 ~/.ssh/aced-deploy
+          ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts
+      - name: Copy verified release source
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          remote="/home/ubuntu/apps/aced/incoming/${GITHUB_SHA}"
+          ssh -i ~/.ssh/aced-deploy "ubuntu@${VPS_HOST}" "mkdir -p '$remote'"
+          rsync -az --delete \
+            --exclude '.git' --exclude '.github' --exclude 'node_modules' --exclude '.next' \
+            --exclude '.env' --exclude '.env.local' \
+            -e 'ssh -i ~/.ssh/aced-deploy' ./ "ubuntu@${VPS_HOST}:$remote/"
+          ssh -i ~/.ssh/aced-deploy "ubuntu@${VPS_HOST}" \
+            "cd '$remote' && GITHUB_SHA='${GITHUB_SHA}' bash scripts/deploy-vps.sh && rm -rf '$remote'"

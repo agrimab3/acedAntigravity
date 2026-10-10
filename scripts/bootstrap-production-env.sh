@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-APP_ROOT="/root/apps/aced"
+APP_ROOT="/home/ubuntu/apps/aced"
 SHARED_DIR="${APP_ROOT}/shared"
 ENV_FILE="${SHARED_DIR}/.env"
 
@@ -15,7 +15,8 @@ fi
 
 cat > "${ENV_FILE}" <<'EOF'
 # Replace the placeholder values before exposing the app publicly.
-NEXTAUTH_URL=https://your-subdomain-here
+NEXTAUTH_URL=https://aceditprep.com
+NEXT_PUBLIC_SITE_URL=https://aceditprep.com
 AUTH_SECRET=replace_me
 AUTH_GOOGLE_ID=replace_me
 AUTH_GOOGLE_SECRET=replace_me

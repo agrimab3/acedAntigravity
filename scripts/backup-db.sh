@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_ROOT="${ACED_APP_ROOT:-/root/apps/aced}"
+APP_ROOT="${ACED_APP_ROOT:-/home/ubuntu/apps/aced}"
 SHARED_ENV="${ACED_ENV_FILE:-${APP_ROOT}/shared/.env}"
 BACKUP_DIR="${ACED_BACKUP_DIR:-${APP_ROOT}/backups}"
 RETENTION_DAYS="${ACED_BACKUP_RETENTION_DAYS:-14}"

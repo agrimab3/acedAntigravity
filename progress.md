@@ -17,7 +17,7 @@
 
 - Reviewed the inherited `Aced` prototype and documented the app architecture
 - Confirmed the new GitHub repo: `https://github.com/agrimab3/acedAntigravity.git`
-- Confirmed VPS target path: `/root/apps/aced`
+- Confirmed VPS target path: `/home/ubuntu/apps/aced`
 - Verified SSH access to the VPS
 - Safely inspected the VPS and confirmed an existing PostgreSQL service is available
 - Confirmed the existing PostgreSQL cluster can likely support a separate `aced` database

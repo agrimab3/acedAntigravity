@@ -1,10 +1,19 @@
-# Replace the hostname below with the final production subdomain after DNS is created.
-# Example:
-# aced.yourdomain.com {
-#   reverse_proxy 127.0.0.1:3005
-# }
+aceditprep.com {
+  @public path /api/health /api/stripe/webhook*
+  handle @public {
+    reverse_proxy 127.0.0.1:3005
+  }
 
-aced.example.com {
-  encode zstd gzip
-  reverse_proxy 127.0.0.1:3005
+  handle {
+    # Temporary pre-launch gate. Replace HASH_FROM_CADDY with:
+    # caddy hash-password --plaintext 'your-password'
+    basicauth {
+      aced HASH_FROM_CADDY
+    }
+    reverse_proxy 127.0.0.1:3005
+  }
+}
+
+www.aceditprep.com {
+  redir https://aceditprep.com{uri} permanent
 }

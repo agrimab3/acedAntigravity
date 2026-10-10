@@ -20,7 +20,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          APP_ROOT="/root/apps/aced"
+          APP_ROOT="/home/ubuntu/apps/aced"
           CURRENT_DIR="${APP_ROOT}/current"
           RUN_ENV_FILE="${APP_ROOT}/shared/.env"
 
@@ -46,8 +46,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cd /root/apps/aced/current
+          cd /home/ubuntu/apps/aced/current
           set -a
-          source /root/apps/aced/shared/.env
+          source /home/ubuntu/apps/aced/shared/.env
           set +a
           node scripts/content-plan.mjs --top=20

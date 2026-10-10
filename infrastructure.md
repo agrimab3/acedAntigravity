@@ -20,7 +20,7 @@
 - Host IP: `69.62.73.167`
 - SSH user: `root`
 - SSH port: `22`
-- Target app path: `/root/apps/aced`
+- Target app path: `/home/ubuntu/apps/aced`
 - Server hostname observed during inspection: `srv1001519`
 - Existing Caddyfile path: `/etc/caddy/Caddyfile`
 
@@ -76,9 +76,9 @@
 
 ## Current Deployment Layout
 
-- Live app root: `/root/apps/aced`
-- Release directory synced by CI/CD: `/root/apps/aced/current`
-- Shared production env file: `/root/apps/aced/shared/.env`
+- Live app root: `/home/ubuntu/apps/aced`
+- Release directory synced by CI/CD: `/home/ubuntu/apps/aced/current`
+- Shared production env file: `/home/ubuntu/apps/aced/shared/.env`
 - PM2 app name: `aced-web`
 - GitHub Actions runner install path: `/root/actions-runner-aced`
 - GitHub Actions runner service: `actions.runner.agrimab3-acedAntigravity.srv1001519-aced.service`
@@ -102,7 +102,7 @@ Planned pipeline:
 2. Push to GitHub
 3. GitHub Actions CI/CD workflow
 4. Self-hosted GitHub Actions runner on the VPS checks out the repo
-5. CI/CD syncs code into `/root/apps/aced/current`
+5. CI/CD syncs code into `/home/ubuntu/apps/aced/current`
 6. CI/CD installs dependencies, builds Next.js, and restarts PM2
 7. CI/CD verifies `http://127.0.0.1:3005/api/health` before marking deploy successful
 

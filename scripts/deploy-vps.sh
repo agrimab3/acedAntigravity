@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_ROOT="/root/apps/aced"
+APP_ROOT="/home/ubuntu/apps/aced"
 RELEASES_DIR="${APP_ROOT}/releases"
 CURRENT_DIR="${APP_ROOT}/current"
 PREVIOUS_LINK="${APP_ROOT}/previous"
 SHARED_DIR="${APP_ROOT}/shared"
 RUN_ENV_FILE="${SHARED_DIR}/.env"
 BACKUP_DIR="${APP_ROOT}/backups"
+LOG_DIR="${APP_ROOT}/logs"
 PM2_APP_NAME="aced-web"
 APP_PORT="3005"
 HEALTHCHECK_URL="http://127.0.0.1:${APP_PORT}/api/health"
@@ -28,14 +29,15 @@ install_cron_line() {
 
 install_schedulers() {
   install_cron_line "# ACED_MOCK_TEST_RELEASE_CRON" \
-    "*/5 * * * * /usr/bin/flock -n /tmp/aced-mocktest-release.lock ${CURRENT_DIR}/scripts/run-mocktest-release-cron.sh >> /var/log/aced-mocktest-release.log 2>&1"
+    "*/5 * * * * /usr/bin/flock -n /tmp/aced-mocktest-release.lock ${CURRENT_DIR}/scripts/run-mocktest-release-cron.sh >> ${LOG_DIR}/mocktest-release.log 2>&1"
   install_cron_line "# ACED_DATABASE_BACKUP_CRON" \
-    "23 9 * * * /usr/bin/flock -n /tmp/aced-db-backup.lock ${CURRENT_DIR}/scripts/backup-db.sh >> /var/log/aced-db-backup.log 2>&1"
+    "23 9 * * * /usr/bin/flock -n /tmp/aced-db-backup.lock ${CURRENT_DIR}/scripts/backup-db.sh >> ${LOG_DIR}/db-backup.log 2>&1"
   echo "Installed idempotent release and nightly database-backup crons."
 }
 
-mkdir -p "${RELEASES_DIR}" "${SHARED_DIR}" "${BACKUP_DIR}"
+mkdir -p "${RELEASES_DIR}" "${SHARED_DIR}" "${BACKUP_DIR}" "${LOG_DIR}"
 chmod 700 "${SHARED_DIR}" "${BACKUP_DIR}"
+chmod 750 "${LOG_DIR}"
 if [[ ! -f "${RUN_ENV_FILE}" ]]; then
   echo "Missing production env file at ${RUN_ENV_FILE}" >&2
   exit 1
