@@ -58,7 +58,8 @@ set -a
 # shellcheck disable=SC1090
 source "${RUN_ENV_FILE}"
 set +a
-npm ci
+# Build tooling is in devDependencies; NODE_ENV=production must not omit it.
+npm ci --include=dev
 npm run build
 npm run db:migrate
 node scripts/check-mocktest-production-release-state.mjs
