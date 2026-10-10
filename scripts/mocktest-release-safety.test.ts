@@ -149,6 +149,6 @@ test("fresh production seed starts Dec 5 scheduled, not released", () => {
 
   assert.match(migration, /'2026-12-05'/);
   assert.match(migration, /'2026-12-06T22:00:00Z'/);
-  assert.match(migration, /200,\s*'open'/s);
+  assert.match(migration, /200,\s*'open'/);
   assert.doesNotMatch(migration, /VALUES\s*\([\s\S]*?'released'/i);
 });

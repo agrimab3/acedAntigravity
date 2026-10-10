@@ -77,12 +77,13 @@ test("expired invite hands the freed spot to the next waitlist entry", () => {
 });
 
 test("production with missing mock-test modes is disabled and shows open-soon copy", () => {
-  const previousNodeEnv = process.env.NODE_ENV;
+  const mutableEnv = process.env as Record<string, string | undefined>;
+  const previousNodeEnv = mutableEnv.NODE_ENV;
   const previousAuth = process.env.MOCK_TEST_AUTH_MODE;
   const previousPayment = process.env.MOCK_TEST_PAYMENT_MODE;
 
   try {
-    process.env.NODE_ENV = "production";
+    mutableEnv.NODE_ENV = "production";
     delete process.env.MOCK_TEST_AUTH_MODE;
     delete process.env.MOCK_TEST_PAYMENT_MODE;
 
@@ -97,8 +98,8 @@ test("production with missing mock-test modes is disabled and shows open-soon co
     assert.equal(getMockTestPaymentMode(), "disabled");
     assert.equal(isMockTestSignupEnabled(), false);
   } finally {
-    if (previousNodeEnv === undefined) delete process.env.NODE_ENV;
-    else process.env.NODE_ENV = previousNodeEnv;
+    if (previousNodeEnv === undefined) delete mutableEnv.NODE_ENV;
+    else mutableEnv.NODE_ENV = previousNodeEnv;
     if (previousAuth === undefined) delete process.env.MOCK_TEST_AUTH_MODE;
     else process.env.MOCK_TEST_AUTH_MODE = previousAuth;
     if (previousPayment === undefined) delete process.env.MOCK_TEST_PAYMENT_MODE;

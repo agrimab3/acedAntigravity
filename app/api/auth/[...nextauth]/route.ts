@@ -7,7 +7,10 @@ const handler = NextAuth(authOptions);
 
 export { handler as GET };
 
-export async function POST(request: Request) {
+export async function POST(
+  request: Request,
+  context: { params: Promise<{ nextauth: string[] }> }
+) {
   const identity = getRequestNetworkIdentity(request);
   const limit = consumeRateLimit(`login:${identity}`, RATE_LIMITS.login);
   if (!limit.allowed) {
@@ -16,5 +19,5 @@ export async function POST(request: Request) {
       { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } }
     );
   }
-  return handler(request as never);
+  return handler(request as never, context);
 }

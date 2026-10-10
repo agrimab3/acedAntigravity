@@ -321,6 +321,7 @@ test("suggested difficulty matching the requested difficulty still accepts keep"
 
 test("verifier prefers a different provider than the generator when available", () => {
   const order = buildVerifierProviderOrder("groq", "groq", {
+    NODE_ENV: "test",
     GROQ_API_KEY: "groq-key",
     GEMINI_API_KEY: "gemini-key",
     OPENROUTER_API_KEY: "openrouter-key",
@@ -332,6 +333,7 @@ test("verifier prefers a different provider than the generator when available", 
 
 test("openrouter generator prefers groq then gemini for verification independence", () => {
   const order = buildVerifierProviderOrder("openrouter", "openrouter", {
+    NODE_ENV: "test",
     GROQ_API_KEY: "groq-key",
     GEMINI_API_KEY: "gemini-key",
     OPENROUTER_API_KEY: "openrouter-key",
@@ -347,6 +349,7 @@ test("verifier candidates keep openrouter after gemini with provider-specific mo
     primaryModel: "gemini-2.5-flash-lite",
     fallbackProviders: ["openrouter", "groq"],
     env: {
+      NODE_ENV: "test",
       GROQ_API_KEY: "groq-key",
       GROQ_MODEL: "openai/gpt-oss-120b",
       GEMINI_API_KEY: "gemini-key",
