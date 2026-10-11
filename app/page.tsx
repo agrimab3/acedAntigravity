@@ -243,7 +243,7 @@ export default function Home() {
             marginBottom: "2.5rem",
           }}
         >
-          Online ACT prep from Aced, with practice, AI tutoring, and a $2 timed ACED Mock Test. Your universe is waiting.
+          Aced is ACT prep with personalized practice questions, an AI tutor for hints, a star map that tracks your progress, and a $2 full-length timed mock test.
         </p>
 
         <button

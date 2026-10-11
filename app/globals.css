@@ -92,3 +92,10 @@ h6 {
 .policyBack {
   margin-top: 2.4rem;
 }
+
+/* Accessible policy-page table of contents and comfortable reading rhythm. */
+.policySections { display:flex; flex-wrap:wrap; gap:8px 14px; padding:16px 0; margin:10px 0 24px; border-top:1px solid rgba(255,255,255,.12); border-bottom:1px solid rgba(255,255,255,.12); }
+.policySections a { font-size:.86rem; line-height:1.6; text-decoration:underline; text-underline-offset:4px; }
+.policyCard h2 { scroll-margin-top:24px; }
+.policyPage { background:radial-gradient(ellipse at 20% 0%, rgba(58,88,153,.25),transparent 55%),radial-gradient(ellipse at 85% 80%,rgba(25,110,94,.12),transparent 55%),#050b18; }
+@media(max-width:600px){.policyPage{padding:24px 12px}.policyCard{border-radius:18px}}

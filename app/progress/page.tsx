@@ -397,7 +397,7 @@ export default function ProgressPage() {
 
         {progress && (
           <>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(6, minmax(0, 1fr))", gap: "12px", marginBottom: "1.4rem" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "12px", marginBottom: "1.4rem" }}>
               {[
                 { value: progress.streaks.current, label: "current streak (days)" },
                 { value: progress.streaks.best, label: "best streak (days)" },
