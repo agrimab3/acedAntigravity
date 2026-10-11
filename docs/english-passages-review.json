@@ -148,8 +148,9 @@
     "model": "human-authored",
     "reviewModel": "gemini-2.5-flash",
     "aiReview": {
-      "verdict": "pending",
-      "summary": "Human-authored and structurally validated; AI review pending."
+      "verdict": "pass",
+      "issues": [],
+      "summary": "All ten English editing questions have a unique correct answer, an accurate key, and are correctly aligned with their numbered underlines in the passage. The explanations are clear and support the correct choices."
     }
   },
   {
@@ -301,8 +302,9 @@
     "model": "human-authored",
     "reviewModel": "gemini-2.5-flash",
     "aiReview": {
-      "verdict": "pending",
-      "summary": "Human-authored and structurally validated; AI review pending."
+      "verdict": "pass",
+      "issues": [],
+      "summary": "All ten English editing questions have a unique correct answer, the provided key is correct, and each question aligns appropriately with its numbered underline in the passage. The questions effectively test various skills, and the explanations are clear and accurate."
     }
   },
   {
@@ -454,8 +456,9 @@
     "model": "human-authored",
     "reviewModel": "gemini-2.5-flash",
     "aiReview": {
-      "verdict": "pending",
-      "summary": "Human-authored and structurally validated; AI review pending."
+      "verdict": "pass",
+      "issues": [],
+      "summary": "All ten English editing questions have a unique correct answer, the provided key is accurate for each, and the questions align perfectly with their corresponding numbered underlines in the passage. The explanations for each answer are clear and correct. No issues were found."
     }
   },
   {
@@ -607,8 +610,9 @@
     "model": "human-authored",
     "reviewModel": "gemini-2.5-flash",
     "aiReview": {
-      "verdict": "pending",
-      "summary": "Human-authored and structurally validated; AI review pending."
+      "verdict": "pass",
+      "issues": [],
+      "summary": "All ten English editing questions have a unique correct answer, the provided key is accurate for each, and the questions align perfectly with their corresponding numbered underlines in the passage. The difficulty levels, skills, prompts, choices, and explanations are appropriate and well-constructed."
     }
   },
   {
@@ -760,8 +764,9 @@
     "model": "human-authored",
     "reviewModel": "gemini-2.5-flash",
     "aiReview": {
-      "verdict": "pending",
-      "summary": "Human-authored and structurally validated; AI review pending."
+      "verdict": "pass",
+      "issues": [],
+      "summary": "All ten English editing questions have a unique correct answer, the provided key matches the correct answer, and each question and its answer are perfectly aligned with the corresponding numbered underline in the passage. The explanations are clear and accurate. The difficulty levels seem appropriate for the questions asked."
     }
   }
 ]

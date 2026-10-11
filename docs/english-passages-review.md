@@ -4,7 +4,7 @@
 
 ## The Night Garden
 
-Word count: 355. AI review: pending.
+Word count: 355. AI review: pass.
 
 On the edge of a busy neighborhood, a narrow strip of land sat between a parking lot and a brick wall. During the day, people hurried past it without looking. At night, however, the space became the setting for an unusual experiment. A group of volunteers wanted to learn whether a small garden could help moths and other insects that visit flowers after sunset.
 
@@ -130,7 +130,7 @@ Explanation: The ending connects the garden's ecological and educational purpose
 
 ## The Last Mapmaker
 
-Word count: 345. AI review: pending.
+Word count: 345. AI review: pass.
 
 When Mara joined the coastal survey team, she expected to spend most of her time drawing lines on maps. Instead, her first assignment involved standing in ankle-deep water, holding a measuring pole while a colleague recorded the position of reeds. The marsh they were studying <u>changed</u> shape after nearly every storm. A channel that appeared wide in spring might be almost invisible by late summer.
 
@@ -256,7 +256,7 @@ Explanation: The ending returns to the theme of a changing coastline.
 
 ## A Library of Sounds
 
-Word count: 348. AI review: pending.
+Word count: 348. AI review: pass.
 
 At the city museum, visitors could examine old cameras, typewriters, and kitchen tools. Yet curator Imani noticed that the displays were strangely quiet. A visitor could see a mechanical cash register but could not hear its bell. To Imani, <u>something important was missing</u>: the sounds that had once accompanied ordinary work.
 
@@ -382,7 +382,7 @@ Explanation: The conclusion reinforces sound as a way to understand history.
 
 ## The Bridge of Paper
 
-Word count: 356. AI review: pending.
+Word count: 356. AI review: pass.
 
 The engineering club had only one afternoon to build a bridge. Their materials were modest: recycled paper, glue, string, and two wooden blocks that represented opposite riverbanks. The bridge needed to support a stack of small weights without touching the table below. At first, the students <u>assumed</u> that using more paper would automatically make their design stronger.
 
@@ -508,7 +508,7 @@ Explanation: The phrase synthesizes iterative testing and evidence-based revisio
 
 ## Seeds on the Roof
 
-Word count: 348. AI review: pending.
+Word count: 348. AI review: pass.
 
 During a particularly hot September, students at Westbrook School noticed that the top-floor classrooms felt warmer than the rooms below. Their science teacher suggested investigating the roof. Most of it was covered with dark material that absorbed sunlight. A small section, however, held planter boxes filled with herbs. The students <u>wondered</u> whether the plants affected the temperature nearby.
 
