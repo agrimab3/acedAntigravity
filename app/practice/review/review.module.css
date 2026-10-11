@@ -45,7 +45,7 @@
 
 .header h1 {
   margin: 6px 0 4px;
-  font: 700 clamp(34px, 6vw, 62px)/1 var(--font-playfair), "Playfair Display", serif;
+  font: 700 clamp(34px, 6vw, 62px)/1 var(--font-playfair), "DM Serif Display", serif;
 }
 
 .header p {
@@ -99,7 +99,7 @@
 
 .empty strong {
   color: #fff;
-  font: 700 24px var(--font-playfair), "Playfair Display", serif;
+  font: 700 24px var(--font-playfair), "DM Serif Display", serif;
 }
 
 .list {
@@ -165,7 +165,7 @@
 
 .question {
   margin-bottom: 16px;
-  font: 600 clamp(20px, 3vw, 27px)/1.55 var(--font-playfair), "Playfair Display", serif;
+  font: 600 clamp(20px, 3vw, 27px)/1.55 var(--font-playfair), "DM Serif Display", serif;
 }
 
 .choices {

@@ -23,10 +23,6 @@ export default async function MockTestDevLoginPage({ searchParams }: LoginPagePr
   return (
     <div className={styles.pageRoot}>
       <NightSky />
-      <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&display=swap"
-        rel="stylesheet"
-      />
       <TestModeBanner />
 
       <main className={styles.content}>

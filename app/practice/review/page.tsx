@@ -3,23 +3,23 @@ import TutorMessage from "@/components/TutorMessage";
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { DM_Sans, Playfair_Display } from "next/font/google";
+import { DM_Sans, DM_Serif_Display } from "next/font/google";
 import NightSky from "@/components/NightSky";
 import QuestionContent from "@/components/question-content/QuestionContent";
 import styles from "./review.module.css";
 
-const playfair = Playfair_Display({
+const playfair = DM_Serif_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
   display: "swap",
-  weight: ["600", "700"],
+  weight: "400",
 });
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-dm-sans",
   display: "swap",
-  weight: ["400", "500", "600", "700"],
+  weight: "400",
 });
 
 const SECTION_META = {

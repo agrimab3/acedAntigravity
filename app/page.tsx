@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { getProviders, signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { sanitizeInternalCallbackUrl } from "@/lib/safe-callback";
+import MockTestCard from "@/components/MockTestCard";
 
 
 function getHomeCallbackUrl() {
@@ -148,7 +149,7 @@ export default function Home() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "var(--font-dm-sans), sans-serif",
         color: "white",
         padding: "2rem",
         textAlign: "center",
@@ -156,10 +157,6 @@ export default function Home() {
         overflow: "hidden",
       }}
     >
-      <link
-        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap"
-        rel="stylesheet"
-      />
 
       <canvas
         ref={canvasRef}
@@ -218,7 +215,7 @@ export default function Home() {
         <div
           style={{
             fontSize: "28px",
-            fontFamily: "'DM Serif Display', serif",
+            fontFamily: "var(--font-dm-serif), serif",
             marginBottom: "2.5rem",
             letterSpacing: "-0.5px",
           }}
@@ -228,7 +225,7 @@ export default function Home() {
 
         <h1
           style={{
-            fontFamily: "'DM Serif Display', serif",
+            fontFamily: "var(--font-dm-serif), serif",
             fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
             lineHeight: 1.1,
             maxWidth: "700px",
@@ -269,7 +266,7 @@ export default function Home() {
             fontWeight: 500,
             cursor: isSigningIn ? "wait" : "pointer",
             opacity: isSigningIn ? 0.7 : 1,
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "var(--font-dm-sans), sans-serif",
             marginBottom: "1rem",
             boxShadow: "0 12px 32px rgba(29, 158, 117, 0.25)",
           }}
@@ -291,7 +288,7 @@ export default function Home() {
               fontWeight: 500,
               cursor: isSigningIn ? "wait" : "pointer",
               opacity: isSigningIn ? 0.7 : 1,
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "var(--font-dm-sans), sans-serif",
               marginBottom: "1rem",
             }}
           >
@@ -299,7 +296,9 @@ export default function Home() {
           </button>
         )}
 
-        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.25)" }}>
+        <MockTestCard />
+
+        <p style={{ marginTop: "1rem", fontSize: "12px", color: "rgba(255,255,255,0.25)" }}>
           beta
         </p>
 

@@ -1,13 +1,14 @@
-import { DM_Sans, Playfair_Display } from "next/font/google";
+import { DM_Sans, DM_Serif_Display } from "next/font/google";
 import { redirect } from "next/navigation";
 import { getMockTestUser } from "@/lib/mockTest/auth";
 import { canBypassMockEventWindow, getPaidMockRegistration } from "@/lib/mockTest/runner";
 import MockTestRunner from "./runner-client";
 
-const playfair = Playfair_Display({
+const playfair = DM_Serif_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
   display: "swap",
+  weight: "400",
 });
 
 const dmSans = DM_Sans({

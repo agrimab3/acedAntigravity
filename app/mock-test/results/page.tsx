@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, Playfair_Display } from "next/font/google";
+import { DM_Sans, DM_Serif_Display } from "next/font/google";
 import { redirect } from "next/navigation";
 import { getMockTestUser } from "@/lib/mockTest/auth";
 import { getMockTestServerNow } from "@/lib/mockTest/devClock";
@@ -10,11 +10,11 @@ import {
 } from "@/lib/mockTest/runner";
 import ResultsClient from "./results-client";
 
-const playfair = Playfair_Display({
+const playfair = DM_Serif_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
   display: "swap",
-  weight: ["700"],
+  weight: "400",
   style: ["normal", "italic"],
 });
 
@@ -22,7 +22,7 @@ const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-dm-sans",
   display: "swap",
-  weight: ["400", "500", "600", "700"],
+  weight: "400",
 });
 
 export const metadata: Metadata = {

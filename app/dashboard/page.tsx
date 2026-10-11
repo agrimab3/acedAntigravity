@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { getProviders, signOut, useSession } from "next-auth/react";
 import FirstTimeWalkthrough, { type WalkthroughTargetKey } from "@/app/dashboard/first-time-walkthrough";
 import MockTestBanner from "@/components/MockTestBanner";
+import MockTestCard from "@/components/MockTestCard";
 import NightSky from "@/components/NightSky";
 import MockTestNavTab from "@/components/MockTestNavTab";
 import { getTopicByName } from "@/lib/act-taxonomy";
@@ -1551,6 +1552,7 @@ export default function Dashboard() {
         </div>
 
         <MockTestBanner />
+        <MockTestCard dynamicSeats />
       </div>
 
         <div

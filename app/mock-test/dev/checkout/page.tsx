@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
-import { DM_Sans, Playfair_Display } from "next/font/google";
+import { DM_Sans, DM_Serif_Display } from "next/font/google";
 import NightSky from "@/components/NightSky";
 import TestModeBanner from "@/components/TestModeBanner";
 import { mockRegistrations, mockTests } from "@/db/schema";
@@ -11,11 +11,11 @@ import { NEXT_MOCK } from "@/lib/mockTests";
 import CompleteTestPayment from "./CompleteTestPayment";
 import styles from "../dev.module.css";
 
-const devSerif = Playfair_Display({
+const devSerif = DM_Serif_Display({
   subsets: ["latin"],
   variable: "--font-dev-serif",
   display: "swap",
-  weight: ["600", "700"],
+  weight: "400",
   style: ["normal", "italic"],
 });
 
@@ -23,7 +23,7 @@ const devSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-dev-sans",
   display: "swap",
-  weight: ["400", "500", "600", "700"],
+  weight: "400",
 });
 
 type CheckoutPageProps = {

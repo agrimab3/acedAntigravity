@@ -1,12 +1,24 @@
 import type { Metadata } from "next";
+import { DM_Sans, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import FeedbackFooter from "@/components/FeedbackFooter";
 import TrademarkDisclaimer from "@/components/TrademarkDisclaimer";
 
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+});
+
+const dmSerif = DM_Serif_Display({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-dm-serif",
+});
+
 export const metadata: Metadata = {
   title: "Aced",
-  description: "AI-powered ACT prep with a constellation dashboard.",
+  description: "Online ACT prep and a $2 timed ACED Mock Test.",
 };
 
 export default function RootLayout({
@@ -15,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className={`h-full antialiased ${dmSans.variable} ${dmSerif.variable}`}>
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
         <TrademarkDisclaimer />

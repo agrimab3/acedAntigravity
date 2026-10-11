@@ -47,7 +47,7 @@
 
 .lobbyBrand,
 .brand {
-  font-family: var(--font-playfair), "Playfair Display", serif;
+  font-family: var(--font-playfair), "DM Serif Display", serif;
   font-weight: 700;
   letter-spacing: -0.04em;
 }
@@ -82,7 +82,7 @@
 .lobbyCard h1,
 .finishCard h1 {
   margin: 14px 0 12px;
-  font-family: var(--font-playfair), "Playfair Display", serif;
+  font-family: var(--font-playfair), "DM Serif Display", serif;
   font-size: clamp(44px, 7vw, 72px);
   line-height: 0.98;
   font-weight: 700;
@@ -225,7 +225,7 @@
 
 .sectionIdentity em {
   color: #8D97A6;
-  font-family: var(--font-playfair), "Playfair Display", serif;
+  font-family: var(--font-playfair), "DM Serif Display", serif;
   font-size: 15px;
 }
 
@@ -407,7 +407,7 @@
 .passageCard h2 {
   margin: 0 0 18px;
   color: #EEF1F5;
-  font-family: var(--font-playfair), "Playfair Display", serif;
+  font-family: var(--font-playfair), "DM Serif Display", serif;
   font-size: 28px;
   line-height: 1.2;
   font-weight: 700;
@@ -417,7 +417,7 @@
 .passageText {
   white-space: pre-wrap;
   color: #DDE2EA;
-  font-family: var(--font-playfair), "Playfair Display", serif;
+  font-family: var(--font-playfair), "DM Serif Display", serif;
   font-size: 19px;
   line-height: 1.85;
 }
@@ -438,7 +438,7 @@
 .questionHeader h1 {
   margin: 0;
   color: #EEF1F5;
-  font-family: var(--font-playfair), "Playfair Display", serif;
+  font-family: var(--font-playfair), "DM Serif Display", serif;
   font-size: clamp(26px, 3vw, 30px);
   line-height: 1.15;
   font-weight: 700;
@@ -452,7 +452,7 @@
 
 .questionHeader h1 small {
   color: #6F7A8A;
-  font-family: var(--font-playfair), "Playfair Display", serif;
+  font-family: var(--font-playfair), "DM Serif Display", serif;
   font-size: 18px;
   font-weight: 400;
 }
@@ -647,7 +647,7 @@
 .dialog h2 {
   margin: 0;
   color: #EEF1F5;
-  font-family: var(--font-playfair), "Playfair Display", serif;
+  font-family: var(--font-playfair), "DM Serif Display", serif;
   font-size: 32px;
   line-height: 1.15;
   font-weight: 700;
@@ -1231,7 +1231,7 @@
 .breakHero h1 {
   margin: 0;
   color: #F7F8FA;
-  font: 700 clamp(56px, 9vw, 88px)/0.95 var(--font-playfair), "Playfair Display", serif;
+  font: 700 clamp(56px, 9vw, 88px)/0.95 var(--font-playfair), "DM Serif Display", serif;
   letter-spacing: -0.045em;
 }
 
@@ -1273,7 +1273,7 @@
 .breakCountdown {
   margin: 9px 0 8px;
   color: #EEF1F5;
-  font: 700 64px/1 var(--font-playfair), "Playfair Display", serif;
+  font: 700 64px/1 var(--font-playfair), "DM Serif Display", serif;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.03em;
   transition:
@@ -1310,13 +1310,13 @@
 
 .breakConstellation {
   color: color-mix(in srgb, var(--next-color) 66%, #8D97A6);
-  font: italic 15px var(--font-playfair), "Playfair Display", serif;
+  font: italic 15px var(--font-playfair), "DM Serif Display", serif;
 }
 
 .breakNextCard h2 {
   margin: 4px 0 6px;
   color: var(--next-color);
-  font: 800 34px/1 var(--font-playfair), "Playfair Display", serif;
+  font: 800 34px/1 var(--font-playfair), "DM Serif Display", serif;
   letter-spacing: -0.025em;
   text-shadow: 0 0 22px color-mix(in srgb, var(--next-color) 24%, transparent);
 }
@@ -1359,7 +1359,7 @@
 .transitionTitle {
   margin: 0;
   color: #EEF1F5;
-  font: 700 40px/1.05 var(--font-playfair), "Playfair Display", serif;
+  font: 700 40px/1.05 var(--font-playfair), "DM Serif Display", serif;
   letter-spacing: -0.035em;
 }
 

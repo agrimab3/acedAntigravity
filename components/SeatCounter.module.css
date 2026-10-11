@@ -4,7 +4,7 @@
   justify-content: center;
   gap: 8px;
   color: #C9CFD8;
-  font-family: var(--font-dm-sans, "DM Sans", Arial, sans-serif);
+  font-family: var(--font-dm-sans, "DM Sans", sans-serif);
   font-size: 15px;
   line-height: 1.3;
 }

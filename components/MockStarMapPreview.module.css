@@ -17,14 +17,14 @@
 }
 
 .sectionName {
-  font-family: "DM Sans", Arial, sans-serif;
+  font-family: "DM Sans", sans-serif;
   font-size: 22px;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
 
 .constellation {
-  font-family: "DM Serif Display", Georgia, serif;
+  font-family: "DM Serif Display", var(--font-dm-serif), serif;
   font-size: 15px;
   font-style: italic;
   opacity: 0.48;
@@ -33,7 +33,7 @@
 .scoreTitle {
   fill: #FFFFFF;
   opacity: 0.92;
-  font-family: "DM Sans", Arial, sans-serif;
+  font-family: "DM Sans", sans-serif;
   font-size: 17px;
   font-weight: 700;
 }
@@ -41,7 +41,7 @@
 .scoreNumber {
   fill: #FFFFFF;
   opacity: 0.90;
-  font-family: "DM Serif Display", Georgia, serif;
+  font-family: "DM Serif Display", var(--font-dm-serif), serif;
   font-size: 58px;
   font-style: italic;
   font-weight: 700;
@@ -50,7 +50,7 @@
 .scoreSub {
   fill: #FFFFFF;
   opacity: 0.18;
-  font-family: "DM Sans", Arial, sans-serif;
+  font-family: "DM Sans", sans-serif;
   font-size: 14px;
 }
 

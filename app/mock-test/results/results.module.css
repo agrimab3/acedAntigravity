@@ -48,7 +48,7 @@
 
 .brand {
   color: #EEF1F5;
-  font: 700 27px/1 var(--font-playfair), "Playfair Display", serif;
+  font: 700 27px/1 var(--font-playfair), "DM Serif Display", serif;
   letter-spacing: -0.04em;
   text-decoration: none;
 }
@@ -70,7 +70,7 @@
 
 .centerState h1 {
   margin: 0;
-  font: 700 clamp(42px, 7vw, 72px)/1 var(--font-playfair), "Playfair Display", serif;
+  font: 700 clamp(42px, 7vw, 72px)/1 var(--font-playfair), "DM Serif Display", serif;
 }
 
 .centerState p {
@@ -130,7 +130,7 @@
 .scoreHeadline h1 {
   margin: 0;
   color: #F7F8FA;
-  font: 700 clamp(52px, 8vw, 92px)/0.98 var(--font-playfair), "Playfair Display", serif;
+  font: 700 clamp(52px, 8vw, 92px)/0.98 var(--font-playfair), "DM Serif Display", serif;
   letter-spacing: -0.035em;
 }
 
@@ -365,7 +365,7 @@
 .solarTimer {
   white-space: nowrap;
   color: #F7F8FA;
-  font: 700 clamp(34px, 5vw, 54px)/1 var(--font-playfair), "Playfair Display", serif;
+  font: 700 clamp(34px, 5vw, 54px)/1 var(--font-playfair), "DM Serif Display", serif;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
@@ -387,7 +387,7 @@
   top: calc(50% + 42%);
   transform: translate(-50%, 8px);
   color: #B4BCC8;
-  font: italic 700 20px var(--font-playfair), "Playfair Display", serif;
+  font: italic 700 20px var(--font-playfair), "DM Serif Display", serif;
   opacity: 0;
   filter: blur(3px);
   white-space: nowrap;
@@ -459,7 +459,7 @@
 
 .compositeNumber {
   color: #EEF1F5;
-  font: italic 800 92px/0.86 var(--font-playfair), "Playfair Display", serif;
+  font: italic 800 92px/0.86 var(--font-playfair), "DM Serif Display", serif;
   letter-spacing: -0.06em;
 }
 
@@ -518,7 +518,7 @@
 
 .releaseTimeLine {
   color: #EEF1F5;
-  font: 700 26px/1.2 var(--font-playfair), "Playfair Display", serif;
+  font: 700 26px/1.2 var(--font-playfair), "DM Serif Display", serif;
 }
 
 .releaseTimeLine span {
@@ -587,7 +587,7 @@
 
 .percentileCard h2 strong {
   color: #5DCAA5;
-  font: 700 26px var(--font-playfair), "Playfair Display", serif;
+  font: 700 26px var(--font-playfair), "DM Serif Display", serif;
 }
 
 .histogram {
@@ -699,18 +699,18 @@
 
 .constellation {
   color: #8D97A6;
-  font: italic 14px var(--font-playfair), "Playfair Display", serif;
+  font: italic 14px var(--font-playfair), "DM Serif Display", serif;
 }
 
 .sectionCard h3 {
   margin: 3px 0 9px;
-  font: 700 20px/1 var(--font-playfair), "Playfair Display", serif;
+  font: 700 20px/1 var(--font-playfair), "DM Serif Display", serif;
 }
 
 .sectionScore {
   display: block;
   color: #EEF1F5;
-  font: 800 46px/1 var(--font-playfair), "Playfair Display", serif;
+  font: 800 46px/1 var(--font-playfair), "DM Serif Display", serif;
   letter-spacing: -0.04em;
 }
 
@@ -771,7 +771,7 @@
 .nextStarCard h2 {
   margin: 6px 0 6px;
   color: #EEF1F5;
-  font: 700 26px/1.1 var(--font-playfair), "Playfair Display", serif;
+  font: 700 26px/1.1 var(--font-playfair), "DM Serif Display", serif;
 }
 
 .brightestCard p,

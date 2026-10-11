@@ -4,7 +4,7 @@
   overflow-x: hidden;
   background: var(--sky-base);
   color: #EEF1F5;
-  font-family: var(--font-dev-sans, "DM Sans", Arial, sans-serif);
+  font-family: var(--font-dev-sans, "DM Sans", sans-serif);
 }
 
 .content {
@@ -39,7 +39,7 @@
 .heading {
   margin: 0;
   color: #F7F8FA;
-  font-family: var(--font-dev-serif, "Playfair Display", serif);
+  font-family: var(--font-dev-serif, "DM Serif Display", serif);
   font-size: clamp(42px, 7vw, 66px);
   font-weight: 700;
   line-height: 1.02;
@@ -156,7 +156,7 @@
 
 .statusCard h1 {
   margin: 0 0 10px;
-  font-family: var(--font-dev-serif, "Playfair Display", serif);
+  font-family: var(--font-dev-serif, "DM Serif Display", serif);
   font-size: 40px;
 }
 

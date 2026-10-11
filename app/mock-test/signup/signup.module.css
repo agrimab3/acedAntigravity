@@ -4,7 +4,7 @@
   overflow-x: hidden;
   background: var(--sky-base);
   color: #EEF1F5;
-  font-family: var(--font-dm-sans, "DM Sans", Arial, sans-serif);
+  font-family: var(--font-dm-sans, "DM Sans", sans-serif);
 }
 
 .content {
