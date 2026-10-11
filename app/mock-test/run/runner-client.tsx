@@ -200,8 +200,9 @@ export default function MockTestRunner({
   const wasOfflineRef = useRef(false);
   const syncedBannerTimerRef = useRef<number | null>(null);
 
-  const load = useCallback(async () => {
-    const cachedFirst = readSessionCache<SessionPayload>();
+  const load = useCallback(async (options?: { useCache?: boolean }) => {
+    const useCache = options?.useCache ?? true;
+    const cachedFirst = useCache ? readSessionCache<SessionPayload>() : null;
     if (cachedFirst) {
       if (cachedFirst.status === "in_progress") {
         cachedFirst.section.questions = overlayOutboxAnswers(
@@ -766,7 +767,7 @@ export default function MockTestRunner({
       ) {
         requestedAdvance = true;
         lastAdvanceAttemptAt = Date.now();
-        void load().finally(() => {
+        void load({ useCache: false }).finally(() => {
           requestedAdvance = false;
         });
       }
