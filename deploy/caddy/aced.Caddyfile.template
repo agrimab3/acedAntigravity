@@ -1,6 +1,17 @@
 aceditprep.com {
-  @public path /api/health /api/stripe/webhook*
+  @public exact_path / /terms /privacy /refunds /contact /favicon.ico /icon.svg /apple-icon.png
+  @publicStatic path /_next/static/* /fonts/* /images/*
+  @health path /api/health /api/stripe/webhook*
+
   handle @public {
+    reverse_proxy 127.0.0.1:3005
+  }
+
+  handle @publicStatic {
+    reverse_proxy 127.0.0.1:3005
+  }
+
+  handle @health {
     reverse_proxy 127.0.0.1:3005
   }
 

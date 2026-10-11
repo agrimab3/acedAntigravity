@@ -253,7 +253,7 @@ export default function Home() {
             marginBottom: "2.5rem",
           }}
         >
-          AI-powered ACT prep, written in the stars. your universe is waiting.
+          Online ACT prep from Aced, with practice, AI tutoring, and a $2 timed ACED Mock Test. Your universe is waiting.
         </p>
 
         <button
