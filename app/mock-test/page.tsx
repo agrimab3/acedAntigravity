@@ -6,7 +6,7 @@ import NightSky from "@/components/NightSky";
 import SeatCounter from "@/components/SeatCounter";
 import { mockRegistrations, mockTests } from "@/db/schema";
 import { getDb } from "@/lib/db";
-import { getMockTestUser } from "@/lib/mockTest/auth";
+import { getMockTestUser, signInUrl, signOutUrl } from "@/lib/mockTest/auth";
 import { getSeatStatusCached } from "@/lib/mockTest/seats";
 import { getStudentSeatDisplay } from "@/lib/mockTest/seat-policy";
 import MockStarMapPreview from "@/components/MockStarMapPreview";
@@ -76,7 +76,6 @@ export default async function MockTestPage() {
     <div className={`${styles.pageRoot} ${dmSerif.variable} ${dmSans.variable}`}>
       {/* Animated starry sky background */}
       <NightSky />
-        <p style={{position:"relative",zIndex:2,textAlign:"center",fontSize:12,color:"#AFA9EC",padding:"8px"}}>A built-in calculator is included. You can also use your own ACT-approved calculator.</p>
 
       <div className={styles.contentWrapper}>
         {/* ==================================================================
@@ -94,9 +93,14 @@ export default async function MockTestPage() {
             <Link href="#faq" className={styles.navLink}>
               new here?
             </Link>
-            <Link href="/" className={styles.signInPill}>
-              sign in
-            </Link>
+            {user ? (
+              <>
+                <span className={styles.navLink} title={user.email}>{user.email}</span>
+                <Link href={signOutUrl("/mock-test")} className={styles.signInPill}>sign out</Link>
+              </>
+            ) : (
+              <Link href={signInUrl("/mock-test")} className={styles.signInPill}>sign in</Link>
+            )}
           </nav>
         </header>
 
@@ -213,6 +217,7 @@ export default async function MockTestPage() {
             </h2>
           </div>
 
+          <p style={{color:"#AFA9EC",fontSize:14,marginBottom:24}}>A built-in calculator is included. You can also use your own ACT-approved calculator.</p>
           <div className={styles.howGrid}>
             <article className={styles.howCard}>
               <div className={styles.howCardDate}>SATURDAY · DEC 5</div>

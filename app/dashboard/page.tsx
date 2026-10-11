@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getProviders, signOut, useSession } from "next-auth/react";
 import FirstTimeWalkthrough, { type WalkthroughTargetKey } from "@/app/dashboard/first-time-walkthrough";
-import MockTestBanner from "@/components/MockTestBanner";
 import MockTestCard from "@/components/MockTestCard";
 import NightSky from "@/components/NightSky";
 import MockTestNavTab from "@/components/MockTestNavTab";
@@ -1503,6 +1502,16 @@ export default function Dashboard() {
                 setActiveSec(section);
                 setSelected(null);
                 stateRef.current.activeSec = section;
+                const canvas = canvasRef.current;
+                if (canvas) {
+                  const rect = canvas.getBoundingClientRect();
+                  const target = section === "all" ? 0.5 : SECS.find(item => item.key === section)!.cx / W;
+                  const top = window.scrollY + rect.top + rect.height * (section === "all" ? 0 : 0.5) - window.innerHeight * (section === "all" ? 0.15 : 0.45);
+                  window.scrollTo({top: Math.max(0, top), behavior: "smooth"});
+                  if (section !== "all" && rect.width > window.innerWidth) {
+                    canvas.parentElement?.scrollTo({left: Math.max(0, target * rect.width - window.innerWidth / 2), behavior: "smooth"});
+                  }
+                }
               }}
               style={{
                 padding: "5px 14px",
@@ -1551,7 +1560,6 @@ export default function Dashboard() {
           ))}
         </div>
 
-        <MockTestBanner />
         <MockTestCard dynamicSeats />
       </div>
 
