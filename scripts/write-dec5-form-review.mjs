@@ -11,7 +11,7 @@ const rows = (
   await client.query(`
     select mfq.section_key,mfq.position,q.id,q.prompt,q.passage,q.choices,
            q.correct_answer,q.explanation,q.fingerprint,q.difficulty,t.name topic,
-           qs.title set_title,qs.content set_content
+           qs.id set_id,qs.title set_title,qs.content set_content
     from mock_test_form_questions mfq
     join mock_test_forms f on f.id=mfq.form_id
     join mock_tests mt on mt.id=f.mock_test_id
@@ -124,23 +124,40 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 `;
 
+const formatPassage = (raw, section, questionNumber) => {
+  let text = String(raw || "");
+  if (section === "english") {
+    text = text.replace(/<u>([\s\S]*?)<\/u>|\[underline\]([\s\S]*?)\[\/underline\]|__([\s\S]*?)__/gi,
+      (_match, html, bracket, markdown) => `**[${questionNumber}] ${html || bracket || markdown}**`);
+  }
+  return text;
+};
+
 for (const section of ["english", "math", "reading", "science"]) {
   output += `\n# ${section[0].toUpperCase() + section.slice(1)}\n`;
-  for (const row of rows.filter((item) => item.section_key === section)) {
-    output += `\n## ${section.toUpperCase()} ${row.position} — ${row.topic} (${row.difficulty})\n\n`;
-    if (row.set_title) {
-      output += `**Passage/set:** ${row.set_title}\n\n`;
+  const sectionRows = rows.filter((item) => item.section_key === section);
+  const renderedSets = new Set();
+  for (const row of sectionRows) {
+    const passage = row.set_content || row.passage || "";
+    const setKey = row.set_id || (passage ? `${section}:${passage}` : `${section}:question:${row.position}`);
+    if (section !== "math" && passage && !renderedSets.has(setKey)) {
+      renderedSets.add(setKey);
+      const group = sectionRows.filter(item => (item.set_id || ((item.set_content || item.passage) ? `${section}:${item.set_content || item.passage}` : `${section}:question:${item.position}`)) === setKey);
+      output += `\n## Passage / set for ${section.toUpperCase()} question${group.length === 1 ? "" : "s"} ${group.map(item => item.position).join(", ")}\n\n`;
+      if (row.set_title) output += `**Title:** ${row.set_title}\n\n`;
+      if (section === "english" && group.length > 1) {
+        let annotated = String(passage);
+        let index = 0;
+        annotated = annotated.replace(/<u>([\s\S]*?)<\/u>|\[underline\]([\s\S]*?)\[\/underline\]|__([\s\S]*?)__/gi,
+          (_match, html, bracket, markdown) => `**[${group[Math.min(index++, group.length - 1)].position}] ${html || bracket || markdown}**`);
+        output += `${annotated}\n\n`;
+      } else output += `${formatPassage(passage, section, row.position)}\n\n`;
+      if (section === "science") output += `*Science tables, figures, and experimental descriptions are reproduced from the stored set text above. Image-only figures require manual visual review.*\n\n`;
     }
-    if (["english", "reading", "science"].includes(section)) {
-      const passage = row.set_content || row.passage || "";
-      output += `**Full passage / set text (question ${row.position}):**\n\n${passage.replace(/<u>([\s\S]*?)<\/u>/gi,"<u>$1</u>").replace(/\[underline\]([\s\S]*?)\[\/underline\]/gi,"<u>$1</u>").replace(/__([\s\S]*?)__/g,"<u>$1</u>")}\n\n`;
-    }
+    output += `\n### ${section.toUpperCase()} ${row.position} — ${row.topic} (${row.difficulty})\n\n`;
     output += `**Question:** ${row.prompt}\n\n`;
-    for (const letter of ["A", "B", "C", "D"]) {
-      output += `- ${letter}. ${row.choices[letter]}\n`;
-    }
-    output += `\n**Answer:** ${row.correct_answer}\n\n`;
-    output += `**Explanation:** ${row.explanation}\n`;
+    for (const letter of ["A", "B", "C", "D"]) output += `- ${letter}. ${row.choices[letter]}\n`;
+    output += `\n**Answer:** ${row.correct_answer}\n\n**Explanation:** ${row.explanation}\n`;
   }
 }
 
