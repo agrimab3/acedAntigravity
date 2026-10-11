@@ -50,7 +50,7 @@ export default function MockTestCard({
           <span>{seatStatus.text || "Limited seats"}</span>
         </div>
       </div>
-      <Link href={href} className={styles.cta}>
+      <Link href={href} prefetch={false} className={styles.cta}>
         {full ? "join waitlist" : "sign up"}
       </Link>
     </section>

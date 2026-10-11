@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { getProviders, signIn, useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { sanitizeInternalCallbackUrl } from "@/lib/safe-callback";
 import MockTestCard from "@/components/MockTestCard";
@@ -15,22 +15,15 @@ function getHomeCallbackUrl() {
 
 export default function Home() {
   const router = useRouter();
-  const { status } = useSession();
   const [authError, setAuthError] = useState<string | null>(null);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [devLoginAvailable, setDevLoginAvailable] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    if (status === "authenticated") {
-      router.replace(getHomeCallbackUrl());
-    }
-  }, [router, status]);
-
-  useEffect(() => {
-    void getProviders().then((providers) => {
-      setDevLoginAvailable(Boolean(providers?.["local-dev-test-user"]));
-    });
+    // Local test sign-in is intentionally shown only on local development hosts.
+    // No auth discovery request is made while rendering any public page.
+    setDevLoginAvailable(["localhost", "127.0.0.1"].includes(window.location.hostname));
   }, []);
 
   useEffect(() => {

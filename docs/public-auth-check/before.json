@@ -1,0 +1,42 @@
+{
+  "/": {
+    "errors": [],
+    "challenged": [],
+    "failures": []
+  },
+  "/terms": {
+    "errors": [],
+    "challenged": [],
+    "failures": []
+  },
+  "/privacy": {
+    "errors": [],
+    "challenged": [],
+    "failures": []
+  },
+  "/refunds": {
+    "errors": [],
+    "challenged": [],
+    "failures": []
+  },
+  "/contact": {
+    "errors": [],
+    "challenged": [],
+    "failures": []
+  },
+  "/dashboard": {
+    "error": "Error: page.goto: net::ERR_INVALID_AUTH_CREDENTIALS at https://aceditprep.com/dashboard\nCall log:\n\u001b[2m  - navigating to "
+  },
+  "/practice": {
+    "error": "Error: page.goto: net::ERR_INVALID_AUTH_CREDENTIALS at https://aceditprep.com/practice\nCall log:\n\u001b[2m  - navigating to \""
+  },
+  "/admin": {
+    "error": "Error: page.goto: net::ERR_INVALID_AUTH_CREDENTIALS at https://aceditprep.com/admin\nCall log:\n\u001b[2m  - navigating to \"htt"
+  },
+  "/api/health": {
+    "error": "Error: page.goto: net::ERR_INVALID_AUTH_CREDENTIALS at https://aceditprep.com/api/health\nCall log:\n\u001b[2m  - navigating to"
+  },
+  "/mock-test": {
+    "error": "Error: page.goto: net::ERR_INVALID_AUTH_CREDENTIALS at https://aceditprep.com/mock-test\nCall log:\n\u001b[2m  - navigating to "
+  }
+}
