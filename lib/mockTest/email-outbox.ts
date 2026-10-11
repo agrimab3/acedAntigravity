@@ -49,6 +49,7 @@ export function getMockEmailHeaderSource(type: MockEmailType, nodeEnv = process.
 }
 
 export function getMockEmailSiteBaseUrl() {
+  if (process.env.NODE_ENV === "production") return "https://aceditprep.com";
   return (process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000").replace(/\/$/, "");
 }
 

@@ -220,3 +220,5 @@ test("all six GIF headers are 1200x400, 40 frames at 10 fps, and under 400 KB", 
     assert.equal(reader.frameInfo(0).delay, 10, `${file} must run at 10 fps`);
   }
 });
+
+// Production email header assets must use the canonical HTTPS domain, never an authenticated origin.
