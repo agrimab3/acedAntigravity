@@ -4,7 +4,12 @@ Generated October 10, 2026. Form contains **171 questions**: English 50, Math 45
 
 ## Suspicious-item scan
 
-- No duplicate prompts, missing explanations, deterministic multiple-answer warnings, or explicit explanation/key contradictions were found in Form A.
+- ⚠️ english 1: thin-english-stem
+- ⚠️ english 11: thin-english-stem
+- ⚠️ english 14: thin-english-stem
+- ⚠️ english 16: thin-english-stem
+- ⚠️ english 19: thin-english-stem
+- ⚠️ english 21: thin-english-context
 
 ## Bank-wide explanation contradiction scan
 
@@ -15,21 +20,21 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## Passage / set for ENGLISH question 1
 
-Last summer my grandmother taught me to bake bread with a sourdough starter she had kept alive for decades. Every morning she **[1] feeds** it a scoop of flour and a splash of water, then covered the jar with a cloth and set it beside the warm stove. By evening, the starter had nearly doubled in size and smelled faintly sour.
+The biologist compared measurements taken at three different times of day. The afternoon readings were consistently higher than the morning readings, but the evening readings were closer to the morning values. Because the pattern was unexpected, the team repeated the experiment to determine **[1] whether the difference was caused by temperature or another environmental factor**.
 
 
-### ENGLISH 1 — Grammar & Usage (easy)
+### ENGLISH 1 — Grammar & Usage (medium)
 
-**Question:** Which choice should replace the underlined portion?
+**Question:** Which choice best completes the sentence?
 
-- A. NO CHANGE
-- B. fed
-- C. has fed
-- D. will feed
+- A. whether the difference was caused by temperature or another environmental factor
+- B. whether was the difference caused by temperature or another environmental factor
+- C. if the difference had been caused by temperature or another environmental factor
+- D. whether the difference had caused by temperature or another environmental factor
 
-**Answer:** B
+**Answer:** A
 
-**Explanation:** The passage describes a past routine, and the same sentence uses the past-tense verbs 'covered' and 'set,' so 'fed' (B) keeps the verbs consistent. 'Feeds' (A) and 'will feed' (D) shift to present and future time. 'Has fed' (C) suggests an action continuing into the present, which clashes with the past-tense verbs that follow.
+**Explanation:** Choice A correctly uses "whether" to introduce the two possible explanations and maintains the tense of the passage. The other choices either shift tense unnecessarily or are grammatically incorrect.
 
 ## Passage / set for ENGLISH question 2
 
@@ -105,21 +110,21 @@ The architect's renovation plan preserves the theater's original entrance while 
 
 ## Passage / set for ENGLISH question 6
 
-This fossil of a small freshwater fish was found in a limestone quarry about forty years ago. The fish lived roughly fifty million years ago, when a shallow lake covered this region. Its delicate ribs and fin rays are **[6] still super visible** in the stone, preserved in remarkable detail.
+My grandmother rarely spoke about her childhood in the mountains, but she kept one photograph from those years on her dresser: a stone house with a crooked chimney and a single pine tree beside the door. When I finally visited her village as an adult, I found the house still standing. The pine had grown taller than the roof, and **[6] the chimney was super crooked, just like in the picture**.
 
 
-### ENGLISH 6 — Style & Tone (easy)
+### ENGLISH 6 — Style & Tone (medium)
 
-**Question:** Which choice best fits the style and tone of this museum display text?
+**Question:** Which choice best maintains the voice of the passage?
 
-- A. still clearly visible
-- B. still super visible
-- C. yet perceptible to the discerning eye
-- D. still kind of visible
+- A. the chimney was super crooked, just like in the picture
+- B. the chimney's angle of inclination corresponded to that documented in the photograph
+- C. the chimney leaned a bunch, which was pretty cool to see
+- D. the chimney leaned at exactly the angle I remembered from the photograph
 
-**Answer:** A
+**Answer:** D
 
-**Explanation:** The display text is clear and informative, and 'still clearly visible' (A) matches that tone. 'Super visible' (B) is too casual for a museum label. C is overly elaborate and implies the bones are hard to see, and 'kind of visible' (D) is both casual and inconsistent with 'preserved in remarkable detail.'
+**Explanation:** The narrator writes in a reflective, personal voice that is clear but not casual. D matches that voice and keeps the focus on the narrator's memory of the photograph. A and C use slang ('super,' 'a bunch,' 'pretty cool') that clashes with the thoughtful tone, and B sounds like a technical report, which is too stiff for a personal reflection.
 
 ## Passage / set for ENGLISH question 7
 
@@ -141,21 +146,21 @@ The composer first sketched the melody in a notebook. She then experimented with
 
 ## Passage / set for ENGLISH question 8
 
-When astronomers first cataloged the distant exoplanet, its unusual orbital velocity surprised researchers. Further observation revealed that the planet, along with its two outer moons, **[8] revolve** around a barycenter situated well outside the host star's immediate core.
+During the restoration of the eighteenth-century fresco, conservators discovered that previous repair crews had applied synthetic lacquers over the natural pigments. To avoid stripping the original brushwork, the team worked **[8] more meticulously** than any previous restoration crew had.
 
 
-### ENGLISH 8 — Grammar & Usage (easy)
+### ENGLISH 8 — Grammar & Usage (medium)
 
-**Question:** Which choice completes the sentence so that it conforms to the conventions of Standard English?
+**Question:** Which choice best completes the sentence according to standard idiom and comparative forms?
 
 - A. NO CHANGE
-- B. have revolved
-- C. revolves
-- D. are revolving
+- B. more meticulous
+- C. most meticulously
+- D. so meticulous
 
-**Answer:** C
+**Answer:** A
 
-**Explanation:** The subject of the verb is the singular noun 'planet'. The intervening prepositional phrase ('along with its two outer moons') does not alter the singular subject, so the singular verb 'revolves' is required.
+**Explanation:** The adverb 'more meticulously' correctly modifies the verb 'worked' and establishes a clear, grammatically sound comparative comparison with 'than any previous restoration crew had'.
 
 ## Passage / set for ENGLISH question 9
 
@@ -195,21 +200,21 @@ The university archive preserves notebooks kept by students who studied astronom
 
 ## Passage / set for ENGLISH question 11
 
-Marine biologists studying kelp forest ecology observed a sudden drop in sea otter populations along the coast. Without these apex predators to control the sea urchin **[11] population; kelp** beds were rapidly depleted by overgrazing.
+The traveling puppet company spends each summer on the road, performing in town squares and old theaters. This year, it will visit three cities that have never hosted it before: **[11] Grenoble, France, Turin, Italy, and Geneva**, Switzerland. At each stop, the puppeteers will also lead free workshops for local children.
 
 
-### ENGLISH 11 — Punctuation (easy)
+### ENGLISH 11 — Punctuation (medium)
 
-**Question:** Which choice provides the correct punctuation between the dependent phrase and the main clause?
+**Question:** Which choice is best for the underlined portion?
 
-- A. NO CHANGE
-- B. population kelp
-- C. population, kelp
-- D. population: kelp
+- A. Grenoble, France, Turin, Italy, and Geneva
+- B. Grenoble, France; Turin, Italy; and Geneva
+- C. Grenoble; France, Turin; Italy, and Geneva
+- D. Grenoble France; Turin Italy; and Geneva
 
-**Answer:** C
+**Answer:** B
 
-**Explanation:** The opening structure 'Without these apex predators to control the sea urchin population' is an introductory prepositional phrase, not an independent clause. It must be set off from the main clause by a comma, making a semicolon ungrammatical.
+**Explanation:** Each item in this list already contains a comma between a city and its country, so semicolons are needed to separate the items themselves (B). With commas alone (A), the list reads like six separate places. C puts the semicolons in the wrong spots, splitting each city from its own country, and D removes the commas that belong between each city and its country.
 
 ## Passage / set for ENGLISH question 12
 
@@ -249,21 +254,21 @@ The archivist preserved the fragile documents, which were written on handmade ve
 
 ## Passage / set for ENGLISH question 14
 
-Synthetic dyes made from coal tar were invented in the mid-nineteenth century, quickly replacing organic colorants. **[14] For example,** textile manufacturers rapidly adopted these chemical compounds because they produced vibrant, fade-resistant colors at a fraction of the cost.
+The seed bank was built to protect the world's food crops from disaster. Its vaults are carved deep into a mountainside, where the rock stays frozen year-round. The entrance sits high above sea level, out of reach of any flood, and the seeds are sealed in moisture-proof packets. **[14] Otherwise,** every part of the facility is designed to keep its collection alive for decades, even if no one is there to tend it.
 
 
-### ENGLISH 14 — Transitions & Cohesion (easy)
+### ENGLISH 14 — Transitions & Cohesion (medium)
 
-**Question:** Which choice provides the most logical transition?
+**Question:** Which choice is best for the underlined portion?
 
-- A. NO CHANGE
-- B. Consequently,
-- C. In contrast,
-- D. Nevertheless,
+- A. For instance,
+- B. Even so,
+- C. In short,
+- D. Otherwise,
 
-**Answer:** B
+**Answer:** C
 
-**Explanation:** The widespread adoption by textile manufacturers was a direct result of the invention and affordability of synthetic dyes. 'Consequently' expresses this cause-and-effect connection.
+**Explanation:** The last sentence sums up the details before it (frozen rock, high entrance, sealed packets) into one general statement, so 'In short' (C) is correct. 'For instance' (A) would introduce a specific example, not a summary. 'Even so' (B) signals a contrast with the earlier details, and 'Otherwise' (D) means 'if not,' which makes no sense here.
 
 ## Passage / set for ENGLISH question 15
 
@@ -285,21 +290,21 @@ Researchers at the Mount Ardent observatory track ground swelling with GPS stati
 
 ## Passage / set for ENGLISH question 16
 
-Two bridges cross the river near the old mill. The stone bridge, built more than a century ago, is narrow and steep, while the steel bridge downstream was designed for modern traffic. Of the two, the steel bridge is **[16] the most heavily used**, carrying trucks and buses from dawn until well after dark.
+Late in the second half, Jordan stole the ball at midfield and passed it to Eli. **[16] He** dribbled past two defenders and scored from six yards out, giving the Falcons a 2–1 lead. It was the first goal of Eli's varsity career.
 
 
-### ENGLISH 16 — Grammar & Usage (easy)
+### ENGLISH 16 — Grammar & Usage (medium)
 
-**Question:** Which choice is best for the underlined portion?
+**Question:** Which choice makes clear who scored the goal?
 
-- A. the more heavy used
-- B. the most heavily used
-- C. the more heavily used
-- D. the most heavy used
+- A. He
+- B. Him
+- C. Eli
+- D. They
 
 **Answer:** C
 
-**Explanation:** When exactly two things are compared ('Of the two'), the comparative 'more' is needed, not the superlative 'most.' Because 'used' is a verb form, it must be described by the adverb 'heavily,' not the adjective 'heavy.' Only C fixes both problems: B uses the superlative, A uses the adjective, and D makes both errors.
+**Explanation:** Two players were just mentioned, so 'He' could mean either Jordan or Eli; naming Eli removes the confusion and matches the last sentence. A is the most tempting because it is grammatically correct, but it is unclear. B is the wrong pronoun form for a subject, and D wrongly suggests both players scored.
 
 ## Passage / set for ENGLISH question 17
 
@@ -339,21 +344,21 @@ We left the cabin before dawn. The snow had stopped, and the woods were quiet. M
 
 ## Passage / set for ENGLISH question 19
 
-The restoration team carefully documented the century-old stained glass window before removing it from the nave. Each individual pane **[19] was cataloged, cleaned,** and photographed prior to reassembly.
+The manuscript contains several marginal notes, but one is especially revealing. **[19] The note, written in a different hand from the main text, suggests that the author revised the final chapter**. Scholars are using the handwriting to determine when the revision occurred.
 
 
-### ENGLISH 19 — Punctuation (easy)
+### ENGLISH 19 — Punctuation (medium)
 
-**Question:** Which choice presents the correct punctuation for the items in the series?
+**Question:** Which choice best punctuates the underlined sentence?
 
-- A. NO CHANGE
-- B. was cataloged cleaned
-- C. was cataloged, cleaned
-- D. was, cataloged, cleaned,
+- A. The note written in a different hand from the main text suggests that the author revised the final chapter.
+- B. The note, written in a different hand from the main text suggests that the author revised the final chapter.
+- C. The note, written in a different hand from the main text, suggests that the author revised the final chapter.
+- D. The note written in a different hand, from the main text, suggests that the author revised the final chapter.
 
-**Answer:** A
+**Answer:** C
 
-**Explanation:** The list consists of three parallel verbs ('cataloged', 'cleaned', and 'photographed'). Standard punctuation requires commas separating items in a series, including the serial comma before 'and'.
+**Explanation:** The phrase "written in a different hand from the main text" is nonessential information, so it should be enclosed by matching commas. The other choices either omit one comma or interrupt the phrase incorrectly.
 
 ## Passage / set for ENGLISH question 20
 
@@ -375,21 +380,21 @@ Proponents of open-plan office layouts argue that removing walls fosters spontan
 
 ## Passage / set for ENGLISH question 21
 
-The pottery studio was small, but its shelves were crowded with finished pieces. The instructor wanted visitors to see how each object changed during firing. **[21] She placed several unfired bowls beside their finished versions, visitors could compare the two stages.** The arrangement made the process easier to understand.
+Perched atop the granite ledge overlooking the valley, **[21] the soaring red-tailed hawk swept its broad wings upward before diving toward the meadow below.**
 
 
-### ENGLISH 21 — Sentence Structure (easy)
+### ENGLISH 21 — Sentence Structure (medium)
 
-**Question:** Which choice best completes the sentence?
+**Question:** Which choice maintains clear modifier placement and logical sentence structure?
 
-- A. She placed several unfired bowls beside their finished versions, so visitors could compare the two stages.
-- B. She placed several unfired bowls beside their finished versions visitors could compare the two stages.
-- C. She placed several unfired bowls beside their finished versions; because visitors could compare the two stages.
-- D. She placed several unfired bowls beside their finished versions, visitors comparing the two stages.
+- A. NO CHANGE
+- B. the broad wings of the red-tailed hawk swept upward before diving toward the meadow below.
+- C. diving toward the meadow below, the soaring red-tailed hawk swept its broad wings upward.
+- D. the valley below was visible to the red-tailed hawk as it swept its broad wings upward.
 
 **Answer:** A
 
-**Explanation:** Choice A correctly joins the two ideas with the coordinating conjunction "so," showing that the placement allowed visitors to compare the stages. B creates a run-on sentence, C leaves a dependent clause after a semicolon, and D produces an awkward and incomplete construction.
+**Explanation:** The modifier 'Perched atop the granite ledge overlooking the valley' logically describes 'the soaring red-tailed hawk'. Choice A places the hawk immediately after the phrase, avoiding misplaced or dangling modifiers.
 
 ## Passage / set for ENGLISH question 22
 

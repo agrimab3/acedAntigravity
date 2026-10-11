@@ -4,6 +4,20 @@ import { reviewQuestionQuality } from "../lib/question-utils.ts";
 
 const { Client } = pg;
 if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required.");
+const snapshotPath = process.argv.find(arg => arg.startsWith('--snapshot='))?.slice('--snapshot='.length);
+let rows;
+if (snapshotPath) {
+  const payload = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
+  const topics = new Map(payload.topics.map(topic => [topic.id, topic.name]));
+  const sets = new Map(payload.sets.map(set => [set.id, set]));
+  const questions = new Map(payload.questions.map(question => [question.id, question]));
+  rows = payload.order.map(order => {
+    const q = questions.get(order.question_id);
+    if (!q) throw new Error(`Missing snapshot question ${order.question_id}`);
+    const set = sets.get(q.question_set_id);
+    return { ...q, ...order, topic: topics.get(q.topic_id), set_id: set?.id ?? null, set_title: set?.title ?? null, set_content: set?.content ?? null };
+  });
+} else {
 const client = new Client({ connectionString: process.env.DATABASE_URL });
 await client.connect();
 
@@ -30,6 +44,7 @@ const rows = (
   `)
 ).rows;
 
+ }
 if (rows.length !== 171) {
   throw new Error(`Expected 171 questions, found ${rows.length}.`);
 }
@@ -163,7 +178,6 @@ for (const section of ["english", "math", "reading", "science"]) {
 
 fs.mkdirSync("docs", { recursive: true });
 fs.writeFileSync("docs/dec5-form-review.md", output);
-await client.end();
 console.log(
   `Wrote docs/dec5-form-review.md with ${rows.length} questions and ${issues.length} flagged issues.`
 );

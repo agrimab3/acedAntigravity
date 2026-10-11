@@ -3,34 +3,6 @@
   "version": "A",
   "questions": [
     {
-      "id": "09d91657-9c5e-44bf-90ca-c128d5305140",
-      "section_key": "english",
-      "topic_id": "f01e6c74-8f92-46e3-9af7-efd5e332df3d",
-      "difficulty": "easy",
-      "question_type": "multiple_choice",
-      "prompt": "Which choice should replace the underlined portion?",
-      "passage": "Last summer my grandmother taught me to bake bread with a sourdough starter she had kept alive for decades. Every morning she [underline]feeds[/underline] it a scoop of flour and a splash of water, then covered the jar with a cloth and set it beside the warm stove. By evening, the starter had nearly doubled in size and smelled faintly sour.",
-      "choices": {
-        "A": "NO CHANGE",
-        "B": "fed",
-        "C": "has fed",
-        "D": "will feed"
-      },
-      "correct_answer": "B",
-      "explanation": "The passage describes a past routine, and the same sentence uses the past-tense verbs 'covered' and 'set,' so 'fed' (B) keeps the verbs consistent. 'Feeds' (A) and 'will feed' (D) shift to present and future time. 'Has fed' (C) suggests an action continuing into the present, which clashes with the past-tense verbs that follow.",
-      "source": "manual_claude",
-      "status": "published",
-      "created_at": "2026-10-06T23:04:47.172Z",
-      "updated_at": "2026-10-11T01:00:06.960Z",
-      "fingerprint": "a88e0745a09b5fae5d1c1849aab2bc3bd492857c8436aaeaa37f0bbb13767042",
-      "generation_model": "claude-pro-manual",
-      "review_notes": "[english-generation-half1-import-2026-10-06] Candidate survived first-half cross-model/existing-bank template pruning; deterministic checks clean; final human audit still required.\n[english-final-audit-2026-10-06] Final human audit passed after ambiguity pruning, distractor-quality review, difficulty calibration, explanation/key review, duplicate review, and fingerprint repair. Approved for publication pending explicit user authorization.\n[english-final-publication-2026-10-06] Published after explicit user authorization.",
-      "reviewed_at": null,
-      "reviewed_by_user_id": null,
-      "question_set_id": null,
-      "usage_scope": "mock_reserve"
-    },
-    {
       "id": "4dfe4a9f-2172-4435-8240-0ee3ee93b20e",
       "section_key": "english",
       "topic_id": "68b29ce0-2545-4a92-9102-804fd49a909c",
@@ -143,34 +115,6 @@
       "usage_scope": "mock_reserve"
     },
     {
-      "id": "750a5d6a-db4e-4dc0-aa64-5e8960736d2a",
-      "section_key": "english",
-      "topic_id": "0d935ad7-1be6-440e-a0e1-06ca9196ee6a",
-      "difficulty": "easy",
-      "question_type": "multiple_choice",
-      "prompt": "Which choice best fits the style and tone of this museum display text?",
-      "passage": "This fossil of a small freshwater fish was found in a limestone quarry about forty years ago. The fish lived roughly fifty million years ago, when a shallow lake covered this region. Its delicate ribs and fin rays are [underline]still super visible[/underline] in the stone, preserved in remarkable detail.",
-      "choices": {
-        "A": "still clearly visible",
-        "B": "still super visible",
-        "C": "yet perceptible to the discerning eye",
-        "D": "still kind of visible"
-      },
-      "correct_answer": "A",
-      "explanation": "The display text is clear and informative, and 'still clearly visible' (A) matches that tone. 'Super visible' (B) is too casual for a museum label. C is overly elaborate and implies the bones are hard to see, and 'kind of visible' (D) is both casual and inconsistent with 'preserved in remarkable detail.'",
-      "source": "manual_claude",
-      "status": "published",
-      "created_at": "2026-10-07T00:36:58.250Z",
-      "updated_at": "2026-10-11T01:00:06.960Z",
-      "fingerprint": "c8b8189590240e62cc276f906552eb9f0e74e90708ddeedaee853ef22f91bb77",
-      "generation_model": "claude-pro-manual",
-      "review_notes": "[english-generation-final63-import-2026-10-06] Candidate survived final-chunk cross-model/existing-bank template pruning; deterministic checks clean; final human audit still required.\n[english-final-audit-2026-10-06] Final human audit passed after ambiguity pruning, distractor-quality review, difficulty calibration, explanation/key review, duplicate review, and fingerprint repair. Approved for publication pending explicit user authorization.\n[english-final-publication-2026-10-06] Published after explicit user authorization.",
-      "reviewed_at": null,
-      "reviewed_by_user_id": null,
-      "question_set_id": null,
-      "usage_scope": "mock_reserve"
-    },
-    {
       "id": "02fa6e34-5cc4-4ee1-a998-e4c5b5e421ab",
       "section_key": "english",
       "topic_id": "169a5307-a100-48f6-801a-f2f11efa338f",
@@ -193,34 +137,6 @@
       "fingerprint": "a429d7d4edda48907a6a5a2212ffcabf6a43bfc3a3ba99c859038b6f314db8da",
       "generation_model": "chatgpt-manual",
       "review_notes": "[english-generation-final63-import-2026-10-06] Candidate survived final-chunk cross-model/existing-bank template pruning; deterministic checks clean; final human audit still required.\n[english-final-audit-2026-10-06] Final human audit passed after ambiguity pruning, distractor-quality review, difficulty calibration, explanation/key review, duplicate review, and fingerprint repair. Approved for publication pending explicit user authorization.\n[english-final-publication-2026-10-06] Published after explicit user authorization.",
-      "reviewed_at": null,
-      "reviewed_by_user_id": null,
-      "question_set_id": null,
-      "usage_scope": "mock_reserve"
-    },
-    {
-      "id": "11cbe33f-3fe1-4e63-b899-312de2554970",
-      "section_key": "english",
-      "topic_id": "f01e6c74-8f92-46e3-9af7-efd5e332df3d",
-      "difficulty": "easy",
-      "question_type": "multiple_choice",
-      "prompt": "Which choice completes the sentence so that it conforms to the conventions of Standard English?",
-      "passage": "When astronomers first cataloged the distant exoplanet, its unusual orbital velocity surprised researchers. Further observation revealed that the planet, along with its two outer moons, [underline]revolve[/underline] around a barycenter situated well outside the host star's immediate core.",
-      "choices": {
-        "A": "NO CHANGE",
-        "B": "have revolved",
-        "C": "revolves",
-        "D": "are revolving"
-      },
-      "correct_answer": "C",
-      "explanation": "The subject of the verb is the singular noun 'planet'. The intervening prepositional phrase ('along with its two outer moons') does not alter the singular subject, so the singular verb 'revolves' is required.",
-      "source": "manual_gemini",
-      "status": "published",
-      "created_at": "2026-10-06T23:04:47.172Z",
-      "updated_at": "2026-10-11T01:00:06.960Z",
-      "fingerprint": "08f1546c3be1f6a0890a4091899f340c850e093e72ae80ff479679a3ed48f404",
-      "generation_model": "gemini-manual",
-      "review_notes": "[english-generation-half1-import-2026-10-06] Candidate survived first-half cross-model/existing-bank template pruning; deterministic checks clean; final human audit still required.\n[english-final-audit-2026-10-06] Final human audit passed after ambiguity pruning, distractor-quality review, difficulty calibration, explanation/key review, duplicate review, and fingerprint repair. Approved for publication pending explicit user authorization.\n[english-final-publication-2026-10-06] Published after explicit user authorization.",
       "reviewed_at": null,
       "reviewed_by_user_id": null,
       "question_set_id": null,
@@ -283,34 +199,6 @@
       "usage_scope": "mock_reserve"
     },
     {
-      "id": "13a421bd-b328-4bcf-8762-88052f505f7f",
-      "section_key": "english",
-      "topic_id": "3b7062d0-0819-4029-8b17-bedd4bfca65a",
-      "difficulty": "easy",
-      "question_type": "multiple_choice",
-      "prompt": "Which choice provides the correct punctuation between the dependent phrase and the main clause?",
-      "passage": "Marine biologists studying kelp forest ecology observed a sudden drop in sea otter populations along the coast. Without these apex predators to control the sea urchin [underline]population; kelp[/underline] beds were rapidly depleted by overgrazing.",
-      "choices": {
-        "A": "NO CHANGE",
-        "B": "population kelp",
-        "C": "population, kelp",
-        "D": "population: kelp"
-      },
-      "correct_answer": "C",
-      "explanation": "The opening structure 'Without these apex predators to control the sea urchin population' is an introductory prepositional phrase, not an independent clause. It must be set off from the main clause by a comma, making a semicolon ungrammatical.",
-      "source": "manual_gemini",
-      "status": "published",
-      "created_at": "2026-10-06T23:04:47.172Z",
-      "updated_at": "2026-10-11T01:00:06.960Z",
-      "fingerprint": "ccc98e0f5b8c7cc1ce021fdc17594d2f5365f0d434f4dfaf9b5440a23bb645c1",
-      "generation_model": "gemini-manual",
-      "review_notes": "[english-generation-half1-import-2026-10-06] Candidate survived first-half cross-model/existing-bank template pruning; deterministic checks clean; final human audit still required.\n[english-final-audit-2026-10-06] Final human audit passed after ambiguity pruning, distractor-quality review, difficulty calibration, explanation/key review, duplicate review, and fingerprint repair. Approved for publication pending explicit user authorization.\n[english-final-publication-2026-10-06] Published after explicit user authorization.",
-      "reviewed_at": null,
-      "reviewed_by_user_id": null,
-      "question_set_id": null,
-      "usage_scope": "mock_reserve"
-    },
-    {
       "id": "a831bfcc-3c92-4470-8f35-268a33370ed6",
       "section_key": "english",
       "topic_id": "0d935ad7-1be6-440e-a0e1-06ca9196ee6a",
@@ -367,34 +255,6 @@
       "usage_scope": "mock_reserve"
     },
     {
-      "id": "0f4768e3-5dc8-4845-8189-60ff61b03030",
-      "section_key": "english",
-      "topic_id": "169a5307-a100-48f6-801a-f2f11efa338f",
-      "difficulty": "easy",
-      "question_type": "multiple_choice",
-      "prompt": "Which choice provides the most logical transition?",
-      "passage": "Synthetic dyes made from coal tar were invented in the mid-nineteenth century, quickly replacing organic colorants. [underline]For example,[/underline] textile manufacturers rapidly adopted these chemical compounds because they produced vibrant, fade-resistant colors at a fraction of the cost.",
-      "choices": {
-        "A": "NO CHANGE",
-        "B": "Consequently,",
-        "C": "In contrast,",
-        "D": "Nevertheless,"
-      },
-      "correct_answer": "B",
-      "explanation": "The widespread adoption by textile manufacturers was a direct result of the invention and affordability of synthetic dyes. 'Consequently' expresses this cause-and-effect connection.",
-      "source": "manual_gemini",
-      "status": "published",
-      "created_at": "2026-10-06T23:45:18.210Z",
-      "updated_at": "2026-10-11T01:00:06.960Z",
-      "fingerprint": "ea9ca4b3aeab0e25cdad3e763d5883ab4f4b8aee1c7342aa49c0575e78b5ea6f",
-      "generation_model": "gemini-manual",
-      "review_notes": "[english-generation-next64-import-2026-10-06] Candidate survived second-chunk cross-model/existing-bank template pruning; deterministic checks clean; final human audit still required.\n[english-final-audit-2026-10-06] Final human audit passed after ambiguity pruning, distractor-quality review, difficulty calibration, explanation/key review, duplicate review, and fingerprint repair. Approved for publication pending explicit user authorization.\n[english-final-publication-2026-10-06] Published after explicit user authorization.",
-      "reviewed_at": null,
-      "reviewed_by_user_id": null,
-      "question_set_id": null,
-      "usage_scope": "mock_reserve"
-    },
-    {
       "id": "cc1e8884-a510-4628-b40e-787ff43d78ad",
       "section_key": "english",
       "topic_id": "f1e6aafc-ba9b-455f-a195-13ba8641c44d",
@@ -417,34 +277,6 @@
       "fingerprint": "4a0b7b8be62b4b33cc7865c05bf682b5ae002b3eec9824d0cad1c5d653e3e96e",
       "generation_model": "claude-pro-manual",
       "review_notes": "[english-supplemental-30-import-2026-10-06] Selected from Claude extra-35 after manual quality review; five weaker/ambiguous items culled. Supplemental human audit passed; approved for publication pending explicit user authorization.\n[english-final-publication-2026-10-06] Published after explicit user authorization.",
-      "reviewed_at": null,
-      "reviewed_by_user_id": null,
-      "question_set_id": null,
-      "usage_scope": "mock_reserve"
-    },
-    {
-      "id": "28005893-e0e3-490b-911a-59127cb497fd",
-      "section_key": "english",
-      "topic_id": "f01e6c74-8f92-46e3-9af7-efd5e332df3d",
-      "difficulty": "easy",
-      "question_type": "multiple_choice",
-      "prompt": "Which choice is best for the underlined portion?",
-      "passage": "Two bridges cross the river near the old mill. The stone bridge, built more than a century ago, is narrow and steep, while the steel bridge downstream was designed for modern traffic. Of the two, the steel bridge is [underline]the most heavily used[/underline], carrying trucks and buses from dawn until well after dark.",
-      "choices": {
-        "A": "the more heavy used",
-        "B": "the most heavily used",
-        "C": "the more heavily used",
-        "D": "the most heavy used"
-      },
-      "correct_answer": "C",
-      "explanation": "When exactly two things are compared ('Of the two'), the comparative 'more' is needed, not the superlative 'most.' Because 'used' is a verb form, it must be described by the adverb 'heavily,' not the adjective 'heavy.' Only C fixes both problems: B uses the superlative, A uses the adjective, and D makes both errors.",
-      "source": "manual_claude",
-      "status": "published",
-      "created_at": "2026-10-06T23:04:47.172Z",
-      "updated_at": "2026-10-11T01:00:06.960Z",
-      "fingerprint": "f331923008dc142d9efccfb618b6c8cb5f227c22f08a50a484a46df0d9c2ab11",
-      "generation_model": "claude-pro-manual",
-      "review_notes": "[english-generation-half1-import-2026-10-06] Candidate survived first-half cross-model/existing-bank template pruning; deterministic checks clean; final human audit still required.\n[english-final-audit-2026-10-06] Final human audit passed after ambiguity pruning, distractor-quality review, difficulty calibration, explanation/key review, duplicate review, and fingerprint repair. Approved for publication pending explicit user authorization.\n[english-final-publication-2026-10-06] Published after explicit user authorization.",
       "reviewed_at": null,
       "reviewed_by_user_id": null,
       "question_set_id": null,
@@ -507,34 +339,6 @@
       "usage_scope": "mock_reserve"
     },
     {
-      "id": "1f191c1a-44e1-4dd4-b892-7895891ecf19",
-      "section_key": "english",
-      "topic_id": "3b7062d0-0819-4029-8b17-bedd4bfca65a",
-      "difficulty": "easy",
-      "question_type": "multiple_choice",
-      "prompt": "Which choice presents the correct punctuation for the items in the series?",
-      "passage": "The restoration team carefully documented the century-old stained glass window before removing it from the nave. Each individual pane [underline]was cataloged, cleaned,[/underline] and photographed prior to reassembly.",
-      "choices": {
-        "A": "NO CHANGE",
-        "B": "was cataloged cleaned",
-        "C": "was cataloged, cleaned",
-        "D": "was, cataloged, cleaned,"
-      },
-      "correct_answer": "A",
-      "explanation": "The list consists of three parallel verbs ('cataloged', 'cleaned', and 'photographed'). Standard punctuation requires commas separating items in a series, including the serial comma before 'and'.",
-      "source": "manual_gemini",
-      "status": "published",
-      "created_at": "2026-10-06T23:04:47.172Z",
-      "updated_at": "2026-10-11T01:00:06.960Z",
-      "fingerprint": "d5850a85fb0978aafa237510c9c04de925128acb2f04211f17b8a29aebe1baf1",
-      "generation_model": "gemini-manual",
-      "review_notes": "[english-generation-half1-import-2026-10-06] Candidate survived first-half cross-model/existing-bank template pruning; deterministic checks clean; final human audit still required.\n[english-final-audit-2026-10-06] Final human audit passed after ambiguity pruning, distractor-quality review, difficulty calibration, explanation/key review, duplicate review, and fingerprint repair. Approved for publication pending explicit user authorization.\n[english-final-publication-2026-10-06] Published after explicit user authorization.",
-      "reviewed_at": null,
-      "reviewed_by_user_id": null,
-      "question_set_id": null,
-      "usage_scope": "mock_reserve"
-    },
-    {
       "id": "053eedd8-dc74-4140-97ee-0539b5a0282e",
       "section_key": "english",
       "topic_id": "169a5307-a100-48f6-801a-f2f11efa338f",
@@ -557,34 +361,6 @@
       "fingerprint": "d11e9d17960c2c75f4acae13a1a636c213ecfaceb337b0c1b1d418a69831d7e3",
       "generation_model": "gemini-manual",
       "review_notes": "[english-generation-half1-import-2026-10-06] Candidate survived first-half cross-model/existing-bank template pruning; deterministic checks clean; final human audit still required.\n[english-final-audit-2026-10-06] Difficulty recalibrated from hard to medium after final human review.\n[english-final-audit-2026-10-06] Final human audit passed after ambiguity pruning, distractor-quality review, difficulty calibration, explanation/key review, duplicate review, and fingerprint repair. Approved for publication pending explicit user authorization.\n[english-final-publication-2026-10-06] Published after explicit user authorization.",
-      "reviewed_at": null,
-      "reviewed_by_user_id": null,
-      "question_set_id": null,
-      "usage_scope": "mock_reserve"
-    },
-    {
-      "id": "2e809908-3e82-4c65-bc51-075195eeb4c7",
-      "section_key": "english",
-      "topic_id": "b1ca6fb5-9bc4-4780-a6d7-3b6819caf0a5",
-      "difficulty": "easy",
-      "question_type": "multiple_choice",
-      "prompt": "Which choice best completes the sentence?",
-      "passage": "The pottery studio was small, but its shelves were crowded with finished pieces. The instructor wanted visitors to see how each object changed during firing. [underline]She placed several unfired bowls beside their finished versions, visitors could compare the two stages.[/underline] The arrangement made the process easier to understand.",
-      "choices": {
-        "A": "She placed several unfired bowls beside their finished versions, so visitors could compare the two stages.",
-        "B": "She placed several unfired bowls beside their finished versions visitors could compare the two stages.",
-        "C": "She placed several unfired bowls beside their finished versions; because visitors could compare the two stages.",
-        "D": "She placed several unfired bowls beside their finished versions, visitors comparing the two stages."
-      },
-      "correct_answer": "A",
-      "explanation": "Choice A correctly joins the two ideas with the coordinating conjunction \"so,\" showing that the placement allowed visitors to compare the stages. B creates a run-on sentence, C leaves a dependent clause after a semicolon, and D produces an awkward and incomplete construction.",
-      "source": "manual_chatgpt",
-      "status": "published",
-      "created_at": "2026-10-06T23:04:47.172Z",
-      "updated_at": "2026-10-11T01:00:06.960Z",
-      "fingerprint": "c004e1391d87a2f540e4a8685dd424ae570bf281f75ebcc157ff6899c22872f3",
-      "generation_model": "chatgpt-manual",
-      "review_notes": "[english-generation-half1-import-2026-10-06] Candidate survived first-half cross-model/existing-bank template pruning; deterministic checks clean; final human audit still required.\n[english-final-audit-2026-10-06] Final human audit passed after ambiguity pruning, distractor-quality review, difficulty calibration, explanation/key review, duplicate review, and fingerprint repair. Approved for publication pending explicit user authorization.\n[english-final-publication-2026-10-06] Published after explicit user authorization.",
       "reviewed_at": null,
       "reviewed_by_user_id": null,
       "question_set_id": null,
@@ -4789,13 +4565,237 @@
       "reviewed_by_user_id": null,
       "question_set_id": "8dcd4047-bcfc-4c69-b66e-5786dcd8d785",
       "usage_scope": "mock_reserve"
+    },
+    {
+      "id": "aedd9537-f22c-4eb6-af84-3f0d89ccfe80",
+      "section_key": "english",
+      "topic_id": "f01e6c74-8f92-46e3-9af7-efd5e332df3d",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "prompt": "Which choice best completes the sentence?",
+      "passage": "The biologist compared measurements taken at three different times of day. The afternoon readings were consistently higher than the morning readings, but the evening readings were closer to the morning values. Because the pattern was unexpected, the team repeated the experiment to determine [underline]whether the difference was caused by temperature or another environmental factor[/underline].",
+      "choices": {
+        "A": "whether the difference was caused by temperature or another environmental factor",
+        "B": "whether was the difference caused by temperature or another environmental factor",
+        "C": "if the difference had been caused by temperature or another environmental factor",
+        "D": "whether the difference had caused by temperature or another environmental factor"
+      },
+      "correct_answer": "A",
+      "explanation": "Choice A correctly uses \"whether\" to introduce the two possible explanations and maintains the tense of the passage. The other choices either shift tense unnecessarily or are grammatically incorrect.",
+      "source": "manual_chatgpt",
+      "status": "published",
+      "created_at": "2026-10-06T23:45:18.210Z",
+      "updated_at": "2026-10-06T23:45:18.210Z",
+      "fingerprint": null,
+      "generation_model": "chatgpt-manual",
+      "review_notes": "Dec 5 Form A: whole-passage replacement of English position 1; source bank question 0e88d482-a97a-4e4d-bbd6-51eaa95e5ed7. Original practice question retained.",
+      "reviewed_at": null,
+      "reviewed_by_user_id": null,
+      "question_set_id": null,
+      "usage_scope": "mock_reserve"
+    },
+    {
+      "id": "5c936d07-6ff5-41c5-ade8-a5c8c13ec246",
+      "section_key": "english",
+      "topic_id": "0d935ad7-1be6-440e-a0e1-06ca9196ee6a",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "prompt": "Which choice best maintains the voice of the passage?",
+      "passage": "My grandmother rarely spoke about her childhood in the mountains, but she kept one photograph from those years on her dresser: a stone house with a crooked chimney and a single pine tree beside the door. When I finally visited her village as an adult, I found the house still standing. The pine had grown taller than the roof, and [underline]the chimney was super crooked, just like in the picture[/underline].",
+      "choices": {
+        "A": "the chimney was super crooked, just like in the picture",
+        "B": "the chimney's angle of inclination corresponded to that documented in the photograph",
+        "C": "the chimney leaned a bunch, which was pretty cool to see",
+        "D": "the chimney leaned at exactly the angle I remembered from the photograph"
+      },
+      "correct_answer": "D",
+      "explanation": "The narrator writes in a reflective, personal voice that is clear but not casual. D matches that voice and keeps the focus on the narrator's memory of the photograph. A and C use slang ('super,' 'a bunch,' 'pretty cool') that clashes with the thoughtful tone, and B sounds like a technical report, which is too stiff for a personal reflection.",
+      "source": "manual_claude",
+      "status": "published",
+      "created_at": "2026-10-06T23:04:47.172Z",
+      "updated_at": "2026-10-06T23:04:47.172Z",
+      "fingerprint": null,
+      "generation_model": "claude-pro-manual",
+      "review_notes": "Dec 5 Form A: whole-passage replacement of English position 6; source bank question 191119e6-c5ea-43ef-b513-bdc361d52b62. Original practice question retained.",
+      "reviewed_at": null,
+      "reviewed_by_user_id": null,
+      "question_set_id": null,
+      "usage_scope": "mock_reserve"
+    },
+    {
+      "id": "d17d7fa6-8046-410d-832f-098e3ae5669c",
+      "section_key": "english",
+      "topic_id": "f01e6c74-8f92-46e3-9af7-efd5e332df3d",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "prompt": "Which choice best completes the sentence according to standard idiom and comparative forms?",
+      "passage": "During the restoration of the eighteenth-century fresco, conservators discovered that previous repair crews had applied synthetic lacquers over the natural pigments. To avoid stripping the original brushwork, the team worked [underline]more meticulously[/underline] than any previous restoration crew had.",
+      "choices": {
+        "A": "NO CHANGE",
+        "B": "more meticulous",
+        "C": "most meticulously",
+        "D": "so meticulous"
+      },
+      "correct_answer": "A",
+      "explanation": "The adverb 'more meticulously' correctly modifies the verb 'worked' and establishes a clear, grammatically sound comparative comparison with 'than any previous restoration crew had'.",
+      "source": "manual_gemini",
+      "status": "published",
+      "created_at": "2026-10-06T23:04:47.172Z",
+      "updated_at": "2026-10-06T23:04:47.172Z",
+      "fingerprint": null,
+      "generation_model": "gemini-manual",
+      "review_notes": "Dec 5 Form A: whole-passage replacement of English position 8; source bank question 15156d33-b0c3-466b-b801-1b1070aa823c. Original practice question retained.",
+      "reviewed_at": null,
+      "reviewed_by_user_id": null,
+      "question_set_id": null,
+      "usage_scope": "mock_reserve"
+    },
+    {
+      "id": "c12b5116-db63-48cd-bbcd-871cd91a1518",
+      "section_key": "english",
+      "topic_id": "3b7062d0-0819-4029-8b17-bedd4bfca65a",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "prompt": "Which choice is best for the underlined portion?",
+      "passage": "The traveling puppet company spends each summer on the road, performing in town squares and old theaters. This year, it will visit three cities that have never hosted it before: [underline]Grenoble, France, Turin, Italy, and Geneva[/underline], Switzerland. At each stop, the puppeteers will also lead free workshops for local children.",
+      "choices": {
+        "A": "Grenoble, France, Turin, Italy, and Geneva",
+        "B": "Grenoble, France; Turin, Italy; and Geneva",
+        "C": "Grenoble; France, Turin; Italy, and Geneva",
+        "D": "Grenoble France; Turin Italy; and Geneva"
+      },
+      "correct_answer": "B",
+      "explanation": "Each item in this list already contains a comma between a city and its country, so semicolons are needed to separate the items themselves (B). With commas alone (A), the list reads like six separate places. C puts the semicolons in the wrong spots, splitting each city from its own country, and D removes the commas that belong between each city and its country.",
+      "source": "manual_claude",
+      "status": "published",
+      "created_at": "2026-10-07T00:36:58.250Z",
+      "updated_at": "2026-10-07T00:36:58.250Z",
+      "fingerprint": null,
+      "generation_model": "claude-pro-manual",
+      "review_notes": "Dec 5 Form A: whole-passage replacement of English position 11; source bank question 1388ec48-750f-4145-9e3e-d1e3e8d2ffb4. Original practice question retained.",
+      "reviewed_at": null,
+      "reviewed_by_user_id": null,
+      "question_set_id": null,
+      "usage_scope": "mock_reserve"
+    },
+    {
+      "id": "c09cdaa7-1143-4e98-b4ac-523b4ca5ce88",
+      "section_key": "english",
+      "topic_id": "169a5307-a100-48f6-801a-f2f11efa338f",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "prompt": "Which choice is best for the underlined portion?",
+      "passage": "The seed bank was built to protect the world's food crops from disaster. Its vaults are carved deep into a mountainside, where the rock stays frozen year-round. The entrance sits high above sea level, out of reach of any flood, and the seeds are sealed in moisture-proof packets. [underline]Otherwise,[/underline] every part of the facility is designed to keep its collection alive for decades, even if no one is there to tend it.",
+      "choices": {
+        "A": "For instance,",
+        "B": "Even so,",
+        "C": "In short,",
+        "D": "Otherwise,"
+      },
+      "correct_answer": "C",
+      "explanation": "The last sentence sums up the details before it (frozen rock, high entrance, sealed packets) into one general statement, so 'In short' (C) is correct. 'For instance' (A) would introduce a specific example, not a summary. 'Even so' (B) signals a contrast with the earlier details, and 'Otherwise' (D) means 'if not,' which makes no sense here.",
+      "source": "manual_claude",
+      "status": "published",
+      "created_at": "2026-10-07T00:36:58.250Z",
+      "updated_at": "2026-10-07T00:36:58.250Z",
+      "fingerprint": null,
+      "generation_model": "claude-pro-manual",
+      "review_notes": "Dec 5 Form A: whole-passage replacement of English position 14; source bank question 030213c8-8401-492a-9640-9be8342b3d3a. Original practice question retained.",
+      "reviewed_at": null,
+      "reviewed_by_user_id": null,
+      "question_set_id": null,
+      "usage_scope": "mock_reserve"
+    },
+    {
+      "id": "748550ed-26b8-4390-a9fa-4dd7b739823b",
+      "section_key": "english",
+      "topic_id": "f01e6c74-8f92-46e3-9af7-efd5e332df3d",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "prompt": "Which choice makes clear who scored the goal?",
+      "passage": "Late in the second half, Jordan stole the ball at midfield and passed it to Eli. [underline]He[/underline] dribbled past two defenders and scored from six yards out, giving the Falcons a 2–1 lead. It was the first goal of Eli's varsity career.",
+      "choices": {
+        "A": "He",
+        "B": "Him",
+        "C": "Eli",
+        "D": "They"
+      },
+      "correct_answer": "C",
+      "explanation": "Two players were just mentioned, so 'He' could mean either Jordan or Eli; naming Eli removes the confusion and matches the last sentence. A is the most tempting because it is grammatically correct, but it is unclear. B is the wrong pronoun form for a subject, and D wrongly suggests both players scored.",
+      "source": "manual_claude",
+      "status": "published",
+      "created_at": "2026-10-07T01:56:21.928Z",
+      "updated_at": "2026-10-07T01:56:21.928Z",
+      "fingerprint": null,
+      "generation_model": "claude-pro-manual",
+      "review_notes": "Dec 5 Form A: whole-passage replacement of English position 16; source bank question 1a8927ec-321e-4141-8d2c-76423b7f32d4. Original practice question retained.",
+      "reviewed_at": null,
+      "reviewed_by_user_id": null,
+      "question_set_id": null,
+      "usage_scope": "mock_reserve"
+    },
+    {
+      "id": "d958752a-0b94-4471-a43d-1e32b494b06f",
+      "section_key": "english",
+      "topic_id": "3b7062d0-0819-4029-8b17-bedd4bfca65a",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "prompt": "Which choice best punctuates the underlined sentence?",
+      "passage": "The manuscript contains several marginal notes, but one is especially revealing. [underline]The note, written in a different hand from the main text, suggests that the author revised the final chapter[/underline]. Scholars are using the handwriting to determine when the revision occurred.",
+      "choices": {
+        "A": "The note written in a different hand from the main text suggests that the author revised the final chapter.",
+        "B": "The note, written in a different hand from the main text suggests that the author revised the final chapter.",
+        "C": "The note, written in a different hand from the main text, suggests that the author revised the final chapter.",
+        "D": "The note written in a different hand, from the main text, suggests that the author revised the final chapter."
+      },
+      "correct_answer": "C",
+      "explanation": "The phrase \"written in a different hand from the main text\" is nonessential information, so it should be enclosed by matching commas. The other choices either omit one comma or interrupt the phrase incorrectly.",
+      "source": "manual_chatgpt",
+      "status": "published",
+      "created_at": "2026-10-06T23:45:18.210Z",
+      "updated_at": "2026-10-06T23:45:18.210Z",
+      "fingerprint": null,
+      "generation_model": "chatgpt-manual",
+      "review_notes": "Dec 5 Form A: whole-passage replacement of English position 19; source bank question 2e701e71-4a13-4233-a5c7-05c66b7261a1. Original practice question retained.",
+      "reviewed_at": null,
+      "reviewed_by_user_id": null,
+      "question_set_id": null,
+      "usage_scope": "mock_reserve"
+    },
+    {
+      "id": "0f0a27ee-2ee2-4590-8279-39f23becc665",
+      "section_key": "english",
+      "topic_id": "b1ca6fb5-9bc4-4780-a6d7-3b6819caf0a5",
+      "difficulty": "medium",
+      "question_type": "multiple_choice",
+      "prompt": "Which choice maintains clear modifier placement and logical sentence structure?",
+      "passage": "Perched atop the granite ledge overlooking the valley, [underline]the soaring red-tailed hawk swept its broad wings upward before diving toward the meadow below.[/underline]",
+      "choices": {
+        "A": "NO CHANGE",
+        "B": "the broad wings of the red-tailed hawk swept upward before diving toward the meadow below.",
+        "C": "diving toward the meadow below, the soaring red-tailed hawk swept its broad wings upward.",
+        "D": "the valley below was visible to the red-tailed hawk as it swept its broad wings upward."
+      },
+      "correct_answer": "A",
+      "explanation": "The modifier 'Perched atop the granite ledge overlooking the valley' logically describes 'the soaring red-tailed hawk'. Choice A places the hawk immediately after the phrase, avoiding misplaced or dangling modifiers.",
+      "source": "manual_gemini",
+      "status": "published",
+      "created_at": "2026-10-06T23:04:47.172Z",
+      "updated_at": "2026-10-06T23:04:47.172Z",
+      "fingerprint": null,
+      "generation_model": "gemini-manual",
+      "review_notes": "Dec 5 Form A: whole-passage replacement of English position 21; source bank question 04a399ec-33e7-4a68-8ff4-8d895fd53cda. Original practice question retained.",
+      "reviewed_at": null,
+      "reviewed_by_user_id": null,
+      "question_set_id": null,
+      "usage_scope": "mock_reserve"
     }
   ],
   "order": [
     {
       "section_key": "english",
       "position": 1,
-      "question_id": "09d91657-9c5e-44bf-90ca-c128d5305140"
+      "question_id": "aedd9537-f22c-4eb6-af84-3f0d89ccfe80"
     },
     {
       "section_key": "english",
@@ -4820,7 +4820,7 @@
     {
       "section_key": "english",
       "position": 6,
-      "question_id": "750a5d6a-db4e-4dc0-aa64-5e8960736d2a"
+      "question_id": "5c936d07-6ff5-41c5-ade8-a5c8c13ec246"
     },
     {
       "section_key": "english",
@@ -4830,7 +4830,7 @@
     {
       "section_key": "english",
       "position": 8,
-      "question_id": "11cbe33f-3fe1-4e63-b899-312de2554970"
+      "question_id": "d17d7fa6-8046-410d-832f-098e3ae5669c"
     },
     {
       "section_key": "english",
@@ -4845,7 +4845,7 @@
     {
       "section_key": "english",
       "position": 11,
-      "question_id": "13a421bd-b328-4bcf-8762-88052f505f7f"
+      "question_id": "c12b5116-db63-48cd-bbcd-871cd91a1518"
     },
     {
       "section_key": "english",
@@ -4860,7 +4860,7 @@
     {
       "section_key": "english",
       "position": 14,
-      "question_id": "0f4768e3-5dc8-4845-8189-60ff61b03030"
+      "question_id": "c09cdaa7-1143-4e98-b4ac-523b4ca5ce88"
     },
     {
       "section_key": "english",
@@ -4870,7 +4870,7 @@
     {
       "section_key": "english",
       "position": 16,
-      "question_id": "28005893-e0e3-490b-911a-59127cb497fd"
+      "question_id": "748550ed-26b8-4390-a9fa-4dd7b739823b"
     },
     {
       "section_key": "english",
@@ -4885,7 +4885,7 @@
     {
       "section_key": "english",
       "position": 19,
-      "question_id": "1f191c1a-44e1-4dd4-b892-7895891ecf19"
+      "question_id": "d958752a-0b94-4471-a43d-1e32b494b06f"
     },
     {
       "section_key": "english",
@@ -4895,7 +4895,7 @@
     {
       "section_key": "english",
       "position": 21,
-      "question_id": "2e809908-3e82-4c65-bc51-075195eeb4c7"
+      "question_id": "0f0a27ee-2ee2-4590-8279-39f23becc665"
     },
     {
       "section_key": "english",
@@ -6092,5 +6092,5 @@
       "updated_at": "2026-09-09T05:10:20.224Z"
     }
   ],
-  "checksum": "8e7832f823c790f0fb78e9c73cebbc5a205d1147bd012524712a7bb9cfad9eeb"
+  "checksum": "6bdab1e8bd8e672191d74a2522729156d8c9531ce75bddddfb31c7a88b1f8940"
 }
