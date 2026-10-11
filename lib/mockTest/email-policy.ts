@@ -1,5 +1,6 @@
+import { SUPPORT_EMAIL } from "../site-config.ts";
 export const MOCK_EMAIL_FROM = process.env.EMAIL_FROM || "onboarding@resend.dev";
-export const MOCK_EMAIL_SUPPORT = process.env.EMAIL_SUPPORT || "support@example.com";
+export const MOCK_EMAIL_SUPPORT = process.env.MOCK_EMAIL_SUPPORT || process.env.EMAIL_SUPPORT || SUPPORT_EMAIL;
 
 export function resolveEmailDeliveryTarget(input: {
   realRecipient: string;

@@ -1,0 +1,3 @@
+import Link from "next/link";
+import { SUPPORT_EMAIL } from "@/lib/site-config";
+export default function RefundsPage(){return <main className="policyPage"><article className="policyCard"><p className="policyEyebrow">Aced</p><h1>Refunds</h1><p className="policyUpdated">Last updated: October 10, 2026</p><h2>Mock test purchases</h2><p>The $2 Aced Mock Test fee is non-refundable after purchase.</p><h2>If the test is full</h2><p>If Aced cannot give you a seat because the test is full, your payment is automatically refunded.</p><h2>Questions</h2><p>If you think a payment was handled incorrectly, email <a href="mailto:support@aceditprep.com">{SUPPORT_EMAIL}</a>.</p><p className="policyBack"><Link href="/">Back to Aced</Link></p></article></main>}

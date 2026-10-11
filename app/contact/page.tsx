@@ -1,0 +1,3 @@
+import Link from "next/link";
+import { SUPPORT_EMAIL } from "@/lib/site-config";
+export default function ContactPage(){return <main className="policyPage"><article className="policyCard"><p className="policyEyebrow">Aced</p><h1>Contact</h1><p className="policyUpdated">Last updated: October 10, 2026</p><h2>Support</h2><p>Email <a href="mailto:support@aceditprep.com">{SUPPORT_EMAIL}</a>. We reply within 2 days.</p><p className="policyBack"><Link href="/">Back to Aced</Link></p></article></main>}
