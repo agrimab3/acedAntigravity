@@ -6,12 +6,12 @@ const {Resend}=require('resend');
 if(!process.argv.includes('--send'))throw Error('Use --send to authorize six test emails');
 if(!process.env.RESEND_API_KEY||!process.env.EMAIL_FROM)throw Error('Missing Resend configuration');
 const {renderEveryMockEmailForTest,MOCK_EMAIL_HEADER_TOKEN}=await import('../lib/mockTest/email-templates.ts');
-const {getMockEmailHeaderFilename}=await import('../lib/mockTest/email-outbox.ts');
+const headerFiles={registration_confirmed:'header-in.gif',tomorrow_reminder:'header-tomorrow.gif',waitlist_invite:'header-seat-open.gif',waitlist_joined:'header-waitlist.gif',payment_refunded:'header-refund.gif',scores_released:'header-scores.gif'};
 const base='https://aceditprep.com';
 const rendered=renderEveryMockEmailForTest({timeZone:'America/Los_Angeles',baseUrl:base});
 const resend=new Resend(process.env.RESEND_API_KEY);
 for(const e of rendered){
- const filename=getMockEmailHeaderFilename(e.type);
+ const filename=headerFiles[e.type];
  const header=`${base}/email/${filename}`;
  const html=e.html.replace(MOCK_EMAIL_HEADER_TOKEN,header);
  const links=[...html.matchAll(/href="([^"]+)"/g)].map(m=>m[1]);
