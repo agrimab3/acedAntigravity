@@ -4,6 +4,9 @@ import {
   resolvePreferredGroqModel,
 } from "@/lib/groq-models";
 
+export const TUTOR_UNAVAILABLE_MESSAGE =
+  "The tutor is taking a quick break, try again in a minute";
+
 type TutorAiOptions = {
   systemInstruction: string;
   prompt: string;

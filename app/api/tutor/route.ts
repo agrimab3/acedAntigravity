@@ -15,7 +15,11 @@ import { getTopicByName, isTopicInPracticeScope, type SectionKey } from "@/lib/a
 import { getAuthSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { consumeRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
-import { generateTutorAiText, hasTutorAiProvider } from "@/lib/tutor-ai";
+import {
+  generateTutorAiText,
+  hasTutorAiProvider,
+  TUTOR_UNAVAILABLE_MESSAGE,
+} from "@/lib/tutor-ai";
 import {
   buildFallbackTutorReply,
   buildSafePreSubmissionReply,
@@ -329,11 +333,12 @@ export async function POST(req: Request) {
   });
 
   if (!hasTutorAiProvider()) {
-    await persistHint(fallbackReply);
+    await persistHint(TUTOR_UNAVAILABLE_MESSAGE);
     return NextResponse.json({
-      reply: fallbackReply,
+      reply: TUTOR_UNAVAILABLE_MESSAGE,
       fallback: true,
-      provider: "local-fallback",
+      unavailable: true,
+      provider: "unavailable",
       hintLevel: decision.nextHintLevel,
       hintCount: nextHintCount,
       answerRevealed,
@@ -491,11 +496,12 @@ export async function POST(req: Request) {
       error: error instanceof Error ? error.message : String(error),
     });
 
-    await persistHint(fallbackReply);
+    await persistHint(TUTOR_UNAVAILABLE_MESSAGE);
     return NextResponse.json({
-      reply: fallbackReply,
+      reply: TUTOR_UNAVAILABLE_MESSAGE,
       fallback: true,
-      provider: "local-fallback",
+      unavailable: true,
+      provider: "unavailable",
       hintLevel: decision.nextHintLevel,
       hintCount: nextHintCount,
       answerRevealed,
