@@ -1751,3 +1751,11 @@
     justify-content: space-between;
   }
 }
+
+/* Ten-question English passages remain readable on narrow screens: passage first, question below. */
+@media(max-width:760px){
+  .longPassageTabs {display:none !important;}
+  .mainArea.longPassageLayout {display:grid;grid-template-columns:minmax(0,1fr);gap:16px;}
+  .mainArea.longPassageLayout .passageCard,.mainArea.longPassageLayout .questionColumn {display:block !important;}
+  .mainArea.longPassageLayout .passageCard {max-height:48dvh;overflow-y:auto;}
+}

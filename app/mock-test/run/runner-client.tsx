@@ -1527,6 +1527,8 @@ export default function MockTestRunner({
   const oneMinuteWarning = effectiveRemaining <= 60 && effectiveRemaining > 0;
   const warningActive = fiveMinuteWarning || oneMinuteWarning;
   const hasPassage = Boolean(currentQuestion?.passage);
+  const multiUnderlinePassage = (currentQuestion?.passage?.match(/\[underline\]|<u>/gi) ?? []).length > 1;
+  const activePassageOrdinal = multiUnderlinePassage && currentQuestion && session ? session.section.questions.filter(q => q.position <= currentQuestion.position && q.passage === currentQuestion.passage).length : undefined;
   const releaseDisplay = getMockTimeZoneDisplay(timeZone);
 
   const saveCopy = !online
@@ -1656,7 +1658,7 @@ export default function MockTestRunner({
 
       <div className={styles.contentFrame}>
         {hasPassage ? (
-          <div className={styles.mobileTabs} role="tablist" aria-label="Question view">
+          <div className={multiUnderlinePassage ? `${styles.mobileTabs} ${styles.longPassageTabs}` : styles.mobileTabs} role="tablist" aria-label="Question view">
             <button
               role="tab"
               aria-selected={mobilePane === "passage"}
@@ -1679,6 +1681,7 @@ export default function MockTestRunner({
         <div
           className={
             styles.mainArea +
+            (multiUnderlinePassage ? ` ${styles.longPassageLayout}` : "") +
             " " +
             (!hasPassage ? styles.singleColumn : "") +
             " " +
@@ -1695,7 +1698,7 @@ export default function MockTestRunner({
               {currentQuestion.questionSetTitle ? (
                 <h2>{currentQuestion.questionSetTitle}</h2>
               ) : null}
-              <div className={styles.passageText}><QuestionContent text={currentQuestion.passage ?? ""} questionNumber={session.section.key === "english" ? currentQuestion.position : undefined} activeUnderline={session.section.key === "english"} /></div>
+              <div className={styles.passageText}><QuestionContent text={currentQuestion.passage ?? ""} questionNumber={session.section.key === "english" ? currentQuestion.position : undefined} underlineOrdinal={activePassageOrdinal} activeUnderline={session.section.key === "english"} /></div>
             </article>
           ) : null}
 

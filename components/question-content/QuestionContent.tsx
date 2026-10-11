@@ -96,10 +96,12 @@ export default function QuestionContent({
   text,
   questionNumber,
   activeUnderline = false,
+  underlineOrdinal,
 }: {
   text: string;
   questionNumber?: number | string | null;
   activeUnderline?: boolean;
+  underlineOrdinal?: number;
 }) {
   const activeRef = useRef<HTMLSpanElement | null>(null);
 
@@ -121,6 +123,8 @@ export default function QuestionContent({
     .replace(/__([\s\S]*?)__/g, "[underline]$1[/underline]");
 
   const lines = normalized.split("\n");
+  const underlineCount = (normalized.match(/\[underline\]/gi) ?? []).length;
+  let underlineIndex = 0;
   const firstUnderlineLineIndex = lines.findIndex((line) => /\[underline\].*?\[\/underline\]/i.test(line));
   const firstUnderlineSegmentIndex =
     firstUnderlineLineIndex >= 0
@@ -140,6 +144,7 @@ export default function QuestionContent({
               const match = segment.match(/^\[underline\]([\s\S]*?)\[\/underline\]$/i);
 
               if (match) {
+                const ordinal = ++underlineIndex;
                 const isFirstUnderline =
                   lineIndex === firstUnderlineLineIndex &&
                   segmentIndex === firstUnderlineSegmentIndex;
@@ -147,16 +152,16 @@ export default function QuestionContent({
                 return (
                   <span
                     key={`underline-${lineIndex}-${segmentIndex}`}
-                    ref={isFirstUnderline ? activeRef : undefined}
+                    ref={(underlineOrdinal ? ordinal === underlineOrdinal : isFirstUnderline) ? activeRef : undefined}
                     className={
-                      activeUnderline && isFirstUnderline
+                      activeUnderline && (underlineOrdinal ? ordinal === underlineOrdinal : isFirstUnderline)
                         ? `${styles.underline} ${styles.activeUnderline}`
                         : styles.underline
                     }
                   >
                     {renderMathAwareText(match[1], `u-${lineIndex}-${segmentIndex}`)}
                     {questionNumber != null ? (
-                      <sup className={styles.questionNumber}>{questionNumber}</sup>
+                      <sup className={styles.questionNumber}>{underlineCount > 1 ? ordinal : questionNumber}</sup>
                     ) : null}
                   </span>
                 );
