@@ -32,7 +32,9 @@ install_schedulers() {
     "*/5 * * * * /usr/bin/flock -n /tmp/aced-mocktest-release.lock ${CURRENT_DIR}/scripts/run-mocktest-release-cron.sh >> ${LOG_DIR}/mocktest-release.log 2>&1"
   install_cron_line "# ACED_DATABASE_BACKUP_CRON" \
     "23 9 * * * /usr/bin/flock -n /tmp/aced-db-backup.lock ${CURRENT_DIR}/scripts/backup-db.sh >> ${LOG_DIR}/db-backup.log 2>&1"
-  echo "Installed idempotent release and nightly database-backup crons."
+  install_cron_line "# ACED_CONTENT_FACTORY_CRON" \
+    "30 8,9 * * * /usr/bin/flock -n /tmp/aced-content-factory.lock ${CURRENT_DIR}/scripts/run-content-factory-cron.sh >> ${LOG_DIR}/content-factory.log 2>&1"
+  echo "Installed idempotent release, backup and Pacific-time content-factory crons."
 }
 
 mkdir -p "${RELEASES_DIR}" "${SHARED_DIR}" "${BACKUP_DIR}" "${LOG_DIR}"
@@ -63,7 +65,7 @@ npm ci --include=dev
 npm run build
 npm run db:migrate
 node scripts/check-mocktest-production-release-state.mjs
-chmod +x scripts/run-mocktest-release-cron.sh scripts/backup-db.sh scripts/restore-backup.sh scripts/rollback-vps.sh
+chmod +x scripts/run-mocktest-release-cron.sh scripts/backup-db.sh scripts/restore-backup.sh scripts/rollback-vps.sh scripts/run-content-factory-cron.sh
 
 prior_target=""
 if [[ -L "${CURRENT_DIR}" ]]; then

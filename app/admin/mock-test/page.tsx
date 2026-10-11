@@ -44,6 +44,7 @@ export default async function MockTestAdminPage({
           <div className={styles.headerActions}>
             <Link className={styles.backLink} href="/admin/feedback">Feedback</Link>
             <Link className={styles.backLink} href="/admin/tutor-usage">Tutor usage</Link>
+            <Link className={styles.backLink} href="/admin/content-factory">Content factory</Link>
             {process.env.NODE_ENV !== "production" ? (
               <Link
                 className={styles.previewButton}

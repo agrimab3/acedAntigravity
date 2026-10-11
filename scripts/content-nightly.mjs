@@ -1,58 +1,29 @@
-import { spawnSync } from "node:child_process";
-
-const args = Object.fromEntries(
-  process.argv
-    .slice(2)
-    .filter((arg) => arg.startsWith("--"))
-    .map((arg) => {
-      const [key, ...rest] = arg.slice(2).split("=");
-      return [key, rest.join("=") || "true"];
-    })
-);
-
-const reserveLimit = Math.min(12, Math.max(0, Number(args["reserve-limit"] ?? 6)));
-const practiceLimit = Math.min(12, Math.max(0, Number(args["practice-limit"] ?? 6)));
-const dryRun = args["dry-run"] === "1" || args["dry-run"] === "true";
-const provider = args.provider?.trim() || process.env.CONTENT_GENERATION_PROVIDER?.trim() || "gemini";
-
-if (reserveLimit + practiceLimit > 12) {
-  throw new Error("Nightly generation is capped at 12 candidate children total.");
-}
-
-function runScope(scope, limit) {
-  if (limit <= 0) return true;
-
-  const childArgs = [
-    "scripts/content-generate-next.mjs",
-    `--scope=${scope}`,
-    `--limit=${limit}`,
-    `--provider=${provider}`,
-  ];
-  if (dryRun) childArgs.push("--dry-run=1");
-
-  const result = spawnSync("node", childArgs, {
-    cwd: process.cwd(),
-    env: process.env,
-    stdio: "inherit",
-  });
-
-  return result.status === 0;
-}
-
-console.log(
-  `ACED nightly content factory · reserve=${reserveLimit} · practice=${practiceLimit} · provider=${provider}${dryRun ? " · dry run" : ""}`
-);
-
-const reserveOk = runScope("mock_reserve", reserveLimit);
-if (!reserveOk) {
-  console.error("Mock-reserve generation did not complete cleanly. Stopping before practice generation.");
-  process.exit(1);
-}
-
-const practiceOk = runScope("practice", practiceLimit);
-if (!practiceOk) {
-  console.error("Practice generation did not complete cleanly.");
-  process.exit(1);
-}
-
-console.log("Nightly content factory completed.");
+import {spawnSync} from 'node:child_process';
+import pg from 'pg';
+const arg=Object.fromEntries(process.argv.slice(2).filter(x=>x.startsWith('--')).map(x=>x.slice(2).split('=')));
+const limit=Math.min(20,Math.max(1,Number(arg.limit||20)));
+if(!Number.isInteger(limit))throw Error('Invalid limit');
+const pacificHour=Number(new Intl.DateTimeFormat('en-US',{timeZone:'America/Los_Angeles',hour:'2-digit',hourCycle:'h23'}).format(new Date()));
+if(!arg.manual && pacificHour!==1){console.log('Skipped: outside 1 AM Pacific hour');process.exit(0)}
+const db=new pg.Client({connectionString:process.env.DATABASE_URL});
+await db.connect();
+let runId;let result={inserted:0,rejected:0,skipped:0,quota_paused:0,status:'skipped',note:''};
+try{
+ const created=await db.query('insert into content_factory_runs(status,requested_limit) values ($1,$2) returning id',['running',limit]);runId=created.rows[0].id;
+ const key=process.env.CONTENT_FACTORY_GEMINI_API_KEY;
+ if(!key){result.note='Missing CONTENT_FACTORY_GEMINI_API_KEY; skipped';console.log(result.note)}
+ else{
+  // Explicitly remove all tutor and other provider credentials. No Groq fallback.
+  const env={...process.env,GEMINI_API_KEY:key,GOOGLE_API_KEY:key,QUESTION_GENERATION_PROVIDER:'gemini',QUESTION_REVIEW_PROVIDER:'gemini',CONTENT_GENERATION_PROVIDER:'gemini',GROQ_API_KEY:'',OPENROUTER_API_KEY:'',OPENROUTER_GENERATION_MODEL:'',OPENROUTER_REVIEW_MODEL:'',OLLAMA_GENERATION_MODEL:'',OLLAMA_REVIEW_MODEL:'',OLLAMA_MODEL:'',OLLAMA_API_BASE_URL:'',OLLAMA_BASE_URL:''};
+  const child=spawnSync('node',['scripts/content-generate-next.mjs','--scope=practice',`--limit=${limit}`,'--provider=gemini'],{cwd:process.cwd(),env,encoding:'utf8',timeout:30*60*1000,maxBuffer:10*1024*1024});
+  const output=child.stdout||'';
+  const at=output.lastIndexOf('Generation batch summary:');
+  if(at>=0){try{const parsed=JSON.parse(output.slice(output.indexOf('{',at)));for(const job of parsed.jobs||[]){result.inserted+=Number(job.inserted||0);result.rejected+=Number(job.reviewRejected||0);result.skipped+=Number(job.skipped||0);if(job.runState==='paused_due_to_provider'||/quota|rate.limit/i.test(job.error||''))result.quota_paused++;} }catch{result.note='Unable to parse generator summary'}}
+  if(result.inserted>limit)throw Error('Inserted count exceeded cap');
+  result.status=child.status===0?'completed':result.quota_paused?'quota_paused':'failed';
+  if(child.error)result.note=child.error.name;
+  if(!result.note&&child.status!==0)result.note='Generator exited unsuccessfully';
+  console.log(JSON.stringify({status:result.status,requested:limit,inserted:result.inserted,rejected:result.rejected,skipped:result.skipped,quota_paused:result.quota_paused,note:result.note}));
+ }
+} catch(e){result.status='failed';result.note=e.message;console.log('Factory failed:',e.message);process.exitCode=1}
+finally{if(runId)await db.query('update content_factory_runs set finished_at=now(),status=$2,inserted=$3,rejected=$4,skipped=$5,quota_paused=$6,note=$7 where id=$1',[runId,result.status,result.inserted,result.rejected,result.skipped,result.quota_paused,result.note]);await db.end()}

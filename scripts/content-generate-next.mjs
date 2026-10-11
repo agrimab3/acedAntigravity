@@ -228,6 +228,10 @@ try {
         error: error instanceof Error ? error.message : "unknown generation error",
       });
     }
+    if (results.at(-1)?.runState === "paused_due_to_provider" || results.at(-1)?.error) {
+      console.log("Provider paused or failed; stopping remaining jobs.");
+      break;
+    }
   }
 
   console.log("\nGeneration batch summary:");
