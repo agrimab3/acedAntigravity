@@ -6,6 +6,7 @@ import { getDb } from "@/lib/db";
 import { userIdentities, users } from "@/db/schema";
 import { MOCK_TEST_DEV_PROVIDER_ID, MOCK_TEST_STUDENTS } from "@/lib/mockTest/testStudents";
 import { captureAcedError } from "@/lib/monitoring";
+import { consumeRateLimit, rateLimitIdentity, RATE_LIMITS } from "@/lib/rate-limit";
 
 export const DEV_LOGIN_PROVIDER_ID = MOCK_TEST_DEV_PROVIDER_ID;
 const DEV_TEST_USER = {
@@ -199,6 +200,14 @@ export const authOptions: NextAuthOptions = {
       : []),
   ],
   callbacks: {
+    async signIn({ user }) {
+      if (!user?.email) return false;
+      const accountIdentity = rateLimitIdentity(user.email.trim().toLowerCase());
+      return consumeRateLimit(
+        `login-account:${accountIdentity}`,
+        RATE_LIMITS.loginAccount
+      ).allowed;
+    },
     async jwt({ token, user, account }) {
       if (user?.email) {
         const syncedUser = await syncSignedInUser(user, account);

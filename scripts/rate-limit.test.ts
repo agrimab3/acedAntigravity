@@ -26,6 +26,42 @@ test("checkout allows only a few tries per minute then resets", () => {
   assert.equal(consumeRateLimit("checkout:user", RATE_LIMITS.checkout, 60_001, store).allowed, true);
 });
 
+test("60 different students can sign in from one school IP within a minute", () => {
+  const store = createRateLimitTestStore();
+  const now = 1_000;
+  for (let index = 0; index < 60; index += 1) {
+    assert.equal(
+      consumeRateLimit("login-ip:school", RATE_LIMITS.loginIp, now, store).allowed,
+      true
+    );
+    assert.equal(
+      consumeRateLimit(
+        `login-account:student-${index}`,
+        RATE_LIMITS.loginAccount,
+        now,
+        store
+      ).allowed,
+      true
+    );
+  }
+});
+
+test("one account is still limited before the school-wide IP limit", () => {
+  const store = createRateLimitTestStore();
+  for (let index = 0; index < RATE_LIMITS.loginAccount.limit; index += 1) {
+    assert.equal(
+      consumeRateLimit("login-account:same-student", RATE_LIMITS.loginAccount, 1_000, store)
+        .allowed,
+      true
+    );
+  }
+  assert.equal(
+    consumeRateLimit("login-account:same-student", RATE_LIMITS.loginAccount, 1_000, store)
+      .allowed,
+    false
+  );
+});
+
 test("answer saving route is not rate limited", () => {
   const source = readFileSync("app/api/mock-test/session/answer/route.ts", "utf8");
   assert.doesNotMatch(source, /consumeRateLimit|RATE_LIMITS/);

@@ -12,7 +12,7 @@ export async function POST(
   context: { params: Promise<{ nextauth: string[] }> }
 ) {
   const identity = getRequestNetworkIdentity(request);
-  const limit = consumeRateLimit(`login:${identity}`, RATE_LIMITS.login);
+  const limit = consumeRateLimit(`login-ip:${identity}`, RATE_LIMITS.loginIp);
   if (!limit.allowed) {
     return NextResponse.json(
       { error: "Too many sign-in tries. Wait a minute and try again." },
