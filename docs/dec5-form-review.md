@@ -15,6 +15,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 1 — Grammar & Usage (easy)
 
+**Full passage / set text (question 1):**
+
+Last summer my grandmother taught me to bake bread with a sourdough starter she had kept alive for decades. Every morning she <u>feeds</u> it a scoop of flour and a splash of water, then covered the jar with a cloth and set it beside the warm stove. By evening, the starter had nearly doubled in size and smelled faintly sour.
+
 **Question:** Which choice should replace the underlined portion?
 
 - A. NO CHANGE
@@ -27,6 +31,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** The passage describes a past routine, and the same sentence uses the past-tense verbs 'covered' and 'set,' so 'fed' (B) keeps the verbs consistent. 'Feeds' (A) and 'will feed' (D) shift to present and future time. 'Has fed' (C) suggests an action continuing into the present, which clashes with the past-tense verbs that follow.
 
 ## ENGLISH 2 — Organization & Flow (hard)
+
+**Full passage / set text (question 2):**
+
+When the town's only bookstore closed, many residents assumed they would have to drive an hour to buy a new novel. Then a retired teacher set a wooden cabinet full of used books outside her house, with a sign inviting neighbors to take one and leave one. Within a year, a dozen similar cabinets had appeared on porches and fence posts across town. Some were painted to match the houses behind them; one was built from an old radio cabinet. <u>The cabinets come in many shapes and sizes.</u>
 
 **Question:** Which choice provides the most effective conclusion to the paragraph?
 
@@ -41,6 +49,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 3 — Precision & Concision (medium)
 
+**Full passage / set text (question 3):**
+
+The historian studied letters written by residents during the winter of 1912. Many letters mention a shortage of coal, but one writer provides unusually specific details about how families adapted. The writer <u>saved and preserved a small supply of coal</u> for cooking after the local deliveries stopped.
+
 **Question:** Which choice best conveys the intended meaning without unnecessary repetition?
 
 - A. saved and preserved a small supply of coal
@@ -53,6 +65,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** "Preserved" already conveys the idea of keeping the coal for later use, so B states the meaning directly. A, C, and D unnecessarily repeat the same idea with multiple verbs.
 
 ## ENGLISH 4 — Punctuation (medium)
+
+**Full passage / set text (question 4):**
+
+The city planner presented two distinct proposals for the vacant waterfront lot: <u>a public park with native flora, and an urban wetland designed for storm runoff.</u> The city council ultimately selected the second option due to impending environmental regulations.
 
 **Question:** Which choice maintains correct punctuation following a colon that introduces a two-item list?
 
@@ -67,6 +83,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 5 — Sentence Structure (hard)
 
+**Full passage / set text (question 5):**
+
+The architect's renovation plan preserves the theater's original entrance while replacing the damaged interior seating. <u>Because the entrance has remained largely unchanged since the building opened, visitors can still recognize the theater's original design, the renovation will make the rest of the space more accessible.</u> The plan also includes improved lighting and wider aisles.
+
 **Question:** Which choice most clearly expresses the contrast between preserving the entrance and renovating the rest of the theater while maintaining correct sentence structure?
 
 - A. Because the entrance has remained largely unchanged since the building opened, visitors can still recognize the theater's original design; the renovation will make the rest of the space more accessible.
@@ -79,6 +99,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** Choice D correctly attaches the opening 'Because' clause to the idea it explains and uses 'while' to make the preservation-versus-renovation contrast explicit. A is grammatically possible but does not state that contrast as clearly; B mispunctuates the dependent opening clause, and C weakens the relationship between the ideas.
 
 ## ENGLISH 6 — Style & Tone (easy)
+
+**Full passage / set text (question 6):**
+
+This fossil of a small freshwater fish was found in a limestone quarry about forty years ago. The fish lived roughly fifty million years ago, when a shallow lake covered this region. Its delicate ribs and fin rays are <u>still super visible</u> in the stone, preserved in remarkable detail.
 
 **Question:** Which choice best fits the style and tone of this museum display text?
 
@@ -93,6 +117,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 7 — Transitions & Cohesion (medium)
 
+**Full passage / set text (question 7):**
+
+The composer first sketched the melody in a notebook. She then experimented with several rhythms before choosing one that fit the lyrics. <u>Next, she recorded a rough version so that she could evaluate the arrangement as a whole</u>. Only after that recording did she decide which instruments to include.
+
 **Question:** Which transition best establishes the relationship between the steps?
 
 - A. Nevertheless, she recorded a rough version so that she could evaluate the arrangement as a whole
@@ -105,6 +133,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** "Next" signals the chronological step that follows experimenting with rhythms and precedes the decision about instrumentation. The other choices indicate contrast or example rather than sequence.
 
 ## ENGLISH 8 — Grammar & Usage (easy)
+
+**Full passage / set text (question 8):**
+
+When astronomers first cataloged the distant exoplanet, its unusual orbital velocity surprised researchers. Further observation revealed that the planet, along with its two outer moons, <u>revolve</u> around a barycenter situated well outside the host star's immediate core.
 
 **Question:** Which choice completes the sentence so that it conforms to the conventions of Standard English?
 
@@ -119,6 +151,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 9 — Precision & Concision (hard)
 
+**Full passage / set text (question 9):**
+
+The report explains how the conservators determined which pigments appeared in an old painting. <u>Because the researchers had a reason to believe that some pigments might have been added during a later restoration, they conducted additional tests before drawing conclusions about the painting's original colors</u>. The extra testing revealed that two pigments were indeed added decades after the painting was completed.
+
 **Question:** Which choice best improves precision and concision without weakening the author's claim?
 
 - A. Because some pigments were possibly added during a later restoration, the researchers had a reason to conduct additional tests before making conclusions about the painting's original colors
@@ -131,6 +167,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** Choice C replaces the wordier "had a reason to believe" with "suspected" and uses the concise phrase "before concluding." D is grammatical but retains unnecessary wording, while A and B are less direct or overly qualified.
 
 ## ENGLISH 10 — Organization & Flow (medium)
+
+**Full passage / set text (question 10):**
+
+The university archive preserves notebooks kept by students who studied astronomy in the early twentieth century. The notebooks contain observations of the night sky as well as sketches of instruments used in the campus observatory. <u>One notebook is especially detailed, recording observations on dozens of evenings and including careful drawings of the moon</u>. Because of that unusually rich record, the archive's curator plans to feature this notebook in an upcoming display about student research.
 
 **Question:** Where should the underlined sentence be placed to best prepare for the curator's decision to feature one notebook?
 
@@ -145,6 +185,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 11 — Punctuation (easy)
 
+**Full passage / set text (question 11):**
+
+Marine biologists studying kelp forest ecology observed a sudden drop in sea otter populations along the coast. Without these apex predators to control the sea urchin <u>population; kelp</u> beds were rapidly depleted by overgrazing.
+
 **Question:** Which choice provides the correct punctuation between the dependent phrase and the main clause?
 
 - A. NO CHANGE
@@ -157,6 +201,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** The opening structure 'Without these apex predators to control the sea urchin population' is an introductory prepositional phrase, not an independent clause. It must be set off from the main clause by a comma, making a semicolon ungrammatical.
 
 ## ENGLISH 12 — Style & Tone (hard)
+
+**Full passage / set text (question 12):**
+
+When the town asked an independent committee to study the future of the old train station, residents expected a fierce debate. The committee's report, however, was careful and balanced. It noted that restoring the building would cost considerably more than tearing it down, but it also pointed out that the station's brick arches and tiled waiting room were among the last of their kind in the region. The report concluded that <u>restoration is the only responsible choice for a town that values its architectural heritage</u>.
 
 **Question:** Which choice best maintains the tone the passage attributes to the report?
 
@@ -171,6 +219,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 13 — Sentence Structure (medium)
 
+**Full passage / set text (question 13):**
+
+The archivist preserved the fragile documents, which were written on handmade vellum, by sealing them in acid-free enclosures. <u>This practice not only protects the organic fibers from humidity fluctuations, but it also shields the historic iron gall ink from light degradation.</u>
+
 **Question:** Which choice provides the most grammatically balanced parallel construction?
 
 - A. NO CHANGE
@@ -183,6 +235,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** The correlative conjunction 'not only... but also' requires parallel grammatical elements following each half. Choice D pairs two active verbs in direct parallelism: 'not only protects... but also shields'.
 
 ## ENGLISH 14 — Transitions & Cohesion (easy)
+
+**Full passage / set text (question 14):**
+
+Synthetic dyes made from coal tar were invented in the mid-nineteenth century, quickly replacing organic colorants. <u>For example,</u> textile manufacturers rapidly adopted these chemical compounds because they produced vibrant, fade-resistant colors at a fraction of the cost.
 
 **Question:** Which choice provides the most logical transition?
 
@@ -197,6 +253,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 15 — Precision & Concision (hard)
 
+**Full passage / set text (question 15):**
+
+Researchers at the Mount Ardent observatory track ground swelling with GPS stations placed around the crater. Last March, the stations recorded <u>an uplift of six centimeters over three weeks</u>, the fastest rate measured since monitoring began in 1994.
+
 **Question:** Which choice is most concise while keeping the information needed to support the claim at the end of the sentence?
 
 - A. an uplift of six centimeters
@@ -209,6 +269,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** The sentence calls this the 'fastest rate,' and a rate requires both an amount and a time period, which D gives with no extra words. A is the most tempting because it is shorter and still specific, but without 'over three weeks' the reader cannot see a rate at all. C drops all the numbers, and B says the same thing three times ('rapid,' 'over three weeks,' 'quickly').
 
 ## ENGLISH 16 — Grammar & Usage (easy)
+
+**Full passage / set text (question 16):**
+
+Two bridges cross the river near the old mill. The stone bridge, built more than a century ago, is narrow and steep, while the steel bridge downstream was designed for modern traffic. Of the two, the steel bridge is <u>the most heavily used</u>, carrying trucks and buses from dawn until well after dark.
 
 **Question:** Which choice is best for the underlined portion?
 
@@ -223,6 +287,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 17 — Organization & Flow (medium)
 
+**Full passage / set text (question 17):**
+
+A report about a restored river ferry begins by describing the vessel's original purpose. It then explains that the ferry stopped operating after a bridge was built nearby. <u>During restoration, workers found that much of the original wooden decking was still intact</u>. The report concludes by describing how the ferry is now used for educational trips.
+
 **Question:** Suppose the writer wants to emphasize the sequence from the ferry's decline to its restoration and eventual reuse. Where should the underlined sentence be placed?
 
 - A. Before the sentence explaining the ferry's original purpose
@@ -235,6 +303,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** The discovery of intact decking occurred during restoration, which logically follows the explanation of why regular ferry service ended. Placing the sentence immediately after the bridge sentence keeps the historical decline, restoration, and present use in sequence.
 
 ## ENGLISH 18 — Style & Tone (hard)
+
+**Full passage / set text (question 18):**
+
+We left the cabin before dawn. The snow had stopped, and the woods were quiet. My brother walked ahead, breaking trail, and I followed in his tracks. Neither of us spoke. At the ridge he stopped and pointed. Below us, the lake lay frozen and white. <u>We stood there, transfixed by the sublime, crystalline majesty of the frozen expanse below, before descending.</u>
 
 **Question:** Which choice best maintains the style of the passage?
 
@@ -249,6 +321,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 19 — Punctuation (easy)
 
+**Full passage / set text (question 19):**
+
+The restoration team carefully documented the century-old stained glass window before removing it from the nave. Each individual pane <u>was cataloged, cleaned,</u> and photographed prior to reassembly.
+
 **Question:** Which choice presents the correct punctuation for the items in the series?
 
 - A. NO CHANGE
@@ -261,6 +337,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** The list consists of three parallel verbs ('cataloged', 'cleaned', and 'photographed'). Standard punctuation requires commas separating items in a series, including the serial comma before 'and'.
 
 ## ENGLISH 20 — Transitions & Cohesion (medium)
+
+**Full passage / set text (question 20):**
+
+Proponents of open-plan office layouts argue that removing walls fosters spontaneous collaboration among team members. <u>Consequently,</u> recent workplace studies demonstrate that open layouts frequently lead to elevated noise levels, frequent interruptions, and a net decline in deep focused work.
 
 **Question:** Which choice provides the most accurate transition between the opposing arguments?
 
@@ -275,6 +355,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 21 — Sentence Structure (easy)
 
+**Full passage / set text (question 21):**
+
+The pottery studio was small, but its shelves were crowded with finished pieces. The instructor wanted visitors to see how each object changed during firing. <u>She placed several unfired bowls beside their finished versions, visitors could compare the two stages.</u> The arrangement made the process easier to understand.
+
 **Question:** Which choice best completes the sentence?
 
 - A. She placed several unfired bowls beside their finished versions, so visitors could compare the two stages.
@@ -287,6 +371,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** Choice A correctly joins the two ideas with the coordinating conjunction "so," showing that the placement allowed visitors to compare the stages. B creates a run-on sentence, C leaves a dependent clause after a semicolon, and D produces an awkward and incomplete construction.
 
 ## ENGLISH 22 — Style & Tone (hard)
+
+**Full passage / set text (question 22):**
+
+For three weeks, I used the city's new TransitNow app on my daily commute. Its real-time arrival estimates were accurate to within a minute on most routes, and its trip planner found connections I had never considered. On the other hand, the app crashed twice during my trial, and running it continuously drained my phone battery by midafternoon. <u>For daily commuters willing to tolerate an occasional glitch, the app is a useful, if imperfect, tool.</u>
 
 **Question:** Which choice best concludes the review in a way that is consistent with the writer's evaluation in the preceding sentences?
 
@@ -301,6 +389,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 23 — Organization & Flow (medium)
 
+**Full passage / set text (question 23):**
+
+During the Great Migration, millions of African Americans moved from the rural South to industrial cities in the North and West. <u>This massive demographic movement reshaped American music, literature, and urban culture, fueling the artistic flowering known as the Harlem Renaissance.</u>
+
 **Question:** If the writer were to delete the underlined sentence, the paragraph would primarily lose:
 
 - A. an explanation of the cultural and artistic impact resulting from the demographic movement.
@@ -313,6 +405,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** The underlined sentence directly identifies the cultural outcomes of the Great Migration (music, literature, Harlem Renaissance). Deleting it removes the statement explaining its broader cultural impact.
 
 ## ENGLISH 24 — Grammar & Usage (easy)
+
+**Full passage / set text (question 24):**
+
+The box of hand-painted tiles that Ana ordered from Puebla <u>sits</u> unopened on her workshop counter; she plans to wait until the new kiln arrives before starting the mosaic.
 
 **Question:** Which choice is correct?
 
@@ -327,6 +423,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 25 — Precision & Concision (medium)
 
+**Full passage / set text (question 25):**
+
+The author describes the archive's decision to digitize the newspapers. <u>In order to be able to make the newspapers accessible to researchers who are unable to visit the archive in person, the staff created high-resolution scans</u>. The scans can now be viewed remotely.
+
 **Question:** Which choice best preserves the intended meaning while improving concision?
 
 - A. In order to make the newspapers accessible to researchers who cannot visit the archive in person, the staff created high-resolution scans
@@ -339,6 +439,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** Choice B removes unnecessary wording while retaining the precise condition that some researchers cannot visit the archive. A is grammatical but slightly less concise, while C and D add unnecessary or indirect phrasing.
 
 ## ENGLISH 26 — Punctuation (easy)
+
+**Full passage / set text (question 26):**
+
+For her twelfth birthday, Lena received a watercolor kit from her aunt. The wooden box held everything a beginner would need to get <u>started: three</u> sable brushes, a mixing palette, a pad of heavy paper, and twelve small cakes of paint.
 
 **Question:** Which choice is best for the underlined portion?
 
@@ -353,6 +457,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 27 — Transitions & Cohesion (medium)
 
+**Full passage / set text (question 27):**
+
+The museum first displayed the recovered photographs in chronological order. Visitors could see how the neighborhood changed over several decades. <u>For example, the final section includes photographs of buildings that had been replaced by a public plaza</u>. These images help visitors connect the earlier streetscape with the area they see today.
+
 **Question:** Which transition best introduces the information in the underlined sentence?
 
 - A. Nevertheless, the final section includes photographs of buildings that had been replaced by a public plaza
@@ -365,6 +473,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** "For example" correctly introduces a specific instance of how the chronological display helps visitors understand change. The other transitions indicate contrast, cause and effect, or simultaneous action, none of which fits the relationship.
 
 ## ENGLISH 28 — Sentence Structure (easy)
+
+**Full passage / set text (question 28):**
+
+The ice on Mille Lacs Lake was eight inches thick by late January<u>, so the</u> annual fishing derby went ahead as planned.
 
 **Question:** Which choice is correct?
 
@@ -379,6 +491,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 29 — Organization & Flow (medium)
 
+**Full passage / set text (question 29):**
+
+Marisol has been blind since birth, but she has built tables, chairs, and cabinets in her garage workshop for more than twenty years. Her tools look much like anyone else's, with a few small changes. <u>Her tape measure has a tiny notch cut into its edge at every quarter inch.</u> To mark a board, she slides her thumbnail along the tape, counting notches until she reaches the length she wants, and presses a sharp awl into the wood at that spot.
+
 **Question:** The writer is considering deleting the underlined sentence. Should the sentence be kept or deleted?
 
 - A. Kept, because it explains the notches that she relies on in the following sentence.
@@ -391,6 +507,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** The underlined sentence gives an example of the 'few small changes' mentioned before it, and it explains what the notches are and where they are placed. Without it, the next sentence's reference to 'counting notches' would be unclear, so it should be kept (A). B is tempting, but the passage never claims her tools are more precise than ordinary ones, only that they have been adapted. D is also tempting, but the following sentence mentions notches without saying what they are or how far apart they are, so nothing is repeated. C mistakes a necessary detail for a distraction.
 
 ## ENGLISH 30 — Grammar & Usage (easy)
+
+**Full passage / set text (question 30):**
+
+Constructed in the early twentieth century, the masonry arch bridge had withstood decades of seasonal flooding. However, after recent inspections revealed micro-fractures along the primary abutment, engineers <u>has determined</u> that structural retrofitting was urgently required to prevent catastrophic failure during future high-water events.
 
 **Question:** Which choice best maintains consistent verb tense throughout the sentence?
 
@@ -405,6 +525,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 31 — Precision & Concision (medium)
 
+**Full passage / set text (question 31):**
+
+The research team concluded that while the synthetic compound accelerated chemical reactions under laboratory conditions, its commercial viability remained uncertain because <u>the costs required to synthesize the chemical were too expensive for large-scale manufacturing operations.</u>
+
 **Question:** Which choice provides the most concise and precise revision?
 
 - A. NO CHANGE
@@ -417,6 +541,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** The original choice repeats 'costs', 'synthesize', and 'expensive'. Choice B conveys all necessary information ('too expensive to synthesize at a commercial scale') cleanly, preserving accuracy and concision.
 
 ## ENGLISH 32 — Punctuation (easy)
+
+**Full passage / set text (question 32):**
+
+On weekends, the science museum's <u>childrens'</u> gallery fills with families. Young visitors can build towers from foam blocks, race toy boats down a long water table, and crawl through a full-size model of a beaver lodge.
 
 **Question:** Which choice is best for the underlined portion?
 
@@ -431,6 +559,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 33 — Style & Tone (medium)
 
+**Full passage / set text (question 33):**
+
+This brochure was written for families visiting the botanical garden, and many of its readers are young children. It explains that the garden's tallest trees, the coast redwoods, can live for more than a thousand years. It also points out that <u>their bark, which can be a foot thick, protects them from fire</u>.
+
 **Question:** Which choice best suits the audience and purpose of the brochure?
 
 - A. their bark, which can be a foot thick, protects them from fire
@@ -443,6 +575,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** The brochure is meant for families with young children, so the wording should be simple and clear. A explains the idea in plain, accurate language. B and D use formal or technical vocabulary ('renders ... impervious,' 'confers thermal protection') that young readers would struggle with. C is easy to read, but its slang is out of place in a published brochure, and 'basically fireproof' overstates what the bark does.
 
 ## ENGLISH 34 — Sentence Structure (easy)
+
+**Full passage / set text (question 34):**
+
+The theater's old posters were stored in flat boxes. They had become brittle after years of exposure to changing temperatures. <u>Because the archivists wanted to preserve them. They moved the boxes to a climate-controlled room.</u>
 
 **Question:** Which choice best completes the sentence fragment?
 
@@ -457,6 +593,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 35 — Transitions & Cohesion (medium)
 
+**Full passage / set text (question 35):**
+
+The conservator expected the oldest pages of the manuscript to be the most difficult to read. Surprisingly, several later pages were more damaged because they had been stored near a leaking window. <u>Although the oldest pages were more fragile, the later pages required more extensive repair</u>. The conservator therefore changed the order in which the pages would be treated.
+
 **Question:** Which transition best expresses the relationship between the two conditions described in the underlined sentence?
 
 - A. As a result, the oldest pages were more fragile, but the later pages required more extensive repair
@@ -469,6 +609,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** "Although" introduces the concession that the oldest pages were more fragile while emphasizing the unexpected fact that the later pages required more repair. A incorrectly suggests a result, B incorrectly introduces an example, and D suggests similarity rather than concession.
 
 ## ENGLISH 36 — Grammar & Usage (easy)
+
+**Full passage / set text (question 36):**
+
+The collection of oral histories includes interviews with longtime residents. Although the recordings span several decades, each interview <u>offer</u> a detailed account of a particular period in the neighborhood's history.
 
 **Question:** Which choice best completes the sentence?
 
@@ -483,6 +627,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 37 — Organization & Flow (medium)
 
+**Full passage / set text (question 37):**
+
+A historian is writing about a lighthouse that guided ships along a rocky coast. The lighthouse was automated in the 1960s, after which its keeper's quarters were no longer needed. The building later became part of a coastal heritage site. <u>Today, visitors to that site can enter the former keeper's quarters and see the narrow staircase that once connected the rooms</u>. The historian then turns from the keeper's quarters to the lighthouse's light mechanism, describing how that equipment was modernized.
+
 **Question:** The writer wants to move from the history of the lighthouse building to a description of what visitors can see today, before returning to the lighthouse's equipment. Where should the underlined sentence be placed?
 
 - A. Where it is now
@@ -495,6 +643,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** The underlined sentence belongs after the heritage-site sentence because 'that site' clearly refers to the coastal heritage site just introduced. It also completes the discussion of the keeper's quarters before the final sentence explicitly shifts to the light mechanism.
 
 ## ENGLISH 38 — Precision & Concision (medium)
+
+**Full passage / set text (question 38):**
+
+The observatory installed a new instrument that can detect faint signals from distant objects. Unlike the older equipment, the instrument can process several observations at once. This change means that researchers can <u>make observations in a more efficient manner</u> during periods when the sky is especially clear.
 
 **Question:** Which choice best maintains the passage's meaning while improving concision?
 
@@ -509,6 +661,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 39 — Punctuation (easy)
 
+**Full passage / set text (question 39):**
+
+Each June, the coastal town holds a festival to welcome the fishing fleet home after the long spring season. The boats are strung with colored flags, and the <u>sailors families</u> set up tables along the harbor to sell smoked fish, knitted caps, and hand-tied nets.
+
 **Question:** Which choice is best for the underlined portion?
 
 - A. sailor's families
@@ -521,6 +677,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** The families belong to the sailors, so a possessive is needed. Because there are many sailors (the passage describes a whole fleet), the plural possessive sailors' (D) is correct. B has no apostrophe, so it is not possessive. A refers to a single sailor, which does not fit a fleet, and C adds an unnecessary 's to a plural noun that already ends in s.
 
 ## ENGLISH 40 — Sentence Structure (easy)
+
+**Full passage / set text (question 40):**
+
+The acoustic paneling absorbed sound reflection throughout the <u>auditorium, it enabled</u> the orchestra's woodwind section to be heard clearly from the upper balcony seats.
 
 **Question:** Which choice best corrects the comma splice in the underlined portion?
 
@@ -535,6 +695,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 41 — Style & Tone (medium)
 
+**Full passage / set text (question 41):**
+
+The legal scholar published an analysis of intellectual property disputes in the digital music industry. The paper concluded that current copyright frameworks struggle to address AI-generated compositions, arguing that courts must establish clearer guidelines regarding <u>authorial attribution and fair compensation for original creators.</u>
+
 **Question:** Which choice best preserves the formal legal register of the paper?
 
 - A. NO CHANGE
@@ -547,6 +711,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** The original phrase is broad enough to address both authorship and compensation while maintaining precise legal register. The alternatives narrow or alter the paper's claim.
 
 ## ENGLISH 42 — Transitions & Cohesion (medium)
+
+**Full passage / set text (question 42):**
+
+The botanist expected the plants near the stream to grow more quickly because they received more water. The measurements did show faster growth there. <u>However, the difference was smaller than the botanist had predicted</u>. The results suggested that water availability was only one factor affecting growth.
 
 **Question:** Which choice best connects the measurement to the next idea?
 
@@ -561,6 +729,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 43 — Grammar & Usage (easy)
 
+**Full passage / set text (question 43):**
+
+The violin that arrived at the repair shop last week was nearly three hundred years old. Over the centuries, <u>it's</u> varnish had darkened to a deep amber, and a long crack ran down the front. The repairer spent two full days studying the instrument before she touched it with a single tool.
+
 **Question:** Which choice is best for the underlined portion?
 
 - A. it's
@@ -573,6 +745,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** The varnish belongs to the violin, so the sentence needs the possessive pronoun 'its' (B). 'It's' (A) is a contraction of 'it is' or 'it has,' which makes no sense here. 'Its'' (C) is not a word, and 'their' (D) is plural, but it refers to a single violin.
 
 ## ENGLISH 44 — Organization & Flow (medium)
+
+**Full passage / set text (question 44):**
+
+Many early films had no recorded sound, but audiences rarely watched them in silence. <u>Movie theaters in that era were often small.</u> In larger cities, some theaters even employed full orchestras that performed scores written specifically for a film. The music told audiences when to feel tense, when to laugh, and when the hero was about to arrive.
 
 **Question:** Which choice most effectively supports the claim in the preceding sentence and leads into the sentence that follows?
 
@@ -587,6 +763,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 45 — Precision & Concision (easy)
 
+**Full passage / set text (question 45):**
+
+The baker arrives at four in the morning so that the bread will be ready when the shop opens. By six o'clock, the smell of warm loaves drifts out onto the street, and a line of customers has already <u>formed</u> at the door.
+
 **Question:** Which choice is best for the underlined portion?
 
 - A. formed
@@ -599,6 +779,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** When people gather into a line on their own, the line is said to 'form,' so 'formed' (A) is the precise word. 'Shaped' and 'constructed' suggest someone deliberately building the line, and 'composed' means 'made up of,' which does not describe a line gathering at a door.
 
 ## ENGLISH 46 — Punctuation (easy)
+
+**Full passage / set text (question 46):**
+
+At sunrise, volunteers gathered along the riverbank to begin the annual bird count. Each group received a map and a checklist before setting out. <u>After a brief orientation the volunteers spread out</u> along the trails and observation platforms.
 
 **Question:** Which choice best punctuates the underlined portion?
 
@@ -613,6 +797,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 47 — Style & Tone (medium)
 
+**Full passage / set text (question 47):**
+
+A literary journal is publishing an essay about a poet's late work. The essay argues that the poet's language became more restrained even as the subjects of the poems grew more personal. <u>The later poems are basically a whole different thing, with the poet tossing around fewer words but somehow making them hit harder</u>. The essay then examines several poems in which ordinary objects carry emotional significance.
+
 **Question:** Which choice best preserves the analytical tone of the essay while retaining its central observation?
 
 - A. The later poems are basically a whole different thing, using fewer words but making them hit harder.
@@ -625,6 +813,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** Choice C expresses the same observation in precise analytical language and avoids the conversational idioms in the other choices. The alternatives retain phrases such as "whole different thing," "really different," "bigger impact," or "throwing around," which are less consistent with a literary-critical essay.
 
 ## ENGLISH 48 — Sentence Structure (easy)
+
+**Full passage / set text (question 48):**
+
+The software update addressed several critical security <u>vulnerabilities, it also streamlined</u> the user interface for desktop devices. Users reported noticeable improvements in processing speed immediately following installation.
 
 **Question:** Which choice best corrects the comma splice in the underlined portion?
 
@@ -639,6 +831,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## ENGLISH 49 — Transitions & Cohesion (medium)
 
+**Full passage / set text (question 49):**
+
+Early telegraph systems relied on manual operators to translate messages into Morse code line by line. <u>Nevertheless,</u> automated teleprinters were introduced in the 1920s, enabling messages to be typed directly on standard typewriter keyboards and transmitted electronically.
+
 **Question:** Which choice provides the most appropriate transition between the sentences?
 
 - A. NO CHANGE
@@ -651,6 +847,10 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 **Explanation:** The passage describes a chronological progression from early manual operators to 1920s automated systems. 'Later' accurately signals this chronological transition.
 
 ## ENGLISH 50 — Grammar & Usage (easy)
+
+**Full passage / set text (question 50):**
+
+The historical archive contains hundreds of regional newspapers printed during the nineteenth century. When researchers examined the fragile newsprint under a microscope, <u>they found</u> that high acid content in early wood-pulp paper had accelerated the decay of several rare editions.
 
 **Question:** Which choice completes the sentence so that it conforms to the conventions of Standard English?
 
@@ -719,7 +919,7 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 ## MATH 5 — Modeling (medium)
 
-**Question:** A rectangular sheet of material is 30 inches by 20 inches. Equal squares of side length x are cut from each corner, and the sides are folded up to form an open box. The volume is modeled by V(x) = x(30 - 2x)(20 - 2x). Which value of x gives the greatest volume for 0 < x < 10?
+**Question:** A rectangular sheet of material is 30 inches by 20 inches. Equal squares of side length x are cut from each corner, and the sides are folded up to form an open box. The volume is modeled by V(x) = x(30 - 2x)(20 - 2x). Of the following values of x, which gives the greatest volume for 0 < x < 10?
 
 - A. 8
 - B. 5
@@ -1265,6 +1465,34 @@ kx + 6y = c
 
 **Passage/set:** The Last Loop at Halverson Park
 
+**Full passage / set text (question 1):**
+
+The course at Halverson Park ran mostly through woods, and by the second mile the runners had stretched into a thin, uneven line, each one alone with the sound of his own breathing and the crunch of the person ahead.
+
+Teo had been told what to do. Coach Abrams had told him at the starting line, one hand on Teo's shoulder and the other pointing at Ruben, who was retying a shoe that did not need retying. "His ankle's not right," the coach had said. "Stay on him. Don't let him go out too fast, and don't let him quit. Top fifteen goes to state. He can still make it if somebody keeps him honest."
+
+So Teo stayed on him. Through the first mile he ran a step behind Ruben's left shoulder, close enough to see the white tape above his sock and the slight hitch every time that foot came down. Ruben had beaten Teo in every race for two years. He had a long, loose stride that made the rest of them look like they were working, and Teo had spent most of those races watching that stride pull away from him around the first bend. It was strange to be this close to it. It was stranger to notice that the stride was not pulling away.
+
+At the two-mile marker a volunteer was calling places. Fourteen. Fifteen. Teo heard the numbers and did the arithmetic without wanting to. Ruben was fifteenth. He was sixteenth.
+
+The trail climbed toward the last loop around the reservoir. Ruben's breathing had changed; it came in short, ragged pulls, and twice he glanced down at his ankle as if it belonged to someone else. Teo moved up beside him. "Easy," he said, because that was what he had been told to say. "Just hold this."
+
+Ruben nodded without looking at him.
+
+On the climb, Teo found that his own legs were good. Not just good enough, but good. The hill that usually made him want to walk felt short. He could feel the distance between himself and the runner ahead, a boy in a green singlet, the way you can feel a wall in a dark room. He could close it. He knew that with a certainty he had never had before in a race, and he understood, almost at the same moment, that closing it would mean leaving Ruben behind.
+
+He thought about the coach's hand on his shoulder. He thought about the two years of watching Ruben's back disappear into the trees, and about how no one had ever told Ruben to stay with him.
+
+At the top of the hill, Ruben slowed, and Teo did not.
+
+He did not decide to go so much as notice that he was already going. The green singlet came back to him in thirty seconds. Another runner, wheezing, came back to him on the flat stretch along the water. The crowd noise from the finish grew from a murmur to a roar, and someone was shouting his name, though he could not tell who.
+
+He crossed the line twelfth. A volunteer pressed a card into his hand and steered him into the chute, and he stood there with his hands on his knees while the other runners came through.
+
+He watched for Ruben. Fourteenth came through, then fifteenth, then a long gap. When Ruben finally appeared, he was not running so much as carrying himself, his face gray, his left foot landing flat and careful. He finished nineteenth.
+
+Teo held his card. It had a number on it and nothing else. Across the chute, Coach Abrams had his clipboard against his chest and was looking at Ruben, not at Teo. After a while Teo walked over to the water table, filled two cups, and carried them back toward the place where Ruben was sitting in the grass. He did not know yet what he would say. He held out one of the cups anyway.
+
 **Question:** Based on the passage, which statement accurately describes Teo and Ruben's results in earlier races?
 
 - A. Teo usually finished just ahead of Ruben.
@@ -1279,6 +1507,34 @@ kx + 6y = c
 ## READING 2 — Literary Narrative (easy)
 
 **Passage/set:** The Last Loop at Halverson Park
+
+**Full passage / set text (question 2):**
+
+The course at Halverson Park ran mostly through woods, and by the second mile the runners had stretched into a thin, uneven line, each one alone with the sound of his own breathing and the crunch of the person ahead.
+
+Teo had been told what to do. Coach Abrams had told him at the starting line, one hand on Teo's shoulder and the other pointing at Ruben, who was retying a shoe that did not need retying. "His ankle's not right," the coach had said. "Stay on him. Don't let him go out too fast, and don't let him quit. Top fifteen goes to state. He can still make it if somebody keeps him honest."
+
+So Teo stayed on him. Through the first mile he ran a step behind Ruben's left shoulder, close enough to see the white tape above his sock and the slight hitch every time that foot came down. Ruben had beaten Teo in every race for two years. He had a long, loose stride that made the rest of them look like they were working, and Teo had spent most of those races watching that stride pull away from him around the first bend. It was strange to be this close to it. It was stranger to notice that the stride was not pulling away.
+
+At the two-mile marker a volunteer was calling places. Fourteen. Fifteen. Teo heard the numbers and did the arithmetic without wanting to. Ruben was fifteenth. He was sixteenth.
+
+The trail climbed toward the last loop around the reservoir. Ruben's breathing had changed; it came in short, ragged pulls, and twice he glanced down at his ankle as if it belonged to someone else. Teo moved up beside him. "Easy," he said, because that was what he had been told to say. "Just hold this."
+
+Ruben nodded without looking at him.
+
+On the climb, Teo found that his own legs were good. Not just good enough, but good. The hill that usually made him want to walk felt short. He could feel the distance between himself and the runner ahead, a boy in a green singlet, the way you can feel a wall in a dark room. He could close it. He knew that with a certainty he had never had before in a race, and he understood, almost at the same moment, that closing it would mean leaving Ruben behind.
+
+He thought about the coach's hand on his shoulder. He thought about the two years of watching Ruben's back disappear into the trees, and about how no one had ever told Ruben to stay with him.
+
+At the top of the hill, Ruben slowed, and Teo did not.
+
+He did not decide to go so much as notice that he was already going. The green singlet came back to him in thirty seconds. Another runner, wheezing, came back to him on the flat stretch along the water. The crowd noise from the finish grew from a murmur to a roar, and someone was shouting his name, though he could not tell who.
+
+He crossed the line twelfth. A volunteer pressed a card into his hand and steered him into the chute, and he stood there with his hands on his knees while the other runners came through.
+
+He watched for Ruben. Fourteenth came through, then fifteenth, then a long gap. When Ruben finally appeared, he was not running so much as carrying himself, his face gray, his left foot landing flat and careful. He finished nineteenth.
+
+Teo held his card. It had a number on it and nothing else. Across the chute, Coach Abrams had his clipboard against his chest and was looking at Ruben, not at Teo. After a while Teo walked over to the water table, filled two cups, and carried them back toward the place where Ruben was sitting in the grass. He did not know yet what he would say. He held out one of the cups anyway.
 
 **Question:** The central conflict Teo faces during the race is between:
 
@@ -1295,6 +1551,34 @@ kx + 6y = c
 
 **Passage/set:** The Last Loop at Halverson Park
 
+**Full passage / set text (question 3):**
+
+The course at Halverson Park ran mostly through woods, and by the second mile the runners had stretched into a thin, uneven line, each one alone with the sound of his own breathing and the crunch of the person ahead.
+
+Teo had been told what to do. Coach Abrams had told him at the starting line, one hand on Teo's shoulder and the other pointing at Ruben, who was retying a shoe that did not need retying. "His ankle's not right," the coach had said. "Stay on him. Don't let him go out too fast, and don't let him quit. Top fifteen goes to state. He can still make it if somebody keeps him honest."
+
+So Teo stayed on him. Through the first mile he ran a step behind Ruben's left shoulder, close enough to see the white tape above his sock and the slight hitch every time that foot came down. Ruben had beaten Teo in every race for two years. He had a long, loose stride that made the rest of them look like they were working, and Teo had spent most of those races watching that stride pull away from him around the first bend. It was strange to be this close to it. It was stranger to notice that the stride was not pulling away.
+
+At the two-mile marker a volunteer was calling places. Fourteen. Fifteen. Teo heard the numbers and did the arithmetic without wanting to. Ruben was fifteenth. He was sixteenth.
+
+The trail climbed toward the last loop around the reservoir. Ruben's breathing had changed; it came in short, ragged pulls, and twice he glanced down at his ankle as if it belonged to someone else. Teo moved up beside him. "Easy," he said, because that was what he had been told to say. "Just hold this."
+
+Ruben nodded without looking at him.
+
+On the climb, Teo found that his own legs were good. Not just good enough, but good. The hill that usually made him want to walk felt short. He could feel the distance between himself and the runner ahead, a boy in a green singlet, the way you can feel a wall in a dark room. He could close it. He knew that with a certainty he had never had before in a race, and he understood, almost at the same moment, that closing it would mean leaving Ruben behind.
+
+He thought about the coach's hand on his shoulder. He thought about the two years of watching Ruben's back disappear into the trees, and about how no one had ever told Ruben to stay with him.
+
+At the top of the hill, Ruben slowed, and Teo did not.
+
+He did not decide to go so much as notice that he was already going. The green singlet came back to him in thirty seconds. Another runner, wheezing, came back to him on the flat stretch along the water. The crowd noise from the finish grew from a murmur to a roar, and someone was shouting his name, though he could not tell who.
+
+He crossed the line twelfth. A volunteer pressed a card into his hand and steered him into the chute, and he stood there with his hands on his knees while the other runners came through.
+
+He watched for Ruben. Fourteenth came through, then fifteenth, then a long gap. When Ruben finally appeared, he was not running so much as carrying himself, his face gray, his left foot landing flat and careful. He finished nineteenth.
+
+Teo held his card. It had a number on it and nothing else. Across the chute, Coach Abrams had his clipboard against his chest and was looking at Ruben, not at Teo. After a while Teo walked over to the water table, filled two cups, and carried them back toward the place where Ruben was sitting in the grass. He did not know yet what he would say. He held out one of the cups anyway.
+
 **Question:** Taken together, the details in the final paragraph most strongly suggest that Teo:
 
 - A. is proud of qualifying and goes to Ruben hoping to be congratulated on his result.
@@ -1309,6 +1593,34 @@ kx + 6y = c
 ## READING 4 — Literary Narrative (medium)
 
 **Passage/set:** The Last Loop at Halverson Park
+
+**Full passage / set text (question 4):**
+
+The course at Halverson Park ran mostly through woods, and by the second mile the runners had stretched into a thin, uneven line, each one alone with the sound of his own breathing and the crunch of the person ahead.
+
+Teo had been told what to do. Coach Abrams had told him at the starting line, one hand on Teo's shoulder and the other pointing at Ruben, who was retying a shoe that did not need retying. "His ankle's not right," the coach had said. "Stay on him. Don't let him go out too fast, and don't let him quit. Top fifteen goes to state. He can still make it if somebody keeps him honest."
+
+So Teo stayed on him. Through the first mile he ran a step behind Ruben's left shoulder, close enough to see the white tape above his sock and the slight hitch every time that foot came down. Ruben had beaten Teo in every race for two years. He had a long, loose stride that made the rest of them look like they were working, and Teo had spent most of those races watching that stride pull away from him around the first bend. It was strange to be this close to it. It was stranger to notice that the stride was not pulling away.
+
+At the two-mile marker a volunteer was calling places. Fourteen. Fifteen. Teo heard the numbers and did the arithmetic without wanting to. Ruben was fifteenth. He was sixteenth.
+
+The trail climbed toward the last loop around the reservoir. Ruben's breathing had changed; it came in short, ragged pulls, and twice he glanced down at his ankle as if it belonged to someone else. Teo moved up beside him. "Easy," he said, because that was what he had been told to say. "Just hold this."
+
+Ruben nodded without looking at him.
+
+On the climb, Teo found that his own legs were good. Not just good enough, but good. The hill that usually made him want to walk felt short. He could feel the distance between himself and the runner ahead, a boy in a green singlet, the way you can feel a wall in a dark room. He could close it. He knew that with a certainty he had never had before in a race, and he understood, almost at the same moment, that closing it would mean leaving Ruben behind.
+
+He thought about the coach's hand on his shoulder. He thought about the two years of watching Ruben's back disappear into the trees, and about how no one had ever told Ruben to stay with him.
+
+At the top of the hill, Ruben slowed, and Teo did not.
+
+He did not decide to go so much as notice that he was already going. The green singlet came back to him in thirty seconds. Another runner, wheezing, came back to him on the flat stretch along the water. The crowd noise from the finish grew from a murmur to a roar, and someone was shouting his name, though he could not tell who.
+
+He crossed the line twelfth. A volunteer pressed a card into his hand and steered him into the chute, and he stood there with his hands on his knees while the other runners came through.
+
+He watched for Ruben. Fourteenth came through, then fifteenth, then a long gap. When Ruben finally appeared, he was not running so much as carrying himself, his face gray, his left foot landing flat and careful. He finished nineteenth.
+
+Teo held his card. It had a number on it and nothing else. Across the chute, Coach Abrams had his clipboard against his chest and was looking at Ruben, not at Teo. After a while Teo walked over to the water table, filled two cups, and carried them back toward the place where Ruben was sitting in the grass. He did not know yet what he would say. He held out one of the cups anyway.
 
 **Question:** What does Teo's observation that Ruben's stride was not pulling away most strongly suggest about Ruben at that point in the race?
 
@@ -1325,6 +1637,34 @@ kx + 6y = c
 
 **Passage/set:** The Last Loop at Halverson Park
 
+**Full passage / set text (question 5):**
+
+The course at Halverson Park ran mostly through woods, and by the second mile the runners had stretched into a thin, uneven line, each one alone with the sound of his own breathing and the crunch of the person ahead.
+
+Teo had been told what to do. Coach Abrams had told him at the starting line, one hand on Teo's shoulder and the other pointing at Ruben, who was retying a shoe that did not need retying. "His ankle's not right," the coach had said. "Stay on him. Don't let him go out too fast, and don't let him quit. Top fifteen goes to state. He can still make it if somebody keeps him honest."
+
+So Teo stayed on him. Through the first mile he ran a step behind Ruben's left shoulder, close enough to see the white tape above his sock and the slight hitch every time that foot came down. Ruben had beaten Teo in every race for two years. He had a long, loose stride that made the rest of them look like they were working, and Teo had spent most of those races watching that stride pull away from him around the first bend. It was strange to be this close to it. It was stranger to notice that the stride was not pulling away.
+
+At the two-mile marker a volunteer was calling places. Fourteen. Fifteen. Teo heard the numbers and did the arithmetic without wanting to. Ruben was fifteenth. He was sixteenth.
+
+The trail climbed toward the last loop around the reservoir. Ruben's breathing had changed; it came in short, ragged pulls, and twice he glanced down at his ankle as if it belonged to someone else. Teo moved up beside him. "Easy," he said, because that was what he had been told to say. "Just hold this."
+
+Ruben nodded without looking at him.
+
+On the climb, Teo found that his own legs were good. Not just good enough, but good. The hill that usually made him want to walk felt short. He could feel the distance between himself and the runner ahead, a boy in a green singlet, the way you can feel a wall in a dark room. He could close it. He knew that with a certainty he had never had before in a race, and he understood, almost at the same moment, that closing it would mean leaving Ruben behind.
+
+He thought about the coach's hand on his shoulder. He thought about the two years of watching Ruben's back disappear into the trees, and about how no one had ever told Ruben to stay with him.
+
+At the top of the hill, Ruben slowed, and Teo did not.
+
+He did not decide to go so much as notice that he was already going. The green singlet came back to him in thirty seconds. Another runner, wheezing, came back to him on the flat stretch along the water. The crowd noise from the finish grew from a murmur to a roar, and someone was shouting his name, though he could not tell who.
+
+He crossed the line twelfth. A volunteer pressed a card into his hand and steered him into the chute, and he stood there with his hands on his knees while the other runners came through.
+
+He watched for Ruben. Fourteenth came through, then fifteenth, then a long gap. When Ruben finally appeared, he was not running so much as carrying himself, his face gray, his left foot landing flat and careful. He finished nineteenth.
+
+Teo held his card. It had a number on it and nothing else. Across the chute, Coach Abrams had his clipboard against his chest and was looking at Ruben, not at Teo. After a while Teo walked over to the water table, filled two cups, and carried them back toward the place where Ruben was sitting in the grass. He did not know yet what he would say. He held out one of the cups anyway.
+
 **Question:** What is the main purpose of Teo's thought that no one had ever told Ruben to stay with him?
 
 - A. reveal that Teo had in fact been the faster runner on the team all along.
@@ -1339,6 +1679,22 @@ kx + 6y = c
 ## READING 6 — Humanities (easy)
 
 **Passage/set:** The Way Into a Room
+
+**Full passage / set text (question 6):**
+
+Most of us remember the rooms of buildings we love. Fewer of us remember how we entered them. Yet the moments between the street and the room, the door, the vestibule, the corridor, the stair, do much of the work of preparing us for what we are about to see. I have come to believe that an architect's skill shows most clearly not in the grand spaces themselves but in the passages that lead to them.
+
+Consider the public library in the city where I grew up. From the street, its entrance is almost disappointing: a modest door set into a heavy stone wall, opening onto a low, dim hallway barely taller than a raised hand. The hallway turns once, and then, without warning, the ceiling lifts away. The reading room beyond rises three stories, lit from high windows, and stepping into it is close to a physical sensation, like the moment a held breath is released. I have walked into that room hundreds of times and still feel it. The room alone, entered directly from the street, would be handsome. Approached through the low hallway, it becomes something closer to astonishing.
+
+Architects sometimes call this technique compression and release. A narrow or low space makes the body briefly aware of its own confinement, and the larger space that follows feels larger by contrast. The principle is old and simple, and it would be easy to dismiss it as a trick. But I think it reflects something true about how we experience buildings: not as a set of separate rooms but as a sequence, each part shaping how we perceive the next. A building is closer to a piece of music than to a photograph. It unfolds in time.
+
+The opposite approach has its own advocates, and their argument deserves a hearing. Many recent museums and offices greet visitors with a wall of glass, so that the entire interior is visible from the sidewalk before anyone opens the door. The intention is generous. These entrances invite people in rather than making them earn their arrival, and they avoid the slightly forbidding quality of a dark hallway. For a building that wants to seem open to everyone, this may be the right choice, and I would not want every lobby to resemble a tunnel.
+
+Still, something is lost. When the whole interior is revealed at once, there is nothing left for the entrance to do. The visitor walks in already knowing what she will find, and the building has, in a sense, told its story before she arrived. The glass entrance welcomes, but it does not prepare.
+
+Compression and release can also fail. I once visited a concert hall whose architects had clearly admired the approach and pushed it further: a long, black corridor with a ceiling so low that tall visitors stooped. By the time the hall itself appeared, most people I saw looked relieved rather than moved. The corridor had gone from preparing them to punishing them. A threshold must be brief enough that the visitor trusts it is leading somewhere. Beyond a certain point, anticipation curdles into discomfort.
+
+What I admire in the library, then, is not the low hallway or the tall room but the proportion between them, the architect's judgment about how much to withhold, and for how long. That judgment cannot be reduced to a rule. It depends on the building's purpose, its audience, and the light of the particular site. But it begins with recognizing that the way into a room is part of the room, and that we arrive in a space with our bodies before we arrive with our eyes.
 
 **Question:** The author's central argument is that:
 
@@ -1355,6 +1711,22 @@ kx + 6y = c
 
 **Passage/set:** The Way Into a Room
 
+**Full passage / set text (question 7):**
+
+Most of us remember the rooms of buildings we love. Fewer of us remember how we entered them. Yet the moments between the street and the room, the door, the vestibule, the corridor, the stair, do much of the work of preparing us for what we are about to see. I have come to believe that an architect's skill shows most clearly not in the grand spaces themselves but in the passages that lead to them.
+
+Consider the public library in the city where I grew up. From the street, its entrance is almost disappointing: a modest door set into a heavy stone wall, opening onto a low, dim hallway barely taller than a raised hand. The hallway turns once, and then, without warning, the ceiling lifts away. The reading room beyond rises three stories, lit from high windows, and stepping into it is close to a physical sensation, like the moment a held breath is released. I have walked into that room hundreds of times and still feel it. The room alone, entered directly from the street, would be handsome. Approached through the low hallway, it becomes something closer to astonishing.
+
+Architects sometimes call this technique compression and release. A narrow or low space makes the body briefly aware of its own confinement, and the larger space that follows feels larger by contrast. The principle is old and simple, and it would be easy to dismiss it as a trick. But I think it reflects something true about how we experience buildings: not as a set of separate rooms but as a sequence, each part shaping how we perceive the next. A building is closer to a piece of music than to a photograph. It unfolds in time.
+
+The opposite approach has its own advocates, and their argument deserves a hearing. Many recent museums and offices greet visitors with a wall of glass, so that the entire interior is visible from the sidewalk before anyone opens the door. The intention is generous. These entrances invite people in rather than making them earn their arrival, and they avoid the slightly forbidding quality of a dark hallway. For a building that wants to seem open to everyone, this may be the right choice, and I would not want every lobby to resemble a tunnel.
+
+Still, something is lost. When the whole interior is revealed at once, there is nothing left for the entrance to do. The visitor walks in already knowing what she will find, and the building has, in a sense, told its story before she arrived. The glass entrance welcomes, but it does not prepare.
+
+Compression and release can also fail. I once visited a concert hall whose architects had clearly admired the approach and pushed it further: a long, black corridor with a ceiling so low that tall visitors stooped. By the time the hall itself appeared, most people I saw looked relieved rather than moved. The corridor had gone from preparing them to punishing them. A threshold must be brief enough that the visitor trusts it is leading somewhere. Beyond a certain point, anticipation curdles into discomfort.
+
+What I admire in the library, then, is not the low hallway or the tall room but the proportion between them, the architect's judgment about how much to withhold, and for how long. That judgment cannot be reduced to a rule. It depends on the building's purpose, its audience, and the light of the particular site. But it begins with recognizing that the way into a room is part of the room, and that we arrive in a space with our bodies before we arrive with our eyes.
+
 **Question:** The author compares a building to a piece of music mainly to emphasize that buildings are:
 
 - A. experienced as a sequence over time rather than all at once.
@@ -1369,6 +1741,22 @@ kx + 6y = c
 ## READING 8 — Humanities (hard)
 
 **Passage/set:** The Way Into a Room
+
+**Full passage / set text (question 8):**
+
+Most of us remember the rooms of buildings we love. Fewer of us remember how we entered them. Yet the moments between the street and the room, the door, the vestibule, the corridor, the stair, do much of the work of preparing us for what we are about to see. I have come to believe that an architect's skill shows most clearly not in the grand spaces themselves but in the passages that lead to them.
+
+Consider the public library in the city where I grew up. From the street, its entrance is almost disappointing: a modest door set into a heavy stone wall, opening onto a low, dim hallway barely taller than a raised hand. The hallway turns once, and then, without warning, the ceiling lifts away. The reading room beyond rises three stories, lit from high windows, and stepping into it is close to a physical sensation, like the moment a held breath is released. I have walked into that room hundreds of times and still feel it. The room alone, entered directly from the street, would be handsome. Approached through the low hallway, it becomes something closer to astonishing.
+
+Architects sometimes call this technique compression and release. A narrow or low space makes the body briefly aware of its own confinement, and the larger space that follows feels larger by contrast. The principle is old and simple, and it would be easy to dismiss it as a trick. But I think it reflects something true about how we experience buildings: not as a set of separate rooms but as a sequence, each part shaping how we perceive the next. A building is closer to a piece of music than to a photograph. It unfolds in time.
+
+The opposite approach has its own advocates, and their argument deserves a hearing. Many recent museums and offices greet visitors with a wall of glass, so that the entire interior is visible from the sidewalk before anyone opens the door. The intention is generous. These entrances invite people in rather than making them earn their arrival, and they avoid the slightly forbidding quality of a dark hallway. For a building that wants to seem open to everyone, this may be the right choice, and I would not want every lobby to resemble a tunnel.
+
+Still, something is lost. When the whole interior is revealed at once, there is nothing left for the entrance to do. The visitor walks in already knowing what she will find, and the building has, in a sense, told its story before she arrived. The glass entrance welcomes, but it does not prepare.
+
+Compression and release can also fail. I once visited a concert hall whose architects had clearly admired the approach and pushed it further: a long, black corridor with a ceiling so low that tall visitors stooped. By the time the hall itself appeared, most people I saw looked relieved rather than moved. The corridor had gone from preparing them to punishing them. A threshold must be brief enough that the visitor trusts it is leading somewhere. Beyond a certain point, anticipation curdles into discomfort.
+
+What I admire in the library, then, is not the low hallway or the tall room but the proportion between them, the architect's judgment about how much to withhold, and for how long. That judgment cannot be reduced to a rule. It depends on the building's purpose, its audience, and the light of the particular site. But it begins with recognizing that the way into a room is part of the room, and that we arrive in a space with our bodies before we arrive with our eyes.
 
 **Question:** Based on the passage, which entrance design would best support the author's main idea about how a building should prepare visitors for a room?
 
@@ -1385,6 +1773,22 @@ kx + 6y = c
 
 **Passage/set:** The Way Into a Room
 
+**Full passage / set text (question 9):**
+
+Most of us remember the rooms of buildings we love. Fewer of us remember how we entered them. Yet the moments between the street and the room, the door, the vestibule, the corridor, the stair, do much of the work of preparing us for what we are about to see. I have come to believe that an architect's skill shows most clearly not in the grand spaces themselves but in the passages that lead to them.
+
+Consider the public library in the city where I grew up. From the street, its entrance is almost disappointing: a modest door set into a heavy stone wall, opening onto a low, dim hallway barely taller than a raised hand. The hallway turns once, and then, without warning, the ceiling lifts away. The reading room beyond rises three stories, lit from high windows, and stepping into it is close to a physical sensation, like the moment a held breath is released. I have walked into that room hundreds of times and still feel it. The room alone, entered directly from the street, would be handsome. Approached through the low hallway, it becomes something closer to astonishing.
+
+Architects sometimes call this technique compression and release. A narrow or low space makes the body briefly aware of its own confinement, and the larger space that follows feels larger by contrast. The principle is old and simple, and it would be easy to dismiss it as a trick. But I think it reflects something true about how we experience buildings: not as a set of separate rooms but as a sequence, each part shaping how we perceive the next. A building is closer to a piece of music than to a photograph. It unfolds in time.
+
+The opposite approach has its own advocates, and their argument deserves a hearing. Many recent museums and offices greet visitors with a wall of glass, so that the entire interior is visible from the sidewalk before anyone opens the door. The intention is generous. These entrances invite people in rather than making them earn their arrival, and they avoid the slightly forbidding quality of a dark hallway. For a building that wants to seem open to everyone, this may be the right choice, and I would not want every lobby to resemble a tunnel.
+
+Still, something is lost. When the whole interior is revealed at once, there is nothing left for the entrance to do. The visitor walks in already knowing what she will find, and the building has, in a sense, told its story before she arrived. The glass entrance welcomes, but it does not prepare.
+
+Compression and release can also fail. I once visited a concert hall whose architects had clearly admired the approach and pushed it further: a long, black corridor with a ceiling so low that tall visitors stooped. By the time the hall itself appeared, most people I saw looked relieved rather than moved. The corridor had gone from preparing them to punishing them. A threshold must be brief enough that the visitor trusts it is leading somewhere. Beyond a certain point, anticipation curdles into discomfort.
+
+What I admire in the library, then, is not the low hallway or the tall room but the proportion between them, the architect's judgment about how much to withhold, and for how long. That judgment cannot be reduced to a rule. It depends on the building's purpose, its audience, and the light of the particular site. But it begins with recognizing that the way into a room is part of the room, and that we arrive in a space with our bodies before we arrive with our eyes.
+
 **Question:** What is the main purpose of the concert-hall example within the essay as a whole?
 
 - A. provide a second example of compression and release working as intended.
@@ -1399,6 +1803,22 @@ kx + 6y = c
 ## READING 10 — Humanities (medium)
 
 **Passage/set:** The Way Into a Room
+
+**Full passage / set text (question 10):**
+
+Most of us remember the rooms of buildings we love. Fewer of us remember how we entered them. Yet the moments between the street and the room, the door, the vestibule, the corridor, the stair, do much of the work of preparing us for what we are about to see. I have come to believe that an architect's skill shows most clearly not in the grand spaces themselves but in the passages that lead to them.
+
+Consider the public library in the city where I grew up. From the street, its entrance is almost disappointing: a modest door set into a heavy stone wall, opening onto a low, dim hallway barely taller than a raised hand. The hallway turns once, and then, without warning, the ceiling lifts away. The reading room beyond rises three stories, lit from high windows, and stepping into it is close to a physical sensation, like the moment a held breath is released. I have walked into that room hundreds of times and still feel it. The room alone, entered directly from the street, would be handsome. Approached through the low hallway, it becomes something closer to astonishing.
+
+Architects sometimes call this technique compression and release. A narrow or low space makes the body briefly aware of its own confinement, and the larger space that follows feels larger by contrast. The principle is old and simple, and it would be easy to dismiss it as a trick. But I think it reflects something true about how we experience buildings: not as a set of separate rooms but as a sequence, each part shaping how we perceive the next. A building is closer to a piece of music than to a photograph. It unfolds in time.
+
+The opposite approach has its own advocates, and their argument deserves a hearing. Many recent museums and offices greet visitors with a wall of glass, so that the entire interior is visible from the sidewalk before anyone opens the door. The intention is generous. These entrances invite people in rather than making them earn their arrival, and they avoid the slightly forbidding quality of a dark hallway. For a building that wants to seem open to everyone, this may be the right choice, and I would not want every lobby to resemble a tunnel.
+
+Still, something is lost. When the whole interior is revealed at once, there is nothing left for the entrance to do. The visitor walks in already knowing what she will find, and the building has, in a sense, told its story before she arrived. The glass entrance welcomes, but it does not prepare.
+
+Compression and release can also fail. I once visited a concert hall whose architects had clearly admired the approach and pushed it further: a long, black corridor with a ceiling so low that tall visitors stooped. By the time the hall itself appeared, most people I saw looked relieved rather than moved. The corridor had gone from preparing them to punishing them. A threshold must be brief enough that the visitor trusts it is leading somewhere. Beyond a certain point, anticipation curdles into discomfort.
+
+What I admire in the library, then, is not the low hallway or the tall room but the proportion between them, the architect's judgment about how much to withhold, and for how long. That judgment cannot be reduced to a rule. It depends on the building's purpose, its audience, and the light of the particular site. But it begins with recognizing that the way into a room is part of the room, and that we arrive in a space with our bodies before we arrive with our eyes.
 
 **Question:** The author's attitude toward entrances that use a wall of glass is best described as:
 
@@ -1415,6 +1835,22 @@ kx + 6y = c
 
 **Passage/set:** A Landscape Built in Layers
 
+**Full passage / set text (question 11):**
+
+When people imagine how a landscape changes over time, they often picture a sequence in which one community of organisms replaces another: bare ground becomes grassland, grassland becomes shrubland, and eventually a more complex community develops. Ecologists sometimes call such broad patterns succession. Yet landscapes do not always move neatly from one stage to another. A patch of ground can carry several histories at once, and those histories can influence what appears there next.
+
+Consider a fictional hillside called Alder Ridge. A storm once stripped vegetation from its upper slope, while a lower section remained covered by mature shrubs. Years later, both sections contained grasses, but the grasses did not appear in identical arrangements. On the upper slope, exposed patches between plants remained common. On the lower slope, grasses often grew beneath or beside established shrubs. If an observer looked only at the species present, the two areas might seem to be following the same trajectory. Their physical arrangement, however, suggested that the communities were responding to different starting conditions.
+
+Ecologists studying such patterns distinguish between what is present in a place and the conditions that make particular organisms likely to establish there. A seed arriving on bare soil encounters a different environment from one arriving beneath an existing canopy. Shade, retained moisture, accumulated organic material, and competition can all influence whether a newcomer persists. These factors do not operate independently. A plant that changes the amount of shade near the ground may also change which other plants can survive there. In this way, organisms can become part of the conditions that shape later stages of community development.
+
+This idea complicates the common image of succession as a simple ladder. Suppose two nearby patches contain the same kinds of plants but differ in how those plants are distributed. A dense cluster in one patch may alter light and moisture enough to encourage a different set of later arrivals than an evenly spaced collection of the same species. The difference is not merely visual. Arrangement can influence interactions, and interactions can influence subsequent composition.
+
+The influence of earlier communities can also persist after those communities are no longer obvious. Decaying roots, accumulated plant material, and changes in shade or soil moisture can leave conditions different from those on nearby ground that looks similar at first glance. Later arrivals therefore respond not only to the climate of the moment but also to conditions partly inherited from what occupied the site before. Such legacies need not determine a single outcome, but they can make two apparently comparable patches diverge over time.
+
+At the same time, ecologists caution against treating every difference between patches as evidence that organisms are reshaping their own environment. Weather, soil depth, animal activity, and chance events can produce differences before plants have had much opportunity to affect local conditions. This is why explanations of succession often need to consider both external influences and feedback from the community itself.
+
+The value of viewing landscapes as layered histories is therefore not that it supplies a single rule for predicting what will appear next. Instead, it changes the question. Rather than asking only, "Which stage is this patch in?" an observer can ask what conditions were present before the current community developed, how organisms have altered those conditions, and which outside forces may still be operating. Such questions do not make succession perfectly predictable. They make its apparent irregularities more intelligible by treating them as consequences of interacting histories rather than deviations from a fixed sequence.
+
 **Question:** What central idea does the passage develop about ecological succession?
 
 - A. It always proceeds through the same fixed sequence of communities.
@@ -1429,6 +1865,22 @@ kx + 6y = c
 ## READING 12 — Natural Science (easy)
 
 **Passage/set:** A Landscape Built in Layers
+
+**Full passage / set text (question 12):**
+
+When people imagine how a landscape changes over time, they often picture a sequence in which one community of organisms replaces another: bare ground becomes grassland, grassland becomes shrubland, and eventually a more complex community develops. Ecologists sometimes call such broad patterns succession. Yet landscapes do not always move neatly from one stage to another. A patch of ground can carry several histories at once, and those histories can influence what appears there next.
+
+Consider a fictional hillside called Alder Ridge. A storm once stripped vegetation from its upper slope, while a lower section remained covered by mature shrubs. Years later, both sections contained grasses, but the grasses did not appear in identical arrangements. On the upper slope, exposed patches between plants remained common. On the lower slope, grasses often grew beneath or beside established shrubs. If an observer looked only at the species present, the two areas might seem to be following the same trajectory. Their physical arrangement, however, suggested that the communities were responding to different starting conditions.
+
+Ecologists studying such patterns distinguish between what is present in a place and the conditions that make particular organisms likely to establish there. A seed arriving on bare soil encounters a different environment from one arriving beneath an existing canopy. Shade, retained moisture, accumulated organic material, and competition can all influence whether a newcomer persists. These factors do not operate independently. A plant that changes the amount of shade near the ground may also change which other plants can survive there. In this way, organisms can become part of the conditions that shape later stages of community development.
+
+This idea complicates the common image of succession as a simple ladder. Suppose two nearby patches contain the same kinds of plants but differ in how those plants are distributed. A dense cluster in one patch may alter light and moisture enough to encourage a different set of later arrivals than an evenly spaced collection of the same species. The difference is not merely visual. Arrangement can influence interactions, and interactions can influence subsequent composition.
+
+The influence of earlier communities can also persist after those communities are no longer obvious. Decaying roots, accumulated plant material, and changes in shade or soil moisture can leave conditions different from those on nearby ground that looks similar at first glance. Later arrivals therefore respond not only to the climate of the moment but also to conditions partly inherited from what occupied the site before. Such legacies need not determine a single outcome, but they can make two apparently comparable patches diverge over time.
+
+At the same time, ecologists caution against treating every difference between patches as evidence that organisms are reshaping their own environment. Weather, soil depth, animal activity, and chance events can produce differences before plants have had much opportunity to affect local conditions. This is why explanations of succession often need to consider both external influences and feedback from the community itself.
+
+The value of viewing landscapes as layered histories is therefore not that it supplies a single rule for predicting what will appear next. Instead, it changes the question. Rather than asking only, "Which stage is this patch in?" an observer can ask what conditions were present before the current community developed, how organisms have altered those conditions, and which outside forces may still be operating. Such questions do not make succession perfectly predictable. They make its apparent irregularities more intelligible by treating them as consequences of interacting histories rather than deviations from a fixed sequence.
 
 **Question:** According to the final paragraph, how does the layered-history approach change the way an observer studies a landscape?
 
@@ -1445,6 +1897,22 @@ kx + 6y = c
 
 **Passage/set:** A Landscape Built in Layers
 
+**Full passage / set text (question 13):**
+
+When people imagine how a landscape changes over time, they often picture a sequence in which one community of organisms replaces another: bare ground becomes grassland, grassland becomes shrubland, and eventually a more complex community develops. Ecologists sometimes call such broad patterns succession. Yet landscapes do not always move neatly from one stage to another. A patch of ground can carry several histories at once, and those histories can influence what appears there next.
+
+Consider a fictional hillside called Alder Ridge. A storm once stripped vegetation from its upper slope, while a lower section remained covered by mature shrubs. Years later, both sections contained grasses, but the grasses did not appear in identical arrangements. On the upper slope, exposed patches between plants remained common. On the lower slope, grasses often grew beneath or beside established shrubs. If an observer looked only at the species present, the two areas might seem to be following the same trajectory. Their physical arrangement, however, suggested that the communities were responding to different starting conditions.
+
+Ecologists studying such patterns distinguish between what is present in a place and the conditions that make particular organisms likely to establish there. A seed arriving on bare soil encounters a different environment from one arriving beneath an existing canopy. Shade, retained moisture, accumulated organic material, and competition can all influence whether a newcomer persists. These factors do not operate independently. A plant that changes the amount of shade near the ground may also change which other plants can survive there. In this way, organisms can become part of the conditions that shape later stages of community development.
+
+This idea complicates the common image of succession as a simple ladder. Suppose two nearby patches contain the same kinds of plants but differ in how those plants are distributed. A dense cluster in one patch may alter light and moisture enough to encourage a different set of later arrivals than an evenly spaced collection of the same species. The difference is not merely visual. Arrangement can influence interactions, and interactions can influence subsequent composition.
+
+The influence of earlier communities can also persist after those communities are no longer obvious. Decaying roots, accumulated plant material, and changes in shade or soil moisture can leave conditions different from those on nearby ground that looks similar at first glance. Later arrivals therefore respond not only to the climate of the moment but also to conditions partly inherited from what occupied the site before. Such legacies need not determine a single outcome, but they can make two apparently comparable patches diverge over time.
+
+At the same time, ecologists caution against treating every difference between patches as evidence that organisms are reshaping their own environment. Weather, soil depth, animal activity, and chance events can produce differences before plants have had much opportunity to affect local conditions. This is why explanations of succession often need to consider both external influences and feedback from the community itself.
+
+The value of viewing landscapes as layered histories is therefore not that it supplies a single rule for predicting what will appear next. Instead, it changes the question. Rather than asking only, "Which stage is this patch in?" an observer can ask what conditions were present before the current community developed, how organisms have altered those conditions, and which outside forces may still be operating. Such questions do not make succession perfectly predictable. They make its apparent irregularities more intelligible by treating them as consequences of interacting histories rather than deviations from a fixed sequence.
+
 **Question:** What would the passage most strongly suggest if two nearby patches began with similar soil and weather conditions but later developed different plant arrangements?
 
 - A. The difference necessarily proves that one patch experienced a stronger disturbance.
@@ -1459,6 +1927,22 @@ kx + 6y = c
 ## READING 14 — Natural Science (medium)
 
 **Passage/set:** A Landscape Built in Layers
+
+**Full passage / set text (question 14):**
+
+When people imagine how a landscape changes over time, they often picture a sequence in which one community of organisms replaces another: bare ground becomes grassland, grassland becomes shrubland, and eventually a more complex community develops. Ecologists sometimes call such broad patterns succession. Yet landscapes do not always move neatly from one stage to another. A patch of ground can carry several histories at once, and those histories can influence what appears there next.
+
+Consider a fictional hillside called Alder Ridge. A storm once stripped vegetation from its upper slope, while a lower section remained covered by mature shrubs. Years later, both sections contained grasses, but the grasses did not appear in identical arrangements. On the upper slope, exposed patches between plants remained common. On the lower slope, grasses often grew beneath or beside established shrubs. If an observer looked only at the species present, the two areas might seem to be following the same trajectory. Their physical arrangement, however, suggested that the communities were responding to different starting conditions.
+
+Ecologists studying such patterns distinguish between what is present in a place and the conditions that make particular organisms likely to establish there. A seed arriving on bare soil encounters a different environment from one arriving beneath an existing canopy. Shade, retained moisture, accumulated organic material, and competition can all influence whether a newcomer persists. These factors do not operate independently. A plant that changes the amount of shade near the ground may also change which other plants can survive there. In this way, organisms can become part of the conditions that shape later stages of community development.
+
+This idea complicates the common image of succession as a simple ladder. Suppose two nearby patches contain the same kinds of plants but differ in how those plants are distributed. A dense cluster in one patch may alter light and moisture enough to encourage a different set of later arrivals than an evenly spaced collection of the same species. The difference is not merely visual. Arrangement can influence interactions, and interactions can influence subsequent composition.
+
+The influence of earlier communities can also persist after those communities are no longer obvious. Decaying roots, accumulated plant material, and changes in shade or soil moisture can leave conditions different from those on nearby ground that looks similar at first glance. Later arrivals therefore respond not only to the climate of the moment but also to conditions partly inherited from what occupied the site before. Such legacies need not determine a single outcome, but they can make two apparently comparable patches diverge over time.
+
+At the same time, ecologists caution against treating every difference between patches as evidence that organisms are reshaping their own environment. Weather, soil depth, animal activity, and chance events can produce differences before plants have had much opportunity to affect local conditions. This is why explanations of succession often need to consider both external influences and feedback from the community itself.
+
+The value of viewing landscapes as layered histories is therefore not that it supplies a single rule for predicting what will appear next. Instead, it changes the question. Rather than asking only, "Which stage is this patch in?" an observer can ask what conditions were present before the current community developed, how organisms have altered those conditions, and which outside forces may still be operating. Such questions do not make succession perfectly predictable. They make its apparent irregularities more intelligible by treating them as consequences of interacting histories rather than deviations from a fixed sequence.
 
 **Question:** What is the main purpose of the fifth paragraph in the passage's discussion of organism-environment feedback?
 
@@ -1475,6 +1959,22 @@ kx + 6y = c
 
 **Passage/set:** A Landscape Built in Layers
 
+**Full passage / set text (question 15):**
+
+When people imagine how a landscape changes over time, they often picture a sequence in which one community of organisms replaces another: bare ground becomes grassland, grassland becomes shrubland, and eventually a more complex community develops. Ecologists sometimes call such broad patterns succession. Yet landscapes do not always move neatly from one stage to another. A patch of ground can carry several histories at once, and those histories can influence what appears there next.
+
+Consider a fictional hillside called Alder Ridge. A storm once stripped vegetation from its upper slope, while a lower section remained covered by mature shrubs. Years later, both sections contained grasses, but the grasses did not appear in identical arrangements. On the upper slope, exposed patches between plants remained common. On the lower slope, grasses often grew beneath or beside established shrubs. If an observer looked only at the species present, the two areas might seem to be following the same trajectory. Their physical arrangement, however, suggested that the communities were responding to different starting conditions.
+
+Ecologists studying such patterns distinguish between what is present in a place and the conditions that make particular organisms likely to establish there. A seed arriving on bare soil encounters a different environment from one arriving beneath an existing canopy. Shade, retained moisture, accumulated organic material, and competition can all influence whether a newcomer persists. These factors do not operate independently. A plant that changes the amount of shade near the ground may also change which other plants can survive there. In this way, organisms can become part of the conditions that shape later stages of community development.
+
+This idea complicates the common image of succession as a simple ladder. Suppose two nearby patches contain the same kinds of plants but differ in how those plants are distributed. A dense cluster in one patch may alter light and moisture enough to encourage a different set of later arrivals than an evenly spaced collection of the same species. The difference is not merely visual. Arrangement can influence interactions, and interactions can influence subsequent composition.
+
+The influence of earlier communities can also persist after those communities are no longer obvious. Decaying roots, accumulated plant material, and changes in shade or soil moisture can leave conditions different from those on nearby ground that looks similar at first glance. Later arrivals therefore respond not only to the climate of the moment but also to conditions partly inherited from what occupied the site before. Such legacies need not determine a single outcome, but they can make two apparently comparable patches diverge over time.
+
+At the same time, ecologists caution against treating every difference between patches as evidence that organisms are reshaping their own environment. Weather, soil depth, animal activity, and chance events can produce differences before plants have had much opportunity to affect local conditions. This is why explanations of succession often need to consider both external influences and feedback from the community itself.
+
+The value of viewing landscapes as layered histories is therefore not that it supplies a single rule for predicting what will appear next. Instead, it changes the question. Rather than asking only, "Which stage is this patch in?" an observer can ask what conditions were present before the current community developed, how organisms have altered those conditions, and which outside forces may still be operating. Such questions do not make succession perfectly predictable. They make its apparent irregularities more intelligible by treating them as consequences of interacting histories rather than deviations from a fixed sequence.
+
 **Question:** What is the main reason the passage emphasizes the arrangement of plants on Alder Ridge rather than only the species present?
 
 - A. Because arrangement can affect environmental conditions and interactions among organisms.
@@ -1489,6 +1989,22 @@ kx + 6y = c
 ## READING 16 — Natural Science (easy)
 
 **Passage/set:** Trees That Answer the Wind
+
+**Full passage / set text (question 16):**
+
+A tree growing alone on a windy ridge rarely looks like a tree of the same species growing in a sheltered valley. The ridge tree tends to be shorter, with a trunk that is thick for its height and branches that are short and stiff. For a long time, it was natural to assume that the wind had simply worn the tree down, breaking off whatever tried to grow too tall. Breakage does play a role. But much of the difference arises before anything breaks. The tree is responding to being bent.
+
+Plants can sense mechanical stress, the pushing, pulling, and bending caused by wind, rain, passing animals, or even the weight of their own branches. When a stem is bent repeatedly, cells along it detect the strain and set off chemical signals that alter how the plant grows. Botanists call this response thigmomorphogenesis, a word built from roots meaning touch, form, and origin: a change in shape caused by physical contact or movement. The typical result is a plant that grows less in height and more in thickness. Its stem and roots become stronger, and its tissues often become stiffer.
+
+The response can be surprisingly sensitive. In greenhouse studies, young plants that are gently brushed or shaken for a few seconds each day often end up noticeably shorter and sturdier than identical plants left undisturbed. The disturbance does not injure them. It simply signals, in effect, that they are growing in a place where movement is common, and they adjust accordingly.
+
+Why should a plant respond this way? Height has obvious advantages. A taller plant can reach more light and spread its seeds or pollen farther. But height also has a cost. A tall, slender stem acts like a long lever: wind pushing on its top places great strain on its base. In a calm place, a plant can afford to invest in height. In a windy one, the same investment could end with the stem snapping. Thickening the stem and strengthening the roots reduce that risk, though they mean the plant devotes less of its growth to reaching upward. The response, then, is a trade-off rather than a pure improvement. The ridge tree is not a better tree than the valley tree; it is a tree built for different conditions.
+
+A striking illustration comes from the practice of staking young trees. Gardeners often tie newly planted trees tightly to stakes to keep them upright. A tree held so firmly that it cannot sway, however, receives little of the bending that would normally prompt it to thicken. When the stake is removed, such a tree may have a slender trunk too weak to support itself in the wind. Many gardeners now recommend loose ties that allow some movement, or removing stakes as soon as the roots are established, so that the young tree can experience enough motion to grow sturdy.
+
+None of this means that every short, thick tree on a windy slope owes its shape to mechanical stress alone. Exposed sites are often also colder and drier, with thinner soil, and each of these conditions can limit growth on its own. Separating the effects of wind from the effects of poor soil or harsh temperatures is difficult outside a controlled setting, which is one reason researchers rely on greenhouse experiments in which bending can be varied while other conditions are held steady.
+
+What thigmomorphogenesis reveals is that a plant's shape is not simply a fixed plan carried out regardless of circumstance. It is partly a record of what the plant has experienced. A plant cannot walk away from the wind, but it can, in its slow way, answer it.
 
 **Question:** The passage as a whole is chiefly about how:
 
@@ -1505,6 +2021,22 @@ kx + 6y = c
 
 **Passage/set:** Trees That Answer the Wind
 
+**Full passage / set text (question 17):**
+
+A tree growing alone on a windy ridge rarely looks like a tree of the same species growing in a sheltered valley. The ridge tree tends to be shorter, with a trunk that is thick for its height and branches that are short and stiff. For a long time, it was natural to assume that the wind had simply worn the tree down, breaking off whatever tried to grow too tall. Breakage does play a role. But much of the difference arises before anything breaks. The tree is responding to being bent.
+
+Plants can sense mechanical stress, the pushing, pulling, and bending caused by wind, rain, passing animals, or even the weight of their own branches. When a stem is bent repeatedly, cells along it detect the strain and set off chemical signals that alter how the plant grows. Botanists call this response thigmomorphogenesis, a word built from roots meaning touch, form, and origin: a change in shape caused by physical contact or movement. The typical result is a plant that grows less in height and more in thickness. Its stem and roots become stronger, and its tissues often become stiffer.
+
+The response can be surprisingly sensitive. In greenhouse studies, young plants that are gently brushed or shaken for a few seconds each day often end up noticeably shorter and sturdier than identical plants left undisturbed. The disturbance does not injure them. It simply signals, in effect, that they are growing in a place where movement is common, and they adjust accordingly.
+
+Why should a plant respond this way? Height has obvious advantages. A taller plant can reach more light and spread its seeds or pollen farther. But height also has a cost. A tall, slender stem acts like a long lever: wind pushing on its top places great strain on its base. In a calm place, a plant can afford to invest in height. In a windy one, the same investment could end with the stem snapping. Thickening the stem and strengthening the roots reduce that risk, though they mean the plant devotes less of its growth to reaching upward. The response, then, is a trade-off rather than a pure improvement. The ridge tree is not a better tree than the valley tree; it is a tree built for different conditions.
+
+A striking illustration comes from the practice of staking young trees. Gardeners often tie newly planted trees tightly to stakes to keep them upright. A tree held so firmly that it cannot sway, however, receives little of the bending that would normally prompt it to thicken. When the stake is removed, such a tree may have a slender trunk too weak to support itself in the wind. Many gardeners now recommend loose ties that allow some movement, or removing stakes as soon as the roots are established, so that the young tree can experience enough motion to grow sturdy.
+
+None of this means that every short, thick tree on a windy slope owes its shape to mechanical stress alone. Exposed sites are often also colder and drier, with thinner soil, and each of these conditions can limit growth on its own. Separating the effects of wind from the effects of poor soil or harsh temperatures is difficult outside a controlled setting, which is one reason researchers rely on greenhouse experiments in which bending can be varied while other conditions are held steady.
+
+What thigmomorphogenesis reveals is that a plant's shape is not simply a fixed plan carried out regardless of circumstance. It is partly a record of what the plant has experienced. A plant cannot walk away from the wind, but it can, in its slow way, answer it.
+
 **Question:** According to the passage, the greenhouse studies found that gently brushing or shaking young plants each day:
 
 - A. made them shorter and sturdier without injuring them.
@@ -1519,6 +2051,22 @@ kx + 6y = c
 ## READING 18 — Natural Science (hard)
 
 **Passage/set:** Trees That Answer the Wind
+
+**Full passage / set text (question 18):**
+
+A tree growing alone on a windy ridge rarely looks like a tree of the same species growing in a sheltered valley. The ridge tree tends to be shorter, with a trunk that is thick for its height and branches that are short and stiff. For a long time, it was natural to assume that the wind had simply worn the tree down, breaking off whatever tried to grow too tall. Breakage does play a role. But much of the difference arises before anything breaks. The tree is responding to being bent.
+
+Plants can sense mechanical stress, the pushing, pulling, and bending caused by wind, rain, passing animals, or even the weight of their own branches. When a stem is bent repeatedly, cells along it detect the strain and set off chemical signals that alter how the plant grows. Botanists call this response thigmomorphogenesis, a word built from roots meaning touch, form, and origin: a change in shape caused by physical contact or movement. The typical result is a plant that grows less in height and more in thickness. Its stem and roots become stronger, and its tissues often become stiffer.
+
+The response can be surprisingly sensitive. In greenhouse studies, young plants that are gently brushed or shaken for a few seconds each day often end up noticeably shorter and sturdier than identical plants left undisturbed. The disturbance does not injure them. It simply signals, in effect, that they are growing in a place where movement is common, and they adjust accordingly.
+
+Why should a plant respond this way? Height has obvious advantages. A taller plant can reach more light and spread its seeds or pollen farther. But height also has a cost. A tall, slender stem acts like a long lever: wind pushing on its top places great strain on its base. In a calm place, a plant can afford to invest in height. In a windy one, the same investment could end with the stem snapping. Thickening the stem and strengthening the roots reduce that risk, though they mean the plant devotes less of its growth to reaching upward. The response, then, is a trade-off rather than a pure improvement. The ridge tree is not a better tree than the valley tree; it is a tree built for different conditions.
+
+A striking illustration comes from the practice of staking young trees. Gardeners often tie newly planted trees tightly to stakes to keep them upright. A tree held so firmly that it cannot sway, however, receives little of the bending that would normally prompt it to thicken. When the stake is removed, such a tree may have a slender trunk too weak to support itself in the wind. Many gardeners now recommend loose ties that allow some movement, or removing stakes as soon as the roots are established, so that the young tree can experience enough motion to grow sturdy.
+
+None of this means that every short, thick tree on a windy slope owes its shape to mechanical stress alone. Exposed sites are often also colder and drier, with thinner soil, and each of these conditions can limit growth on its own. Separating the effects of wind from the effects of poor soil or harsh temperatures is difficult outside a controlled setting, which is one reason researchers rely on greenhouse experiments in which bending can be varied while other conditions are held steady.
+
+What thigmomorphogenesis reveals is that a plant's shape is not simply a fixed plan carried out regardless of circumstance. It is partly a record of what the plant has experienced. A plant cannot walk away from the wind, but it can, in its slow way, answer it.
 
 **Question:** What does the passage most strongly suggest about the shorter, thicker trees on a windy hilltop where the soil is also thin and dry?
 
@@ -1535,6 +2083,22 @@ kx + 6y = c
 
 **Passage/set:** Trees That Answer the Wind
 
+**Full passage / set text (question 19):**
+
+A tree growing alone on a windy ridge rarely looks like a tree of the same species growing in a sheltered valley. The ridge tree tends to be shorter, with a trunk that is thick for its height and branches that are short and stiff. For a long time, it was natural to assume that the wind had simply worn the tree down, breaking off whatever tried to grow too tall. Breakage does play a role. But much of the difference arises before anything breaks. The tree is responding to being bent.
+
+Plants can sense mechanical stress, the pushing, pulling, and bending caused by wind, rain, passing animals, or even the weight of their own branches. When a stem is bent repeatedly, cells along it detect the strain and set off chemical signals that alter how the plant grows. Botanists call this response thigmomorphogenesis, a word built from roots meaning touch, form, and origin: a change in shape caused by physical contact or movement. The typical result is a plant that grows less in height and more in thickness. Its stem and roots become stronger, and its tissues often become stiffer.
+
+The response can be surprisingly sensitive. In greenhouse studies, young plants that are gently brushed or shaken for a few seconds each day often end up noticeably shorter and sturdier than identical plants left undisturbed. The disturbance does not injure them. It simply signals, in effect, that they are growing in a place where movement is common, and they adjust accordingly.
+
+Why should a plant respond this way? Height has obvious advantages. A taller plant can reach more light and spread its seeds or pollen farther. But height also has a cost. A tall, slender stem acts like a long lever: wind pushing on its top places great strain on its base. In a calm place, a plant can afford to invest in height. In a windy one, the same investment could end with the stem snapping. Thickening the stem and strengthening the roots reduce that risk, though they mean the plant devotes less of its growth to reaching upward. The response, then, is a trade-off rather than a pure improvement. The ridge tree is not a better tree than the valley tree; it is a tree built for different conditions.
+
+A striking illustration comes from the practice of staking young trees. Gardeners often tie newly planted trees tightly to stakes to keep them upright. A tree held so firmly that it cannot sway, however, receives little of the bending that would normally prompt it to thicken. When the stake is removed, such a tree may have a slender trunk too weak to support itself in the wind. Many gardeners now recommend loose ties that allow some movement, or removing stakes as soon as the roots are established, so that the young tree can experience enough motion to grow sturdy.
+
+None of this means that every short, thick tree on a windy slope owes its shape to mechanical stress alone. Exposed sites are often also colder and drier, with thinner soil, and each of these conditions can limit growth on its own. Separating the effects of wind from the effects of poor soil or harsh temperatures is difficult outside a controlled setting, which is one reason researchers rely on greenhouse experiments in which bending can be varied while other conditions are held steady.
+
+What thigmomorphogenesis reveals is that a plant's shape is not simply a fixed plan carried out regardless of circumstance. It is partly a record of what the plant has experienced. A plant cannot walk away from the wind, but it can, in its slow way, answer it.
+
 **Question:** What does the passage suggest is the main reason the plant's response to bending is a trade-off rather than a pure improvement?
 
 - A. a thicker stem helps the plant reach more light than a slender one.
@@ -1549,6 +2113,22 @@ kx + 6y = c
 ## READING 20 — Natural Science (medium)
 
 **Passage/set:** Trees That Answer the Wind
+
+**Full passage / set text (question 20):**
+
+A tree growing alone on a windy ridge rarely looks like a tree of the same species growing in a sheltered valley. The ridge tree tends to be shorter, with a trunk that is thick for its height and branches that are short and stiff. For a long time, it was natural to assume that the wind had simply worn the tree down, breaking off whatever tried to grow too tall. Breakage does play a role. But much of the difference arises before anything breaks. The tree is responding to being bent.
+
+Plants can sense mechanical stress, the pushing, pulling, and bending caused by wind, rain, passing animals, or even the weight of their own branches. When a stem is bent repeatedly, cells along it detect the strain and set off chemical signals that alter how the plant grows. Botanists call this response thigmomorphogenesis, a word built from roots meaning touch, form, and origin: a change in shape caused by physical contact or movement. The typical result is a plant that grows less in height and more in thickness. Its stem and roots become stronger, and its tissues often become stiffer.
+
+The response can be surprisingly sensitive. In greenhouse studies, young plants that are gently brushed or shaken for a few seconds each day often end up noticeably shorter and sturdier than identical plants left undisturbed. The disturbance does not injure them. It simply signals, in effect, that they are growing in a place where movement is common, and they adjust accordingly.
+
+Why should a plant respond this way? Height has obvious advantages. A taller plant can reach more light and spread its seeds or pollen farther. But height also has a cost. A tall, slender stem acts like a long lever: wind pushing on its top places great strain on its base. In a calm place, a plant can afford to invest in height. In a windy one, the same investment could end with the stem snapping. Thickening the stem and strengthening the roots reduce that risk, though they mean the plant devotes less of its growth to reaching upward. The response, then, is a trade-off rather than a pure improvement. The ridge tree is not a better tree than the valley tree; it is a tree built for different conditions.
+
+A striking illustration comes from the practice of staking young trees. Gardeners often tie newly planted trees tightly to stakes to keep them upright. A tree held so firmly that it cannot sway, however, receives little of the bending that would normally prompt it to thicken. When the stake is removed, such a tree may have a slender trunk too weak to support itself in the wind. Many gardeners now recommend loose ties that allow some movement, or removing stakes as soon as the roots are established, so that the young tree can experience enough motion to grow sturdy.
+
+None of this means that every short, thick tree on a windy slope owes its shape to mechanical stress alone. Exposed sites are often also colder and drier, with thinner soil, and each of these conditions can limit growth on its own. Separating the effects of wind from the effects of poor soil or harsh temperatures is difficult outside a controlled setting, which is one reason researchers rely on greenhouse experiments in which bending can be varied while other conditions are held steady.
+
+What thigmomorphogenesis reveals is that a plant's shape is not simply a fixed plan carried out regardless of circumstance. It is partly a record of what the plant has experienced. A plant cannot walk away from the wind, but it can, in its slow way, answer it.
 
 **Question:** What is the main purpose of the example of tightly staked young trees?
 
@@ -1565,6 +2145,22 @@ kx + 6y = c
 
 **Passage/set:** The Bin in the Garage
 
+**Full passage / set text (question 21):**
+
+When the town of Ellery Falls introduced curbside composting, officials faced a choice that seemed minor at the time. Residents could be asked to sign up for the program, or they could be enrolled automatically and given the option to leave. The town chose the second approach for half of its neighborhoods and the first for the other half, partly for administrative reasons and partly out of curiosity. The difference in outcomes was larger than anyone expected, and more complicated.
+
+Choices like this one involve what researchers call a default: the option a person ends up with if he or she takes no action. Defaults matter because many people, faced with a form or a decision, do nothing. They may be busy, uncertain, or simply unwilling to spend effort on a question that seems unimportant. Whatever the reason, inaction delivers them to whatever outcome the default specifies. A person who would never have bothered to sign up for a program may also never bother to leave it.
+
+In Ellery Falls, the effect of the default on enrollment was dramatic. In neighborhoods where residents had to request a compost bin, about one household in five did so in the first year. In neighborhoods where every household received a bin unless it asked not to, fewer than one in ten opted out, meaning more than nine in ten remained enrolled. On paper, the automatic approach had produced more than four times as many participants.
+
+Enrollment, however, is not the same as participation. The town also tracked how many bins were actually set out on collection day, and here the picture changed. In the sign-up neighborhoods, most enrolled households used their bins regularly. These were people who had wanted to compost badly enough to fill out a form. In the automatic neighborhoods, a large share of bins sat in garages or beside houses, empty, week after week. When the town counted households that set out a bin at least twice a month, the automatic neighborhoods still came out ahead, but by a much smaller margin than the enrollment numbers suggested.
+
+There are two ways to read this result. One emphasizes the gain: even after accounting for unused bins, the default produced more composting households, and some of those households might never have started otherwise. The bin in the garage also serves as a quiet reminder, and over time some reluctant participants may begin using it. The other reading emphasizes the cost. Every unused bin had to be purchased and delivered, and each one represents a household that was counted as participating when it was not. A town that judged its program by enrollment alone would badly overestimate its success.
+
+A further complication concerns how residents felt about the approach. In surveys, most households in the automatic neighborhoods said they did not mind being enrolled. A minority, though, described it as presumptuous, and some of those residents reported feeling less favorable toward the town's environmental programs in general. It is not clear whether their irritation reflected the default itself or a broader distrust that existed before the program began; the town did not survey residents beforehand, so it cannot tell.
+
+What Ellery Falls illustrates is that a default is a powerful tool for changing what people end up with, but a weaker tool for changing what they actually do. It can move the starting line without moving the runner. That does not make defaults useless, since a closer starting line still matters, but it does suggest that officials should be careful about which numbers they celebrate. A default that fills a sign-up sheet has accomplished something real. Whether it has accomplished what the program was meant to accomplish is a separate question, and it can only be answered by watching what happens after the form is filed.
+
 **Question:** The author's main point about automatic enrollment in Ellery Falls is that it:
 
 - A. failed to increase the number of households that actually composted.
@@ -1579,6 +2175,22 @@ kx + 6y = c
 ## READING 22 — Social Science (easy)
 
 **Passage/set:** The Bin in the Garage
+
+**Full passage / set text (question 22):**
+
+When the town of Ellery Falls introduced curbside composting, officials faced a choice that seemed minor at the time. Residents could be asked to sign up for the program, or they could be enrolled automatically and given the option to leave. The town chose the second approach for half of its neighborhoods and the first for the other half, partly for administrative reasons and partly out of curiosity. The difference in outcomes was larger than anyone expected, and more complicated.
+
+Choices like this one involve what researchers call a default: the option a person ends up with if he or she takes no action. Defaults matter because many people, faced with a form or a decision, do nothing. They may be busy, uncertain, or simply unwilling to spend effort on a question that seems unimportant. Whatever the reason, inaction delivers them to whatever outcome the default specifies. A person who would never have bothered to sign up for a program may also never bother to leave it.
+
+In Ellery Falls, the effect of the default on enrollment was dramatic. In neighborhoods where residents had to request a compost bin, about one household in five did so in the first year. In neighborhoods where every household received a bin unless it asked not to, fewer than one in ten opted out, meaning more than nine in ten remained enrolled. On paper, the automatic approach had produced more than four times as many participants.
+
+Enrollment, however, is not the same as participation. The town also tracked how many bins were actually set out on collection day, and here the picture changed. In the sign-up neighborhoods, most enrolled households used their bins regularly. These were people who had wanted to compost badly enough to fill out a form. In the automatic neighborhoods, a large share of bins sat in garages or beside houses, empty, week after week. When the town counted households that set out a bin at least twice a month, the automatic neighborhoods still came out ahead, but by a much smaller margin than the enrollment numbers suggested.
+
+There are two ways to read this result. One emphasizes the gain: even after accounting for unused bins, the default produced more composting households, and some of those households might never have started otherwise. The bin in the garage also serves as a quiet reminder, and over time some reluctant participants may begin using it. The other reading emphasizes the cost. Every unused bin had to be purchased and delivered, and each one represents a household that was counted as participating when it was not. A town that judged its program by enrollment alone would badly overestimate its success.
+
+A further complication concerns how residents felt about the approach. In surveys, most households in the automatic neighborhoods said they did not mind being enrolled. A minority, though, described it as presumptuous, and some of those residents reported feeling less favorable toward the town's environmental programs in general. It is not clear whether their irritation reflected the default itself or a broader distrust that existed before the program began; the town did not survey residents beforehand, so it cannot tell.
+
+What Ellery Falls illustrates is that a default is a powerful tool for changing what people end up with, but a weaker tool for changing what they actually do. It can move the starting line without moving the runner. That does not make defaults useless, since a closer starting line still matters, but it does suggest that officials should be careful about which numbers they celebrate. A default that fills a sign-up sheet has accomplished something real. Whether it has accomplished what the program was meant to accomplish is a separate question, and it can only be answered by watching what happens after the form is filed.
 
 **Question:** In the final paragraph, the phrase move the starting line without moving the runner most nearly means that a default can:
 
@@ -1595,6 +2207,22 @@ kx + 6y = c
 
 **Passage/set:** The Bin in the Garage
 
+**Full passage / set text (question 23):**
+
+When the town of Ellery Falls introduced curbside composting, officials faced a choice that seemed minor at the time. Residents could be asked to sign up for the program, or they could be enrolled automatically and given the option to leave. The town chose the second approach for half of its neighborhoods and the first for the other half, partly for administrative reasons and partly out of curiosity. The difference in outcomes was larger than anyone expected, and more complicated.
+
+Choices like this one involve what researchers call a default: the option a person ends up with if he or she takes no action. Defaults matter because many people, faced with a form or a decision, do nothing. They may be busy, uncertain, or simply unwilling to spend effort on a question that seems unimportant. Whatever the reason, inaction delivers them to whatever outcome the default specifies. A person who would never have bothered to sign up for a program may also never bother to leave it.
+
+In Ellery Falls, the effect of the default on enrollment was dramatic. In neighborhoods where residents had to request a compost bin, about one household in five did so in the first year. In neighborhoods where every household received a bin unless it asked not to, fewer than one in ten opted out, meaning more than nine in ten remained enrolled. On paper, the automatic approach had produced more than four times as many participants.
+
+Enrollment, however, is not the same as participation. The town also tracked how many bins were actually set out on collection day, and here the picture changed. In the sign-up neighborhoods, most enrolled households used their bins regularly. These were people who had wanted to compost badly enough to fill out a form. In the automatic neighborhoods, a large share of bins sat in garages or beside houses, empty, week after week. When the town counted households that set out a bin at least twice a month, the automatic neighborhoods still came out ahead, but by a much smaller margin than the enrollment numbers suggested.
+
+There are two ways to read this result. One emphasizes the gain: even after accounting for unused bins, the default produced more composting households, and some of those households might never have started otherwise. The bin in the garage also serves as a quiet reminder, and over time some reluctant participants may begin using it. The other reading emphasizes the cost. Every unused bin had to be purchased and delivered, and each one represents a household that was counted as participating when it was not. A town that judged its program by enrollment alone would badly overestimate its success.
+
+A further complication concerns how residents felt about the approach. In surveys, most households in the automatic neighborhoods said they did not mind being enrolled. A minority, though, described it as presumptuous, and some of those residents reported feeling less favorable toward the town's environmental programs in general. It is not clear whether their irritation reflected the default itself or a broader distrust that existed before the program began; the town did not survey residents beforehand, so it cannot tell.
+
+What Ellery Falls illustrates is that a default is a powerful tool for changing what people end up with, but a weaker tool for changing what they actually do. It can move the starting line without moving the runner. That does not make defaults useless, since a closer starting line still matters, but it does suggest that officials should be careful about which numbers they celebrate. A default that fills a sign-up sheet has accomplished something real. Whether it has accomplished what the program was meant to accomplish is a separate question, and it can only be answered by watching what happens after the form is filed.
+
 **Question:** What would the author most likely infer about a nearby town that reports 95 percent participation in a recycling program based only on automatic-enrollment records?
 
 - A. praising the figure as clear evidence that the program has succeeded.
@@ -1609,6 +2237,22 @@ kx + 6y = c
 ## READING 24 — Social Science (medium)
 
 **Passage/set:** The Bin in the Garage
+
+**Full passage / set text (question 24):**
+
+When the town of Ellery Falls introduced curbside composting, officials faced a choice that seemed minor at the time. Residents could be asked to sign up for the program, or they could be enrolled automatically and given the option to leave. The town chose the second approach for half of its neighborhoods and the first for the other half, partly for administrative reasons and partly out of curiosity. The difference in outcomes was larger than anyone expected, and more complicated.
+
+Choices like this one involve what researchers call a default: the option a person ends up with if he or she takes no action. Defaults matter because many people, faced with a form or a decision, do nothing. They may be busy, uncertain, or simply unwilling to spend effort on a question that seems unimportant. Whatever the reason, inaction delivers them to whatever outcome the default specifies. A person who would never have bothered to sign up for a program may also never bother to leave it.
+
+In Ellery Falls, the effect of the default on enrollment was dramatic. In neighborhoods where residents had to request a compost bin, about one household in five did so in the first year. In neighborhoods where every household received a bin unless it asked not to, fewer than one in ten opted out, meaning more than nine in ten remained enrolled. On paper, the automatic approach had produced more than four times as many participants.
+
+Enrollment, however, is not the same as participation. The town also tracked how many bins were actually set out on collection day, and here the picture changed. In the sign-up neighborhoods, most enrolled households used their bins regularly. These were people who had wanted to compost badly enough to fill out a form. In the automatic neighborhoods, a large share of bins sat in garages or beside houses, empty, week after week. When the town counted households that set out a bin at least twice a month, the automatic neighborhoods still came out ahead, but by a much smaller margin than the enrollment numbers suggested.
+
+There are two ways to read this result. One emphasizes the gain: even after accounting for unused bins, the default produced more composting households, and some of those households might never have started otherwise. The bin in the garage also serves as a quiet reminder, and over time some reluctant participants may begin using it. The other reading emphasizes the cost. Every unused bin had to be purchased and delivered, and each one represents a household that was counted as participating when it was not. A town that judged its program by enrollment alone would badly overestimate its success.
+
+A further complication concerns how residents felt about the approach. In surveys, most households in the automatic neighborhoods said they did not mind being enrolled. A minority, though, described it as presumptuous, and some of those residents reported feeling less favorable toward the town's environmental programs in general. It is not clear whether their irritation reflected the default itself or a broader distrust that existed before the program began; the town did not survey residents beforehand, so it cannot tell.
+
+What Ellery Falls illustrates is that a default is a powerful tool for changing what people end up with, but a weaker tool for changing what they actually do. It can move the starting line without moving the runner. That does not make defaults useless, since a closer starting line still matters, but it does suggest that officials should be careful about which numbers they celebrate. A default that fills a sign-up sheet has accomplished something real. Whether it has accomplished what the program was meant to accomplish is a separate question, and it can only be answered by watching what happens after the form is filed.
 
 **Question:** What does the passage suggest is the main reason enrolled households in the sign-up neighborhoods used their bins more consistently than those in the automatic neighborhoods?
 
@@ -1625,6 +2269,22 @@ kx + 6y = c
 
 **Passage/set:** The Bin in the Garage
 
+**Full passage / set text (question 25):**
+
+When the town of Ellery Falls introduced curbside composting, officials faced a choice that seemed minor at the time. Residents could be asked to sign up for the program, or they could be enrolled automatically and given the option to leave. The town chose the second approach for half of its neighborhoods and the first for the other half, partly for administrative reasons and partly out of curiosity. The difference in outcomes was larger than anyone expected, and more complicated.
+
+Choices like this one involve what researchers call a default: the option a person ends up with if he or she takes no action. Defaults matter because many people, faced with a form or a decision, do nothing. They may be busy, uncertain, or simply unwilling to spend effort on a question that seems unimportant. Whatever the reason, inaction delivers them to whatever outcome the default specifies. A person who would never have bothered to sign up for a program may also never bother to leave it.
+
+In Ellery Falls, the effect of the default on enrollment was dramatic. In neighborhoods where residents had to request a compost bin, about one household in five did so in the first year. In neighborhoods where every household received a bin unless it asked not to, fewer than one in ten opted out, meaning more than nine in ten remained enrolled. On paper, the automatic approach had produced more than four times as many participants.
+
+Enrollment, however, is not the same as participation. The town also tracked how many bins were actually set out on collection day, and here the picture changed. In the sign-up neighborhoods, most enrolled households used their bins regularly. These were people who had wanted to compost badly enough to fill out a form. In the automatic neighborhoods, a large share of bins sat in garages or beside houses, empty, week after week. When the town counted households that set out a bin at least twice a month, the automatic neighborhoods still came out ahead, but by a much smaller margin than the enrollment numbers suggested.
+
+There are two ways to read this result. One emphasizes the gain: even after accounting for unused bins, the default produced more composting households, and some of those households might never have started otherwise. The bin in the garage also serves as a quiet reminder, and over time some reluctant participants may begin using it. The other reading emphasizes the cost. Every unused bin had to be purchased and delivered, and each one represents a household that was counted as participating when it was not. A town that judged its program by enrollment alone would badly overestimate its success.
+
+A further complication concerns how residents felt about the approach. In surveys, most households in the automatic neighborhoods said they did not mind being enrolled. A minority, though, described it as presumptuous, and some of those residents reported feeling less favorable toward the town's environmental programs in general. It is not clear whether their irritation reflected the default itself or a broader distrust that existed before the program began; the town did not survey residents beforehand, so it cannot tell.
+
+What Ellery Falls illustrates is that a default is a powerful tool for changing what people end up with, but a weaker tool for changing what they actually do. It can move the starting line without moving the runner. That does not make defaults useless, since a closer starting line still matters, but it does suggest that officials should be careful about which numbers they celebrate. A default that fills a sign-up sheet has accomplished something real. Whether it has accomplished what the program was meant to accomplish is a separate question, and it can only be answered by watching what happens after the form is filed.
+
 **Question:** What is the main purpose of the paragraph that presents two ways to read the result?
 
 - A. argues that the program's gains clearly outweigh its costs.
@@ -1639,6 +2299,22 @@ kx + 6y = c
 ## READING 26 — Humanities (easy)
 
 **Passage/set:** The Tilted Letter
+
+**Full passage / set text (question 26):**
+
+There is a hardware store in my town whose front window still carries the name of its founder in gold leaf, painted by hand some sixty years ago—an example of the art of traditional sign lettering. The letters are elegant, but they are not identical. The two lowercase e's in the owner's surname differ slightly in the angle of their crossbars, and the final s leans a fraction farther than its neighbors, as though the painter's arm had grown tired by the end of the word. I have walked past that window for most of my life, and only recently did I notice these differences. Once I noticed them, I could not stop seeing them, and I could not decide whether they were flaws.
+
+The easy answer is that they are. A sign exists to be read, and every inconsistency is a small obstacle to reading. By this standard, the uniform letters produced by a computer and cut from vinyl are an improvement: each e is the same e, every time, and the eye moves across them without snagging. The shop down the street, which opened last year, has such a sign. It is crisp, legible, and entirely forgettable.
+
+I want to resist the easy answer without falling into the opposite one. It would be pleasant to claim that hand-lettered signs are simply better, that something warm and human has been lost to the machine. But that claim is mostly nostalgia, and nostalgia is a poor critic. Many hand-painted signs were clumsy. Many were hard to read from a moving car. The painters who made them were working quickly for modest fees, and plenty of their work deserved to be painted over.
+
+What interests me is not whether hand lettering is better but what its irregularities record. The tilted s on the hardware store window is not a random error. It is a trace of a particular person's posture at the end of a long afternoon, of a brush that held a little less paint than it had at the start of the word. The variation is information. It tells the attentive viewer how the sign was made, in what order, and with what effort. A vinyl letter carries no such history. It could have been cut yesterday or ten years ago, in this town or anywhere.
+
+A friend who designs typefaces for a living once objected to this argument. Digital letters, she pointed out, are also made by people. Someone drew that crisp e on the new shop's sign, adjusting its curves over many hours until it looked right at every size. She is correct, and her point matters. The difference is not that one kind of letter is human and the other is not. It is that the digital letter hides its making behind perfect repetition, while the painted letter displays its making in every small departure from the one before.
+
+This difference explains, I think, why the hardware store's window has become a kind of landmark while its neighbor's sign has not. People do not admire the old window because they can read it more easily. They admire it because, without quite knowing why, they sense that someone stood in that spot with a brush, and that the work could have gone slightly differently. The letters are not just a name. They are a record of an afternoon.
+
+None of this means that the new shop should have hired a sign painter. Its owner wanted a sign that was cheap, quick, and clear, and she got one. But it does mean that when we judge lettering only by how efficiently it can be read, we measure one thing it does and ignore another. A sign can tell us what a place is called. A few signs can also tell us that a place was made.
 
 **Question:** The author's attitude toward the new shop's vinyl sign is best described as:
 
@@ -1655,6 +2331,22 @@ kx + 6y = c
 
 **Passage/set:** The Tilted Letter
 
+**Full passage / set text (question 27):**
+
+There is a hardware store in my town whose front window still carries the name of its founder in gold leaf, painted by hand some sixty years ago—an example of the art of traditional sign lettering. The letters are elegant, but they are not identical. The two lowercase e's in the owner's surname differ slightly in the angle of their crossbars, and the final s leans a fraction farther than its neighbors, as though the painter's arm had grown tired by the end of the word. I have walked past that window for most of my life, and only recently did I notice these differences. Once I noticed them, I could not stop seeing them, and I could not decide whether they were flaws.
+
+The easy answer is that they are. A sign exists to be read, and every inconsistency is a small obstacle to reading. By this standard, the uniform letters produced by a computer and cut from vinyl are an improvement: each e is the same e, every time, and the eye moves across them without snagging. The shop down the street, which opened last year, has such a sign. It is crisp, legible, and entirely forgettable.
+
+I want to resist the easy answer without falling into the opposite one. It would be pleasant to claim that hand-lettered signs are simply better, that something warm and human has been lost to the machine. But that claim is mostly nostalgia, and nostalgia is a poor critic. Many hand-painted signs were clumsy. Many were hard to read from a moving car. The painters who made them were working quickly for modest fees, and plenty of their work deserved to be painted over.
+
+What interests me is not whether hand lettering is better but what its irregularities record. The tilted s on the hardware store window is not a random error. It is a trace of a particular person's posture at the end of a long afternoon, of a brush that held a little less paint than it had at the start of the word. The variation is information. It tells the attentive viewer how the sign was made, in what order, and with what effort. A vinyl letter carries no such history. It could have been cut yesterday or ten years ago, in this town or anywhere.
+
+A friend who designs typefaces for a living once objected to this argument. Digital letters, she pointed out, are also made by people. Someone drew that crisp e on the new shop's sign, adjusting its curves over many hours until it looked right at every size. She is correct, and her point matters. The difference is not that one kind of letter is human and the other is not. It is that the digital letter hides its making behind perfect repetition, while the painted letter displays its making in every small departure from the one before.
+
+This difference explains, I think, why the hardware store's window has become a kind of landmark while its neighbor's sign has not. People do not admire the old window because they can read it more easily. They admire it because, without quite knowing why, they sense that someone stood in that spot with a brush, and that the work could have gone slightly differently. The letters are not just a name. They are a record of an afternoon.
+
+None of this means that the new shop should have hired a sign painter. Its owner wanted a sign that was cheap, quick, and clear, and she got one. But it does mean that when we judge lettering only by how efficiently it can be read, we measure one thing it does and ignore another. A sign can tell us what a place is called. A few signs can also tell us that a place was made.
+
 **Question:** The main purpose of the passage is to:
 
 - A. argue that hand-painted signs are easier to read than signs made with computer-cut letters.
@@ -1669,6 +2361,22 @@ kx + 6y = c
 ## READING 28 — Humanities (hard)
 
 **Passage/set:** The Tilted Letter
+
+**Full passage / set text (question 28):**
+
+There is a hardware store in my town whose front window still carries the name of its founder in gold leaf, painted by hand some sixty years ago—an example of the art of traditional sign lettering. The letters are elegant, but they are not identical. The two lowercase e's in the owner's surname differ slightly in the angle of their crossbars, and the final s leans a fraction farther than its neighbors, as though the painter's arm had grown tired by the end of the word. I have walked past that window for most of my life, and only recently did I notice these differences. Once I noticed them, I could not stop seeing them, and I could not decide whether they were flaws.
+
+The easy answer is that they are. A sign exists to be read, and every inconsistency is a small obstacle to reading. By this standard, the uniform letters produced by a computer and cut from vinyl are an improvement: each e is the same e, every time, and the eye moves across them without snagging. The shop down the street, which opened last year, has such a sign. It is crisp, legible, and entirely forgettable.
+
+I want to resist the easy answer without falling into the opposite one. It would be pleasant to claim that hand-lettered signs are simply better, that something warm and human has been lost to the machine. But that claim is mostly nostalgia, and nostalgia is a poor critic. Many hand-painted signs were clumsy. Many were hard to read from a moving car. The painters who made them were working quickly for modest fees, and plenty of their work deserved to be painted over.
+
+What interests me is not whether hand lettering is better but what its irregularities record. The tilted s on the hardware store window is not a random error. It is a trace of a particular person's posture at the end of a long afternoon, of a brush that held a little less paint than it had at the start of the word. The variation is information. It tells the attentive viewer how the sign was made, in what order, and with what effort. A vinyl letter carries no such history. It could have been cut yesterday or ten years ago, in this town or anywhere.
+
+A friend who designs typefaces for a living once objected to this argument. Digital letters, she pointed out, are also made by people. Someone drew that crisp e on the new shop's sign, adjusting its curves over many hours until it looked right at every size. She is correct, and her point matters. The difference is not that one kind of letter is human and the other is not. It is that the digital letter hides its making behind perfect repetition, while the painted letter displays its making in every small departure from the one before.
+
+This difference explains, I think, why the hardware store's window has become a kind of landmark while its neighbor's sign has not. People do not admire the old window because they can read it more easily. They admire it because, without quite knowing why, they sense that someone stood in that spot with a brush, and that the work could have gone slightly differently. The letters are not just a name. They are a record of an afternoon.
+
+None of this means that the new shop should have hired a sign painter. Its owner wanted a sign that was cheap, quick, and clear, and she got one. But it does mean that when we judge lettering only by how efficiently it can be read, we measure one thing it does and ignore another. A sign can tell us what a place is called. A few signs can also tell us that a place was made.
 
 **Question:** Suppose a new shop uses computer-printed letters designed to look hand-painted, with the same slight tilt copied exactly onto every letter. Based on the passage, what would the author most likely infer about these letters?
 
@@ -1685,6 +2393,22 @@ kx + 6y = c
 
 **Passage/set:** The Tilted Letter
 
+**Full passage / set text (question 29):**
+
+There is a hardware store in my town whose front window still carries the name of its founder in gold leaf, painted by hand some sixty years ago—an example of the art of traditional sign lettering. The letters are elegant, but they are not identical. The two lowercase e's in the owner's surname differ slightly in the angle of their crossbars, and the final s leans a fraction farther than its neighbors, as though the painter's arm had grown tired by the end of the word. I have walked past that window for most of my life, and only recently did I notice these differences. Once I noticed them, I could not stop seeing them, and I could not decide whether they were flaws.
+
+The easy answer is that they are. A sign exists to be read, and every inconsistency is a small obstacle to reading. By this standard, the uniform letters produced by a computer and cut from vinyl are an improvement: each e is the same e, every time, and the eye moves across them without snagging. The shop down the street, which opened last year, has such a sign. It is crisp, legible, and entirely forgettable.
+
+I want to resist the easy answer without falling into the opposite one. It would be pleasant to claim that hand-lettered signs are simply better, that something warm and human has been lost to the machine. But that claim is mostly nostalgia, and nostalgia is a poor critic. Many hand-painted signs were clumsy. Many were hard to read from a moving car. The painters who made them were working quickly for modest fees, and plenty of their work deserved to be painted over.
+
+What interests me is not whether hand lettering is better but what its irregularities record. The tilted s on the hardware store window is not a random error. It is a trace of a particular person's posture at the end of a long afternoon, of a brush that held a little less paint than it had at the start of the word. The variation is information. It tells the attentive viewer how the sign was made, in what order, and with what effort. A vinyl letter carries no such history. It could have been cut yesterday or ten years ago, in this town or anywhere.
+
+A friend who designs typefaces for a living once objected to this argument. Digital letters, she pointed out, are also made by people. Someone drew that crisp e on the new shop's sign, adjusting its curves over many hours until it looked right at every size. She is correct, and her point matters. The difference is not that one kind of letter is human and the other is not. It is that the digital letter hides its making behind perfect repetition, while the painted letter displays its making in every small departure from the one before.
+
+This difference explains, I think, why the hardware store's window has become a kind of landmark while its neighbor's sign has not. People do not admire the old window because they can read it more easily. They admire it because, without quite knowing why, they sense that someone stood in that spot with a brush, and that the work could have gone slightly differently. The letters are not just a name. They are a record of an afternoon.
+
+None of this means that the new shop should have hired a sign painter. Its owner wanted a sign that was cheap, quick, and clear, and she got one. But it does mean that when we judge lettering only by how efficiently it can be read, we measure one thing it does and ignore another. A sign can tell us what a place is called. A few signs can also tell us that a place was made.
+
 **Question:** The third paragraph primarily serves what purpose in developing the author's argument?
 
 - A. present evidence that hand-painted signs were usually easier to read from a distance.
@@ -1699,6 +2423,22 @@ kx + 6y = c
 ## READING 30 — Humanities (medium)
 
 **Passage/set:** The Tilted Letter
+
+**Full passage / set text (question 30):**
+
+There is a hardware store in my town whose front window still carries the name of its founder in gold leaf, painted by hand some sixty years ago—an example of the art of traditional sign lettering. The letters are elegant, but they are not identical. The two lowercase e's in the owner's surname differ slightly in the angle of their crossbars, and the final s leans a fraction farther than its neighbors, as though the painter's arm had grown tired by the end of the word. I have walked past that window for most of my life, and only recently did I notice these differences. Once I noticed them, I could not stop seeing them, and I could not decide whether they were flaws.
+
+The easy answer is that they are. A sign exists to be read, and every inconsistency is a small obstacle to reading. By this standard, the uniform letters produced by a computer and cut from vinyl are an improvement: each e is the same e, every time, and the eye moves across them without snagging. The shop down the street, which opened last year, has such a sign. It is crisp, legible, and entirely forgettable.
+
+I want to resist the easy answer without falling into the opposite one. It would be pleasant to claim that hand-lettered signs are simply better, that something warm and human has been lost to the machine. But that claim is mostly nostalgia, and nostalgia is a poor critic. Many hand-painted signs were clumsy. Many were hard to read from a moving car. The painters who made them were working quickly for modest fees, and plenty of their work deserved to be painted over.
+
+What interests me is not whether hand lettering is better but what its irregularities record. The tilted s on the hardware store window is not a random error. It is a trace of a particular person's posture at the end of a long afternoon, of a brush that held a little less paint than it had at the start of the word. The variation is information. It tells the attentive viewer how the sign was made, in what order, and with what effort. A vinyl letter carries no such history. It could have been cut yesterday or ten years ago, in this town or anywhere.
+
+A friend who designs typefaces for a living once objected to this argument. Digital letters, she pointed out, are also made by people. Someone drew that crisp e on the new shop's sign, adjusting its curves over many hours until it looked right at every size. She is correct, and her point matters. The difference is not that one kind of letter is human and the other is not. It is that the digital letter hides its making behind perfect repetition, while the painted letter displays its making in every small departure from the one before.
+
+This difference explains, I think, why the hardware store's window has become a kind of landmark while its neighbor's sign has not. People do not admire the old window because they can read it more easily. They admire it because, without quite knowing why, they sense that someone stood in that spot with a brush, and that the work could have gone slightly differently. The letters are not just a name. They are a record of an afternoon.
+
+None of this means that the new shop should have hired a sign painter. Its owner wanted a sign that was cheap, quick, and clear, and she got one. But it does mean that when we judge lettering only by how efficiently it can be read, we measure one thing it does and ignore another. A sign can tell us what a place is called. A few signs can also tell us that a place was made.
 
 **Question:** How does the author respond to the friend's point that digital letters are also made by people, and what does that response suggest about the author's argument?
 
@@ -1715,6 +2455,20 @@ kx + 6y = c
 
 **Passage/set:** The Market Days of Varrow Valley
 
+**Full passage / set text (question 31):**
+
+In the hill country of the fictional Varrow Valley, nine small towns sit along a single winding road, each about a half day's walk from the next. For as long as local records go back, each town has held a weekly market, and almost none of them hold it on the same day as their nearest neighbors. Harlow's market falls on Monday, Fenby's on Tuesday, Coldwater's on Wednesday, and so on up the valley. Visitors often assume the arrangement is a coincidence or a matter of old habit. A closer look suggests that it may be something more deliberate: a solution to a problem that every small market town faces.
+
+The problem is that a single small town rarely has enough buyers to support a full market on its own. A traveling cloth seller or tinsmith cannot make a living from the few dozen households of one village. If every town held its market on the same day, such traders would have to choose one town each week and leave the others unserved. Villagers would find only local farmers' produce, and the traders would find too few customers. When the market days are staggered, however, a trader can move along the road, selling in Harlow on Monday, Fenby on Tuesday, and Coldwater on Wednesday. Each town gets a share of the traveling merchants, and each merchant gets the combined custom of several towns. In effect, the towns share a pool of buyers that none of them could have supported alone.
+
+Several features of the valley fit this explanation. The towns whose market days fall on consecutive days are, almost without exception, those that lie a half day apart, roughly the distance a trader with a loaded cart could cover between the close of one market and the opening of the next. Old account books kept by a family of traveling ironmongers, preserved in Fenby's town hall, record a circuit through five valley towns on five consecutive days, returning to the start each week. And when one town, Ashcombe, moved its market from Thursday to Wednesday some decades ago, so that it clashed with Coldwater's, its market shrank within a few years until the town quietly moved it back.
+
+Not everyone who has studied the valley accepts this account. Some local historians point out that several of the market days coincide with the days on which each town's church once held a weekly service, and they argue that the schedule grew out of religious practice rather than trade. People gathered in town for worship, the reasoning goes, and markets naturally formed around those gatherings. On this view, the convenient spacing for traders may be a happy accident rather than the reason for the pattern.
+
+The two explanations are not entirely at odds. A schedule that began for religious reasons could have persisted because it also happened to suit traveling traders, and towns that tried to change it, like Ashcombe, may have discovered how much they depended on it. The evidence available makes it difficult to decide between these possibilities. The ironmongers' account books cover only about twenty years, long after the market days had been established, and no surviving document records why any town first chose its day. What the records can show is how the schedule worked once it existed, not how it began.
+
+That distinction matters beyond the valley. When a social arrangement seems well suited to its purpose, it is tempting to conclude that it was designed for that purpose. Sometimes it was. But an arrangement can also survive because it proved useful, whatever its origins, and the forces that keep a practice alive are not necessarily the ones that created it. The staggered markets of Varrow Valley may be best understood not as a plan anyone drew up but as a pattern that, once it emerged, gave the towns good reasons to keep it.
+
 **Question:** What is the passage mainly concerned with explaining about Varrow Valley's market schedule?
 
 - A. proving that traveling traders designed the valley's market schedule to increase their profits.
@@ -1729,6 +2483,20 @@ kx + 6y = c
 ## READING 32 — Social Science (easy)
 
 **Passage/set:** The Market Days of Varrow Valley
+
+**Full passage / set text (question 32):**
+
+In the hill country of the fictional Varrow Valley, nine small towns sit along a single winding road, each about a half day's walk from the next. For as long as local records go back, each town has held a weekly market, and almost none of them hold it on the same day as their nearest neighbors. Harlow's market falls on Monday, Fenby's on Tuesday, Coldwater's on Wednesday, and so on up the valley. Visitors often assume the arrangement is a coincidence or a matter of old habit. A closer look suggests that it may be something more deliberate: a solution to a problem that every small market town faces.
+
+The problem is that a single small town rarely has enough buyers to support a full market on its own. A traveling cloth seller or tinsmith cannot make a living from the few dozen households of one village. If every town held its market on the same day, such traders would have to choose one town each week and leave the others unserved. Villagers would find only local farmers' produce, and the traders would find too few customers. When the market days are staggered, however, a trader can move along the road, selling in Harlow on Monday, Fenby on Tuesday, and Coldwater on Wednesday. Each town gets a share of the traveling merchants, and each merchant gets the combined custom of several towns. In effect, the towns share a pool of buyers that none of them could have supported alone.
+
+Several features of the valley fit this explanation. The towns whose market days fall on consecutive days are, almost without exception, those that lie a half day apart, roughly the distance a trader with a loaded cart could cover between the close of one market and the opening of the next. Old account books kept by a family of traveling ironmongers, preserved in Fenby's town hall, record a circuit through five valley towns on five consecutive days, returning to the start each week. And when one town, Ashcombe, moved its market from Thursday to Wednesday some decades ago, so that it clashed with Coldwater's, its market shrank within a few years until the town quietly moved it back.
+
+Not everyone who has studied the valley accepts this account. Some local historians point out that several of the market days coincide with the days on which each town's church once held a weekly service, and they argue that the schedule grew out of religious practice rather than trade. People gathered in town for worship, the reasoning goes, and markets naturally formed around those gatherings. On this view, the convenient spacing for traders may be a happy accident rather than the reason for the pattern.
+
+The two explanations are not entirely at odds. A schedule that began for religious reasons could have persisted because it also happened to suit traveling traders, and towns that tried to change it, like Ashcombe, may have discovered how much they depended on it. The evidence available makes it difficult to decide between these possibilities. The ironmongers' account books cover only about twenty years, long after the market days had been established, and no surviving document records why any town first chose its day. What the records can show is how the schedule worked once it existed, not how it began.
+
+That distinction matters beyond the valley. When a social arrangement seems well suited to its purpose, it is tempting to conclude that it was designed for that purpose. Sometimes it was. But an arrangement can also survive because it proved useful, whatever its origins, and the forces that keep a practice alive are not necessarily the ones that created it. The staggered markets of Varrow Valley may be best understood not as a plan anyone drew up but as a pattern that, once it emerged, gave the towns good reasons to keep it.
 
 **Question:** According to the trade-based explanation, staggering market days benefits the towns by:
 
@@ -1745,6 +2513,20 @@ kx + 6y = c
 
 **Passage/set:** The Market Days of Varrow Valley
 
+**Full passage / set text (question 33):**
+
+In the hill country of the fictional Varrow Valley, nine small towns sit along a single winding road, each about a half day's walk from the next. For as long as local records go back, each town has held a weekly market, and almost none of them hold it on the same day as their nearest neighbors. Harlow's market falls on Monday, Fenby's on Tuesday, Coldwater's on Wednesday, and so on up the valley. Visitors often assume the arrangement is a coincidence or a matter of old habit. A closer look suggests that it may be something more deliberate: a solution to a problem that every small market town faces.
+
+The problem is that a single small town rarely has enough buyers to support a full market on its own. A traveling cloth seller or tinsmith cannot make a living from the few dozen households of one village. If every town held its market on the same day, such traders would have to choose one town each week and leave the others unserved. Villagers would find only local farmers' produce, and the traders would find too few customers. When the market days are staggered, however, a trader can move along the road, selling in Harlow on Monday, Fenby on Tuesday, and Coldwater on Wednesday. Each town gets a share of the traveling merchants, and each merchant gets the combined custom of several towns. In effect, the towns share a pool of buyers that none of them could have supported alone.
+
+Several features of the valley fit this explanation. The towns whose market days fall on consecutive days are, almost without exception, those that lie a half day apart, roughly the distance a trader with a loaded cart could cover between the close of one market and the opening of the next. Old account books kept by a family of traveling ironmongers, preserved in Fenby's town hall, record a circuit through five valley towns on five consecutive days, returning to the start each week. And when one town, Ashcombe, moved its market from Thursday to Wednesday some decades ago, so that it clashed with Coldwater's, its market shrank within a few years until the town quietly moved it back.
+
+Not everyone who has studied the valley accepts this account. Some local historians point out that several of the market days coincide with the days on which each town's church once held a weekly service, and they argue that the schedule grew out of religious practice rather than trade. People gathered in town for worship, the reasoning goes, and markets naturally formed around those gatherings. On this view, the convenient spacing for traders may be a happy accident rather than the reason for the pattern.
+
+The two explanations are not entirely at odds. A schedule that began for religious reasons could have persisted because it also happened to suit traveling traders, and towns that tried to change it, like Ashcombe, may have discovered how much they depended on it. The evidence available makes it difficult to decide between these possibilities. The ironmongers' account books cover only about twenty years, long after the market days had been established, and no surviving document records why any town first chose its day. What the records can show is how the schedule worked once it existed, not how it began.
+
+That distinction matters beyond the valley. When a social arrangement seems well suited to its purpose, it is tempting to conclude that it was designed for that purpose. Sometimes it was. But an arrangement can also survive because it proved useful, whatever its origins, and the forces that keep a practice alive are not necessarily the ones that created it. The staggered markets of Varrow Valley may be best understood not as a plan anyone drew up but as a pattern that, once it emerged, gave the towns good reasons to keep it.
+
 **Question:** What would the author most likely infer about a useful alternating-hours arrangement between two branch libraries if no record explains why the arrangement originally began?
 
 - A. the arrangement's usefulness may explain why it has lasted without showing it was created for that reason.
@@ -1759,6 +2541,20 @@ kx + 6y = c
 ## READING 34 — Social Science (medium)
 
 **Passage/set:** The Market Days of Varrow Valley
+
+**Full passage / set text (question 34):**
+
+In the hill country of the fictional Varrow Valley, nine small towns sit along a single winding road, each about a half day's walk from the next. For as long as local records go back, each town has held a weekly market, and almost none of them hold it on the same day as their nearest neighbors. Harlow's market falls on Monday, Fenby's on Tuesday, Coldwater's on Wednesday, and so on up the valley. Visitors often assume the arrangement is a coincidence or a matter of old habit. A closer look suggests that it may be something more deliberate: a solution to a problem that every small market town faces.
+
+The problem is that a single small town rarely has enough buyers to support a full market on its own. A traveling cloth seller or tinsmith cannot make a living from the few dozen households of one village. If every town held its market on the same day, such traders would have to choose one town each week and leave the others unserved. Villagers would find only local farmers' produce, and the traders would find too few customers. When the market days are staggered, however, a trader can move along the road, selling in Harlow on Monday, Fenby on Tuesday, and Coldwater on Wednesday. Each town gets a share of the traveling merchants, and each merchant gets the combined custom of several towns. In effect, the towns share a pool of buyers that none of them could have supported alone.
+
+Several features of the valley fit this explanation. The towns whose market days fall on consecutive days are, almost without exception, those that lie a half day apart, roughly the distance a trader with a loaded cart could cover between the close of one market and the opening of the next. Old account books kept by a family of traveling ironmongers, preserved in Fenby's town hall, record a circuit through five valley towns on five consecutive days, returning to the start each week. And when one town, Ashcombe, moved its market from Thursday to Wednesday some decades ago, so that it clashed with Coldwater's, its market shrank within a few years until the town quietly moved it back.
+
+Not everyone who has studied the valley accepts this account. Some local historians point out that several of the market days coincide with the days on which each town's church once held a weekly service, and they argue that the schedule grew out of religious practice rather than trade. People gathered in town for worship, the reasoning goes, and markets naturally formed around those gatherings. On this view, the convenient spacing for traders may be a happy accident rather than the reason for the pattern.
+
+The two explanations are not entirely at odds. A schedule that began for religious reasons could have persisted because it also happened to suit traveling traders, and towns that tried to change it, like Ashcombe, may have discovered how much they depended on it. The evidence available makes it difficult to decide between these possibilities. The ironmongers' account books cover only about twenty years, long after the market days had been established, and no surviving document records why any town first chose its day. What the records can show is how the schedule worked once it existed, not how it began.
+
+That distinction matters beyond the valley. When a social arrangement seems well suited to its purpose, it is tempting to conclude that it was designed for that purpose. Sometimes it was. But an arrangement can also survive because it proved useful, whatever its origins, and the forces that keep a practice alive are not necessarily the ones that created it. The staggered markets of Varrow Valley may be best understood not as a plan anyone drew up but as a pattern that, once it emerged, gave the towns good reasons to keep it.
 
 **Question:** Why does the author suggest that the ironmongers' account books cannot settle the disagreement between the two explanations?
 
@@ -1775,6 +2571,20 @@ kx + 6y = c
 
 **Passage/set:** The Market Days of Varrow Valley
 
+**Full passage / set text (question 35):**
+
+In the hill country of the fictional Varrow Valley, nine small towns sit along a single winding road, each about a half day's walk from the next. For as long as local records go back, each town has held a weekly market, and almost none of them hold it on the same day as their nearest neighbors. Harlow's market falls on Monday, Fenby's on Tuesday, Coldwater's on Wednesday, and so on up the valley. Visitors often assume the arrangement is a coincidence or a matter of old habit. A closer look suggests that it may be something more deliberate: a solution to a problem that every small market town faces.
+
+The problem is that a single small town rarely has enough buyers to support a full market on its own. A traveling cloth seller or tinsmith cannot make a living from the few dozen households of one village. If every town held its market on the same day, such traders would have to choose one town each week and leave the others unserved. Villagers would find only local farmers' produce, and the traders would find too few customers. When the market days are staggered, however, a trader can move along the road, selling in Harlow on Monday, Fenby on Tuesday, and Coldwater on Wednesday. Each town gets a share of the traveling merchants, and each merchant gets the combined custom of several towns. In effect, the towns share a pool of buyers that none of them could have supported alone.
+
+Several features of the valley fit this explanation. The towns whose market days fall on consecutive days are, almost without exception, those that lie a half day apart, roughly the distance a trader with a loaded cart could cover between the close of one market and the opening of the next. Old account books kept by a family of traveling ironmongers, preserved in Fenby's town hall, record a circuit through five valley towns on five consecutive days, returning to the start each week. And when one town, Ashcombe, moved its market from Thursday to Wednesday some decades ago, so that it clashed with Coldwater's, its market shrank within a few years until the town quietly moved it back.
+
+Not everyone who has studied the valley accepts this account. Some local historians point out that several of the market days coincide with the days on which each town's church once held a weekly service, and they argue that the schedule grew out of religious practice rather than trade. People gathered in town for worship, the reasoning goes, and markets naturally formed around those gatherings. On this view, the convenient spacing for traders may be a happy accident rather than the reason for the pattern.
+
+The two explanations are not entirely at odds. A schedule that began for religious reasons could have persisted because it also happened to suit traveling traders, and towns that tried to change it, like Ashcombe, may have discovered how much they depended on it. The evidence available makes it difficult to decide between these possibilities. The ironmongers' account books cover only about twenty years, long after the market days had been established, and no surviving document records why any town first chose its day. What the records can show is how the schedule worked once it existed, not how it began.
+
+That distinction matters beyond the valley. When a social arrangement seems well suited to its purpose, it is tempting to conclude that it was designed for that purpose. Sometimes it was. But an arrangement can also survive because it proved useful, whatever its origins, and the forces that keep a practice alive are not necessarily the ones that created it. The staggered markets of Varrow Valley may be best understood not as a plan anyone drew up but as a pattern that, once it emerged, gave the towns good reasons to keep it.
+
 **Question:** What is the main purpose of the example of Ashcombe moving its market day?
 
 - A. To show that Ashcombe's market originally grew out of a weekly church service
@@ -1789,6 +2599,20 @@ kx + 6y = c
 ## READING 36 — Social Science (medium)
 
 **Passage/set:** The Market Days of Varrow Valley
+
+**Full passage / set text (question 36):**
+
+In the hill country of the fictional Varrow Valley, nine small towns sit along a single winding road, each about a half day's walk from the next. For as long as local records go back, each town has held a weekly market, and almost none of them hold it on the same day as their nearest neighbors. Harlow's market falls on Monday, Fenby's on Tuesday, Coldwater's on Wednesday, and so on up the valley. Visitors often assume the arrangement is a coincidence or a matter of old habit. A closer look suggests that it may be something more deliberate: a solution to a problem that every small market town faces.
+
+The problem is that a single small town rarely has enough buyers to support a full market on its own. A traveling cloth seller or tinsmith cannot make a living from the few dozen households of one village. If every town held its market on the same day, such traders would have to choose one town each week and leave the others unserved. Villagers would find only local farmers' produce, and the traders would find too few customers. When the market days are staggered, however, a trader can move along the road, selling in Harlow on Monday, Fenby on Tuesday, and Coldwater on Wednesday. Each town gets a share of the traveling merchants, and each merchant gets the combined custom of several towns. In effect, the towns share a pool of buyers that none of them could have supported alone.
+
+Several features of the valley fit this explanation. The towns whose market days fall on consecutive days are, almost without exception, those that lie a half day apart, roughly the distance a trader with a loaded cart could cover between the close of one market and the opening of the next. Old account books kept by a family of traveling ironmongers, preserved in Fenby's town hall, record a circuit through five valley towns on five consecutive days, returning to the start each week. And when one town, Ashcombe, moved its market from Thursday to Wednesday some decades ago, so that it clashed with Coldwater's, its market shrank within a few years until the town quietly moved it back.
+
+Not everyone who has studied the valley accepts this account. Some local historians point out that several of the market days coincide with the days on which each town's church once held a weekly service, and they argue that the schedule grew out of religious practice rather than trade. People gathered in town for worship, the reasoning goes, and markets naturally formed around those gatherings. On this view, the convenient spacing for traders may be a happy accident rather than the reason for the pattern.
+
+The two explanations are not entirely at odds. A schedule that began for religious reasons could have persisted because it also happened to suit traveling traders, and towns that tried to change it, like Ashcombe, may have discovered how much they depended on it. The evidence available makes it difficult to decide between these possibilities. The ironmongers' account books cover only about twenty years, long after the market days had been established, and no surviving document records why any town first chose its day. What the records can show is how the schedule worked once it existed, not how it began.
+
+That distinction matters beyond the valley. When a social arrangement seems well suited to its purpose, it is tempting to conclude that it was designed for that purpose. Sometimes it was. But an arrangement can also survive because it proved useful, whatever its origins, and the forces that keep a practice alive are not necessarily the ones that created it. The staggered markets of Varrow Valley may be best understood not as a plan anyone drew up but as a pattern that, once it emerged, gave the towns good reasons to keep it.
 
 **Question:** The distinction the author makes between how an arrangement began and why it persisted primarily serves to:
 
@@ -1807,6 +2631,18 @@ kx + 6y = c
 
 **Passage/set:** Mineral Weathering in Acidic Environments
 
+**Full passage / set text (question 1):**
+
+A geochemist investigated how soil pH affects the weathering (mass loss) of two common minerals, Calcite and Quartz. Three different soil environments were prepared with pH levels of 4.0, 5.5, and 7.0. For each environment, a 10,000 mg sample of Calcite and a 10,000 mg sample of Quartz were buried. The mass of the mineral lost to weathering was measured after 30 days and again after 60 days.
+
+Table 1: Mass Loss of Minerals (mg)
+Calcite at pH 4.0: 450 mg (30 days), 890 mg (60 days)
+Calcite at pH 5.5: 120 mg (30 days), 235 mg (60 days)
+Calcite at pH 7.0: 15 mg (30 days), 32 mg (60 days)
+Quartz at pH 4.0: 12 mg (30 days), 25 mg (60 days)
+Quartz at pH 5.5: 8 mg (30 days), 16 mg (60 days)
+Quartz at pH 7.0: 5 mg (30 days), 10 mg (60 days)
+
 **Question:** Based on the table, which mineral lost the greatest amount of mass at a pH of 4.0 over the first 30 days?
 
 - A. Calcite
@@ -1821,6 +2657,18 @@ kx + 6y = c
 ## SCIENCE 2 — Data Representation (easy)
 
 **Passage/set:** Mineral Weathering in Acidic Environments
+
+**Full passage / set text (question 2):**
+
+A geochemist investigated how soil pH affects the weathering (mass loss) of two common minerals, Calcite and Quartz. Three different soil environments were prepared with pH levels of 4.0, 5.5, and 7.0. For each environment, a 10,000 mg sample of Calcite and a 10,000 mg sample of Quartz were buried. The mass of the mineral lost to weathering was measured after 30 days and again after 60 days.
+
+Table 1: Mass Loss of Minerals (mg)
+Calcite at pH 4.0: 450 mg (30 days), 890 mg (60 days)
+Calcite at pH 5.5: 120 mg (30 days), 235 mg (60 days)
+Calcite at pH 7.0: 15 mg (30 days), 32 mg (60 days)
+Quartz at pH 4.0: 12 mg (30 days), 25 mg (60 days)
+Quartz at pH 5.5: 8 mg (30 days), 16 mg (60 days)
+Quartz at pH 7.0: 5 mg (30 days), 10 mg (60 days)
 
 **Question:** For the Calcite samples at 60 days, what is the general trend in mass loss as the soil pH increases from 4.0 to 7.0?
 
@@ -1837,6 +2685,18 @@ kx + 6y = c
 
 **Passage/set:** Mineral Weathering in Acidic Environments
 
+**Full passage / set text (question 3):**
+
+A geochemist investigated how soil pH affects the weathering (mass loss) of two common minerals, Calcite and Quartz. Three different soil environments were prepared with pH levels of 4.0, 5.5, and 7.0. For each environment, a 10,000 mg sample of Calcite and a 10,000 mg sample of Quartz were buried. The mass of the mineral lost to weathering was measured after 30 days and again after 60 days.
+
+Table 1: Mass Loss of Minerals (mg)
+Calcite at pH 4.0: 450 mg (30 days), 890 mg (60 days)
+Calcite at pH 5.5: 120 mg (30 days), 235 mg (60 days)
+Calcite at pH 7.0: 15 mg (30 days), 32 mg (60 days)
+Quartz at pH 4.0: 12 mg (30 days), 25 mg (60 days)
+Quartz at pH 5.5: 8 mg (30 days), 16 mg (60 days)
+Quartz at pH 7.0: 5 mg (30 days), 10 mg (60 days)
+
 **Question:** A geochemist claims that lowering soil pH from 7.0 to 4.0 has a much larger effect on 60-day weathering of Calcite than on 60-day weathering of Quartz. Which comparison best supports this claim?
 
 - A. Calcite mass loss increases by 858 mg, while Quartz mass loss increases by 15 mg.
@@ -1851,6 +2711,18 @@ kx + 6y = c
 ## SCIENCE 4 — Data Representation (medium)
 
 **Passage/set:** Mineral Weathering in Acidic Environments
+
+**Full passage / set text (question 4):**
+
+A geochemist investigated how soil pH affects the weathering (mass loss) of two common minerals, Calcite and Quartz. Three different soil environments were prepared with pH levels of 4.0, 5.5, and 7.0. For each environment, a 10,000 mg sample of Calcite and a 10,000 mg sample of Quartz were buried. The mass of the mineral lost to weathering was measured after 30 days and again after 60 days.
+
+Table 1: Mass Loss of Minerals (mg)
+Calcite at pH 4.0: 450 mg (30 days), 890 mg (60 days)
+Calcite at pH 5.5: 120 mg (30 days), 235 mg (60 days)
+Calcite at pH 7.0: 15 mg (30 days), 32 mg (60 days)
+Quartz at pH 4.0: 12 mg (30 days), 25 mg (60 days)
+Quartz at pH 5.5: 8 mg (30 days), 16 mg (60 days)
+Quartz at pH 7.0: 5 mg (30 days), 10 mg (60 days)
 
 **Question:** Compare the amount of mass lost by Calcite at pH 4.0 during the first 30 days to the amount of mass lost during the second 30 days (from day 30 to day 60). How do these two rates compare?
 
@@ -1867,6 +2739,18 @@ kx + 6y = c
 
 **Passage/set:** Mineral Weathering in Acidic Environments
 
+**Full passage / set text (question 5):**
+
+A geochemist investigated how soil pH affects the weathering (mass loss) of two common minerals, Calcite and Quartz. Three different soil environments were prepared with pH levels of 4.0, 5.5, and 7.0. For each environment, a 10,000 mg sample of Calcite and a 10,000 mg sample of Quartz were buried. The mass of the mineral lost to weathering was measured after 30 days and again after 60 days.
+
+Table 1: Mass Loss of Minerals (mg)
+Calcite at pH 4.0: 450 mg (30 days), 890 mg (60 days)
+Calcite at pH 5.5: 120 mg (30 days), 235 mg (60 days)
+Calcite at pH 7.0: 15 mg (30 days), 32 mg (60 days)
+Quartz at pH 4.0: 12 mg (30 days), 25 mg (60 days)
+Quartz at pH 5.5: 8 mg (30 days), 16 mg (60 days)
+Quartz at pH 7.0: 5 mg (30 days), 10 mg (60 days)
+
 **Question:** At 60 days, at which pH was the difference in mass loss between Calcite and Quartz greatest?
 
 - A. pH 4.0
@@ -1881,6 +2765,25 @@ kx + 6y = c
 ## SCIENCE 6 — Data Representation (easy)
 
 **Passage/set:** Performance of Artificial Solar Pigments
+
+**Full passage / set text (question 6):**
+
+Engineers developed four artificial pigments (Alpha, Beta, Gamma, and Delta) for use in next-generation solar cells. Table 1 shows each pigment's peak absorbance wavelength, effective absorption range, and energy transfer efficiency (the percentage of absorbed light successfully converted into electrical energy).
+
+Table 1: Pigment Properties
+Pigment | Peak Absorbance (nm) | Absorption Range (nm) | Energy Transfer Efficiency (%)
+Alpha | 450 | 400 - 500 | 85%
+Beta | 550 | 500 - 600 | 60%
+Gamma | 650 | 600 - 700 | 75%
+Delta | 480 | 420 - 560 | 40%
+
+Table 2 displays the light intensity output of the standard test lamp used in the laboratory across different wavelength bands.
+
+Table 2: Test Lamp Output
+Wavelength Band | Intensity
+400 - 500 nm | High
+500 - 600 nm | Medium
+600 - 700 nm | Low
 
 **Question:** Based on Table 1, which pigment is capable of absorbing light across the widest total range of wavelengths?
 
@@ -1897,6 +2800,25 @@ kx + 6y = c
 
 **Passage/set:** Performance of Artificial Solar Pigments
 
+**Full passage / set text (question 7):**
+
+Engineers developed four artificial pigments (Alpha, Beta, Gamma, and Delta) for use in next-generation solar cells. Table 1 shows each pigment's peak absorbance wavelength, effective absorption range, and energy transfer efficiency (the percentage of absorbed light successfully converted into electrical energy).
+
+Table 1: Pigment Properties
+Pigment | Peak Absorbance (nm) | Absorption Range (nm) | Energy Transfer Efficiency (%)
+Alpha | 450 | 400 - 500 | 85%
+Beta | 550 | 500 - 600 | 60%
+Gamma | 650 | 600 - 700 | 75%
+Delta | 480 | 420 - 560 | 40%
+
+Table 2 displays the light intensity output of the standard test lamp used in the laboratory across different wavelength bands.
+
+Table 2: Test Lamp Output
+Wavelength Band | Intensity
+400 - 500 nm | High
+500 - 600 nm | Medium
+600 - 700 nm | Low
+
 **Question:** According to Table 1, which pigment successfully converts the highest percentage of absorbed light into electrical energy?
 
 - A. Delta
@@ -1911,6 +2833,25 @@ kx + 6y = c
 ## SCIENCE 8 — Data Representation (hard)
 
 **Passage/set:** Performance of Artificial Solar Pigments
+
+**Full passage / set text (question 8):**
+
+Engineers developed four artificial pigments (Alpha, Beta, Gamma, and Delta) for use in next-generation solar cells. Table 1 shows each pigment's peak absorbance wavelength, effective absorption range, and energy transfer efficiency (the percentage of absorbed light successfully converted into electrical energy).
+
+Table 1: Pigment Properties
+Pigment | Peak Absorbance (nm) | Absorption Range (nm) | Energy Transfer Efficiency (%)
+Alpha | 450 | 400 - 500 | 85%
+Beta | 550 | 500 - 600 | 60%
+Gamma | 650 | 600 - 700 | 75%
+Delta | 480 | 420 - 560 | 40%
+
+Table 2 displays the light intensity output of the standard test lamp used in the laboratory across different wavelength bands.
+
+Table 2: Test Lamp Output
+Wavelength Band | Intensity
+400 - 500 nm | High
+500 - 600 nm | Medium
+600 - 700 nm | Low
 
 **Question:** A technician proposes that pigments with peak absorbance at longer wavelengths will always exhibit lower energy transfer efficiencies than pigments with peak absorbance at shorter wavelengths. Does the data support this proposition?
 
@@ -1927,6 +2868,25 @@ kx + 6y = c
 
 **Passage/set:** Performance of Artificial Solar Pigments
 
+**Full passage / set text (question 9):**
+
+Engineers developed four artificial pigments (Alpha, Beta, Gamma, and Delta) for use in next-generation solar cells. Table 1 shows each pigment's peak absorbance wavelength, effective absorption range, and energy transfer efficiency (the percentage of absorbed light successfully converted into electrical energy).
+
+Table 1: Pigment Properties
+Pigment | Peak Absorbance (nm) | Absorption Range (nm) | Energy Transfer Efficiency (%)
+Alpha | 450 | 400 - 500 | 85%
+Beta | 550 | 500 - 600 | 60%
+Gamma | 650 | 600 - 700 | 75%
+Delta | 480 | 420 - 560 | 40%
+
+Table 2 displays the light intensity output of the standard test lamp used in the laboratory across different wavelength bands.
+
+Table 2: Test Lamp Output
+Wavelength Band | Intensity
+400 - 500 nm | High
+500 - 600 nm | Medium
+600 - 700 nm | Low
+
 **Question:** If a specialized solar cell requires a pigment that can absorb light at 630 nm and has an energy transfer efficiency greater than 70%, which pigment should be selected?
 
 - A. Gamma
@@ -1941,6 +2901,25 @@ kx + 6y = c
 ## SCIENCE 10 — Data Representation (medium)
 
 **Passage/set:** Performance of Artificial Solar Pigments
+
+**Full passage / set text (question 10):**
+
+Engineers developed four artificial pigments (Alpha, Beta, Gamma, and Delta) for use in next-generation solar cells. Table 1 shows each pigment's peak absorbance wavelength, effective absorption range, and energy transfer efficiency (the percentage of absorbed light successfully converted into electrical energy).
+
+Table 1: Pigment Properties
+Pigment | Peak Absorbance (nm) | Absorption Range (nm) | Energy Transfer Efficiency (%)
+Alpha | 450 | 400 - 500 | 85%
+Beta | 550 | 500 - 600 | 60%
+Gamma | 650 | 600 - 700 | 75%
+Delta | 480 | 420 - 560 | 40%
+
+Table 2 displays the light intensity output of the standard test lamp used in the laboratory across different wavelength bands.
+
+Table 2: Test Lamp Output
+Wavelength Band | Intensity
+400 - 500 nm | High
+500 - 600 nm | Medium
+600 - 700 nm | Low
 
 **Question:** Which pigment absorbs light within the wavelength band where the test lamp output is High, but has an energy transfer efficiency below 50%?
 
@@ -1957,6 +2936,19 @@ kx + 6y = c
 
 **Passage/set:** Wind Turbine Power Output by Wind Speed and Blade Length
 
+**Full passage / set text (question 11):**
+
+Engineers measured the electrical power produced by three wind turbines that were identical except for blade length: 20 m, 30 m, or 40 m. Each turbine has a control system that limits its output to a maximum value so the machine is not damaged in strong winds. Power output was recorded in kilowatts (kW) while the wind blew steadily at 4, 6, 8, 10, or 12 meters per second (m/s). Each value in Table 1 is the average of 20 one-minute readings.
+
+Table 1: Average power output (kW)
+
+Wind speed (m/s) | 20 m blades | 30 m blades | 40 m blades
+4                | 20          | 45          | 80
+6                | 70          | 155         | 275
+8                | 165         | 370         | 655
+10               | 320         | 720         | 1,000
+12               | 320         | 720         | 1,000
+
 **Question:** At a wind speed of 8 m/s, how much more power did the turbine with 40 m blades produce than the turbine with 20 m blades?
 
 - A. 285 kW
@@ -1971,6 +2963,19 @@ kx + 6y = c
 ## SCIENCE 12 — Data Representation (easy)
 
 **Passage/set:** Wind Turbine Power Output by Wind Speed and Blade Length
+
+**Full passage / set text (question 12):**
+
+Engineers measured the electrical power produced by three wind turbines that were identical except for blade length: 20 m, 30 m, or 40 m. Each turbine has a control system that limits its output to a maximum value so the machine is not damaged in strong winds. Power output was recorded in kilowatts (kW) while the wind blew steadily at 4, 6, 8, 10, or 12 meters per second (m/s). Each value in Table 1 is the average of 20 one-minute readings.
+
+Table 1: Average power output (kW)
+
+Wind speed (m/s) | 20 m blades | 30 m blades | 40 m blades
+4                | 20          | 45          | 80
+6                | 70          | 155         | 275
+8                | 165         | 370         | 655
+10               | 320         | 720         | 1,000
+12               | 320         | 720         | 1,000
 
 **Question:** For the turbine with 30 m blades, how did power output change as wind speed increased from 4 m/s to 12 m/s?
 
@@ -1987,6 +2992,19 @@ kx + 6y = c
 
 **Passage/set:** Wind Turbine Power Output by Wind Speed and Blade Length
 
+**Full passage / set text (question 13):**
+
+Engineers measured the electrical power produced by three wind turbines that were identical except for blade length: 20 m, 30 m, or 40 m. Each turbine has a control system that limits its output to a maximum value so the machine is not damaged in strong winds. Power output was recorded in kilowatts (kW) while the wind blew steadily at 4, 6, 8, 10, or 12 meters per second (m/s). Each value in Table 1 is the average of 20 one-minute readings.
+
+Table 1: Average power output (kW)
+
+Wind speed (m/s) | 20 m blades | 30 m blades | 40 m blades
+4                | 20          | 45          | 80
+6                | 70          | 155         | 275
+8                | 165         | 370         | 655
+10               | 320         | 720         | 1,000
+12               | 320         | 720         | 1,000
+
 **Question:** A town needs a single turbine that produces at least 600 kW. Which of the following lists ALL the tested combinations of blade length and wind speed that meet this requirement?
 
 - A. 40 m blades at 8, 10, and 12 m/s only
@@ -2001,6 +3019,19 @@ kx + 6y = c
 ## SCIENCE 14 — Data Representation (medium)
 
 **Passage/set:** Wind Turbine Power Output by Wind Speed and Blade Length
+
+**Full passage / set text (question 14):**
+
+Engineers measured the electrical power produced by three wind turbines that were identical except for blade length: 20 m, 30 m, or 40 m. Each turbine has a control system that limits its output to a maximum value so the machine is not damaged in strong winds. Power output was recorded in kilowatts (kW) while the wind blew steadily at 4, 6, 8, 10, or 12 meters per second (m/s). Each value in Table 1 is the average of 20 one-minute readings.
+
+Table 1: Average power output (kW)
+
+Wind speed (m/s) | 20 m blades | 30 m blades | 40 m blades
+4                | 20          | 45          | 80
+6                | 70          | 155         | 275
+8                | 165         | 370         | 655
+10               | 320         | 720         | 1,000
+12               | 320         | 720         | 1,000
 
 **Question:** For the turbine with 20 m blades at 6 m/s, which change would increase power output more: raising the wind speed to 8 m/s, or switching to 30 m blades at 6 m/s?
 
@@ -2017,6 +3048,19 @@ kx + 6y = c
 
 **Passage/set:** Wind Turbine Power Output by Wind Speed and Blade Length
 
+**Full passage / set text (question 15):**
+
+Engineers measured the electrical power produced by three wind turbines that were identical except for blade length: 20 m, 30 m, or 40 m. Each turbine has a control system that limits its output to a maximum value so the machine is not damaged in strong winds. Power output was recorded in kilowatts (kW) while the wind blew steadily at 4, 6, 8, 10, or 12 meters per second (m/s). Each value in Table 1 is the average of 20 one-minute readings.
+
+Table 1: Average power output (kW)
+
+Wind speed (m/s) | 20 m blades | 30 m blades | 40 m blades
+4                | 20          | 45          | 80
+6                | 70          | 155         | 275
+8                | 165         | 370         | 655
+10               | 320         | 720         | 1,000
+12               | 320         | 720         | 1,000
+
 **Question:** An engineer claims, "At every wind speed tested, the turbine with 40 m blades produced at least 3 times as much power as the turbine with 20 m blades." Do the data support this claim?
 
 - A. Yes; the 40 m output divided by the 20 m output was at least 3 at every wind speed.
@@ -2031,6 +3075,23 @@ kx + 6y = c
 ## SCIENCE 16 — Research Summaries (easy)
 
 **Passage/set:** Kinetic Friction of Ice Skate Blades
+
+**Full passage / set text (question 16):**
+
+Sports physicists evaluated the kinetic friction coefficient (μk) of two different ice skate blades gliding over ice under varying conditions. A lower μk indicates less friction and faster gliding.
+
+Experiment 1
+The physicists tested Blade A (carbon steel) and Blade B (stainless steel) on smooth indoor ice at three different temperatures. The tests were conducted at a constant speed.
+At -10°C: Blade A = 0.015, Blade B = 0.018
+At -6°C: Blade A = 0.011, Blade B = 0.014
+At -2°C: Blade A = 0.008, Blade B = 0.010
+
+Experiment 2
+To simulate outdoor conditions, the physicists tested Blade A at a constant temperature of -6°C on ice surfaces containing varying amounts of sand impurities, measured in grams per square meter (g/m²).
+0 g/m²: 0.011
+5 g/m²: 0.025
+10 g/m²: 0.045
+20 g/m²: 0.080
 
 **Question:** In Experiment 1, what effect does increasing the ice temperature from -10°C to -2°C have on the kinetic friction coefficient of the blades?
 
@@ -2047,6 +3108,23 @@ kx + 6y = c
 
 **Passage/set:** Kinetic Friction of Ice Skate Blades
 
+**Full passage / set text (question 17):**
+
+Sports physicists evaluated the kinetic friction coefficient (μk) of two different ice skate blades gliding over ice under varying conditions. A lower μk indicates less friction and faster gliding.
+
+Experiment 1
+The physicists tested Blade A (carbon steel) and Blade B (stainless steel) on smooth indoor ice at three different temperatures. The tests were conducted at a constant speed.
+At -10°C: Blade A = 0.015, Blade B = 0.018
+At -6°C: Blade A = 0.011, Blade B = 0.014
+At -2°C: Blade A = 0.008, Blade B = 0.010
+
+Experiment 2
+To simulate outdoor conditions, the physicists tested Blade A at a constant temperature of -6°C on ice surfaces containing varying amounts of sand impurities, measured in grams per square meter (g/m²).
+0 g/m²: 0.011
+5 g/m²: 0.025
+10 g/m²: 0.045
+20 g/m²: 0.080
+
 **Question:** Based on Experiment 1, which blade material consistently exhibited lower friction across all tested temperatures?
 
 - A. Blade B (stainless steel)
@@ -2061,6 +3139,23 @@ kx + 6y = c
 ## SCIENCE 18 — Research Summaries (hard)
 
 **Passage/set:** Kinetic Friction of Ice Skate Blades
+
+**Full passage / set text (question 18):**
+
+Sports physicists evaluated the kinetic friction coefficient (μk) of two different ice skate blades gliding over ice under varying conditions. A lower μk indicates less friction and faster gliding.
+
+Experiment 1
+The physicists tested Blade A (carbon steel) and Blade B (stainless steel) on smooth indoor ice at three different temperatures. The tests were conducted at a constant speed.
+At -10°C: Blade A = 0.015, Blade B = 0.018
+At -6°C: Blade A = 0.011, Blade B = 0.014
+At -2°C: Blade A = 0.008, Blade B = 0.010
+
+Experiment 2
+To simulate outdoor conditions, the physicists tested Blade A at a constant temperature of -6°C on ice surfaces containing varying amounts of sand impurities, measured in grams per square meter (g/m²).
+0 g/m²: 0.011
+5 g/m²: 0.025
+10 g/m²: 0.045
+20 g/m²: 0.080
 
 **Question:** An engineer claims that, at -6°C, choosing Blade A instead of Blade B affects friction more than changing the ice from clean to 20 g/m² of sand impurities. Is this claim supported by the tested data?
 
@@ -2077,6 +3172,23 @@ kx + 6y = c
 
 **Passage/set:** Kinetic Friction of Ice Skate Blades
 
+**Full passage / set text (question 19):**
+
+Sports physicists evaluated the kinetic friction coefficient (μk) of two different ice skate blades gliding over ice under varying conditions. A lower μk indicates less friction and faster gliding.
+
+Experiment 1
+The physicists tested Blade A (carbon steel) and Blade B (stainless steel) on smooth indoor ice at three different temperatures. The tests were conducted at a constant speed.
+At -10°C: Blade A = 0.015, Blade B = 0.018
+At -6°C: Blade A = 0.011, Blade B = 0.014
+At -2°C: Blade A = 0.008, Blade B = 0.010
+
+Experiment 2
+To simulate outdoor conditions, the physicists tested Blade A at a constant temperature of -6°C on ice surfaces containing varying amounts of sand impurities, measured in grams per square meter (g/m²).
+0 g/m²: 0.011
+5 g/m²: 0.025
+10 g/m²: 0.045
+20 g/m²: 0.080
+
 **Question:** Comparing the two experiments, which independent variable caused the greatest maximum absolute change in the kinetic friction coefficient for Blade A?
 
 - A. Changing sand impurities from 0 to 20 g/m² caused a much larger absolute change than changing temperature from -2°C to -10°C.
@@ -2091,6 +3203,23 @@ kx + 6y = c
 ## SCIENCE 20 — Research Summaries (medium)
 
 **Passage/set:** Kinetic Friction of Ice Skate Blades
+
+**Full passage / set text (question 20):**
+
+Sports physicists evaluated the kinetic friction coefficient (μk) of two different ice skate blades gliding over ice under varying conditions. A lower μk indicates less friction and faster gliding.
+
+Experiment 1
+The physicists tested Blade A (carbon steel) and Blade B (stainless steel) on smooth indoor ice at three different temperatures. The tests were conducted at a constant speed.
+At -10°C: Blade A = 0.015, Blade B = 0.018
+At -6°C: Blade A = 0.011, Blade B = 0.014
+At -2°C: Blade A = 0.008, Blade B = 0.010
+
+Experiment 2
+To simulate outdoor conditions, the physicists tested Blade A at a constant temperature of -6°C on ice surfaces containing varying amounts of sand impurities, measured in grams per square meter (g/m²).
+0 g/m²: 0.011
+5 g/m²: 0.025
+10 g/m²: 0.045
+20 g/m²: 0.080
 
 **Question:** For Blade A at -6°C, increasing sand impurities from 0 to 10 g/m² raised μk from 0.011 to 0.045. How does this increase compare with the total change in Blade A's μk from -10°C to -2°C on smooth ice?
 
@@ -2107,6 +3236,28 @@ kx + 6y = c
 
 **Passage/set:** How Far Water Climbs Up Paper Strips
 
+**Full passage / set text (question 21):**
+
+Students investigated how far water climbs up strips of paper when the bottom edge of each strip is dipped in water. In every trial, a strip 15 cm long was hung vertically with its bottom 0.5 cm below the surface of dyed water at 21°C. The height of the dye line above the water surface was measured with a ruler. Each condition was tested with 5 strips, and the average height was calculated.
+
+Experiment 1
+Strips 2 cm wide were cut from four types of paper: filter paper, paper towel, newspaper, and printer paper. The dye height was measured after 10 minutes.
+
+Table 1: Average dye height after 10 minutes (cm)
+Filter paper  | 9.6
+Paper towel   | 7.2
+Newspaper     | 4.8
+Printer paper | 1.5
+
+Experiment 2
+Only filter paper was used. Strips were cut 1 cm, 2 cm, or 4 cm wide, and the dye height was measured after 2, 5, and 10 minutes.
+
+Table 2: Average dye height (cm)
+Strip width | 2 min | 5 min | 10 min
+1 cm        | 4.1   | 6.8   | 9.7
+2 cm        | 4.0   | 6.7   | 9.6
+4 cm        | 4.2   | 6.9   | 9.5
+
 **Question:** Which factor did the students deliberately vary in Experiment 2 that was kept the same in Experiment 1?
 
 - A. The width of the paper strip
@@ -2121,6 +3272,28 @@ kx + 6y = c
 ## SCIENCE 22 — Research Summaries (easy)
 
 **Passage/set:** How Far Water Climbs Up Paper Strips
+
+**Full passage / set text (question 22):**
+
+Students investigated how far water climbs up strips of paper when the bottom edge of each strip is dipped in water. In every trial, a strip 15 cm long was hung vertically with its bottom 0.5 cm below the surface of dyed water at 21°C. The height of the dye line above the water surface was measured with a ruler. Each condition was tested with 5 strips, and the average height was calculated.
+
+Experiment 1
+Strips 2 cm wide were cut from four types of paper: filter paper, paper towel, newspaper, and printer paper. The dye height was measured after 10 minutes.
+
+Table 1: Average dye height after 10 minutes (cm)
+Filter paper  | 9.6
+Paper towel   | 7.2
+Newspaper     | 4.8
+Printer paper | 1.5
+
+Experiment 2
+Only filter paper was used. Strips were cut 1 cm, 2 cm, or 4 cm wide, and the dye height was measured after 2, 5, and 10 minutes.
+
+Table 2: Average dye height (cm)
+Strip width | 2 min | 5 min | 10 min
+1 cm        | 4.1   | 6.8   | 9.7
+2 cm        | 4.0   | 6.7   | 9.6
+4 cm        | 4.2   | 6.9   | 9.5
 
 **Question:** In Experiment 1, how did the average dye height in paper towel compare with that in newspaper?
 
@@ -2137,6 +3310,28 @@ kx + 6y = c
 
 **Passage/set:** How Far Water Climbs Up Paper Strips
 
+**Full passage / set text (question 23):**
+
+Students investigated how far water climbs up strips of paper when the bottom edge of each strip is dipped in water. In every trial, a strip 15 cm long was hung vertically with its bottom 0.5 cm below the surface of dyed water at 21°C. The height of the dye line above the water surface was measured with a ruler. Each condition was tested with 5 strips, and the average height was calculated.
+
+Experiment 1
+Strips 2 cm wide were cut from four types of paper: filter paper, paper towel, newspaper, and printer paper. The dye height was measured after 10 minutes.
+
+Table 1: Average dye height after 10 minutes (cm)
+Filter paper  | 9.6
+Paper towel   | 7.2
+Newspaper     | 4.8
+Printer paper | 1.5
+
+Experiment 2
+Only filter paper was used. Strips were cut 1 cm, 2 cm, or 4 cm wide, and the dye height was measured after 2, 5, and 10 minutes.
+
+Table 2: Average dye height (cm)
+Strip width | 2 min | 5 min | 10 min
+1 cm        | 4.1   | 6.8   | 9.7
+2 cm        | 4.0   | 6.7   | 9.6
+4 cm        | 4.2   | 6.9   | 9.5
+
 **Question:** A student predicts that newspaper strips 4 cm wide would reach a dye height of about 4.8 cm after 10 minutes. Is this prediction justified by the two experiments?
 
 - A. Yes; Experiment 2 showed that width does not affect how high water climbs in paper.
@@ -2151,6 +3346,28 @@ kx + 6y = c
 ## SCIENCE 24 — Research Summaries (medium)
 
 **Passage/set:** How Far Water Climbs Up Paper Strips
+
+**Full passage / set text (question 24):**
+
+Students investigated how far water climbs up strips of paper when the bottom edge of each strip is dipped in water. In every trial, a strip 15 cm long was hung vertically with its bottom 0.5 cm below the surface of dyed water at 21°C. The height of the dye line above the water surface was measured with a ruler. Each condition was tested with 5 strips, and the average height was calculated.
+
+Experiment 1
+Strips 2 cm wide were cut from four types of paper: filter paper, paper towel, newspaper, and printer paper. The dye height was measured after 10 minutes.
+
+Table 1: Average dye height after 10 minutes (cm)
+Filter paper  | 9.6
+Paper towel   | 7.2
+Newspaper     | 4.8
+Printer paper | 1.5
+
+Experiment 2
+Only filter paper was used. Strips were cut 1 cm, 2 cm, or 4 cm wide, and the dye height was measured after 2, 5, and 10 minutes.
+
+Table 2: Average dye height (cm)
+Strip width | 2 min | 5 min | 10 min
+1 cm        | 4.1   | 6.8   | 9.7
+2 cm        | 4.0   | 6.7   | 9.6
+4 cm        | 4.2   | 6.9   | 9.5
 
 **Question:** Based on the 2 cm strips in Experiment 2, how did the rate at which water climbed change over the 10 minutes?
 
@@ -2167,6 +3384,28 @@ kx + 6y = c
 
 **Passage/set:** How Far Water Climbs Up Paper Strips
 
+**Full passage / set text (question 25):**
+
+Students investigated how far water climbs up strips of paper when the bottom edge of each strip is dipped in water. In every trial, a strip 15 cm long was hung vertically with its bottom 0.5 cm below the surface of dyed water at 21°C. The height of the dye line above the water surface was measured with a ruler. Each condition was tested with 5 strips, and the average height was calculated.
+
+Experiment 1
+Strips 2 cm wide were cut from four types of paper: filter paper, paper towel, newspaper, and printer paper. The dye height was measured after 10 minutes.
+
+Table 1: Average dye height after 10 minutes (cm)
+Filter paper  | 9.6
+Paper towel   | 7.2
+Newspaper     | 4.8
+Printer paper | 1.5
+
+Experiment 2
+Only filter paper was used. Strips were cut 1 cm, 2 cm, or 4 cm wide, and the dye height was measured after 2, 5, and 10 minutes.
+
+Table 2: Average dye height (cm)
+Strip width | 2 min | 5 min | 10 min
+1 cm        | 4.1   | 6.8   | 9.7
+2 cm        | 4.0   | 6.7   | 9.6
+4 cm        | 4.2   | 6.9   | 9.5
+
 **Question:** Which conclusion about filter paper is best supported by the results of Experiment 2?
 
 - A. Wider strips allowed water to climb much higher at every time measured.
@@ -2181,6 +3420,28 @@ kx + 6y = c
 ## SCIENCE 26 — Research Summaries (easy)
 
 **Passage/set:** Gas Production by Two Yeast Strains in Bread Dough
+
+**Full passage / set text (question 26):**
+
+Yeast are tiny organisms that release gas as they feed, which makes bread dough rise. A baker tested how sugar and temperature affect gas production by two yeast strains, X and Y. In each trial, 100 g of flour, 60 mL of water, and 2 g of yeast were mixed into a dough and sealed in a flask attached to a gas collection tube. The volume of gas collected in 60 minutes was recorded. Each condition was tested 4 times, and the averages are shown.
+
+Experiment 1
+Dough was made with Strain X or Strain Y and with 0, 5, or 10 g of sugar. All flasks were kept at 30°C.
+
+Table 1: Average gas volume after 60 minutes (mL)
+Sugar (g) | Strain X | Strain Y
+0         | 40       | 20
+5         | 90       | 60
+10        | 120      | 100
+
+Experiment 2
+Only Strain X was used, with 5 g of sugar in each dough. Flasks were kept at 20°C, 30°C, or 40°C.
+
+Table 2: Average gas volume after 60 minutes (mL)
+Temperature (°C) | Strain X
+20               | 50
+30               | 90
+40               | 70
 
 **Question:** Which of the following was held constant for all trials in Experiment 1?
 
@@ -2197,6 +3458,28 @@ kx + 6y = c
 
 **Passage/set:** Gas Production by Two Yeast Strains in Bread Dough
 
+**Full passage / set text (question 27):**
+
+Yeast are tiny organisms that release gas as they feed, which makes bread dough rise. A baker tested how sugar and temperature affect gas production by two yeast strains, X and Y. In each trial, 100 g of flour, 60 mL of water, and 2 g of yeast were mixed into a dough and sealed in a flask attached to a gas collection tube. The volume of gas collected in 60 minutes was recorded. Each condition was tested 4 times, and the averages are shown.
+
+Experiment 1
+Dough was made with Strain X or Strain Y and with 0, 5, or 10 g of sugar. All flasks were kept at 30°C.
+
+Table 1: Average gas volume after 60 minutes (mL)
+Sugar (g) | Strain X | Strain Y
+0         | 40       | 20
+5         | 90       | 60
+10        | 120      | 100
+
+Experiment 2
+Only Strain X was used, with 5 g of sugar in each dough. Flasks were kept at 20°C, 30°C, or 40°C.
+
+Table 2: Average gas volume after 60 minutes (mL)
+Temperature (°C) | Strain X
+20               | 50
+30               | 90
+40               | 70
+
 **Question:** In Experiment 1, with 10 g of sugar, how did the gas volume from Strain X compare with that from Strain Y?
 
 - A. Strain X produced 20 mL less.
@@ -2211,6 +3494,28 @@ kx + 6y = c
 ## SCIENCE 28 — Research Summaries (hard)
 
 **Passage/set:** Gas Production by Two Yeast Strains in Bread Dough
+
+**Full passage / set text (question 28):**
+
+Yeast are tiny organisms that release gas as they feed, which makes bread dough rise. A baker tested how sugar and temperature affect gas production by two yeast strains, X and Y. In each trial, 100 g of flour, 60 mL of water, and 2 g of yeast were mixed into a dough and sealed in a flask attached to a gas collection tube. The volume of gas collected in 60 minutes was recorded. Each condition was tested 4 times, and the averages are shown.
+
+Experiment 1
+Dough was made with Strain X or Strain Y and with 0, 5, or 10 g of sugar. All flasks were kept at 30°C.
+
+Table 1: Average gas volume after 60 minutes (mL)
+Sugar (g) | Strain X | Strain Y
+0         | 40       | 20
+5         | 90       | 60
+10        | 120      | 100
+
+Experiment 2
+Only Strain X was used, with 5 g of sugar in each dough. Flasks were kept at 20°C, 30°C, or 40°C.
+
+Table 2: Average gas volume after 60 minutes (mL)
+Temperature (°C) | Strain X
+20               | 50
+30               | 90
+40               | 70
 
 **Question:** A student claims, "Strain Y responds more strongly to added sugar than Strain X does." Based on the change from 0 g to 10 g of sugar in Experiment 1, which evaluation of this claim is best?
 
@@ -2227,6 +3532,28 @@ kx + 6y = c
 
 **Passage/set:** Gas Production by Two Yeast Strains in Bread Dough
 
+**Full passage / set text (question 29):**
+
+Yeast are tiny organisms that release gas as they feed, which makes bread dough rise. A baker tested how sugar and temperature affect gas production by two yeast strains, X and Y. In each trial, 100 g of flour, 60 mL of water, and 2 g of yeast were mixed into a dough and sealed in a flask attached to a gas collection tube. The volume of gas collected in 60 minutes was recorded. Each condition was tested 4 times, and the averages are shown.
+
+Experiment 1
+Dough was made with Strain X or Strain Y and with 0, 5, or 10 g of sugar. All flasks were kept at 30°C.
+
+Table 1: Average gas volume after 60 minutes (mL)
+Sugar (g) | Strain X | Strain Y
+0         | 40       | 20
+5         | 90       | 60
+10        | 120      | 100
+
+Experiment 2
+Only Strain X was used, with 5 g of sugar in each dough. Flasks were kept at 20°C, 30°C, or 40°C.
+
+Table 2: Average gas volume after 60 minutes (mL)
+Temperature (°C) | Strain X
+20               | 50
+30               | 90
+40               | 70
+
 **Question:** Which statement best describes the effect of temperature on gas production in Experiment 2?
 
 - A. Gas volume increased steadily from 20°C to 40°C.
@@ -2241,6 +3568,28 @@ kx + 6y = c
 ## SCIENCE 30 — Research Summaries (medium)
 
 **Passage/set:** Gas Production by Two Yeast Strains in Bread Dough
+
+**Full passage / set text (question 30):**
+
+Yeast are tiny organisms that release gas as they feed, which makes bread dough rise. A baker tested how sugar and temperature affect gas production by two yeast strains, X and Y. In each trial, 100 g of flour, 60 mL of water, and 2 g of yeast were mixed into a dough and sealed in a flask attached to a gas collection tube. The volume of gas collected in 60 minutes was recorded. Each condition was tested 4 times, and the averages are shown.
+
+Experiment 1
+Dough was made with Strain X or Strain Y and with 0, 5, or 10 g of sugar. All flasks were kept at 30°C.
+
+Table 1: Average gas volume after 60 minutes (mL)
+Sugar (g) | Strain X | Strain Y
+0         | 40       | 20
+5         | 90       | 60
+10        | 120      | 100
+
+Experiment 2
+Only Strain X was used, with 5 g of sugar in each dough. Flasks were kept at 20°C, 30°C, or 40°C.
+
+Table 2: Average gas volume after 60 minutes (mL)
+Temperature (°C) | Strain X
+20               | 50
+30               | 90
+40               | 70
 
 **Question:** Based on both experiments, which dough produced more gas in 60 minutes: Strain X with 5 g of sugar at 20°C, or Strain Y with 5 g of sugar at 30°C?
 
@@ -2257,6 +3606,31 @@ kx + 6y = c
 
 **Passage/set:** Light Color, Light Duration, and Duckweed Growth
 
+**Full passage / set text (question 31):**
+
+Duckweed is a tiny plant that floats on water and reproduces by splitting into new plants. A student investigated how the color and duration of light affect how quickly duckweed populations grow.
+
+Experiment 1
+Twelve identical glass tanks were each filled with 2 L of the same pond water and given 20 duckweed plants. Three tanks were assigned to each light color: white, red, blue, or green. Each tank was lit from above by a lamp of its assigned color for 12 hours per day, and all lamps were adjusted to the same light intensity. Water temperature in every tank was kept at 24°C. After 14 days, the student counted the plants in each tank.
+
+Table 1: Number of plants after 14 days (Experiment 1)
+
+Light color | Tank 1 | Tank 2 | Tank 3 | Average
+White       | 62     | 58     | 60     | 60
+Red         | 54     | 50     | 52     | 52
+Blue        | 46     | 44     | 48     | 46
+Green       | 26     | 24     | 22     | 24
+
+Experiment 2
+The procedure of Experiment 1 was repeated with 9 new tanks, except that all tanks received white light, and three tanks each were lit for 8, 12, or 16 hours per day.
+
+Table 2: Average number of plants after 14 days (Experiment 2)
+
+Hours of light per day | Average
+8                      | 34
+12                     | 60
+16                     | 72
+
 **Question:** In Experiment 1, which factor did the student deliberately vary from one group of tanks to another?
 
 - A. The number of plants after 14 days
@@ -2271,6 +3645,31 @@ kx + 6y = c
 ## SCIENCE 32 — Research Summaries (easy)
 
 **Passage/set:** Light Color, Light Duration, and Duckweed Growth
+
+**Full passage / set text (question 32):**
+
+Duckweed is a tiny plant that floats on water and reproduces by splitting into new plants. A student investigated how the color and duration of light affect how quickly duckweed populations grow.
+
+Experiment 1
+Twelve identical glass tanks were each filled with 2 L of the same pond water and given 20 duckweed plants. Three tanks were assigned to each light color: white, red, blue, or green. Each tank was lit from above by a lamp of its assigned color for 12 hours per day, and all lamps were adjusted to the same light intensity. Water temperature in every tank was kept at 24°C. After 14 days, the student counted the plants in each tank.
+
+Table 1: Number of plants after 14 days (Experiment 1)
+
+Light color | Tank 1 | Tank 2 | Tank 3 | Average
+White       | 62     | 58     | 60     | 60
+Red         | 54     | 50     | 52     | 52
+Blue        | 46     | 44     | 48     | 46
+Green       | 26     | 24     | 22     | 24
+
+Experiment 2
+The procedure of Experiment 1 was repeated with 9 new tanks, except that all tanks received white light, and three tanks each were lit for 8, 12, or 16 hours per day.
+
+Table 2: Average number of plants after 14 days (Experiment 2)
+
+Hours of light per day | Average
+8                      | 34
+12                     | 60
+16                     | 72
 
 **Question:** In Experiment 1, compared with tanks under blue light, tanks under red light ended with:
 
@@ -2287,6 +3686,31 @@ kx + 6y = c
 
 **Passage/set:** Light Color, Light Duration, and Duckweed Growth
 
+**Full passage / set text (question 33):**
+
+Duckweed is a tiny plant that floats on water and reproduces by splitting into new plants. A student investigated how the color and duration of light affect how quickly duckweed populations grow.
+
+Experiment 1
+Twelve identical glass tanks were each filled with 2 L of the same pond water and given 20 duckweed plants. Three tanks were assigned to each light color: white, red, blue, or green. Each tank was lit from above by a lamp of its assigned color for 12 hours per day, and all lamps were adjusted to the same light intensity. Water temperature in every tank was kept at 24°C. After 14 days, the student counted the plants in each tank.
+
+Table 1: Number of plants after 14 days (Experiment 1)
+
+Light color | Tank 1 | Tank 2 | Tank 3 | Average
+White       | 62     | 58     | 60     | 60
+Red         | 54     | 50     | 52     | 52
+Blue        | 46     | 44     | 48     | 46
+Green       | 26     | 24     | 22     | 24
+
+Experiment 2
+The procedure of Experiment 1 was repeated with 9 new tanks, except that all tanks received white light, and three tanks each were lit for 8, 12, or 16 hours per day.
+
+Table 2: Average number of plants after 14 days (Experiment 2)
+
+Hours of light per day | Average
+8                      | 34
+12                     | 60
+16                     | 72
+
 **Question:** The student wants to find out whether red light still produces fewer plants than white light when both are given 16 hours of light per day. Which new experiment would best test this?
 
 - A. Light 3 tanks with red light for 16 hours per day, and compare them with the white-light tanks from Experiment 1, which received 12 hours per day.
@@ -2301,6 +3725,31 @@ kx + 6y = c
 ## SCIENCE 34 — Research Summaries (medium)
 
 **Passage/set:** Light Color, Light Duration, and Duckweed Growth
+
+**Full passage / set text (question 34):**
+
+Duckweed is a tiny plant that floats on water and reproduces by splitting into new plants. A student investigated how the color and duration of light affect how quickly duckweed populations grow.
+
+Experiment 1
+Twelve identical glass tanks were each filled with 2 L of the same pond water and given 20 duckweed plants. Three tanks were assigned to each light color: white, red, blue, or green. Each tank was lit from above by a lamp of its assigned color for 12 hours per day, and all lamps were adjusted to the same light intensity. Water temperature in every tank was kept at 24°C. After 14 days, the student counted the plants in each tank.
+
+Table 1: Number of plants after 14 days (Experiment 1)
+
+Light color | Tank 1 | Tank 2 | Tank 3 | Average
+White       | 62     | 58     | 60     | 60
+Red         | 54     | 50     | 52     | 52
+Blue        | 46     | 44     | 48     | 46
+Green       | 26     | 24     | 22     | 24
+
+Experiment 2
+The procedure of Experiment 1 was repeated with 9 new tanks, except that all tanks received white light, and three tanks each were lit for 8, 12, or 16 hours per day.
+
+Table 2: Average number of plants after 14 days (Experiment 2)
+
+Hours of light per day | Average
+8                      | 34
+12                     | 60
+16                     | 72
 
 **Question:** Based on Experiment 2, which statement best describes the effect of adding 4 hours of light per day?
 
@@ -2317,6 +3766,31 @@ kx + 6y = c
 
 **Passage/set:** Light Color, Light Duration, and Duckweed Growth
 
+**Full passage / set text (question 35):**
+
+Duckweed is a tiny plant that floats on water and reproduces by splitting into new plants. A student investigated how the color and duration of light affect how quickly duckweed populations grow.
+
+Experiment 1
+Twelve identical glass tanks were each filled with 2 L of the same pond water and given 20 duckweed plants. Three tanks were assigned to each light color: white, red, blue, or green. Each tank was lit from above by a lamp of its assigned color for 12 hours per day, and all lamps were adjusted to the same light intensity. Water temperature in every tank was kept at 24°C. After 14 days, the student counted the plants in each tank.
+
+Table 1: Number of plants after 14 days (Experiment 1)
+
+Light color | Tank 1 | Tank 2 | Tank 3 | Average
+White       | 62     | 58     | 60     | 60
+Red         | 54     | 50     | 52     | 52
+Blue        | 46     | 44     | 48     | 46
+Green       | 26     | 24     | 22     | 24
+
+Experiment 2
+The procedure of Experiment 1 was repeated with 9 new tanks, except that all tanks received white light, and three tanks each were lit for 8, 12, or 16 hours per day.
+
+Table 2: Average number of plants after 14 days (Experiment 2)
+
+Hours of light per day | Average
+8                      | 34
+12                     | 60
+16                     | 72
+
 **Question:** Which conclusion about light duration is NOT supported by the two experiments?
 
 - A. Under white light, increasing daily light from 8 to 16 hours increased the average number of plants.
@@ -2331,6 +3805,18 @@ kx + 6y = c
 ## SCIENCE 36 — Data Representation (easy)
 
 **Passage/set:** Evaporation Rates Under Different Temperatures and Fan Speeds
+
+**Full passage / set text (question 36):**
+
+A student studied how air temperature and air movement affect how much water evaporates from an open dish. In each trial, a shallow dish holding 100.0 g of water was placed inside a closed chamber. The air temperature in the chamber was held at 20°C, 30°C, 40°C, or 50°C. A fan blew air across the dish at 0 m/s (fan off), 2 m/s, or 4 m/s. After 60 minutes, the dish was weighed, and the mass of water lost to evaporation was recorded. All dishes had the same size and shape, and all other conditions were kept constant.
+
+Table 1: Mass of water lost (g) after 60 minutes
+
+Temperature | Fan 0 m/s | Fan 2 m/s | Fan 4 m/s
+20°C        | 2.0       | 3.0       | 4.0
+30°C        | 3.5       | 5.0       | 6.5
+40°C        | 5.5       | 7.5       | 9.5
+50°C        | 8.0       | 10.5      | 13.0
 
 **Question:** According to Table 1, at 30°C, as fan speed increased from 0 m/s to 4 m/s, the mass of water lost:
 
@@ -2347,6 +3833,18 @@ kx + 6y = c
 
 **Passage/set:** Evaporation Rates Under Different Temperatures and Fan Speeds
 
+**Full passage / set text (question 37):**
+
+A student studied how air temperature and air movement affect how much water evaporates from an open dish. In each trial, a shallow dish holding 100.0 g of water was placed inside a closed chamber. The air temperature in the chamber was held at 20°C, 30°C, 40°C, or 50°C. A fan blew air across the dish at 0 m/s (fan off), 2 m/s, or 4 m/s. After 60 minutes, the dish was weighed, and the mass of water lost to evaporation was recorded. All dishes had the same size and shape, and all other conditions were kept constant.
+
+Table 1: Mass of water lost (g) after 60 minutes
+
+Temperature | Fan 0 m/s | Fan 2 m/s | Fan 4 m/s
+20°C        | 2.0       | 3.0       | 4.0
+30°C        | 3.5       | 5.0       | 6.5
+40°C        | 5.5       | 7.5       | 9.5
+50°C        | 8.0       | 10.5      | 13.0
+
 **Question:** Based on Table 1, which trial lost more water, and by how much: the trial at 40°C with the fan off, or the trial at 30°C with the fan at 4 m/s?
 
 - A. The 30°C, 4 m/s trial lost 1.0 g more.
@@ -2361,6 +3859,18 @@ kx + 6y = c
 ## SCIENCE 38 — Data Representation (hard)
 
 **Passage/set:** Evaporation Rates Under Different Temperatures and Fan Speeds
+
+**Full passage / set text (question 38):**
+
+A student studied how air temperature and air movement affect how much water evaporates from an open dish. In each trial, a shallow dish holding 100.0 g of water was placed inside a closed chamber. The air temperature in the chamber was held at 20°C, 30°C, 40°C, or 50°C. A fan blew air across the dish at 0 m/s (fan off), 2 m/s, or 4 m/s. After 60 minutes, the dish was weighed, and the mass of water lost to evaporation was recorded. All dishes had the same size and shape, and all other conditions were kept constant.
+
+Table 1: Mass of water lost (g) after 60 minutes
+
+Temperature | Fan 0 m/s | Fan 2 m/s | Fan 4 m/s
+20°C        | 2.0       | 3.0       | 4.0
+30°C        | 3.5       | 5.0       | 6.5
+40°C        | 5.5       | 7.5       | 9.5
+50°C        | 8.0       | 10.5      | 13.0
 
 **Question:** A researcher proposes that temperature and fan speed affect evaporation independently, meaning that increasing fan speed from 0 m/s to 4 m/s should increase water loss by the same amount at every tested temperature. Which statement best evaluates this proposal using Table 1?
 
@@ -2377,6 +3887,18 @@ kx + 6y = c
 
 **Passage/set:** Evaporation Rates Under Different Temperatures and Fan Speeds
 
+**Full passage / set text (question 39):**
+
+A student studied how air temperature and air movement affect how much water evaporates from an open dish. In each trial, a shallow dish holding 100.0 g of water was placed inside a closed chamber. The air temperature in the chamber was held at 20°C, 30°C, 40°C, or 50°C. A fan blew air across the dish at 0 m/s (fan off), 2 m/s, or 4 m/s. After 60 minutes, the dish was weighed, and the mass of water lost to evaporation was recorded. All dishes had the same size and shape, and all other conditions were kept constant.
+
+Table 1: Mass of water lost (g) after 60 minutes
+
+Temperature | Fan 0 m/s | Fan 2 m/s | Fan 4 m/s
+20°C        | 2.0       | 3.0       | 4.0
+30°C        | 3.5       | 5.0       | 6.5
+40°C        | 5.5       | 7.5       | 9.5
+50°C        | 8.0       | 10.5      | 13.0
+
 **Question:** Which of the following statements about the effect of fan speed is best supported by Table 1?
 
 - A. At each temperature, increasing fan speed from 0 m/s to 2 m/s increased the mass lost more than increasing it from 2 m/s to 4 m/s.
@@ -2391,6 +3913,18 @@ kx + 6y = c
 ## SCIENCE 40 — Data Representation (medium)
 
 **Passage/set:** Evaporation Rates Under Different Temperatures and Fan Speeds
+
+**Full passage / set text (question 40):**
+
+A student studied how air temperature and air movement affect how much water evaporates from an open dish. In each trial, a shallow dish holding 100.0 g of water was placed inside a closed chamber. The air temperature in the chamber was held at 20°C, 30°C, 40°C, or 50°C. A fan blew air across the dish at 0 m/s (fan off), 2 m/s, or 4 m/s. After 60 minutes, the dish was weighed, and the mass of water lost to evaporation was recorded. All dishes had the same size and shape, and all other conditions were kept constant.
+
+Table 1: Mass of water lost (g) after 60 minutes
+
+Temperature | Fan 0 m/s | Fan 2 m/s | Fan 4 m/s
+20°C        | 2.0       | 3.0       | 4.0
+30°C        | 3.5       | 5.0       | 6.5
+40°C        | 5.5       | 7.5       | 9.5
+50°C        | 8.0       | 10.5      | 13.0
 
 **Question:** For which fan speed did raising the temperature from 20°C to 50°C cause the greatest increase in the mass of water lost?
 

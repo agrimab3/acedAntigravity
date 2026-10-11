@@ -131,6 +131,10 @@ for (const section of ["english", "math", "reading", "science"]) {
     if (row.set_title) {
       output += `**Passage/set:** ${row.set_title}\n\n`;
     }
+    if (["english", "reading", "science"].includes(section)) {
+      const passage = row.set_content || row.passage || "";
+      output += `**Full passage / set text (question ${row.position}):**\n\n${passage.replace(/<u>([\s\S]*?)<\/u>/gi,"<u>$1</u>").replace(/\[underline\]([\s\S]*?)\[\/underline\]/gi,"<u>$1</u>").replace(/__([\s\S]*?)__/g,"<u>$1</u>")}\n\n`;
+    }
     output += `**Question:** ${row.prompt}\n\n`;
     for (const letter of ["A", "B", "C", "D"]) {
       output += `- ${letter}. ${row.choices[letter]}\n`;

@@ -1,0 +1,2 @@
+export const TUTOR_GEMINI_MODELS: readonly string[];
+export function runTutorFallbackChain(options: {systemInstruction:string;prompt:string;temperature?:number;maxOutputTokens?:number}, runners: {gemini?:(model:string,options:{systemInstruction:string;prompt:string;temperature?:number;maxOutputTokens?:number})=>Promise<string>;groq?:(model:string,options:{systemInstruction:string;prompt:string;temperature?:number;maxOutputTokens?:number})=>Promise<string>}):Promise<{text:string;provider:'gemini'|'groq';model:string}>;

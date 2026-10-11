@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
@@ -335,7 +335,7 @@ export async function POST(req: Request) {
   if (!hasTutorAiProvider()) {
     await persistHint(TUTOR_UNAVAILABLE_MESSAGE);
     return NextResponse.json({
-      reply: TUTOR_UNAVAILABLE_MESSAGE,
+      reply: `${TUTOR_UNAVAILABLE_MESSAGE}.\n\n${fallbackReply}`,
       fallback: true,
       unavailable: true,
       provider: "unavailable",
@@ -365,6 +365,7 @@ export async function POST(req: Request) {
     });
 
   let activeProvider: "gemini" | "groq" | undefined;
+  let activeModel: string | undefined;
   const generateReply = async (strictPreSubmit: boolean) => {
     const result = await generateTutorAiText({
       systemInstruction: buildInstruction(strictPreSubmit),
@@ -373,6 +374,13 @@ export async function POST(req: Request) {
       temperature: submitted ? 0.35 : 0.25,
     });
     activeProvider = result.provider;
+    activeModel = result.model;
+    // Only provider/model/time: never store student, question or conversation data.
+    try {
+      await db.execute(sql`insert into tutor_model_usage (provider, model) values (${result.provider}, ${result.model})`);
+    } catch {
+      console.warn("[tutor-model] usage counter unavailable");
+    }
     return normalizeTutorReply(result.text);
   };
 
@@ -467,6 +475,7 @@ export async function POST(req: Request) {
         answerRevealed,
         submitted: false,
         provider: activeProvider,
+        model: activeModel,
       });
     }
 
@@ -486,6 +495,7 @@ export async function POST(req: Request) {
       answerRevealed,
       submitted: true,
       provider: activeProvider,
+      model: activeModel,
     });
   } catch (error) {
     console.error("Tutor request failed", {
@@ -498,7 +508,7 @@ export async function POST(req: Request) {
 
     await persistHint(TUTOR_UNAVAILABLE_MESSAGE);
     return NextResponse.json({
-      reply: TUTOR_UNAVAILABLE_MESSAGE,
+      reply: `${TUTOR_UNAVAILABLE_MESSAGE}.\n\n${fallbackReply}`,
       fallback: true,
       unavailable: true,
       provider: "unavailable",

@@ -1,4 +1,5 @@
 import { generateGeminiText, hasGeminiApiKey } from "@/lib/gemini";
+import { runTutorFallbackChain } from "./tutor-fallback-chain.mjs";
 import {
   resolveGroqFallbackModel,
   resolvePreferredGroqModel,
@@ -17,6 +18,7 @@ type TutorAiOptions = {
 type TutorAiResult = {
   text: string;
   provider: "gemini" | "groq";
+  model: string;
 };
 
 export function hasTutorAiProvider() {
@@ -87,36 +89,12 @@ async function generateGroqTutorText({
 }
 
 export async function generateTutorAiText(options: TutorAiOptions): Promise<TutorAiResult> {
-  const failures: string[] = [];
-
-  if (hasGeminiApiKey()) {
-    try {
-      const text = await generateGeminiText(options);
-      return { text, provider: "gemini" };
-    } catch (error) {
-      failures.push(error instanceof Error ? error.message : String(error));
-    }
-  }
-
-  if (process.env.GROQ_API_KEY) {
-    const preferredModel = resolvePreferredGroqModel(process.env.GROQ_MODEL);
-    const fallbackModel = resolveGroqFallbackModel(preferredModel);
-
-    for (const model of Array.from(new Set([preferredModel, fallbackModel]))) {
-      try {
-        const text = await generateGroqTutorText({ options, model });
-        return { text, provider: "groq" };
-      } catch (error) {
-        failures.push(
-          `${model}: ${error instanceof Error ? error.message : String(error)}`
-        );
-      }
-    }
-  }
-
-  throw new Error(
-    failures.length > 0
-      ? `Tutor AI providers unavailable: ${failures.join(" | ")}`
-      : "No tutor AI provider is configured."
-  );
+  return runTutorFallbackChain(options, {
+    gemini: hasGeminiApiKey()
+      ? (model, input) => generateGeminiText({ ...input, model })
+      : undefined,
+    groq: process.env.GROQ_API_KEY
+      ? (model, input) => generateGroqTutorText({ options: input, model })
+      : undefined,
+  });
 }
