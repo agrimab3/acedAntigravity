@@ -8,6 +8,7 @@ import {
 } from "../lib/mockTest/formAssembler.mjs";
 
 const { Pool } = pg;
+throw new Error("Dec 5 Form A is reviewed and frozen. Use scripts/dec5-reviewed-form.mjs import with the committed reviewed JSON; never assemble a new Dec 5 form.");
 const SLUG = "2026-12-05";
 const VERSION = "A";
 const COUNTS = { english: 50, math: 45, reading: 36, science: 40 };

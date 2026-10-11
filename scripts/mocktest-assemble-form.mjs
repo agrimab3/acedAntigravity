@@ -27,6 +27,9 @@ const version = (args.version || "A").trim().toUpperCase();
 const dryRun = args["dry-run"] === "1" || args["dry-run"] === "true";
 const replaceDraft = args["replace-draft"] === "1" || args["replace-draft"] === "true";
 
+if (slug === "2026-12-05" && version === "A") {
+  throw new Error("Dec 5 Form A is reviewed and frozen. Import the committed reviewed form; do not assemble a new one.");
+}
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 function fail(message, details = null) {
