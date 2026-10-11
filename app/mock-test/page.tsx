@@ -76,6 +76,7 @@ export default async function MockTestPage() {
     <div className={`${styles.pageRoot} ${dmSerif.variable} ${dmSans.variable}`}>
       {/* Animated starry sky background */}
       <NightSky />
+        <p style={{position:"relative",zIndex:2,textAlign:"center",fontSize:12,color:"#AFA9EC",padding:"8px"}}>A built-in calculator is included. You can also use your own ACT-approved calculator.</p>
 
       <div className={styles.contentWrapper}>
         {/* ==================================================================

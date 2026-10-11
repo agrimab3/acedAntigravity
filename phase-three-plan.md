@@ -8,7 +8,7 @@ Build Aced's official ACT-style practice test experience:
 - a full-test mode with optional Science
 - realistic pacing, navigation, and submission flow
 - post-test score reporting tied back to constellation stars
-- Math-specific calculator support, with Desmos as the preferred long-term calculator experience
+- Math-specific calculator support, with Aced’s built-in calculator as the preferred long-term calculator experience
 
 ## Product Direction
 
@@ -83,7 +83,7 @@ Expected UX:
 Preferred long-term direction:
 
 - integrate a built-in graphing calculator for Math
-- use Desmos if technically feasible and visually clean
+- use Aced’s built-in calculator if technically feasible and visually clean
 
 Product rule:
 
@@ -150,7 +150,7 @@ Phase 3B/3C foundation is now live:
 1. timed runner works for section and full-test modes
 2. practice-test sessions/results persist in PostgreSQL
 3. report screens include missed-skill and missed-question review
-4. Math sections can open Desmos inside the runner
+4. Math sections can open Aced’s built-in calculator inside the runner
 5. completed timed tests now influence the main dashboard ACT estimates
 6. practice-test history and pacing analytics are now live
 

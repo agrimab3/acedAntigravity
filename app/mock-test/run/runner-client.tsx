@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import DesmosPanel from "@/components/DesmosPanel";
+import AcedCalculator from "@/components/calculator/AcedCalculator";
 import NightSky from "@/components/NightSky";
 import QuestionContent from "@/components/question-content/QuestionContent";
 import {
@@ -183,6 +183,11 @@ export default function MockTestRunner({
   const reviewButtonRef = useRef<HTMLButtonElement>(null);
   const keepWorkingRef = useRef<HTMLButtonElement>(null);
   const calculatorButtonRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (session?.status === "completed") {
+      try { localStorage.removeItem("aced-calculator:mock:" + session.registrationId + ":math"); } catch {}
+    }
+  }, [session?.status, session?.registrationId]);
   const choiceRefs = useRef<Array<HTMLInputElement | null>>([]);
   const announcedRef = useRef(new Set<string>());
   const previousSessionStatusRef = useRef<SessionPayload["status"] | null>(null);
@@ -1141,7 +1146,7 @@ export default function MockTestRunner({
     const onKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
       const insideCalculator = Boolean(
-        target?.closest("[data-desmos-calculator], [data-desmos-panel]")
+        target?.closest("[data-aced-calculator], [data-calculator-panel]")
       );
       const typingTarget =
         target?.isContentEditable ||
@@ -1251,7 +1256,7 @@ export default function MockTestRunner({
               refreshes or Wi-Fi drops. Submitted sections are locked.
             </p>
             <p className={styles.lobbyRule}>
-              Math has a built-in Desmos calculator. You can also use your own ACT-approved calculator.
+              A built-in calculator is included. You can also use your own ACT-approved calculator.
             </p>
             <button
               className={styles.primaryAction}
@@ -1709,7 +1714,7 @@ export default function MockTestRunner({
                         className={styles.calculatorButton}
                         onClick={() => setShowCalculator((current) => !current)}
                         aria-expanded={showCalculator}
-                        aria-controls="mock-desmos-panel"
+                        aria-controls="mock-calculator-panel"
                       >
                         <span className={styles.calculatorIcon} aria-hidden="true">▦</span>
                         {showCalculator ? "hide calculator" : "calculator"}
@@ -1789,11 +1794,11 @@ export default function MockTestRunner({
       </div>
 
       {mockSectionAllowsCalculator(session.section.key) ? (
-        <DesmosPanel
-          id="mock-desmos-panel"
+        <AcedCalculator
+          id="mock-calculator-panel"
           isOpen={showCalculator}
           onClose={() => setShowCalculator(false)}
-          storageKey={"aced-desmos:mock:" + session.registrationId + ":math"}
+          storageKey={"aced-calculator:mock:" + session.registrationId + ":math"}
           returnFocusRef={calculatorButtonRef}
           variant="mock"
         />

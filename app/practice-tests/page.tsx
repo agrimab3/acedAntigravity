@@ -827,7 +827,7 @@ export default function PracticeTestsPage() {
                 {[
                   { value: selectedMode.questionCount, label: "questions" },
                   { value: formatDuration(selectedMode.durationMinutes), label: "timed" },
-                  { value: selectedMode.includesDesmos ? "desmos" : "focus", label: selectedMode.includesDesmos ? "math tool" : "mode" },
+                  { value: selectedMode.includesCalculator ? "calculator" : "focus", label: selectedMode.includesCalculator ? "math tool" : "mode" },
                 ].map((item) => (
                   <div
                     key={item.label}

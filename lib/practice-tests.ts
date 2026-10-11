@@ -15,7 +15,7 @@ export type PracticeTestMode = {
   accentColor: string;
   constellation: string;
   description: string;
-  includesDesmos: boolean;
+  includesCalculator: boolean;
   scienceOptional: boolean;
   sections: Array<{
     key: PracticeTestSectionKey;
@@ -37,7 +37,7 @@ export const SECTION_TESTS: PracticeTestMode[] = [
     accentColor: "#5DCAA5",
     constellation: "Gemini",
     description: "Production of Writing, Knowledge of Language, and Conventions of Standard English under official ACT timing.",
-    includesDesmos: false,
+    includesCalculator: false,
     scienceOptional: false,
     sections: [{ key: "english", label: "English", questionCount: 50, durationMinutes: 35 }],
   },
@@ -52,7 +52,7 @@ export const SECTION_TESTS: PracticeTestMode[] = [
     accentColor: "#AFA9EC",
     constellation: "Aquarius",
     description: "ACT math pacing with a built-in graphing calculator.",
-    includesDesmos: true,
+    includesCalculator: true,
     scienceOptional: false,
     sections: [{ key: "math", label: "Math", questionCount: 45, durationMinutes: 50 }],
   },
@@ -67,7 +67,7 @@ export const SECTION_TESTS: PracticeTestMode[] = [
     accentColor: "#EF9F27",
     constellation: "Virgo",
     description: "Four ACT passage sets with official pacing for literary narrative, social science, humanities, and natural science.",
-    includesDesmos: false,
+    includesCalculator: false,
     scienceOptional: false,
     sections: [{ key: "reading", label: "Reading", questionCount: 36, durationMinutes: 40 }],
   },
@@ -82,7 +82,7 @@ export const SECTION_TESTS: PracticeTestMode[] = [
     accentColor: "#F0997B",
     constellation: "Sagittarius",
     description: "Optional science timing with data representation, research summaries, and conflicting viewpoints.",
-    includesDesmos: false,
+    includesCalculator: false,
     scienceOptional: true,
     sections: [{ key: "science", label: "Science", questionCount: 40, durationMinutes: 40 }],
   },
@@ -99,7 +99,7 @@ export const FULL_TESTS: PracticeTestMode[] = [
     accentColor: "#F4F0E8",
     constellation: "Full Sky",
     description: "The full multiple-choice ACT flow with English, Math, Reading, and optional Science in sequence.",
-    includesDesmos: true,
+    includesCalculator: true,
     scienceOptional: true,
     sections: [
       { key: "english", label: "English", questionCount: 50, durationMinutes: 35 },
@@ -118,7 +118,7 @@ export const FULL_TESTS: PracticeTestMode[] = [
     accentColor: "#D6D3FF",
     constellation: "Core Sky",
     description: "English, Math, and Reading only for students who want the core ACT without Science.",
-    includesDesmos: true,
+    includesCalculator: true,
     scienceOptional: true,
     sections: [
       { key: "english", label: "English", questionCount: 50, durationMinutes: 35 },

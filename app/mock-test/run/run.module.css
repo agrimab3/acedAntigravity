@@ -12,7 +12,7 @@
   font-family: var(--font-dm-sans), "DM Sans", system-ui, sans-serif;
 }
 
-.page > *:not(:first-child):not([data-desmos-panel]) {
+.page > *:not(:first-child):not([data-calculator-panel]) {
   position: relative;
   z-index: 1;
 }

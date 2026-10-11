@@ -1,0 +1,29 @@
+.shiftHost {
+  transition:
+    padding-right 250ms ease,
+    padding-bottom 250ms ease;
+}
+
+@media (min-width: 1025px) {
+  .shiftHostOpen {
+    padding-right: min(440px, 38vw);
+  }
+}
+
+@media (max-width: 1024px) {
+  .shiftHostOpen {
+    padding-bottom: min(60dvh, 620px);
+  }
+}
+
+@media (max-width: 760px) {
+  .shiftHostOpen {
+    padding-bottom: min(60dvh, 560px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shiftHost {
+    transition: none;
+  }
+}

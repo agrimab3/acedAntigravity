@@ -79,7 +79,7 @@
   - section score breakdowns
   - missed-skill analysis
   - missed-question review
-- Added Math calculator support inside the timed runner via Desmos
+- Added Math calculator support inside the timed runner via Aced’s built-in calculator
 - Synced completed practice-test results back into the dashboard ACT estimate model so timed tests now influence section/composite score estimates
 - Added practice-test history on the `Practice Tests` page
 - Added pacing analytics to timed test reports and history cards

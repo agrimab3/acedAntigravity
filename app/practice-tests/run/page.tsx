@@ -11,9 +11,9 @@ import {
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import FeedbackForm from "@/components/FeedbackForm";
-import DesmosPanel from "@/components/DesmosPanel";
+import AcedCalculator from "@/components/calculator/AcedCalculator";
 import QuestionContent from "@/components/question-content/QuestionContent";
-import desmosPanelStyles from "@/components/DesmosPanel.module.css";
+import calculatorLayoutStyles from "@/components/calculator/practice-layout.module.css";
 import { useSession } from "next-auth/react";
 import {
   getPracticeTestMode,
@@ -925,6 +925,14 @@ function PracticeTestRunContent() {
   const [showCalculator, setShowCalculator] = useState(false);
   const [calculatorStorageId, setCalculatorStorageId] = useState<string | null>(null);
   const calculatorButtonRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (phase === "report" && mode) {
+      try {
+        localStorage.removeItem("aced-calculator:practice:" + (calculatorStorageId ?? sessionId ?? mode.key) + ":math");
+        sessionStorage.removeItem("aced-practice-calculator-run:" + mode.key);
+      } catch {}
+    }
+  }, [phase, mode, calculatorStorageId, sessionId]);
   const [report, setReport] = useState<CompletionReport | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [loadError, setLoadError] = useState<RunnerLoadError | null>(null);
@@ -952,7 +960,7 @@ function PracticeTestRunContent() {
       return;
     }
 
-    const key = "aced-practice-desmos-run:" + mode.key;
+    const key = "aced-practice-calculator-run:" + mode.key;
     try {
       let storageId = window.sessionStorage.getItem(key);
       if (!storageId) {
@@ -1073,7 +1081,7 @@ function PracticeTestRunContent() {
     if (
       phase !== "running" ||
       currentSection?.sectionKey !== "math" ||
-      !mode?.includesDesmos
+      !mode?.includesCalculator
     ) {
       return;
     }
@@ -1081,7 +1089,7 @@ function PracticeTestRunContent() {
     const onKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
       const insideCalculator = Boolean(
-        target?.closest("[data-desmos-calculator], [data-desmos-panel]")
+        target?.closest("[data-aced-calculator], [data-calculator-panel]")
       );
       const typingTarget =
         target?.isContentEditable ||
@@ -1098,7 +1106,7 @@ function PracticeTestRunContent() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [phase, currentSection?.sectionKey, mode?.includesDesmos]);
+  }, [phase, currentSection?.sectionKey, mode?.includesCalculator]);
 
   const currentQuestionIndex = currentQuestionIndices[currentSectionIndex] ?? 0;
   const currentQuestion = currentSection?.questions[currentQuestionIndex] ?? null;
@@ -1786,7 +1794,7 @@ function PracticeTestRunContent() {
             {[
               { value: totalQuestionCount, label: "questions" },
               { value: formatDurationLabel(mode.durationMinutes), label: "timer" },
-              { value: mode.includesDesmos ? "calculator" : "focus mode", label: "tools" },
+              { value: mode.includesCalculator ? "calculator" : "focus mode", label: "tools" },
               { value: "live bank", label: "question set" },
             ].map((item) => (
               <div
@@ -2504,8 +2512,8 @@ function PracticeTestRunContent() {
       />
       <div
         className={
-          desmosPanelStyles.shiftHost +
-          (showCalculator ? " " + desmosPanelStyles.shiftHostOpen : "")
+          calculatorLayoutStyles.shiftHost +
+          (showCalculator ? " " + calculatorLayoutStyles.shiftHostOpen : "")
         }
         style={{ maxWidth: "1240px", margin: "0 auto", position: "relative", zIndex: 1 }}
       >
@@ -2669,14 +2677,14 @@ function PracticeTestRunContent() {
               })}
             </div>
 
-            {currentSection.sectionKey === "math" && mode.includesDesmos ? (
+            {currentSection.sectionKey === "math" && mode.includesCalculator ? (
               <div style={{ marginBottom: "1rem" }}>
                 <button
                   ref={calculatorButtonRef}
                   type="button"
                   onClick={() => setShowCalculator((current) => !current)}
                   aria-expanded={showCalculator}
-                  aria-controls="practice-desmos-panel"
+                  aria-controls="practice-calculator-panel"
                   style={{
                     minHeight: "44px",
                     padding: "10px 16px",
@@ -2917,13 +2925,13 @@ function PracticeTestRunContent() {
         </div>
       </div>
 
-      {currentSection.sectionKey === "math" && mode.includesDesmos ? (
-        <DesmosPanel
-          id="practice-desmos-panel"
+      {currentSection.sectionKey === "math" && mode.includesCalculator ? (
+        <AcedCalculator
+          id="practice-calculator-panel"
           isOpen={showCalculator}
           onClose={() => setShowCalculator(false)}
           storageKey={
-            "aced-desmos:practice:" +
+            "aced-calculator:practice:" +
             (calculatorStorageId ?? sessionId ?? mode.key) +
             ":math"
           }
