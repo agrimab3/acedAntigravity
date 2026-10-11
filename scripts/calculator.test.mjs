@@ -32,3 +32,15 @@ test('parabola and line intersect twice',()=>{const pts=intersections('y=x^2','y
 test('parabola zeros',()=>{const pts=specialPoints([compileCurve('y=x^2-4')],bounds).filter(p=>p.kind==='x-intercept');assert.ok(pts.some(p=>Math.abs(p.x-2)<.01));assert.ok(pts.some(p=>Math.abs(p.x+2)<.01));});
 test('vertical line intersects parabola',()=>{const pts=intersections('x=3','y=x^2');assert.ok(pts.some(p=>Math.hypot(p.x-3,p.y-9)<.03));});
 test('circle intersects horizontal line',()=>{const pts=intersections('(x-2)^2+(y+1)^2=9','y=-1');assert.ok(pts.some(p=>Math.hypot(p.x+1,p.y+1)<.03));assert.ok(pts.some(p=>Math.hypot(p.x-5,p.y+1)<.03));});
+
+test('ordinary ACT graph notation, pi and decimals',()=>{
+ const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-8,`${a} != ${b}`);
+ near(compileCurve('y=3πx').fn(2,6*Math.PI),0);
+ near(compileCurve('y=2πx').fn(3,6*Math.PI),0);
+ near(compileCurve('y=πx²').fn(2,4*Math.PI),0);
+ near(compileCurve('y=0.5x+1.25').fn(2,2.25),0);
+ near(compileCurve('y=3(x+1)').fn(2,9),0);
+ near(value('2π'),2*Math.PI);
+ near(value('0.5+1.25'),1.75);
+ assert.throws(()=>calculate('x.constructor'),/unsupported|numbers/);
+});

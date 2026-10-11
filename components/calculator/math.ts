@@ -2,7 +2,7 @@ import { create, all, type MathNode } from 'mathjs';
 
 const math = create(all, { number: 'Fraction', predictable: true });
 const graphMath = create(all, { number: 'number', predictable: true });
-const forbidden = /\b(?:import|createUnit|evaluate|parse|simplify|derivative|resolve|typed|chain|map|filter|forEach|constructor|prototype|__proto__|matrix|ones|zeros|random|pickRandom|help|unit|index|subset|range|concat|resize|size|config)\b|[;{}\[\]"'`]|\./i;
+const forbidden = /\b(?:import|createUnit|evaluate|parse|simplify|derivative|resolve|typed|chain|map|filter|forEach|constructor|prototype|__proto__|matrix|ones|zeros|random|pickRandom|help|unit|index|subset|range|concat|resize|size|config)\b|[;{}\[\]"'`]|\.(?!\d)/i;
 const allowedFunctions = new Set(['sin','cos','tan','asin','acos','atan','sqrt','abs','log','ln','exp','floor','ceil','round']);
 const allowedSymbols = new Set(['x','y','pi','e','ans']);
 export type AngleMode = 'deg' | 'rad';
@@ -16,7 +16,7 @@ export function friendlyError(error: unknown): string {
 }
 function checked(expression: string, graph: boolean): MathNode {
   if (expression.length > 180 || forbidden.test(expression)) throw new Error('unsupported input');
-  const normalized = expression.replace(/[−–]/g, '-').replace(/×/g, '*').replace(/÷/g, '/').replace(/π/g, 'pi').replace(/√\s*\(/g, 'sqrt(').replace(/√\s*([\w.]+)/g, 'sqrt($1)').replace(/(\d+(?:\.\d+)?)%/g, '($1/100)');
+  const normalized = expression.replace(/[−–]/g, '-').replace(/×/g, '*').replace(/÷/g, '/').replace(/²/g, '^2').replace(/π/g, ' pi ').replace(/√\s*\(/g, 'sqrt(').replace(/√\s*([\w.]+)/g, 'sqrt($1)').replace(/(\d+(?:\.\d+)?)%/g, '($1/100)');
   let node: MathNode;
   try { node = (graph ? graphMath : math).parse(normalized); } catch (e) { throw new Error(friendlyError(e)); }
   node.traverse((n) => {

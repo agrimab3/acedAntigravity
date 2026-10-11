@@ -6,6 +6,10 @@ try {
   const page=await browser.newPage({viewport});
   await page.goto('http://localhost:3322/dev/calculator');
   await page.getByRole('tab',{name:'graph'}).click();
+  await page.getByRole('textbox',{name:'Equation 1'}).fill('y=3πx');
+  await page.getByRole('textbox',{name:'Equation 1'}).blur();
+  assert.equal(await page.getByText('check the equation and try again').count(),0);
+  await page.getByRole('textbox',{name:'Equation 1'}).fill('y=x^2');
   await page.getByRole('button',{name:/intersection \(2, 4\)/}).first().click();
   await page.getByText('intersection (2, 4)').waitFor();
   await page.getByRole('tab',{name:'scientific'}).click();
