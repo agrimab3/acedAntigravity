@@ -46,6 +46,7 @@ export default function ProgressPage() {
   });
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState<{
+    streaks: { current: number; best: number };
     totals: {
       drillsCompleted: number;
       testRunsCompleted: number;
@@ -398,6 +399,8 @@ export default function ProgressPage() {
           <>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(6, minmax(0, 1fr))", gap: "12px", marginBottom: "1.4rem" }}>
               {[
+                { value: progress.streaks.current, label: "current streak (days)" },
+                { value: progress.streaks.best, label: "best streak (days)" },
                 { value: progress.totals.drillsCompleted, label: "drills" },
                 { value: progress.totals.testRunsCompleted, label: "test runs" },
                 { value: progress.totals.questionsAnswered, label: "questions" },

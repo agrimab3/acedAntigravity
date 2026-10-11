@@ -9,6 +9,7 @@ import {
 import { getAuthSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { getPracticeTestMode } from "@/lib/practice-test-engine";
+import { getPracticeStreaks } from "@/lib/practice-streak.mjs";
 
 function average(values: number[]) {
   if (values.length === 0) return 0;
@@ -112,6 +113,7 @@ export async function GET() {
   }));
 
   return NextResponse.json({
+    streaks: getPracticeStreaks([...drillRows, ...testRows].map(row => row.completedAt)),
     totals: {
       drillsCompleted: drillRows.length,
       testRunsCompleted: testRows.length,
