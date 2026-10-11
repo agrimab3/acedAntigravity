@@ -8,7 +8,7 @@ import { getMockFormAudit } from "@/lib/mockTest/formAudit";
 
 const patchSchema = z.object({
   formId: z.string().uuid(),
-  action: z.enum(["mark-review", "lock"]),
+  action: z.enum(["mark-review", "lock", "unlock"]),
 });
 
 export async function GET(request: Request) {
@@ -60,6 +60,32 @@ export async function PATCH(request: Request) {
   const audit = await getMockFormAudit(parsed.data.formId);
   if (!audit) {
     return NextResponse.json({ error: "Form not found." }, { status: 404 });
+  }
+
+  if (parsed.data.action === "unlock") {
+    if (audit.form.status !== "locked") {
+      return NextResponse.json(
+        { error: "Only locked forms can be deliberately unlocked." },
+        { status: 409 }
+      );
+    }
+
+    const now = new Date();
+    const [updated] = await db
+      .update(mockTestForms)
+      .set({
+        status: "review",
+        lockedAt: null,
+        lockedByUserId: null,
+        updatedAt: now,
+      })
+      .where(eq(mockTestForms.id, parsed.data.formId))
+      .returning();
+
+    return NextResponse.json({
+      form: updated,
+      audit: await getMockFormAudit(parsed.data.formId),
+    });
   }
 
   if (!audit.pass) {

@@ -23,8 +23,6 @@
     "mocktest:fill-seats": "node --env-file=.env scripts/mocktest-fill-seats.mjs",
     "mocktest:invite": "node --env-file=.env scripts/mocktest-invite.mjs",
     "mocktest:assemble-form": "node --env-file=.env scripts/mocktest-assemble-form.mjs",
-    "mocktest:dev-rehearsal": "node --env-file=.env scripts/mocktest-dev-rehearsal.mjs",
-    "mocktest:dev-rehearsal:cleanup": "node --env-file=.env scripts/mocktest-dev-rehearsal.mjs --cleanup",
     "mocktest:release": "node --experimental-strip-types --env-file=.env scripts/mocktest-release.ts",
     "mocktest:dev-results": "node --experimental-strip-types --env-file=.env scripts/mocktest-dev-results.ts",
     "mocktest:seed-results": "node --experimental-strip-types --env-file=.env scripts/mocktest-seed-results.mjs",
@@ -32,7 +30,9 @@
     "mocktest:admin-busy": "node --env-file=.env scripts/mocktest-admin-busy.mjs",
     "check:secrets": "node scripts/check-secrets.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
-    "test:all": "node scripts/run-all-tests.mjs"
+    "test:all": "node scripts/run-all-tests.mjs",
+    "mocktest:prepare-dec5": "node --experimental-strip-types --env-file=.env scripts/prepare-dec5-form.mjs",
+    "mocktest:review-dec5": "node --experimental-strip-types --env-file=.env scripts/write-dec5-form-review.mjs"
   },
   "dependencies": {
     "@sentry/nextjs": "^11.6.0",

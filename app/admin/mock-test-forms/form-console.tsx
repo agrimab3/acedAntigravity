@@ -78,7 +78,7 @@ export default function FormConsole() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function act(action: "mark-review" | "lock") {
+  async function act(action: "mark-review" | "lock" | "unlock") {
     if (!audit) return;
     setBusy(true);
     setMessage(null);
@@ -91,7 +91,13 @@ export default function FormConsole() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Form action failed.");
       setAudit(data.audit);
-      setMessage(action === "lock" ? "Form locked. Assignments are now immutable." : "Form moved to review.");
+      setMessage(
+        action === "lock"
+          ? "Form locked. Assignments are now immutable."
+          : action === "unlock"
+            ? "Form deliberately unlocked and returned to review."
+            : "Form moved to review."
+      );
       await loadForms();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Form action failed.");
@@ -156,6 +162,11 @@ export default function FormConsole() {
                   {audit.form.status === "review" ? (
                     <button disabled={busy || !audit.pass} onClick={() => void act("lock")} style={{ padding: "10px 14px", borderRadius: 10 }}>
                       lock form
+                    </button>
+                  ) : null}
+                  {audit.form.status === "locked" ? (
+                    <button disabled={busy} onClick={() => void act("unlock")} style={{ padding: "10px 14px", borderRadius: 10 }}>
+                      unlock on purpose
                     </button>
                   ) : null}
                 </div>
