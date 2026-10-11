@@ -219,6 +219,7 @@ try {
         reviewErrors: Number(summary.reviewErrors ?? 0),
         runState: summary.runState ?? "unknown",
         pauseReason: summary.pauseReason ?? null,
+        providerFailure: summary.topics?.find(topic => topic.providerFailure)?.providerFailure ?? null,
         provider: summary.provider ?? null,
         model: summary.model ?? null,
       });

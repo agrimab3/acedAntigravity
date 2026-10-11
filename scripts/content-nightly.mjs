@@ -20,9 +20,25 @@ try{
   const stderr=child.stderr||'';
   const safeError=(value)=>String(value||'').replaceAll(key,'[REDACTED]').replace(/AIza[\w-]{20,}/g,'[REDACTED]').slice(0,1400);
   const at=output.lastIndexOf('Generation batch summary:');
-  if(at>=0){try{const parsed=JSON.parse(output.slice(output.indexOf('{',at)));for(const job of parsed.jobs||[]){result.inserted+=Number(job.inserted||0);result.rejected+=Number(job.reviewRejected||0);result.skipped+=Number(job.skipped||0);if(job.runState==='paused_due_to_provider'||/429|RESOURCE_EXHAUSTED|quota|rate.limit/i.test(job.error||''))result.quota_paused++;if(job.error||job.pauseReason)result.note=safeError(job.pauseReason||job.error);} }catch{result.note='Unable to parse generator summary'}}
+  let failureKind = null;
+  if(at>=0){try{
+    const parsed=JSON.parse(output.slice(output.indexOf('{',at)));
+    for(const job of parsed.jobs||[]){
+      result.inserted+=Number(job.inserted||0);
+      result.rejected+=Number(job.reviewRejected||0);
+      result.skipped+=Number(job.skipped||0);
+      const failure=job.providerFailure;
+      const detail=safeError(failure?.message||job.error||'');
+      if(detail)result.note=`${failure?.provider||'gemini'} ${failure?.kind||job.pauseReason||'error'}: ${detail}`;
+      const auth=/invalid api key|api key not valid|unauthorized|authentication|permission denied|http 401|http 403/i.test(detail);
+      const quota=/quota|rate.limit|RESOURCE_EXHAUSTED|429/i.test(detail)||['hard-quota','temporary-rate-limit'].includes(failure?.kind);
+      if(auth)failureKind='auth_error';
+      else if(quota&&!failureKind){failureKind='quota_paused';result.quota_paused++;}
+      else if(job.runState==='paused_due_to_provider'&&!failureKind)failureKind='failed';
+    }
+  }catch{result.note='Unable to parse generator summary'}}
   if(result.inserted>limit)throw Error('Inserted count exceeded cap');
-  result.status=child.status===0?'completed':result.quota_paused?'quota_paused':'failed';
+  result.status=failureKind|| (child.status===0?'completed':'failed');
   if(child.error)result.note=child.error.name;
   if(!result.note&&child.status!==0)result.note=safeError(stderr||output.slice(-1400));
   if(!result.note&&child.status!==0)result.note='Generator exited unsuccessfully';
