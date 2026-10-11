@@ -14,16 +14,19 @@ try{
  if(!key){result.note='Missing CONTENT_FACTORY_GEMINI_API_KEY; skipped';console.log(result.note)}
  else{
   // Explicitly remove all tutor and other provider credentials. No Groq fallback.
-  const env={...process.env,GEMINI_API_KEY:key,GOOGLE_API_KEY:key,QUESTION_GENERATION_PROVIDER:'gemini',QUESTION_REVIEW_PROVIDER:'gemini',CONTENT_GENERATION_PROVIDER:'gemini',GROQ_API_KEY:'',OPENROUTER_API_KEY:'',OPENROUTER_GENERATION_MODEL:'',OPENROUTER_REVIEW_MODEL:'',OLLAMA_GENERATION_MODEL:'',OLLAMA_REVIEW_MODEL:'',OLLAMA_MODEL:'',OLLAMA_API_BASE_URL:'',OLLAMA_BASE_URL:''};
+  const env={...process.env,GEMINI_GENERATION_MODEL:'gemini-3.1-flash-lite-preview',GEMINI_REVIEW_MODEL:'gemini-2.5-flash',CONTENT_FACTORY_REQUEST_SPACING_MS:'5000',GEMINI_API_KEY:key,GOOGLE_API_KEY:key,QUESTION_GENERATION_PROVIDER:'gemini',QUESTION_REVIEW_PROVIDER:'gemini',CONTENT_GENERATION_PROVIDER:'gemini',GROQ_API_KEY:'',OPENROUTER_API_KEY:'',OPENROUTER_GENERATION_MODEL:'',OPENROUTER_REVIEW_MODEL:'',OLLAMA_GENERATION_MODEL:'',OLLAMA_REVIEW_MODEL:'',OLLAMA_MODEL:'',OLLAMA_API_BASE_URL:'',OLLAMA_BASE_URL:''};
   const child=spawnSync('node',['scripts/content-generate-next.mjs','--scope=practice',`--limit=${limit}`,'--provider=gemini'],{cwd:process.cwd(),env,encoding:'utf8',timeout:30*60*1000,maxBuffer:10*1024*1024});
   const output=child.stdout||'';
+  const stderr=child.stderr||'';
+  const safeError=(value)=>String(value||'').replaceAll(key,'[REDACTED]').replace(/AIza[\w-]{20,}/g,'[REDACTED]').slice(0,1400);
   const at=output.lastIndexOf('Generation batch summary:');
-  if(at>=0){try{const parsed=JSON.parse(output.slice(output.indexOf('{',at)));for(const job of parsed.jobs||[]){result.inserted+=Number(job.inserted||0);result.rejected+=Number(job.reviewRejected||0);result.skipped+=Number(job.skipped||0);if(job.runState==='paused_due_to_provider'||/quota|rate.limit/i.test(job.error||''))result.quota_paused++;} }catch{result.note='Unable to parse generator summary'}}
+  if(at>=0){try{const parsed=JSON.parse(output.slice(output.indexOf('{',at)));for(const job of parsed.jobs||[]){result.inserted+=Number(job.inserted||0);result.rejected+=Number(job.reviewRejected||0);result.skipped+=Number(job.skipped||0);if(job.runState==='paused_due_to_provider'||/429|RESOURCE_EXHAUSTED|quota|rate.limit/i.test(job.error||''))result.quota_paused++;if(job.error||job.pauseReason)result.note=safeError(job.pauseReason||job.error);} }catch{result.note='Unable to parse generator summary'}}
   if(result.inserted>limit)throw Error('Inserted count exceeded cap');
   result.status=child.status===0?'completed':result.quota_paused?'quota_paused':'failed';
   if(child.error)result.note=child.error.name;
+  if(!result.note&&child.status!==0)result.note=safeError(stderr||output.slice(-1400));
   if(!result.note&&child.status!==0)result.note='Generator exited unsuccessfully';
-  console.log(JSON.stringify({status:result.status,requested:limit,inserted:result.inserted,rejected:result.rejected,skipped:result.skipped,quota_paused:result.quota_paused,note:result.note}));
+  console.log(JSON.stringify({generationModel:env.GEMINI_GENERATION_MODEL,reviewModel:env.GEMINI_REVIEW_MODEL,status:result.status,requested:limit,inserted:result.inserted,rejected:result.rejected,skipped:result.skipped,quota_paused:result.quota_paused,note:result.note}));
  }
 } catch(e){result.status='failed';result.note=e.message;console.log('Factory failed:',e.message);process.exitCode=1}
 finally{if(runId)await db.query('update content_factory_runs set finished_at=now(),status=$2,inserted=$3,rejected=$4,skipped=$5,quota_paused=$6,note=$7 where id=$1',[runId,result.status,result.inserted,result.rejected,result.skipped,result.quota_paused,result.note]);await db.end()}

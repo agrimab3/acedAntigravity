@@ -1856,6 +1856,11 @@ async function fetchProviderResponse(provider, url, options) {
 }
 
 async function requestGeminiJson({ model, systemPrompt, userPrompt, schema, temperature = 0.35 }) {
+  if (process.env.CONTENT_FACTORY_GEMINI_API_KEY) {
+    const allowed = new Set(['gemini-3.1-flash-lite-preview','gemini-2.5-flash','gemini-3-flash-preview','gemini-2.5-flash-lite']);
+    if (!allowed.has(model)) throw new Error(`Content factory model is not on free-tier allowlist: ${model}`);
+    await new Promise(resolve => setTimeout(resolve, Math.max(5000,Number(process.env.CONTENT_FACTORY_REQUEST_SPACING_MS)||5000)));
+  }
   const response = await fetchProviderResponse("Gemini", `${resolveGeminiBaseUrl()}/models/${model}:generateContent`, {
     method: "POST",
     headers: {

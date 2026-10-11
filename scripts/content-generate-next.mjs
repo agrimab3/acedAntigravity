@@ -195,11 +195,12 @@ try {
       `--difficulty-plan=${buildDifficultyPlan(job.difficultyPlan)}`,
       "--status=draft",
       `--usage-scope=${scope}`,
-      "--delay-ms=0",
+      "--delay-ms=5000",
       "--json=1",
     ];
     if (provider) childArgs.push(`--provider=${provider}`);
     if (model) childArgs.push(`--model=${model}`);
+    if (process.env.CONTENT_FACTORY_GEMINI_API_KEY) { childArgs.push("--model=gemini-3.1-flash-lite-preview", "--review-model=gemini-2.5-flash"); }
 
     console.log(`\nGenerating ${job.sectionKey}/${job.topicSlug}...`);
     try {
@@ -225,7 +226,7 @@ try {
       results.push({
         ...job,
         inserted: 0,
-        error: error instanceof Error ? error.message : "unknown generation error",
+        error: error instanceof Error ? `${error.message} ${error.stdout || ""} ${error.stderr || ""}`.slice(-3500) : "unknown generation error",
       });
     }
     if (results.at(-1)?.runState === "paused_due_to_provider" || results.at(-1)?.error) {
