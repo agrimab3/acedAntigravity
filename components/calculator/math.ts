@@ -8,15 +8,46 @@ const allowedSymbols = new Set(['x','y','pi','e','ans']);
 export type AngleMode = 'deg' | 'rad';
 export function friendlyError(error: unknown): string {
   const s = error instanceof Error ? error.message : String(error);
+  if (/something is missing after|a bracket isn’t closed|there’s an extra \)|use x and y only|add something after =/.test(s)) return s;
   if (/zero|Infinity|divide/i.test(s)) return 'cannot divide by zero';
+  if (/unexpected.*\)|extra.*\)|unmatched.*\)/i.test(s)) return 'there’s an extra )';
   if (/parenthesis|bracket|\)/i.test(s)) return 'a bracket isn’t closed';
   if (/end of expression|unexpected end|value expected|operator expected/i.test(s)) return 'something is missing after an operator';
-  if (/symbol|undefined|function|variable/i.test(s)) return 'use x and y only, or supported functions';
+  if (/symbol|undefined|function|variable/i.test(s)) return 'use x and y only';
   return 'check the equation and try again';
+}
+function validateExpressionSyntax(expression: string): void {
+  const trimmed = expression.trim();
+  const operator = trimmed.match(/([+\-−×*÷/^])\s*$/);
+  if (operator) {
+    const display: Record<string,string> = {'*':'×','/':'÷','-':'−'};
+    throw new Error(`something is missing after ${display[operator[1]] ?? operator[1]}`);
+  }
+  let depth = 0;
+  for (const ch of trimmed) {
+    if (ch === '(') depth++;
+    if (ch === ')') { if (depth === 0) throw new Error('there’s an extra )'); depth--; }
+  }
+  if (depth > 0) throw new Error('a bracket isn’t closed');
+  // Only permitted symbols/functions are accepted by checked() after parsing.
+}
+/** Nice-number tick intervals with enough horizontal room for a signed label. */
+export function axisTickStep(span: number, pixels: number): number {
+  if (!(span > 0) || !(pixels > 0)) throw new Error('invalid graph view');
+  const magnitude = Math.max(1, Math.floor(Math.log10(Math.max(1, span))));
+  const labelWidth = 15 + (magnitude + 3) * 7;
+  const desired = span * labelWidth / pixels;
+  const power = Math.pow(10, Math.floor(Math.log10(desired)));
+  for (const multiplier of [1, 2, 5, 10]) {
+    const step = multiplier * power;
+    if (step >= desired) return step;
+  }
+  return 10 * power;
 }
 function checked(expression: string, graph: boolean): MathNode {
   if (expression.length > 180 || forbidden.test(expression)) throw new Error('unsupported input');
   const normalized = expression.replace(/[−–]/g, '-').replace(/×/g, '*').replace(/÷/g, '/').replace(/²/g, '^2').replace(/π/g, ' pi ').replace(/√\s*\(/g, 'sqrt(').replace(/√\s*([\w.]+)/g, 'sqrt($1)').replace(/(\d+(?:\.\d+)?)%/g, '($1/100)');
+  validateExpressionSyntax(normalized);
   let node: MathNode;
   try { node = (graph ? graphMath : math).parse(normalized); } catch (e) { throw new Error(friendlyError(e)); }
   node.traverse((n) => {
@@ -57,7 +88,8 @@ export function compileCurve(expression:string):Curve {
   const match = eq.match(/^(.*?)=(.*)$/);
   const lhs = match ? match[1].trim() : 'y';
   const rhs = match ? match[2].trim() : eq;
-  if (!rhs) throw new Error('something is missing after =');
+  if (!rhs) throw new Error('add something after =');
+  if (match && !lhs) throw new Error('add something before =');
   const kind = lhs === 'y' ? 'function' : lhs === 'x' ? 'vertical' : 'implicit';
   const left = checked(lhs, true).compile();
   const right = checked(rhs, true).compile();

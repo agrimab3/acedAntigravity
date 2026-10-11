@@ -330,7 +330,7 @@ export async function processMockEmailOutbox(now = new Date()) {
     try {
       const response = await resend.emails.send(
         {
-          from: `Aced <${MOCK_EMAIL_FROM}>`,
+          from: MOCK_EMAIL_FROM.includes("<") ? MOCK_EMAIL_FROM : `Aced <${MOCK_EMAIL_FROM}>`,
           replyTo: MOCK_EMAIL_SUPPORT,
           to: target.to,
           subject: target.subject,

@@ -178,7 +178,7 @@ test("header delivery uses CID locally and absolute site URLs in production", ()
   assert.match(outbox, /`\$\{getMockEmailSiteBaseUrl\(\)\}\/email\/\$\{filename\}`/);
   assert.match(outbox, /"cid:aced-header"/);
   assert.match(outbox, /contentId: "aced-header"/);
-  assert.match(outbox, /from: `Aced <\$\{MOCK_EMAIL_FROM\}>`/);
+  assert.match(outbox, /from: MOCK_EMAIL_FROM.includes/);
   assert.match(outbox, /replyTo: MOCK_EMAIL_SUPPORT/);
 });
 
