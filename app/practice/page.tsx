@@ -551,6 +551,9 @@ function PracticeContent() {
     return (
       <div style={{ background: 'linear-gradient(180deg,#0d1b2a,#060d1e,#020408)', minHeight: '100vh', color: '#fff', fontFamily: 'DM Sans,sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
         <div style={{ maxWidth: '520px', width: '100%', textAlign: 'center' }}>
+          <nav aria-label="Choose practice section" style={{display:'flex',flexWrap:'wrap',justifyContent:'center',gap:8,marginBottom:24}}>
+            {(['english','math','reading','science','mixed'] as const).map(choice => <button key={choice} type="button" aria-current={section===choice?'page':undefined} onClick={() => router.push(choice==='mixed'?'/practice-tests':`/practice?section=${choice}`)} style={{border:'1px solid rgba(255,255,255,.25)',borderRadius:18,padding:'8px 13px',background:section===choice?'rgba(93,202,165,.22)':'rgba(255,255,255,.06)',color:'white',cursor:'pointer',textTransform:'capitalize'}} title={choice==='mixed'?'Mixed sections are available in full practice tests':undefined}>{choice==='mixed'?'Mixed (full test)':choice}</button>)}
+          </nav>
           <div style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '.08em', color: meta.color, marginBottom: '10px' }}>
             {section.toUpperCase()} · {meta.constellation}
           </div>

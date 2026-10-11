@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
+test('practice and missed review share bold-markdown formatter',()=>{const component=fs.readFileSync('components/TutorMessage.tsx','utf8');assert.match(component,/part\.startsWith\("\*\*"\).*?<strong/s);for(const file of ['app/practice/page.tsx','app/practice/review/page.tsx']){const page=fs.readFileSync(file,'utf8');assert.match(page,/import TutorMessage from/);assert.match(page,/<TutorMessage text=/);}});
+test('test review tutor is not claimed to use shared renderer without evidence',()=>{const page=fs.readFileSync('app/practice-tests/page.tsx','utf8');assert.match(page,/ask your AI tutor/i);});
