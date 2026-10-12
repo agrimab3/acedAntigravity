@@ -13,6 +13,7 @@ import AcedCalculator from "@/components/calculator/AcedCalculator";
 import NightSky from "@/components/NightSky";
 import QuestionContent from "@/components/question-content/QuestionContent";
 import ReadingPassage from "@/components/question-content/ReadingPassage";
+import SciencePassage from "@/components/question-content/SciencePassage";
 import {
   MOCK_SECTIONS,
   NEXT_MOCK,
@@ -1684,7 +1685,7 @@ export default function MockTestRunner({
         <div
           className={
             styles.mainArea +
-            (multiUnderlinePassage || session.section.key === "reading" ? ` ${styles.longPassageLayout}` : "") +
+            (multiUnderlinePassage || session.section.key === "reading" || session.section.key === "science" ? ` ${styles.longPassageLayout}` : "") +
             " " +
             (!hasPassage ? styles.singleColumn : "") +
             " " +
@@ -1701,7 +1702,7 @@ export default function MockTestRunner({
               {currentQuestion.questionSetTitle ? (
                 <h2>{currentQuestion.questionSetTitle}</h2>
               ) : null}
-              <div className={styles.passageText}>{session.section.key === "reading" && /^001 (?:¶ |  )/.test(currentQuestion.passage ?? "") ? <ReadingPassage text={currentQuestion.passage ?? ""} /> : <QuestionContent text={session.section.key === "english" ? globalEnglishPassage(currentQuestion.passage ?? "", currentQuestion.position) : currentQuestion.passage ?? ""} questionNumber={session.section.key === "english" ? currentQuestion.position : undefined} underlineOrdinal={session.section.key === "english" && activePassageOrdinal ? Math.floor((currentQuestion.position - 1) / 10) * 10 + activePassageOrdinal : activePassageOrdinal} activeUnderline={session.section.key === "english"} />}</div>
+              <div className={styles.passageText}>{session.section.key === "science" && /\*\*Table \d+/.test(currentQuestion.passage ?? "") ? <SciencePassage text={currentQuestion.passage ?? ""} /> : session.section.key === "reading" && /^001 (?:¶ |  )/.test(currentQuestion.passage ?? "") ? <ReadingPassage text={currentQuestion.passage ?? ""} /> : <QuestionContent text={session.section.key === "english" ? globalEnglishPassage(currentQuestion.passage ?? "", currentQuestion.position) : currentQuestion.passage ?? ""} questionNumber={session.section.key === "english" ? currentQuestion.position : undefined} underlineOrdinal={session.section.key === "english" && activePassageOrdinal ? Math.floor((currentQuestion.position - 1) / 10) * 10 + activePassageOrdinal : activePassageOrdinal} activeUnderline={session.section.key === "english"} />}</div>
             </article>
           ) : null}
 

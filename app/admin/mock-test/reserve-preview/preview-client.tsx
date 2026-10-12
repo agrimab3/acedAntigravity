@@ -2,6 +2,7 @@
 import { globalEnglishPassage, globalEnglishPrompt } from '@/lib/mockTest/global-numbering';
 import {useState} from 'react';
 import ReadingPassage from '@/components/question-content/ReadingPassage';
+import SciencePassage from '@/components/question-content/SciencePassage';
 import QuestionContent from '@/components/question-content/QuestionContent';
 import styles from '@/app/mock-test/run/run.module.css';
 
@@ -12,7 +13,7 @@ export default function ReservePreviewClient({section,title,prompt,passage,choic
  <div className={styles.mainArea+' '+styles.longPassageLayout}>
  <article className={styles.passageCard}>
  <div className={styles.passageLabel}>PASSAGE {passageNumber} · {title}</div>
- <div className={styles.passageText}>{section==='reading'?<ReadingPassage text={passage}/>:<QuestionContent text={globalEnglishPassage(passage,number)} questionNumber={number} underlineOrdinal={number} activeUnderline/>}</div>
+ <div className={styles.passageText}>{section==='science'?<SciencePassage text={passage}/>:section==='reading'?<ReadingPassage text={passage}/>:<QuestionContent text={globalEnglishPassage(passage,number)} questionNumber={number} underlineOrdinal={number} activeUnderline/>}</div>
  </article>
  <section className={styles.questionColumn}>
  <div className={styles.questionHeader}><h1>question <span>{number}</span> <small>of {total}</small></h1></div>

@@ -1,0 +1,11 @@
+.root{font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.65;color:inherit;overflow-wrap:break-word}
+.root p{margin:0 0 1.1em}.root ul{padding-left:1.4em;margin:0 0 1.1em}.root li{margin-bottom:.4em}
+.heading{font:700 15px/1.5 Georgia,serif;margin:1.3em 0 .55em}
+.caption{font-weight:700;margin:1.2em 0 .45em;line-height:1.4}
+.note{font-style:italic;font-size:13px;margin:.35em 0 1.2em!important}
+.tableScroll{max-width:100%;overflow-x:auto;margin-bottom:1em}
+.table{width:100%;border-collapse:collapse;font:14px/1.45 system-ui,sans-serif;min-width:max-content}
+.table th,.table td{border:1px solid #8291a5;padding:8px 10px;text-align:center;white-space:nowrap}
+.table th{font-weight:700;background:rgba(130,145,165,.17)}
+.table td:first-child,.table th:first-child{text-align:left}
+.numeric{text-align:right!important;font-variant-numeric:tabular-nums}

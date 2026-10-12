@@ -61,6 +61,35 @@ export function validateReading(items) {
   return {passages:items.length,questions:total};
 }
 
+export function validateScience(items) {
+ assert(items.length===6,'Expected six Science passages');
+ const expected=[6,6,7,7,7,7];
+ const types=['DATA REPRESENTATION','DATA REPRESENTATION','RESEARCH SUMMARIES','RESEARCH SUMMARIES','RESEARCH SUMMARIES','CONFLICTING VIEWPOINTS'];
+ let total=0;const answers={A:0,B:0,C:0,D:0};
+ for(const [index,item] of items.entries()){
+  assert(item.type===types[index],item.title+': passage type');
+  assert(item.passage && item.questions.length===expected[index],item.title+': passage/question count');
+  const tableCount=(item.passage.match(/^\*\*Table \d+(?::[^\n]*)?\*\*$/gm)??[]).length;
+  assert(tableCount===(index===0||index===1||index===3?2:index===2||index===4?3:0),item.title+': table captions');
+  const mix={easy:0,medium:0,hard:0};
+  for(const q of item.questions){
+   assert(q.number===total+1,item.title+': global numbering');
+   assert(q.prompt && q.skill && q.choices && q.explanationByChoice,item.title+' Q'+q.number+': missing content');
+   assert(Object.keys(q.choices).sort().join('')==='ABCD' && Object.keys(q.explanationByChoice).sort().join('')==='ABCD',item.title+' Q'+q.number+': exactly four choices and explanations');
+   assert(Object.values(q.choices).every(Boolean) && Object.values(q.explanationByChoice).every(Boolean),item.title+' Q'+q.number+': empty choice or explanation');
+   assert(!Object.values(q.choices).some(c=>normalize(c)==='no change'),item.title+' Q'+q.number+': NO CHANGE prohibited');
+   assert(new Set(Object.values(q.choices).map(normalize)).size===4,item.title+' Q'+q.number+': duplicate choices');
+   assert(q.answer in answers,item.title+' Q'+q.number+': invalid answer');answers[q.answer]++;
+   assert(q.difficulty in mix,item.title+' Q'+q.number+': invalid difficulty');mix[q.difficulty]++;total++;
+  }
+  const expectedMix=[[2,3,1],[2,3,1],[2,3,2],[2,4,1],[2,3,2],[2,4,1]][index];
+  assert([mix.easy,mix.medium,mix.hard].every((n,i)=>n===expectedMix[i]),item.title+': difficulty mix');
+ }
+ assert(total===40,'Expected 40 Science questions');
+ assert(Object.values(answers).every(n=>n===10),'Expected balanced Science answer key');
+ return {passages:items.length,questions:total,answers};
+}
+
 if (process.argv[1]?.endsWith('validate-act-passages.mjs')) {
   const english = JSON.parse(fs.readFileSync('docs/english-passages-review.json', 'utf8'));
   if (process.argv.includes('--night-garden')) {

@@ -1,0 +1,816 @@
+[
+  {
+    "roman": "I",
+    "type": "DATA REPRESENTATION",
+    "title": "Seeds and Soil Temperature",
+    "passage": "Farmers often plant seeds when the soil reaches a certain temperature. Scientists tested how soil temperature affects *germination* (the sprouting of a seed) in three crop species: lettuce, tomato, and pepper.\n\nFor each species, 100 seeds were placed in trays of moist soil kept at a constant temperature. Trays were kept at 10°C, 15°C, 20°C, 25°C, 30°C, or 35°C. Each day for 14 days, the number of germinated seeds was counted.\n\n**Table 1: Percent of seeds germinated after 14 days**\n\n| Soil temperature (°C) | Lettuce | Tomato | Pepper |\n|---|---|---|---|\n| 10 | 62 | 5 | 0 |\n| 15 | 88 | 38 | 12 |\n| 20 | 95 | 80 | 55 |\n| 25 | 90 | 94 | 83 |\n| 30 | 41 | 92 | 96 |\n| 35 | 8 | 60 | 74 |\n\n**Table 2: Number of days until 50% of seeds had germinated**\n\n| Soil temperature (°C) | Lettuce | Tomato | Pepper |\n|---|---|---|---|\n| 10 | 9 | — | — |\n| 15 | 5 | — | — |\n| 20 | 3 | 6 | 9 |\n| 25 | 3 | 4 | 6 |\n| 30 | — | 4 | 5 |\n| 35 | — | 8 | 7 |\n\n*— = fewer than 50% of seeds germinated within 14 days*",
+    "questions": [
+      {
+        "number": 1,
+        "difficulty": "easy",
+        "skill": "reading a table",
+        "prompt": "According to Table 1, at 25°C, which species had the highest percent of seeds germinated?",
+        "choices": {
+          "A": "Tomato",
+          "B": "Lettuce",
+          "C": "Pepper",
+          "D": "All three species had the same percent."
+        },
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. At 25°C, tomato had 94%, compared with 90% for lettuce and 83% for pepper.",
+          "B": "Lettuce had 90% at 25°C, less than tomato's 94%.",
+          "C": "Pepper had 83% at 25°C, the lowest of the three.",
+          "D": "The percents were 90, 94, and 83, which are not equal."
+        }
+      },
+      {
+        "number": 2,
+        "difficulty": "easy",
+        "skill": "trend",
+        "prompt": "According to Table 1, as soil temperature increased from 10°C to 35°C, the percent of lettuce seeds germinated:",
+        "choices": {
+          "A": "increased only.",
+          "B": "increased and then decreased.",
+          "C": "decreased only.",
+          "D": "decreased and then increased."
+        },
+        "answer": "B",
+        "explanationByChoice": {
+          "A": "Lettuce fell after 20°C (95% → 90% → 41% → 8%).",
+          "B": "Correct. Lettuce rose from 62% to a peak of 95% at 20°C, then fell to 8% at 35°C.",
+          "C": "Lettuce rose from 10°C to 20°C (62% → 95%).",
+          "D": "This is the reverse of the actual pattern."
+        }
+      },
+      {
+        "number": 3,
+        "difficulty": "medium",
+        "skill": "comparing data",
+        "prompt": "Based on Table 1, at which temperature did all three species have at least 80% of their seeds germinate?",
+        "choices": {
+          "A": "20°C",
+          "B": "25°C",
+          "C": "30°C",
+          "D": "35°C"
+        },
+        "answer": "B",
+        "explanationByChoice": {
+          "A": "At 20°C, pepper had only 55%.",
+          "B": "Correct. At 25°C: lettuce 90%, tomato 94%, pepper 83%. All are at least 80%.",
+          "C": "At 30°C, lettuce had only 41%.",
+          "D": "At 35°C, lettuce had 8% and tomato 60%."
+        }
+      },
+      {
+        "number": 4,
+        "difficulty": "medium",
+        "skill": "interpolation",
+        "prompt": "Based on Table 1, if pepper seeds had been tested at 22°C, the percent germinated would most likely have been closest to:",
+        "choices": {
+          "A": "10%",
+          "B": "40%",
+          "C": "68%",
+          "D": "97%"
+        },
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "10% is below the 20°C value (55%); at 22°C the value should be higher.",
+          "B": "40% is below the 20°C value (55%), but germination was rising with temperature.",
+          "C": "Correct. 22°C is between 20°C (55%) and 25°C (83%), so the value should be between 55% and 83%.",
+          "D": "97% is higher than pepper's value at 25°C (83%)."
+        }
+      },
+      {
+        "number": 5,
+        "difficulty": "medium",
+        "skill": "trend",
+        "prompt": "According to Table 2, as soil temperature increased from 20°C to 30°C, the number of days for tomato seeds to reach 50% germination:",
+        "choices": {
+          "A": "decreased and then stayed the same.",
+          "B": "increased only.",
+          "C": "decreased only.",
+          "D": "stayed the same and then increased."
+        },
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. Tomato went from 6 days (20°C) to 4 days (25°C) to 4 days (30°C).",
+          "B": "The number of days went down, not up.",
+          "C": "It went down from 6 to 4, but then stayed at 4 instead of decreasing further.",
+          "D": "It decreased first (6 → 4), then stayed the same."
+        }
+      },
+      {
+        "number": 6,
+        "difficulty": "hard",
+        "skill": "evaluating a claim",
+        "prompt": "A student claims: \"For each species, the temperature with the highest percent germinated (Table 1) was also a temperature with the fewest days to reach 50% germination (Table 2).\" Do the data support this claim?",
+        "choices": {
+          "A": "Yes, but it is true only for lettuce and tomato.",
+          "B": "Yes; this is true for lettuce, tomato, and pepper.",
+          "C": "No; it is not true for pepper.",
+          "D": "No; it is not true for lettuce."
+        },
+        "answer": "B",
+        "explanationByChoice": {
+          "A": "It is also true for pepper (96% and 5 days, both at 30°C).",
+          "B": "Correct. Lettuce: highest 95% at 20°C, fewest days (3) at 20°C. Tomato: highest 94% at 25°C, fewest days (4) at 25°C. Pepper: highest 96% at 30°C, fewest days (5) at 30°C.",
+          "C": "For pepper, 30°C has both the highest percent (96%) and the fewest days (5).",
+          "D": "For lettuce, 20°C has both the highest percent (95%) and the fewest days (3, tied with 25°C)."
+        }
+      }
+    ],
+    "sourceDocument": "docs/science-passages-final.md"
+  },
+  {
+    "roman": "II",
+    "type": "DATA REPRESENTATION",
+    "title": "Ocean Acidity and Snail Shells",
+    "passage": "When seawater absorbs carbon dioxide (CO₂) from the air, its *pH* drops, meaning it becomes more acidic. Lower pH also lowers the amount of *carbonate ions* in the water. Many sea animals use carbonate ions to build their shells.\n\nScientists raised young sea snails in tanks of seawater for 30 days. The tanks differed in pH and in water temperature (15°C or 20°C). Each snail's shell was weighed at the start and end of the study. A positive change means the shell gained mass; a negative change means it lost mass.\n\n**Table 1: Average change in shell mass (mg) after 30 days**\n\n| Seawater pH | 15°C | 20°C |\n|---|---|---|\n| 8.1 | +12 | +15 |\n| 7.9 | +9 | +10 |\n| 7.7 | +5 | +4 |\n| 7.5 | +1 | −2 |\n| 7.3 | −4 | −8 |\n\n**Table 2: Carbonate ion concentration of the seawater**\n\n| Seawater pH | Carbonate ions (µmol/kg) |\n|---|---|\n| 8.1 | 200 |\n| 7.9 | 140 |\n| 7.7 | 95 |\n| 7.5 | 62 |\n| 7.3 | 40 |\n\n*µmol/kg = micromoles per kilogram of seawater*",
+    "questions": [
+      {
+        "number": 7,
+        "difficulty": "easy",
+        "skill": "reading a table",
+        "prompt": "According to Table 1, what was the average change in shell mass for snails at pH 7.7 and 20°C?",
+        "choices": {
+          "A": "−2 mg",
+          "B": "+4 mg",
+          "C": "+5 mg",
+          "D": "+10 mg"
+        },
+        "answer": "B",
+        "explanationByChoice": {
+          "A": "−2 mg is the value at pH 7.5 and 20°C.",
+          "B": "Correct. The table shows +4 mg at pH 7.7 and 20°C.",
+          "C": "+5 mg is the value at pH 7.7 and 15°C.",
+          "D": "+10 mg is the value at pH 7.9 and 20°C."
+        }
+      },
+      {
+        "number": 8,
+        "difficulty": "easy",
+        "skill": "trend",
+        "prompt": "According to Table 2, as pH decreased from 8.1 to 7.3, the carbonate ion concentration:",
+        "choices": {
+          "A": "decreased only.",
+          "B": "increased only.",
+          "C": "increased and then decreased.",
+          "D": "stayed about the same."
+        },
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. It fell at every step: 200 → 140 → 95 → 62 → 40.",
+          "B": "The values went down, not up.",
+          "C": "There was no increase at any point.",
+          "D": "It dropped from 200 to 40, which is a large change."
+        }
+      },
+      {
+        "number": 9,
+        "difficulty": "medium",
+        "skill": "reading a table",
+        "prompt": "According to Table 1, at 20°C, what is the highest pH at which shells lost mass on average?",
+        "choices": {
+          "A": "8.1",
+          "B": "7.9",
+          "C": "7.5",
+          "D": "7.3"
+        },
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "At pH 8.1, shells gained 15 mg.",
+          "B": "At pH 7.9, shells gained 10 mg.",
+          "C": "Correct. At pH 7.5, the change was −2 mg, the first loss as pH drops. At 7.3 shells also lost mass, but 7.5 is the higher pH.",
+          "D": "Shells lost mass at 7.3, but 7.5 is a higher pH where mass was also lost."
+        }
+      },
+      {
+        "number": 10,
+        "difficulty": "medium",
+        "skill": "combining tables",
+        "prompt": "Based on Tables 1 and 2, at 15°C, shells lost mass on average only when the carbonate ion concentration was:",
+        "choices": {
+          "A": "greater than 200 µmol/kg.",
+          "B": "between 140 and 200 µmol/kg.",
+          "C": "between 62 and 95 µmol/kg.",
+          "D": "less than 62 µmol/kg."
+        },
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "No tank had more than 200 µmol/kg.",
+          "B": "At 140–200 µmol/kg (pH 7.9–8.1), shells gained mass at 15°C.",
+          "C": "At 62–95 µmol/kg (pH 7.5–7.7), shells still gained mass (+1 and +5 mg).",
+          "D": "Correct. The only loss at 15°C was at pH 7.3, where carbonate was 40 µmol/kg, less than 62."
+        }
+      },
+      {
+        "number": 11,
+        "difficulty": "medium",
+        "skill": "extrapolation",
+        "prompt": "If snails had also been raised at pH 7.1 and 15°C, the average change in shell mass would most likely have been closest to:",
+        "choices": {
+          "A": "+6 mg",
+          "B": "+1 mg",
+          "C": "−4 mg",
+          "D": "−9 mg"
+        },
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "Shell mass change fell as pH fell, so a gain is unlikely below pH 7.3.",
+          "B": "+1 mg was the value at pH 7.5; lower pH gave lower values.",
+          "C": "−4 mg was the value at pH 7.3; the trend suggests an even larger loss at 7.1.",
+          "D": "Correct. At 15°C each 0.2 drop in pH lowered the change by 3–5 mg, so pH 7.1 should be below −4 mg."
+        }
+      },
+      {
+        "number": 12,
+        "difficulty": "hard",
+        "skill": "drawing conclusions",
+        "prompt": "Which statement about the effect of warmer water (20°C compared with 15°C) is best supported by Table 1?",
+        "choices": {
+          "A": "Warmer water increased shell growth at every pH.",
+          "B": "Warmer water increased shell growth at higher pH but increased shell loss at lower pH.",
+          "C": "Warmer water decreased shell growth at every pH.",
+          "D": "Warmer water had no effect on shell mass at any pH."
+        },
+        "answer": "B",
+        "explanationByChoice": {
+          "A": "At pH 7.7, 7.5, and 7.3, the 20°C snails did worse than the 15°C snails.",
+          "B": "Correct. At pH 8.1 and 7.9, 20°C snails gained more (+15 vs. +12, +10 vs. +9). At pH 7.5 and 7.3, they did worse (−2 vs. +1, −8 vs. −4).",
+          "C": "At pH 8.1 and 7.9, the 20°C snails gained more.",
+          "D": "The values differ at every pH."
+        }
+      }
+    ],
+    "sourceDocument": "docs/science-passages-final.md"
+  },
+  {
+    "roman": "III",
+    "type": "RESEARCH SUMMARIES",
+    "title": "Enzyme Activity",
+    "passage": "*Catalase* is an enzyme found in many living things, including potatoes. It speeds up the breakdown of hydrogen peroxide (H₂O₂) into water and oxygen gas (O₂). Students used potato extract (a liquid containing catalase) to study how conditions affect catalase activity.\n\nIn each trial, potato extract was added to a flask containing 10 mL of 3% H₂O₂. The flask was connected by a tube to an upside-down, water-filled graduated cylinder, so that the O₂ produced pushed water out of the cylinder. The volume of O₂ collected in 60 seconds was recorded. More O₂ means greater catalase activity.\n\n**Experiment 1**\n\nStudents added 1.0 mL of extract to the H₂O₂ at pH 7. The extract and H₂O₂ were brought to a different temperature in each trial.\n\n**Table 1**\n\n| Temperature (°C) | O₂ collected (mL) |\n|---|---|\n| 10 | 12 |\n| 20 | 21 |\n| 30 | 33 |\n| 40 | 38 |\n| 50 | 19 |\n| 60 | 4 |\n\n**Experiment 2**\n\nStudents added 1.0 mL of extract to the H₂O₂ at 30°C. A different buffer solution was used in each trial to set the pH.\n\n**Table 2**\n\n| pH | O₂ collected (mL) |\n|---|---|\n| 4 | 6 |\n| 5 | 15 |\n| 6 | 27 |\n| 7 | 33 |\n| 8 | 29 |\n| 9 | 17 |\n\n**Experiment 3**\n\nStudents used 30°C and pH 7 for every trial but changed the volume of extract added.\n\n**Table 3**\n\n| Extract volume (mL) | O₂ collected (mL) |\n|---|---|\n| 0.5 | 17 |\n| 1.0 | 33 |\n| 1.5 | 48 |\n| 2.0 | 61 |",
+    "questions": [
+      {
+        "number": 13,
+        "difficulty": "easy",
+        "skill": "reading a table",
+        "prompt": "In Experiment 1, the greatest volume of O₂ was collected at which temperature?",
+        "choices": {
+          "A": "30°C",
+          "B": "40°C",
+          "C": "50°C",
+          "D": "60°C"
+        },
+        "answer": "B",
+        "explanationByChoice": {
+          "A": "At 30°C, 33 mL was collected, less than at 40°C.",
+          "B": "Correct. 38 mL at 40°C is the largest value in Table 1.",
+          "C": "At 50°C, only 19 mL was collected.",
+          "D": "At 60°C, only 4 mL was collected."
+        }
+      },
+      {
+        "number": 14,
+        "difficulty": "easy",
+        "skill": "experimental design",
+        "prompt": "Which variable was intentionally changed in Experiment 2?",
+        "choices": {
+          "A": "pH",
+          "B": "Temperature",
+          "C": "Volume of extract",
+          "D": "Volume of H₂O₂"
+        },
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. Each trial used a different buffer to set a different pH.",
+          "B": "Temperature was kept at 30°C in Experiment 2.",
+          "C": "Every trial in Experiment 2 used 1.0 mL of extract.",
+          "D": "Every trial used 10 mL of H₂O₂."
+        }
+      },
+      {
+        "number": 15,
+        "difficulty": "medium",
+        "skill": "experimental design",
+        "prompt": "The 1.0 mL trial in Experiment 3 was performed under the same conditions as which trial in Experiment 1?",
+        "choices": {
+          "A": "The trial at 20°C",
+          "B": "The trial at 30°C",
+          "C": "The trial at 40°C",
+          "D": "The trial at 50°C"
+        },
+        "answer": "B",
+        "explanationByChoice": {
+          "A": "Experiment 3 used 30°C, not 20°C.",
+          "B": "Correct. Both used 1.0 mL of extract, pH 7, and 30°C, and both collected 33 mL of O₂.",
+          "C": "Experiment 3 used 30°C, not 40°C.",
+          "D": "Experiment 3 used 30°C, not 50°C."
+        }
+      },
+      {
+        "number": 16,
+        "difficulty": "medium",
+        "skill": "trend",
+        "prompt": "According to Table 3, when the extract volume was doubled from 0.5 mL to 1.0 mL, the volume of O₂ collected:",
+        "choices": {
+          "A": "stayed about the same.",
+          "B": "about doubled.",
+          "C": "decreased by about half.",
+          "D": "increased about 10 times."
+        },
+        "answer": "B",
+        "explanationByChoice": {
+          "A": "It changed from 17 to 33 mL, a large increase.",
+          "B": "Correct. It went from 17 mL to 33 mL, almost exactly double.",
+          "C": "It increased; it did not decrease.",
+          "D": "Ten times 17 would be 170 mL, far more than 33 mL."
+        }
+      },
+      {
+        "number": 17,
+        "difficulty": "medium",
+        "skill": "extrapolation",
+        "prompt": "If Experiment 3 had included a trial with 2.5 mL of extract, the volume of O₂ collected would most likely have been closest to:",
+        "choices": {
+          "A": "33 mL",
+          "B": "55 mL",
+          "C": "74 mL",
+          "D": "120 mL"
+        },
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "33 mL is the value for 1.0 mL of extract; more extract gave more O₂.",
+          "B": "55 mL is less than the 61 mL collected with 2.0 mL of extract.",
+          "C": "Correct. Each extra 0.5 mL added about 13–16 mL of O₂, so 61 + about 13 ≈ 74 mL.",
+          "D": "120 mL would be a jump of almost 60 mL, far larger than the pattern."
+        }
+      },
+      {
+        "number": 18,
+        "difficulty": "hard",
+        "skill": "scientific reasoning",
+        "prompt": "Which of the following best explains why less O₂ was collected at 50°C and 60°C than at 40°C in Experiment 1?",
+        "choices": {
+          "A": "High temperatures changed the shape of the catalase, making it less able to work.",
+          "B": "High temperatures made the H₂O₂ break down faster.",
+          "C": "The flasks at 50°C and 60°C contained less H₂O₂.",
+          "D": "More extract was added in the trials at 50°C and 60°C."
+        },
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. Enzymes are proteins; too much heat changes (denatures) their shape, so activity drops above an ideal temperature.",
+          "B": "If H₂O₂ broke down faster, more O₂ would be collected, not less.",
+          "C": "Every trial used 10 mL of 3% H₂O₂.",
+          "D": "Every trial in Experiment 1 used 1.0 mL of extract."
+        }
+      },
+      {
+        "number": 19,
+        "difficulty": "hard",
+        "skill": "evaluating a hypothesis",
+        "prompt": "A student predicted that catalase works best in slightly acidic conditions (pH 5–6). Do the results of Experiment 2 support this prediction?",
+        "choices": {
+          "A": "Yes; the most O₂ was collected at pH 5.",
+          "B": "Yes; the most O₂ was collected at pH 6.",
+          "C": "No; the most O₂ was collected at pH 9.",
+          "D": "No; the most O₂ was collected at pH 7."
+        },
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "Only 15 mL was collected at pH 5.",
+          "B": "27 mL at pH 6 is less than 33 mL at pH 7.",
+          "C": "Only 17 mL was collected at pH 9; the peak was at pH 7.",
+          "D": "Correct. The peak was 33 mL at pH 7, which is neutral, not acidic."
+        }
+      }
+    ],
+    "sourceDocument": "docs/science-passages-final.md"
+  },
+  {
+    "roman": "IV",
+    "type": "RESEARCH SUMMARIES",
+    "title": "Plants and Light",
+    "passage": "Plants use light to make food through photosynthesis. Different colors of light can affect how plants grow. Two studies were done with bean seedlings.\n\nIn both studies, all seeds came from the same package and were planted in identical pots with the same soil. Each pot received the same amount of water each day, and room temperature was kept at 24°C. Each group had 20 plants. After 14 days, the height of each plant was measured, and its leaves were removed and weighed.\n\n**Study 1**\n\nFour groups of plants were grown under LED lights of different colors. All lights had the same brightness and were on for 12 hours per day.\n\n**Table 1**\n\n| Light color | Average height (cm) | Average leaf mass (g) |\n|---|---|---|\n| White | 18.2 | 2.4 |\n| Red | 22.5 | 1.9 |\n| Blue | 12.1 | 2.6 |\n| Green | 9.4 | 1.1 |\n\n**Study 2**\n\nFive groups of plants were grown under white LED lights of the same brightness as in Study 1. Each group received light for a different number of hours per day.\n\n**Table 2**\n\n| Hours of light per day | Average height (cm) | Average leaf mass (g) |\n|---|---|---|\n| 4 | 8.3 | 0.9 |\n| 8 | 13.6 | 1.7 |\n| 12 | 18.2 | 2.4 |\n| 16 | 20.9 | 2.9 |\n| 20 | 21.4 | 3.0 |",
+    "questions": [
+      {
+        "number": 20,
+        "difficulty": "easy",
+        "skill": "reading a table",
+        "prompt": "In Study 1, plants grown under which color of light had the greatest average height?",
+        "choices": {
+          "A": "Red",
+          "B": "White",
+          "C": "Blue",
+          "D": "Green"
+        },
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. Red-light plants averaged 22.5 cm, the tallest in Table 1.",
+          "B": "White-light plants averaged 18.2 cm, shorter than red.",
+          "C": "Blue-light plants averaged 12.1 cm.",
+          "D": "Green-light plants averaged 9.4 cm, the shortest."
+        }
+      },
+      {
+        "number": 21,
+        "difficulty": "easy",
+        "skill": "experimental design",
+        "prompt": "Which variable was intentionally changed in Study 2?",
+        "choices": {
+          "A": "The color of the light",
+          "B": "The amount of water given",
+          "C": "The number of hours of light per day",
+          "D": "The type of seed"
+        },
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "All Study 2 plants were grown under white light.",
+          "B": "All pots received the same amount of water.",
+          "C": "Correct. Each group in Study 2 got a different number of hours of light (4 to 20).",
+          "D": "All seeds came from the same package."
+        }
+      },
+      {
+        "number": 22,
+        "difficulty": "medium",
+        "skill": "experimental design",
+        "prompt": "Which group in Study 1 was grown under the same conditions as the 12-hour group in Study 2?",
+        "choices": {
+          "A": "The red-light group",
+          "B": "The blue-light group",
+          "C": "The green-light group",
+          "D": "The white-light group"
+        },
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "Study 2 used white light, not red.",
+          "B": "Study 2 used white light, not blue.",
+          "C": "Study 2 used white light, not green.",
+          "D": "Correct. Both had white light, the same brightness, and 12 hours per day, and both averaged 18.2 cm and 2.4 g."
+        }
+      },
+      {
+        "number": 23,
+        "difficulty": "medium",
+        "skill": "comparing data",
+        "prompt": "In Study 2, how did the increase in average height from 16 to 20 hours compare with the increase from 4 to 8 hours?",
+        "choices": {
+          "A": "It was about the same.",
+          "B": "It was much larger.",
+          "C": "It was much smaller.",
+          "D": "It was a decrease rather than an increase."
+        },
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "0.5 cm and 5.3 cm are very different.",
+          "B": "0.5 cm is smaller than 5.3 cm, not larger.",
+          "C": "Correct. 16 → 20 hours added 0.5 cm (20.9 → 21.4), while 4 → 8 hours added 5.3 cm (8.3 → 13.6).",
+          "D": "Height still increased slightly from 20.9 to 21.4 cm."
+        }
+      },
+      {
+        "number": 24,
+        "difficulty": "medium",
+        "skill": "extrapolation",
+        "prompt": "If a group in Study 2 had received light for 24 hours per day, its average leaf mass would most likely have been closest to:",
+        "choices": {
+          "A": "1.5 g",
+          "B": "2.4 g",
+          "C": "3.0 g",
+          "D": "4.5 g"
+        },
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "1.5 g is less than the 8-hour group's 1.7 g; more hours of light gave more leaf mass.",
+          "B": "2.4 g is the 12-hour value; more hours gave more mass.",
+          "C": "Correct. Leaf mass was leveling off (2.9 g at 16 hours, 3.0 g at 20 hours), so 24 hours should give about 3.0 g.",
+          "D": "A jump to 4.5 g doesn't fit the leveling-off pattern."
+        }
+      },
+      {
+        "number": 25,
+        "difficulty": "hard",
+        "skill": "evaluating a claim",
+        "prompt": "A student claims that in these studies, taller plants always had greater leaf mass. Which result is inconsistent with this claim?",
+        "choices": {
+          "A": "Green-light plants were the shortest and had the least leaf mass.",
+          "B": "In Study 2, plants with 20 hours of light were tallest and had the most leaf mass.",
+          "C": "Blue-light plants were taller than green-light plants and had more leaf mass.",
+          "D": "Red-light plants were taller than white-light plants but had less leaf mass."
+        },
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "Shortest with least mass fits the claim.",
+          "B": "Tallest with most mass fits the claim.",
+          "C": "Taller with more mass fits the claim.",
+          "D": "Correct. Red: 22.5 cm and 1.9 g; white: 18.2 cm and 2.4 g. The taller group had less leaf mass."
+        }
+      },
+      {
+        "number": 26,
+        "difficulty": "medium",
+        "skill": "experimental design",
+        "prompt": "Why did the researchers use seeds from the same package and give every pot the same soil, water, and temperature?",
+        "choices": {
+          "A": "So that the plants would grow as tall as possible",
+          "B": "So that each group would need less light",
+          "C": "So that the plants would all have the same leaf mass",
+          "D": "So that differences in growth could be linked to the light and not to other factors"
+        },
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "Keeping conditions equal doesn't make plants grow taller; it makes the comparison fair.",
+          "B": "Controlling these factors doesn't change how much light the plants need.",
+          "C": "The groups ended with different leaf masses, so this was not the goal.",
+          "D": "Correct. Keeping other factors the same (controlled variables) makes light the only thing that differs between groups."
+        }
+      }
+    ],
+    "sourceDocument": "docs/science-passages-final.md"
+  },
+  {
+    "roman": "V",
+    "type": "RESEARCH SUMMARIES",
+    "title": "Blocks on Ramps",
+    "passage": "A physics class studied how a wooden block slides down a ramp. In each trial, the block was placed at rest at the top of a ramp and released. The time it took to slide 1.0 m down the ramp was measured with a motion sensor. Each time shown is the average of 5 trials. A shorter time means the block sped up more quickly.\n\n**Experiment 1**\n\nA 0.4 kg block was placed on a ramp with a wood surface. The angle of the ramp was changed in each trial.\n\n**Table 1**\n\n| Ramp angle | Time to slide 1.0 m (s) |\n|---|---|\n| 15° | did not move |\n| 20° | 1.84 |\n| 25° | 1.16 |\n| 30° | 0.92 |\n| 35° | 0.79 |\n| 40° | 0.70 |\n\n**Experiment 2**\n\nThe 0.4 kg block was placed on a ramp set at 30°. The ramp was covered with a different surface material in each trial.\n\n**Table 2**\n\n| Ramp surface | Time to slide 1.0 m (s) |\n|---|---|\n| Glass | 0.70 |\n| Wood | 0.92 |\n| Sandpaper | 1.74 |\n| Rubber | did not move |\n\n**Experiment 3**\n\nBlocks of different mass were placed on a wood-surface ramp set at 30°.\n\n**Table 3**\n\n| Block mass (kg) | Time to slide 1.0 m (s) |\n|---|---|\n| 0.2 | 0.92 |\n| 0.4 | 0.92 |\n| 0.8 | 0.91 |",
+    "questions": [
+      {
+        "number": 27,
+        "difficulty": "easy",
+        "skill": "trend",
+        "prompt": "According to Table 1, as the ramp angle increased from 20° to 40°, the time for the block to slide 1.0 m:",
+        "choices": {
+          "A": "increased only.",
+          "B": "increased and then decreased.",
+          "C": "decreased only.",
+          "D": "stayed the same."
+        },
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "The times got shorter, not longer.",
+          "B": "There was no increase at any point.",
+          "C": "Correct. The time dropped at every step: 1.84 → 1.16 → 0.92 → 0.79 → 0.70 s.",
+          "D": "The time changed from 1.84 s to 0.70 s."
+        }
+      },
+      {
+        "number": 28,
+        "difficulty": "easy",
+        "skill": "reading a table",
+        "prompt": "According to Table 2, the block slid 1.0 m in the shortest time on which surface?",
+        "choices": {
+          "A": "Glass",
+          "B": "Wood",
+          "C": "Sandpaper",
+          "D": "Rubber"
+        },
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. Glass had the shortest time, 0.70 s.",
+          "B": "Wood took 0.92 s, longer than glass.",
+          "C": "Sandpaper took 1.74 s.",
+          "D": "On rubber, the block did not move at all."
+        }
+      },
+      {
+        "number": 29,
+        "difficulty": "medium",
+        "skill": "drawing conclusions",
+        "prompt": "The results of Experiment 3 best support which conclusion about the block's mass?",
+        "choices": {
+          "A": "Mass had little or no effect on the time to slide 1.0 m.",
+          "B": "Heavier blocks slid 1.0 m in much less time.",
+          "C": "Heavier blocks slid 1.0 m in much more time.",
+          "D": "Only the 0.4 kg block was able to slide."
+        },
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. Doubling and quadrupling the mass changed the time by at most 0.01 s.",
+          "B": "The 0.8 kg block took 0.91 s, almost the same as the 0.2 kg block (0.92 s).",
+          "C": "The heavier block did not take longer.",
+          "D": "All three blocks slid."
+        }
+      },
+      {
+        "number": 30,
+        "difficulty": "medium",
+        "skill": "experimental design",
+        "prompt": "The wood trial in Experiment 2 was performed under the same conditions as which trial in Experiment 1?",
+        "choices": {
+          "A": "The trial at 20°",
+          "B": "The trial at 25°",
+          "C": "The trial at 30°",
+          "D": "The trial at 40°"
+        },
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "Experiment 2 used a 30° ramp.",
+          "B": "Experiment 2 used a 30° ramp.",
+          "C": "Correct. Both used the 0.4 kg block on wood at 30°, and both took 0.92 s.",
+          "D": "Experiment 2 used a 30° ramp."
+        }
+      },
+      {
+        "number": 31,
+        "difficulty": "medium",
+        "skill": "extrapolation",
+        "prompt": "If Experiment 1 had included a trial at 45°, the time to slide 1.0 m would most likely have been closest to:",
+        "choices": {
+          "A": "0.64 s",
+          "B": "0.75 s",
+          "C": "0.92 s",
+          "D": "1.20 s"
+        },
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. Times kept getting shorter as the angle increased (0.79 s at 35°, 0.70 s at 40°), so 45° should be a bit less than 0.70 s.",
+          "B": "0.75 s is longer than the 40° time; steeper ramps gave shorter times.",
+          "C": "0.92 s is the 30° time.",
+          "D": "1.20 s is close to the 25° time; a 45° ramp should be faster."
+        }
+      },
+      {
+        "number": 32,
+        "difficulty": "hard",
+        "skill": "scientific reasoning",
+        "prompt": "Which of the following best explains why the block did not move at 15° on wood (Experiment 1) and at 30° on rubber (Experiment 2)?",
+        "choices": {
+          "A": "The block was too light for gravity to act on it.",
+          "B": "Gravity pulls only on blocks placed on steep ramps.",
+          "C": "The motion sensor could not detect the block on those surfaces.",
+          "D": "Friction between the block and the surface was strong enough to balance the pull of gravity down the ramp."
+        },
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "The same 0.4 kg block slid in other trials, so it wasn't too light.",
+          "B": "Gravity acts on the block at every angle.",
+          "C": "Nothing suggests a sensor problem; the block didn't move.",
+          "D": "Correct. The block stays still when friction can match the part of gravity pulling it down the ramp. A low angle or a grippy surface makes this happen."
+        }
+      },
+      {
+        "number": 33,
+        "difficulty": "hard",
+        "skill": "applying results",
+        "prompt": "Based on Experiments 1 and 2, if the students wanted the block to slide down a sandpaper ramp in about 0.92 s, they should most likely have:",
+        "choices": {
+          "A": "used an angle greater than 30°.",
+          "B": "used an angle less than 30°.",
+          "C": "kept the angle at 30° and used a heavier block.",
+          "D": "kept the angle at 30° and used a lighter block."
+        },
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. On sandpaper at 30°, the block took 1.74 s, too slow. Experiment 1 shows that steeper angles make the time shorter.",
+          "B": "A smaller angle would make the time even longer than 1.74 s.",
+          "C": "Experiment 3 shows that mass has almost no effect on the time.",
+          "D": "Experiment 3 shows that mass has almost no effect on the time."
+        }
+      }
+    ],
+    "sourceDocument": "docs/science-passages-final.md"
+  },
+  {
+    "roman": "VI",
+    "type": "CONFLICTING VIEWPOINTS",
+    "title": "Where Did the Moon Come From?",
+    "passage": "Scientists have long debated how Earth's Moon formed. Some facts are known:\n\n- The Moon's average density is about 3.3 g/cm³, while Earth's is about 5.5 g/cm³.\n- Earth has a large iron core. The Moon has only a very small iron core.\n- Earth's *mantle* (the rocky layer above the core) contains little iron.\n\nThree students explain the Moon's origin.\n\n**Student 1**\n\nEarly Earth spun very fast, completing one rotation in just a few hours. This fast spin caused part of Earth's outer layers to bulge out at the equator and break away. That material formed the Moon. Because it came from Earth's mantle, the Moon has little iron and a low density. Rocks from the Moon should have nearly the same chemical makeup as rocks from Earth's mantle.\n\n**Student 2**\n\nThe Moon formed in a different part of the solar system, where less iron was available. Later, it passed close to Earth and was captured by Earth's gravity. Because the Moon formed far from Earth, from different material, Moon rocks should have a chemical makeup that is clearly different from that of Earth rocks.\n\n**Student 3**\n\nSoon after Earth formed, a planet-sized body about the size of Mars crashed into it. The collision blasted rock from the mantles of both bodies into orbit around Earth, and this material came together to form the Moon. Most of the iron from both bodies' cores ended up in Earth. The heat of the collision boiled away substances that turn into gas easily, such as water. So Moon rocks should be similar to Earth's mantle rocks but contain much less water.",
+    "questions": [
+      {
+        "number": 34,
+        "difficulty": "easy",
+        "skill": "understanding a viewpoint",
+        "prompt": "According to Student 2, the Moon formed:",
+        "choices": {
+          "A": "from material that broke off Earth's equator.",
+          "B": "from debris after a collision with Earth.",
+          "C": "in a different part of the solar system from Earth.",
+          "D": "at the same time and place as Earth's core."
+        },
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "This is Student 1's view.",
+          "B": "This is Student 3's view.",
+          "C": "Correct. Student 2 says the Moon \"formed in a different part of the solar system\" and was later captured.",
+          "D": "No student says this."
+        }
+      },
+      {
+        "number": 35,
+        "difficulty": "easy",
+        "skill": "comparing viewpoints",
+        "prompt": "Which students state that at least some of the Moon's material came from Earth?",
+        "choices": {
+          "A": "Student 1 only",
+          "B": "Students 2 and 3 only",
+          "C": "Students 1, 2, and 3",
+          "D": "Students 1 and 3 only"
+        },
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "Student 3 also says the material came partly from Earth's mantle.",
+          "B": "Student 2 says the Moon formed from different material, far from Earth.",
+          "C": "Student 2 does not say any of the Moon came from Earth.",
+          "D": "Correct. Student 1 says it broke off Earth; Student 3 says it came from both bodies' mantles, including Earth's."
+        }
+      },
+      {
+        "number": 36,
+        "difficulty": "medium",
+        "skill": "weakening a viewpoint",
+        "prompt": "Studies show that the oxygen in Moon rocks has nearly the same chemical makeup as the oxygen in Earth's mantle rocks. This finding most weakens the view of which student?",
+        "choices": {
+          "A": "Student 1",
+          "B": "Student 3",
+          "C": "None of the students",
+          "D": "Student 2"
+        },
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "Student 1 predicts Moon rocks should match Earth's mantle, so this supports Student 1.",
+          "B": "Student 3 predicts Moon rocks should be similar to Earth's mantle, so this supports Student 3.",
+          "C": "It conflicts with Student 2's prediction.",
+          "D": "Correct. Student 2 predicts Moon rocks should be \"clearly different\" from Earth rocks."
+        }
+      },
+      {
+        "number": 37,
+        "difficulty": "medium",
+        "skill": "strengthening a viewpoint",
+        "prompt": "Moon rocks have been found to contain much less water than Earth rocks. This finding most strongly supports which student's view?",
+        "choices": {
+          "A": "Student 1",
+          "B": "Student 3",
+          "C": "Student 2",
+          "D": "Students 1 and 2 equally"
+        },
+        "answer": "B",
+        "explanationByChoice": {
+          "A": "Student 1 predicts Moon rocks should be nearly the same as Earth's mantle, which doesn't explain less water.",
+          "B": "Correct. Only Student 3 predicts that Moon rocks should contain much less water, because the collision's heat boiled it away.",
+          "C": "Student 2 predicts different makeup but says nothing about water specifically.",
+          "D": "Neither Student 1 nor Student 2 predicts low water."
+        }
+      },
+      {
+        "number": 38,
+        "difficulty": "medium",
+        "skill": "comparing viewpoints",
+        "prompt": "Students 1 and 3 would most likely agree that the Moon has a small iron core because:",
+        "choices": {
+          "A": "the Moon formed far from the Sun, where little iron was available.",
+          "B": "the Moon formed mostly from mantle material, which contains little iron.",
+          "C": "the Moon's iron was boiled away by heat.",
+          "D": "iron from Earth's core moved to the Moon."
+        },
+        "answer": "B",
+        "explanationByChoice": {
+          "A": "This reason is Student 2's.",
+          "B": "Correct. Student 1 says the Moon came from Earth's mantle; Student 3 says it came from the mantles of two bodies. Both point to iron-poor mantle rock.",
+          "C": "Student 3 says heat boiled away water and similar substances, not iron.",
+          "D": "Neither student says iron moved from Earth to the Moon; Student 3 says the iron went into Earth."
+        }
+      },
+      {
+        "number": 39,
+        "difficulty": "medium",
+        "skill": "weakening a viewpoint",
+        "prompt": "Calculations show that early Earth could never have spun fast enough to throw off material from its equator. This finding most weakens the view of which student?",
+        "choices": {
+          "A": "Student 2",
+          "B": "Student 3",
+          "C": "Students 2 and 3",
+          "D": "Student 1"
+        },
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "Student 2's view doesn't depend on Earth's spin.",
+          "B": "Student 3's view depends on a collision, not on Earth's spin.",
+          "C": "Neither Student 2 nor Student 3 relies on fast spin.",
+          "D": "Correct. Student 1's explanation depends on Earth spinning fast enough for material to break away."
+        }
+      },
+      {
+        "number": 40,
+        "difficulty": "hard",
+        "skill": "comparing viewpoints",
+        "prompt": "Which statement is consistent with the views of both Student 2 and Student 3 but NOT with the view of Student 1?",
+        "choices": {
+          "A": "The Moon formed entirely from Earth's mantle.",
+          "B": "The Moon's density is greater than Earth's.",
+          "C": "The Moon's origin involved a body that formed separately from Earth.",
+          "D": "Moon rocks contain less water than Earth rocks."
+        },
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "Only Student 1 says this.",
+          "B": "The passage states the Moon's density (3.3) is less than Earth's (5.5); no student disagrees.",
+          "C": "Correct. For Student 2, the Moon itself formed separately; for Student 3, the Mars-sized body did. Student 1 says the Moon came only from Earth.",
+          "D": "Only Student 3 says this; Student 2 doesn't mention water."
+        }
+      }
+    ],
+    "sourceDocument": "docs/science-passages-final.md"
+  }
+]
