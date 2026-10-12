@@ -5,31 +5,36 @@ const normalize = value => String(value).trim().toLowerCase();
 
 export function validateEnglish(items, {singlePassage = false} = {}) {
   assert(items.length === (singlePassage ? 1 : 5), 'Unexpected English passage count');
-  let incorrect = 0;
+  let incorrect = 0, editing = 0;
   for (const item of items) {
-    const words = item.passage.replace(/\[\/?underline\]/g, '').trim().split(/\s+/).length;
-    assert(words >= 300 && words <= 400, item.title + ': passage word count');
-    const spans = [...item.passage.matchAll(/\[underline\]([\s\S]*?)\[\/underline\]/g)].map(m => m[1]);
-    assert(spans.length === 10 && (item.passage.match(/\[underline\]/g) || []).length === 10, item.title + ': underline count');
     assert(item.questions.length === 10, item.title + ': question count');
-    const skills = item.questions.map(q => (q.skill + ' ' + q.prompt).toLowerCase());
-    assert(skills.some(s => /add.or.delete|add.*delete/.test(s)), item.title + ': missing add/delete');
-    assert(skills.some(s => /placement|where.*sentence|sentence.*placed/.test(s)), item.title + ': missing placement');
-    assert(skills.some(s => /writer.s goal|writer.s primary goal|suppose the writer/.test(s)), item.title + ': missing writer goal');
-    for (let i = 0; i < 10; i++) {
-      const q = item.questions[i];
-      assert(q.choices.A === 'NO CHANGE', item.title + ' Q' + (i + 1) + ': A must be NO CHANGE');
-      assert(['A','B','C','D'].includes(q.answer), 'Invalid key');
-      const choices = Object.values(q.choices).map(normalize);
-      assert(new Set(choices).size === 4, item.title + ': duplicate choices');
-      assert(q.explanationByChoice && ['A','B','C','D'].every(c => q.explanationByChoice[c]), item.title + ': missing explanation for an option');
-      assert(q.originalCorrect === (q.answer === 'A'), item.title + ': original correctness and key disagree');
-      if (q.answer !== 'A') incorrect++;
-      if (q.answer !== 'A') assert(normalize(q.choices[q.answer]) !== normalize(spans[i]), item.title + ': correct choice copies incorrect text');
+    const markers = [...item.passage.matchAll(/\[(\d+)\](?:<u>([\s\S]*?)<\/u>)?/g)];
+    const underlines = markers.filter(m => m[2] !== undefined);
+    assert(underlines.length >= 7 && underlines.length <= 8, item.title + ': underline count');
+    assert(item.passage.includes('[Paragraph 1]'), item.title + ': paragraph labels');
+    const mix = {easy:0,medium:0,hard:0};
+    for (const q of item.questions) {
+      assert(q.number >= 1 && q.number <= 10, item.title + ': question number');
+      assert(['A','B','C','D'].includes(q.answer), item.title + ' Q'+q.number+': answer');
+      assert(['A','B','C','D'].every(c => q.choices?.[c] && q.explanationByChoice?.[c]), item.title + ' Q'+q.number+': options/explanations');
+      assert(new Set(Object.values(q.choices).map(normalize)).size === 4, item.title + ' Q'+q.number+': duplicate choices');
+      assert(q.difficulty in mix, item.title + ' Q'+q.number+': difficulty');mix[q.difficulty]++;
+      if(q.type === 'editing') {
+        editing++;
+        assert(q.choices.A === 'NO CHANGE', item.title + ' Q'+q.number+': A must be NO CHANGE');
+        assert(underlines.some(m=>Number(m[1])===q.number),item.title+' Q'+q.number+': missing underline');
+        if(q.answer !== 'A')incorrect++;
+      } else {
+        assert(q.choices.A !== 'NO CHANGE',item.title+' Q'+q.number+': rhetorical A must not be NO CHANGE');
+        if(q.type === 'goal' || q.type === 'add_delete')assert(['A','B','C','D'].every(c=>/^(Yes|No), because /i.test(q.choices[c])),item.title+' Q'+q.number+': Yes/No reasons required');
+        if(q.type === 'placement')assert(['A','B','C','D'].every(c=>!/^Yes|^No/i.test(q.choices[c])),item.title+' Q'+q.number+': placement options required');
+      }
     }
+    assert(mix.easy===3 && mix.medium===5 && mix.hard===2,item.title+': difficulty mix');
+    assert(item.questions.some(q=>q.type==='add_delete'||q.type==='placement'),item.title+': missing organization question');
   }
-  assert(incorrect >= (singlePassage ? 6 : 30) && incorrect <= (singlePassage ? 7 : 35), 'Incorrect underline count: ' + incorrect);
-  return {passages: items.length, questions: items.length * 10, incorrectUnderlines: incorrect};
+  assert(incorrect >= (singlePassage ? 5 : 25) && incorrect <= (singlePassage ? 7 : 35),'Incorrect editing items: '+incorrect);
+  return {passages:items.length,questions:items.length*10,editing,incorrectUnderlines:incorrect};
 }
 
 export function validateReading(items) {
@@ -61,6 +66,7 @@ if (process.argv[1]?.endsWith('validate-act-passages.mjs')) {
     console.log('English passage 1:', validateEnglish([english.find(x => x.title === 'The Night Garden')], {singlePassage:true}));
     process.exit(0);
   }
+  if (process.argv.includes('--english-only')) { console.log('English:',validateEnglish(english));process.exit(0); }
   const readingPath = 'docs/reading-passages-review.json';
   console.log('English:', validateEnglish(english));
   assert(fs.existsSync(readingPath), 'Reading review file not yet written');

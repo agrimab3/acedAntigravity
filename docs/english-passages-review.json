@@ -1,13 +1,13 @@
 [
   {
     "title": "The Night Garden",
-    "passage": "[Paragraph 1] On the edge of a busy neighborhood, a narrow strip of land lay between a parking lot and a brick wall. At night, however, the space became the setting for an unusual experiment. A group of volunteers wanted to discover whether a small garden could support moths and other insects that visited flowers after sunset.\n\n[Paragraph 2] The volunteers [underline]was[/underline] careful not to begin with a shopping trip. First, they spent two evenings observing the site. They recorded which lights stayed on, where rainwater collected, and how the wind moved between the buildings. [underline]Afterward;[/underline] they drew a plan placing taller plants near the wall and shorter flowers beside the sidewalk. The volunteers knew that artificial light could disturb the insects they hoped to observe.\n\n[Paragraph 3] Choosing flowers required more research than anyone expected. Some plants opened their blossoms in the morning; others released their strongest scent at dusk. The group selected several native species [underline]which blooms at different times[/underline] so the garden would offer food throughout the season. This slower approach [underline]was something that resulted in the saving of money and materials[/underline].\n\n[Paragraph 4] The first week brought little excitement. A few flowers drooped in the heat, and one volunteer wondered whether the experiment had failed. [underline]Similarly,[/underline] the group continued taking notes rather than making sudden changes. By the third week, observers had counted several kinds of moths and noticed tiny beetles moving among the leaves. [underline]Walking quietly between the beds, several insects were photographed by the volunteers.[/underline] The volunteers [underline]recorded each sighting without disturbing the insects[/underline], even when an unfamiliar moth stayed still long enough for a closer look.\n\n[Paragraph 5] The project did not prove that every vacant strip should become a garden. [underline]Its results were limited to one small site.[/underline] Still, the volunteers had learned something useful: careful observation could turn an overlooked place into a source of questions. [underline]They also invited neighbors to share observations.[/underline] For their next step, they planned to repeat the count in autumn. By opening their notebooks to the neighborhood, the volunteers made the project a shared investigation rather than a private experiment. [underline]The project ultimately showed how a modest public space could encourage both scientific curiosity and cooperation.[/underline]",
+    "passage": "[Paragraph 1]\n\nOn the edge of a busy neighborhood, a narrow strip of land lay between a parking lot and a brick wall. During the day, people hurried past it without looking. At night, however, the space became the setting for an unusual experiment. A group of volunteers wanted to discover whether a small garden could support moths and other insects that visit flowers after sunset.\n\n[Paragraph 2]\n\nThe volunteers [1]<u>was</u> careful not to begin with a shopping trip. First, they spent two evenings observing the site. They recorded which lights stayed on, where rainwater collected, and how the wind moved between the buildings. [2]<u>Afterward; they</u> drew a plan that placed taller plants near the wall and shorter flowers beside the sidewalk. The plan left out a bright decorative lamp, [3]<u>since</u> the volunteers knew that artificial light could disturb the insects they hoped to observe.\n\n[Paragraph 3]\n\nChoosing flowers required more research than anyone expected. Some plants opened their blossoms in the morning; others released their strongest scent at dusk. The group selected several native species [4]<u>which blooms</u> at different times so that the garden would offer food throughout the season. Instead of replacing all the soil, the volunteers tested it and added compost only where it was needed. This slower approach [5]<u>was something that resulted in the saving of</u> money and materials.\n\n[Paragraph 4]\n\nThe first week brought little excitement. A few flowers drooped in the heat, and one volunteer wondered whether the experiment had failed. [6]<u>Similarly,</u> the group kept taking notes rather than making sudden changes. By the third week, observers had counted several kinds of moths and noticed tiny beetles moving among the leaves. [7]<u>Walking quietly between the beds, several insects were photographed by the volunteers.</u> Each visitor was recorded without being touched and then compared with pictures in a local field guide.\n\n[Paragraph 5]\n\n(1) The project did not prove that every vacant strip should become a garden. (2) Its results came from one small site observed during a single summer. [9] (3) Still, the volunteers had learned something useful: careful observation could turn an overlooked place into a source of questions. (4) They also invited neighbors to share what they noticed. (5) For their next step, they planned to repeat the count in autumn. (6) By opening their notebooks to the neighborhood, the volunteers made the project a shared investigation rather than a private experiment.",
     "questions": [
       {
         "number": 1,
         "difficulty": "easy",
-        "skill": "Subject-verb agreement",
-        "prompt": "Which choice best completes the sentence?",
+        "skill": "subject-verb agreement",
+        "prompt": "Choose the best answer for question 1.",
         "choices": {
           "A": "NO CHANGE",
           "B": "were",
@@ -15,79 +15,104 @@
           "D": "being"
         },
         "answer": "B",
-        "originalCorrect": false,
         "explanationByChoice": {
-          "A": "Was is singular, but volunteers is plural.",
-          "B": "Were agrees with the plural subject volunteers and fits the past-tense narrative.",
-          "C": "Has been is singular and shifts the tense.",
-          "D": "Being cannot serve as the finite verb in this sentence."
-        }
+          "A": "\"Was\" is singular, but the subject \"volunteers\" is plural.",
+          "B": "Correct. \"Were\" agrees with the plural subject and keeps the past tense.",
+          "C": "\"Has been\" is singular and shifts out of the past tense.",
+          "D": "\"Being\" cannot serve as the main verb of a sentence."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 2,
         "difficulty": "easy",
-        "skill": "Punctuation",
-        "prompt": "Which choice correctly punctuates the transition at the start of the sentence?",
+        "skill": "punctuation",
+        "prompt": "Choose the best answer for question 2.",
         "choices": {
           "A": "NO CHANGE",
-          "B": "Afterward:",
-          "C": "Afterward,",
-          "D": "Afterward"
+          "B": "Afterward, they",
+          "C": "Afterward: they",
+          "D": "Afterward, and they"
         },
-        "answer": "C",
-        "originalCorrect": false,
+        "answer": "B",
         "explanationByChoice": {
-          "A": "A semicolon cannot separate an introductory adverb from the clause it modifies.",
-          "B": "A colon would incorrectly introduce the clause as an explanation or list.",
-          "C": "A comma appropriately sets off the introductory transition.",
-          "D": "Without punctuation, the transition is less clearly separated from the main clause."
-        }
+          "A": "A semicolon must join two complete sentences; \"Afterward\" alone is not one.",
+          "B": "Correct. A comma sets off the introductory word.",
+          "C": "A colon must follow a complete sentence; \"Afterward\" is not one.",
+          "D": "\"And\" has nothing to join; \"Afterward\" is not a clause."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 3,
-        "difficulty": "medium",
-        "skill": "Agreement and restrictive clauses",
-        "prompt": "Which choice best maintains standard written English?",
+        "difficulty": "easy",
+        "skill": "logical connector",
+        "prompt": "Choose the best answer for question 3.",
         "choices": {
           "A": "NO CHANGE",
-          "B": "which bloom at different times",
-          "C": "that blooms at different times",
-          "D": "that bloomed at different times"
+          "B": "although",
+          "C": "unless",
+          "D": "so"
         },
-        "answer": "D",
-        "originalCorrect": false,
+        "answer": "A",
         "explanationByChoice": {
-          "A": "Blooms does not agree with the plural noun species, and which is awkward for an essential identifying clause.",
-          "B": "Bloom agrees in number, but the present tense is inconsistent with the past-tense account and which is less appropriate for the essential clause.",
-          "C": "Blooms is singular and disagrees with species.",
-          "D": "That introduces the essential clause; bloomed agrees with the plural subject and the past-tense narration."
-        }
+          "A": "Correct. \"Since\" shows the reason the lamp was left out: light disturbs insects.",
+          "B": "\"Although\" signals contrast, but the second idea explains the first.",
+          "C": "\"Unless\" creates a condition that makes no sense here.",
+          "D": "\"So\" reverses cause and effect (the lamp being left out did not cause the volunteers' knowledge)."
+        },
+        "type": "editing",
+        "originalCorrect": true
       },
       {
         "number": 4,
         "difficulty": "medium",
-        "skill": "Concision",
-        "prompt": "Which choice most effectively expresses the idea without unnecessary wording?",
+        "skill": "agreement in a clause",
+        "prompt": "Choose the best answer for question 4.",
         "choices": {
           "A": "NO CHANGE",
-          "B": "saved both money and materials",
-          "C": "was the cause of a reduction in the amount of money and materials used",
-          "D": "made money and materials into savings"
+          "B": "that blooms",
+          "C": "that bloom",
+          "D": "they bloom"
         },
-        "answer": "B",
-        "originalCorrect": false,
+        "answer": "C",
         "explanationByChoice": {
-          "A": "The phrase buries the action in an unnecessarily long construction.",
-          "B": "Saved is a direct verb that preserves the intended meaning.",
-          "C": "This is also wordy and makes the action less direct.",
-          "D": "The wording is imprecise and suggests that the materials themselves became savings."
-        }
+          "A": "\"Blooms\" is singular, but it refers to \"species,\" which is plural here (\"several species\").",
+          "B": "Still uses the singular \"blooms.\"",
+          "C": "Correct. \"That bloom\" agrees with the plural \"species\" and correctly limits which species were chosen.",
+          "D": "Creates a run-on: \"several native species they bloom\" joins two clauses with no connector."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 5,
         "difficulty": "medium",
-        "skill": "Logical transitions",
-        "prompt": "Which choice best connects the volunteers’ doubts with their decision to continue collecting evidence?",
+        "skill": "concision",
+        "prompt": "Choose the best answer for question 5.",
+        "choices": {
+          "A": "NO CHANGE",
+          "B": "ended up being a savings of",
+          "C": "was a saving for",
+          "D": "saved"
+        },
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "Wordy; \"was something that resulted in the saving of\" buries the action.",
+          "B": "Still wordy and awkward (\"being a savings of money\").",
+          "C": "Changes the meaning; the approach didn't save \"for\" money.",
+          "D": "Correct. \"Saved money and materials\" is direct and clear."
+        },
+        "type": "editing",
+        "originalCorrect": false
+      },
+      {
+        "number": 6,
+        "difficulty": "medium",
+        "skill": "transitions",
+        "prompt": "Choose the best answer for question 6.",
         "choices": {
           "A": "NO CHANGE",
           "B": "Consequently,",
@@ -95,736 +120,988 @@
           "D": "For instance,"
         },
         "answer": "C",
-        "originalCorrect": false,
         "explanationByChoice": {
-          "A": "Similarly signals likeness, not the contrast between discouragement and persistence.",
-          "B": "Consequently incorrectly suggests the doubts caused the decision to continue.",
-          "C": "Nevertheless accurately signals that they continued despite discouragement.",
-          "D": "For instance would introduce an example rather than a contrasting response."
-        }
-      },
-      {
-        "number": 6,
-        "difficulty": "hard",
-        "skill": "Dangling modifiers",
-        "prompt": "Which choice most clearly identifies who was walking between the beds?",
-        "choices": {
-          "A": "NO CHANGE",
-          "B": "Walking quietly between the beds, the volunteers photographed several insects.",
-          "C": "Several insects were photographed, walking quietly between the beds, by volunteers.",
-          "D": "Photographed by volunteers, several insects were walking quietly between the beds."
+          "A": "\"Similarly\" signals likeness, but continuing despite doubt is a contrast.",
+          "B": "\"Consequently\" suggests the doubt caused the group to keep going, which is illogical.",
+          "C": "Correct. \"Nevertheless\" shows the group kept working despite the discouraging first week.",
+          "D": "\"For instance\" introduces an example, but this sentence is not an example of the doubt."
         },
-        "answer": "B",
-        "originalCorrect": false,
-        "explanationByChoice": {
-          "A": "The opening modifier illogically describes insects as walking quietly between the beds.",
-          "B": "The volunteers immediately follow the modifier, correctly identifying who was walking.",
-          "C": "The modifier still appears to describe the insects and awkwardly interrupts the passive construction.",
-          "D": "The sentence changes the intended meaning by making the insects the walkers."
-        }
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 7,
-        "difficulty": "easy",
-        "skill": "Clarity and concision",
-        "prompt": "Which choice most clearly expresses the volunteers’ method?",
+        "difficulty": "medium",
+        "skill": "modifier placement",
+        "prompt": "Choose the best answer for question 7.",
         "choices": {
           "A": "NO CHANGE",
-          "B": "recorded each sighting, which did not disturb the insects",
-          "C": "recorded the sightings and the insects were not disturbed by them",
-          "D": "recorded each sighting in a way where no insect disturbance happened"
+          "B": "Several insects were photographed walking quietly between the beds by the volunteers.",
+          "C": "The volunteers, several insects photographed, walking quietly between the beds.",
+          "D": "Walking quietly between the beds, the volunteers photographed several insects."
         },
-        "answer": "A",
-        "originalCorrect": true,
+        "answer": "D",
         "explanationByChoice": {
-          "A": "The original directly describes both the action and the volunteers’ care.",
-          "B": "Which ambiguously refers to the sighting rather than the volunteers’ actions.",
-          "C": "The second clause is unnecessarily passive and leaves them ambiguous.",
-          "D": "In a way where is wordy and less idiomatic than without disturbing."
-        }
+          "A": "The opening phrase \"Walking quietly between the beds\" seems to describe the insects, which is illogical.",
+          "B": "Still suggests the insects were walking, and the passive wording is awkward.",
+          "C": "Not a complete sentence; it has no main verb.",
+          "D": "Correct. \"The volunteers\" comes right after the phrase, so it's clear who was walking."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 8,
-        "difficulty": "medium",
-        "skill": "Add or delete sentence",
-        "prompt": "The writer is considering deleting the underlined sentence in Paragraph 5. Should the writer keep or delete it?",
+        "difficulty": "hard",
+        "skill": "sentence placement",
+        "prompt": "For the sake of logic and cohesion, Sentence 4 in Paragraph 5 should be placed:",
         "choices": {
-          "A": "NO CHANGE",
-          "B": "Delete it because the sentence repeats the first sentence without adding a qualification.",
-          "C": "Delete it because one site is sufficient to establish conclusions about every vacant lot.",
-          "D": "Keep it because the sentence proves the volunteers observed insects in every season."
+          "A": "where it is now.",
+          "B": "before Sentence 1.",
+          "C": "after Sentence 5.",
+          "D": "after Sentence 6."
         },
-        "answer": "A",
-        "originalCorrect": true,
+        "answer": "C",
         "explanationByChoice": {
-          "A": "Keep it: the sentence appropriately limits what can be inferred from one small study.",
-          "B": "The first sentence gives a general caution; this sentence explains the specific limitation.",
-          "C": "A single site cannot establish a universal conclusion.",
-          "D": "The sentence does not claim observations were made across seasons."
-        }
+          "A": "\"Also\" needs an earlier action to add to; Sentence 3 is about what they learned, not an action.",
+          "B": "Inviting neighbors makes no sense before the paragraph explains the project's limits.",
+          "C": "Correct. \"Also\" adds to the plan in Sentence 5, and Sentence 6 (\"By opening their notebooks to the neighborhood\") directly builds on the invitation.",
+          "D": "Sentence 6 already refers to involving neighbors, so the invitation must come before it."
+        },
+        "type": "placement",
+        "originalCorrect": false
       },
       {
         "number": 9,
         "difficulty": "hard",
-        "skill": "Sentence placement",
-        "prompt": "The underlined sentence currently appears in Paragraph 5 after the sentence beginning “Still, the volunteers.” Which choice gives its most logical placement?",
+        "skill": "add a sentence",
+        "prompt": "At point 9, the writer is considering adding the following sentence:\n*\"Moths are most active on warm, humid nights.\"*\nShould the writer make this addition here?",
         "choices": {
-          "A": "NO CHANGE",
-          "B": "At the beginning of Paragraph 1, before the setting is described.",
-          "C": "After the sentence beginning “For their next step” in Paragraph 5.",
-          "D": "Between the first and second sentences of Paragraph 3."
+          "A": "Yes, because it explains why the volunteers chose to observe in summer.",
+          "B": "Yes, because it supports the claim that the results came from one small site.",
+          "C": "No, because it contradicts the earlier statement that moths visited the garden.",
+          "D": "No, because it interrupts the discussion of what the project could and could not show with a general fact about moths."
         },
-        "answer": "C",
-        "originalCorrect": false,
+        "answer": "D",
         "explanationByChoice": {
-          "A": "The invitation interrupts the transition from the study’s limits to its planned autumn count.",
-          "B": "The neighbors have not yet been introduced to the project at that point.",
-          "C": "Placing the invitation after the autumn plan groups the two next steps together before the final reflection.",
-          "D": "Paragraph 3 discusses plant selection; a neighbor invitation would break that focus."
-        }
+          "A": "The paragraph is about the project's limits, not about why summer was chosen.",
+          "B": "The sentence says nothing about how many sites were studied.",
+          "C": "It doesn't contradict anything; moths did visit the garden.",
+          "D": "Correct. The paragraph weighs the project's results, and this general fact breaks that line of thought."
+        },
+        "type": "add_delete",
+        "originalCorrect": false
       },
       {
         "number": 10,
         "difficulty": "medium",
-        "skill": "Writer’s goal",
-        "prompt": "Suppose the writer’s primary goal was to show how a small community experiment can produce useful knowledge without proving a universal claim. Does the passage accomplish that goal?",
+        "skill": "writer's goal",
+        "prompt": "Suppose the writer's goal had been to show how a small community project can produce useful knowledge even when its conclusions are limited. Would this essay accomplish that goal?",
         "choices": {
-          "A": "NO CHANGE",
-          "B": "No, because the passage concentrates entirely on plant species and provides no account of observation.",
-          "C": "No, because the volunteers establish that every vacant lot should become a garden.",
-          "D": "Yes, because the volunteers conclusively demonstrate that artificial light harms all moths."
+          "A": "Yes, because it shows volunteers carefully observing a small site and then admitting what their results could not prove.",
+          "B": "Yes, because it proves that every vacant strip of land should become a garden.",
+          "C": "No, because it focuses only on how the volunteers chose their plants.",
+          "D": "No, because the volunteers never record any observations."
         },
         "answer": "A",
-        "originalCorrect": true,
         "explanationByChoice": {
-          "A": "Yes: the observations, limited conclusions, and plans for further counting support the stated goal.",
-          "B": "The passage describes observation and evidence across several paragraphs.",
-          "C": "The passage explicitly avoids making a universal recommendation.",
-          "D": "The passage notes a concern about light but does not establish such a universal finding."
-        }
+          "A": "Correct. The essay covers careful observation, real findings, and clearly stated limits.",
+          "B": "Paragraph 5 says the project did *not* prove this.",
+          "C": "Plant choice is only one paragraph; the essay also covers observation and results.",
+          "D": "The volunteers take notes, count moths, and photograph insects."
+        },
+        "type": "goal",
+        "originalCorrect": false
       }
     ],
-    "words": 370,
-    "model": "human-authored",
     "aiReview": {
       "verdict": "pending",
-      "summary": "Rewritten after prior AI review; new content awaits owner review."
-    }
+      "summary": "Exact owner-provided final draft, pending owner approval."
+    },
+    "sourceDocument": "docs/english-passages-final.md"
   },
   {
     "title": "The Last Mapmaker",
-    "passage": "When Mara joined the coastal survey team, she expected to spend most of her time drawing lines on maps. Instead, her first assignment involved standing in ankle-deep water, holding a measuring pole while a colleague recorded the position of reeds. The marsh they were studying [underline]changed[/underline] shape after nearly every storm. A channel that appeared wide in spring might be almost invisible by late summer.\n\nOlder maps showed the marsh as a fixed border between land and sea. Mara soon realized that [underline]this border was anything but fixed[/underline]. Sediment moved with the tides, and plants slowed the water enough for new patches of ground to form. At the same time, stronger waves could wash away a bank overnight. [underline]Consequently,[/underline] the team needed repeated measurements rather than a single perfect drawing.\n\nEach morning, the researchers checked their instruments before setting out. They used satellite coordinates to locate their stations, but they also kept handwritten notebooks. A battery could fail, [underline]whereas a pencil could still record a measurement[/underline]. Mara labeled each sketch with the date, weather, and tide level. Those details mattered because [underline]a line on a map meant little without the conditions under which it was drawn[/underline].\n\nOne afternoon, Mara found that a narrow island shown on last year's map had split into two pieces. She was tempted to erase the old shape and replace it. Her supervisor suggested another approach: preserve both outlines and note when each had been observed. [underline]That way,[/underline] future readers could see the marsh changing rather than mistake the difference for an error. Mara began to think of maps not as finished portraits but as [underline]records of ongoing change[/underline].\n\nAt the end of the season, the team published a digital map with a timeline. Users could move a slider to compare different surveys, [underline]revealing where the shoreline had shifted[/underline]. Mara wrote a short note explaining the limits of the data. [underline]The team had measured selected locations, not every inch of the coast.[/underline] She hoped the map would help planners ask better questions, [underline]rather than pretend that the coastline would remain still.[/underline]",
+    "passage": "[Paragraph 1]\n\nWhen Mara joined the coastal survey team, she expected to spend most of her time drawing lines on maps. Instead, her first assignment involved standing in ankle-deep water and holding a measuring pole while a colleague recorded the position of the reeds. The marsh they were studying changed [1]<u>it's</u> shape after nearly every storm. A channel that appeared wide in spring might be almost invisible by late summer.\n\n[Paragraph 2]\n\n(1) Older maps showed the marsh as a fixed border between land and sea. (2) Mara soon realized that this border was anything but fixed. (3) Sediment moved with the tides, and plants slowed the water enough for new patches of ground to form. (4) At the same time, stronger waves could wash away a bank overnight. (5) [2]<u>For instance,</u> the team needed repeated measurements rather than a single perfect drawing.\n\n[Paragraph 3]\n\nEach morning, the researchers checked their instruments before setting out. They used satellite coordinates to locate their stations, [3]<u>but they also kept</u> handwritten notebooks. A battery could [4]<u>fail, however a</u> pencil could still record a measurement. Mara labeled each sketch with the date, the weather, and the tide level. Those details mattered because a line on a map meant little without the conditions [5]<u>under which it was drawn, recorded at the time it was drawn</u>.\n\n[Paragraph 4]\n\n(1) One afternoon, Mara found that a narrow island shown on last year's map had split into two pieces. (2) She was tempted to erase the old shape and replace it. (3) Her supervisor suggested another approach: preserve both outlines and note when each had been observed. (4) That way, future readers could see the marsh changing rather than mistake the difference for an error. (5) Mara began to think of maps not as finished portraits but as records of ongoing change.\n\n[Paragraph 5]\n\nAt the end of the season, the team published a digital map with a timeline. Users could move a slider to compare different surveys, [7]<u>revealed</u> where the shoreline had shifted. Mara wrote a short note explaining the limits of the data: the team had measured selected locations, not every inch of the coast. [8] She hoped the map would help planners ask better questions [9]<u>rather then pretend</u> that the coastline would remain still.",
     "questions": [
       {
         "number": 1,
         "difficulty": "easy",
-        "skill": "Verb tense",
-        "prompt": "Which verb fits the narrative's past tense?",
+        "skill": "its / it's",
+        "prompt": "Choose the best answer for question 1.",
         "choices": {
-          "A": "changed",
-          "B": "change",
-          "C": "changing",
-          "D": "will change"
+          "A": "NO CHANGE",
+          "B": "its",
+          "C": "its'",
+          "D": "their"
         },
-        "answer": "A",
-        "explanation": "Changed agrees with the past-tense narrative."
+        "answer": "B",
+        "explanationByChoice": {
+          "A": "\"It's\" means \"it is,\" which doesn't fit (\"changed it is shape\").",
+          "B": "Correct. \"Its\" is the possessive form for the marsh.",
+          "C": "\"Its'\" is not a word.",
+          "D": "\"Their\" is plural, but \"marsh\" is singular."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 2,
         "difficulty": "easy",
-        "skill": "Emphasis",
-        "prompt": "Which wording most clearly emphasizes the unstable boundary?",
+        "skill": "transitions",
+        "prompt": "Choose the best answer for question 2.",
         "choices": {
-          "A": "this border was a border",
-          "B": "the border was definitely a thing",
-          "C": "it was a line of some kind",
-          "D": "this border was anything but fixed"
+          "A": "NO CHANGE",
+          "B": "Nevertheless,",
+          "C": "Similarly,",
+          "D": "Consequently,"
         },
         "answer": "D",
-        "explanation": "Anything but fixed directly contrasts with the old maps."
+        "explanationByChoice": {
+          "A": "Repeated measurements aren't an example of erosion; they're a result of the constant change.",
+          "B": "\"Nevertheless\" signals contrast, but this sentence follows logically from the changes described.",
+          "C": "\"Similarly\" signals likeness, which doesn't fit.",
+          "D": "Correct. Because the marsh kept changing, the team needed repeated measurements."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 3,
-        "difficulty": "easy",
-        "skill": "Transitions",
-        "prompt": "Which transition best introduces the need for repeated surveys?",
+        "difficulty": "medium",
+        "skill": "sentence structure",
+        "prompt": "Choose the best answer for question 3.",
         "choices": {
-          "A": "For instance,",
-          "B": "Nevertheless,",
-          "C": "Consequently,",
-          "D": "Meanwhile,"
+          "A": "NO CHANGE",
+          "B": "but they also keeping",
+          "C": "they also kept",
+          "D": "but also keeping"
         },
-        "answer": "C",
-        "explanation": "Consequently shows that changing conditions caused the need."
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. \"But\" properly joins two complete clauses after the comma.",
+          "B": "\"Keeping\" can't be the main verb of the second clause.",
+          "C": "Creates a comma splice: two complete sentences joined only by a comma.",
+          "D": "\"Keeping\" leaves the second part without a proper verb and has no subject."
+        },
+        "type": "editing",
+        "originalCorrect": true
       },
       {
         "number": 4,
         "difficulty": "medium",
-        "skill": "Comparison",
-        "prompt": "Which wording correctly contrasts the two recording tools?",
+        "skill": "comma splice with \"however\"",
+        "prompt": "Choose the best answer for question 4.",
         "choices": {
-          "A": "and pencil was recording measures",
-          "B": "whereas a pencil could still record a measurement",
-          "C": "whereas a pencil recording a measurement",
-          "D": "but a pencil could still recording"
+          "A": "NO CHANGE",
+          "B": "fail however a",
+          "C": "fail; however, a",
+          "D": "fail, however, a"
         },
-        "answer": "B",
-        "explanation": "Whereas establishes a grammatical contrast."
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "Comma splice: \"however\" isn't a joining word, so a comma alone can't connect two sentences.",
+          "B": "Run-on with no punctuation at all.",
+          "C": "Correct. A semicolon joins the two sentences, and a comma follows \"however.\"",
+          "D": "Still a comma splice; commas on both sides of \"however\" don't fix it."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 5,
         "difficulty": "medium",
-        "skill": "Reasoning",
-        "prompt": "Which statement best explains why field notes matter?",
+        "skill": "redundancy",
+        "prompt": "Choose the best answer for question 5.",
         "choices": {
-          "A": "a line on a map meant little without the conditions under which it was drawn",
-          "B": "maps are lines and conditions are conditions",
-          "C": "a map could be seen by looking at it",
-          "D": "field notes were written in notebooks"
+          "A": "NO CHANGE",
+          "B": "that were present and existed when drawing happened",
+          "C": "of drawing it at the time of its drawing",
+          "D": "under which it was drawn"
         },
-        "answer": "A",
-        "explanation": "The sentence directly connects recorded conditions to interpreting measurements."
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "Redundant: \"recorded at the time it was drawn\" repeats \"under which it was drawn.\"",
+          "B": "Wordy and redundant (\"present and existed\").",
+          "C": "Awkward and repetitive (\"drawing … drawing\").",
+          "D": "Correct. Clear and concise."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 6,
         "difficulty": "medium",
-        "skill": "Transitions",
-        "prompt": "Which transition introduces the supervisor's alternative approach?",
+        "skill": "delete a sentence",
+        "prompt": "The writer is considering deleting Sentence 4 from Paragraph 4. Should the writer make this deletion?",
         "choices": {
-          "A": "For example,",
-          "B": "In contrast to that way,",
-          "C": "Previously,",
-          "D": "That way,"
+          "A": "Yes, because it repeats the information in Sentence 3.",
+          "B": "Yes, because it contradicts Mara's later view of maps.",
+          "C": "No, because it explains why the supervisor's approach was useful.",
+          "D": "No, because it describes how the island split into two pieces."
         },
-        "answer": "D",
-        "explanation": "That way points to the consequence of preserving both outlines."
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "Sentence 3 gives the approach; Sentence 4 gives a new idea, its benefit.",
+          "B": "It supports Mara's view of maps as records of change; it doesn't contradict it.",
+          "C": "Correct. Without it, the reader doesn't learn why keeping both outlines matters.",
+          "D": "Sentence 1 describes the split; Sentence 4 doesn't."
+        },
+        "type": "add_delete",
+        "originalCorrect": false
       },
       {
         "number": 7,
         "difficulty": "medium",
-        "skill": "Word choice",
-        "prompt": "Which phrase best captures Mara's new view of maps?",
+        "skill": "verb form",
+        "prompt": "Choose the best answer for question 7.",
         "choices": {
-          "A": "pictures with some lines",
-          "B": "objects made with paper",
-          "C": "records of ongoing change",
-          "D": "things that were done"
+          "A": "NO CHANGE",
+          "B": "revealing",
+          "C": "and it revealing",
+          "D": "which revealed them"
         },
-        "answer": "C",
-        "explanation": "Records of ongoing change expresses her conceptual shift."
+        "answer": "B",
+        "explanationByChoice": {
+          "A": "\"Revealed\" creates a second main verb with no subject or joining word.",
+          "B": "Correct. \"Revealing\" describes what comparing the surveys does.",
+          "C": "\"It revealing\" is not a complete verb.",
+          "D": "\"Them\" has nothing clear to refer to and makes the sentence ungrammatical."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 8,
-        "difficulty": "medium",
-        "skill": "Modifier",
-        "prompt": "Which phrase correctly describes what the timeline lets users see?",
+        "difficulty": "hard",
+        "skill": "add a sentence",
+        "prompt": "At point 8, the writer is considering adding the following sentence:\n*\"Satellite images, which show large areas at once, are often used to track coastlines.\"*\nShould the writer make this addition here?",
         "choices": {
-          "A": "to revealed a shifted shoreline",
-          "B": "revealing where the shoreline had shifted",
-          "C": "revealed where shoreline shift",
-          "D": "reveal the shoreline shifting it"
+          "A": "Yes, because it explains why the team did not need field measurements.",
+          "B": "Yes, because it supports the note's point about the limits of the data.",
+          "C": "No, because it shifts the focus from Mara's note and her hopes for the map to a general statement about satellite images.",
+          "D": "No, because it contradicts the earlier statement that the team used satellite coordinates."
         },
-        "answer": "B",
-        "explanation": "The participial phrase logically modifies the comparison action."
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "The team clearly did take field measurements, so this reasoning is false.",
+          "B": "The sentence is about other methods, not about the limits of this team's data.",
+          "C": "Correct. It's a general fact that breaks the flow between the note and Mara's hope.",
+          "D": "There's no contradiction; using coordinates and using images are different things."
+        },
+        "type": "add_delete",
+        "originalCorrect": false
       },
       {
         "number": 9,
-        "difficulty": "hard",
-        "skill": "Evidence",
-        "prompt": "Which statement accurately qualifies the scope of the survey?",
+        "difficulty": "easy",
+        "skill": "than / then",
+        "prompt": "Choose the best answer for question 9.",
         "choices": {
-          "A": "The team had measured selected locations, not every inch of the coast.",
-          "B": "The team measured every square inch of the coast.",
-          "C": "No locations had been measured.",
-          "D": "The measurements applied equally to every coastline."
+          "A": "NO CHANGE",
+          "B": "rather then pretending",
+          "C": "rather than pretended",
+          "D": "rather than pretend"
         },
-        "answer": "A",
-        "explanation": "The survey covered selected locations, so a narrower claim is warranted."
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "\"Then\" refers to time; comparisons use \"than.\"",
+          "B": "Still uses \"then.\"",
+          "C": "\"Pretended\" doesn't match \"ask\" (both should follow \"would help planners\").",
+          "D": "Correct. \"Rather than pretend\" matches \"ask\" and uses \"than.\""
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 10,
         "difficulty": "hard",
-        "skill": "Conclusion",
-        "prompt": "Which ending best reinforces the passage's central idea?",
+        "skill": "add a sentence / placement",
+        "prompt": "The writer wants to add the following sentence to Paragraph 2:\n*\"In other words, the coastline was growing and shrinking at the same time.\"*\nThe sentence would most logically be placed after Sentence:",
         "choices": {
-          "A": "because pencils were less expensive than satellites.",
-          "B": "even though the team preferred sunny afternoons.",
-          "C": "since the island had once been narrow.",
-          "D": "rather than pretend that the coastline would remain still."
+          "A": "1.",
+          "B": "2.",
+          "C": "3.",
+          "D": "4."
         },
         "answer": "D",
-        "explanation": "The ending returns to the theme of a changing coastline."
+        "explanationByChoice": {
+          "A": "Nothing about growing or shrinking has been described yet.",
+          "B": "Mara has only said the border wasn't fixed; the two processes come later.",
+          "C": "Only growth (new ground forming) has been described so far.",
+          "D": "Correct. After Sentence 4, both growth (Sentence 3) and loss (Sentence 4) have been described, so \"In other words\" sums them up before the result in Sentence 5."
+        },
+        "type": "placement",
+        "originalCorrect": false
       }
     ],
-    "words": 345,
-    "model": "human-authored",
-    "reviewModel": "gemini-2.5-flash",
     "aiReview": {
-      "verdict": "pass",
-      "issues": [],
-      "summary": "All ten English editing questions have a unique correct answer, the provided key is correct, and each question aligns appropriately with its numbered underline in the passage. The questions effectively test various skills, and the explanations are clear and accurate."
-    }
+      "verdict": "pending",
+      "summary": "Exact owner-provided final draft, pending owner approval."
+    },
+    "sourceDocument": "docs/english-passages-final.md"
   },
   {
     "title": "A Library of Sounds",
-    "passage": "At the city museum, visitors could examine old cameras, typewriters, and kitchen tools. Yet curator Imani noticed that the displays were strangely quiet. A visitor could see a mechanical cash register but could not hear its bell. To Imani, [underline]something important was missing[/underline]: the sounds that had once accompanied ordinary work.\n\nShe proposed creating a sound archive. Rather than collecting recordings from the internet, the museum would invite people to bring working objects to a temporary studio. Staff members [underline]would record[/underline] each object in a quiet room, noting its age and the story of its owner. They began with a sewing machine, a bicycle bell, and a hand-cranked pencil sharpener. [underline]For example,[/underline] the sewing machine made a steady clicking rhythm that changed when its operator increased the speed.\n\nRecording was not as simple as pressing a button. Microphones picked up the hum of ventilation and the scrape of shoes against the floor. [underline]To reduce this noise,[/underline] the team covered hard surfaces with thick curtains and scheduled sessions before opening hours. They also recorded a few seconds of silence in each session, allowing editors to identify background sounds. The process [underline]required patience rather than expensive equipment[/underline].\n\nThe archive soon raised questions that no photograph could answer. Why did two apparently identical machines sound different? Had their parts worn unevenly, or had their owners maintained them in different ways? [underline]Instead of guessing,[/underline] Imani asked a repair specialist to examine the machines. The specialist explained how small changes in tension could alter the pitch of a mechanism. These observations [underline]added context to the recordings[/underline], making the archive useful to researchers as well as visitors.\n\nFor the public exhibition, the museum installed listening stations beside selected objects. Each station offered a short recording and a caption describing how it had been made. [underline]Visitors could listen without operating fragile equipment.[/underline] The museum also provided transcripts for spoken explanations and adjustable volume controls. [underline]These features made the exhibition more accessible.[/underline] Imani hoped future visitors would recognize that history was not only something to look at: [underline]it was also something people once heard every day.[/underline]",
+    "passage": "[Paragraph 1]\n\nAt the city museum, visitors could examine old cameras, typewriters, and kitchen tools. Yet curator Imani Brooks noticed that the displays were strangely quiet. A visitor could see a mechanical cash register but could not hear its bell. To Imani, something important was [1]<u>missing; the</u> sounds that had once accompanied ordinary work.\n\n[Paragraph 2]\n\nShe proposed creating a sound archive. Rather than collecting recordings from the internet, the museum would invite people to bring working objects to a temporary studio. Staff members [2]<u>would record</u> each object in a quiet room, noting its age and the story of its owner. They began with a sewing machine, a bicycle bell, and a hand-cranked pencil sharpener. [3]<u>However,</u> the sewing machine made a steady clicking rhythm that changed whenever its operator increased the speed.\n\n[Paragraph 3]\n\nRecording was not as simple as pressing a button. Microphones picked up the hum of ventilation and the scrape of shoes against the floor. [4]<u>To reduce this noise, thick curtains covered the hard surfaces</u> and sessions were scheduled before opening hours. They also recorded a few seconds of silence in each session, allowing editors to identify background sounds. The process required patience [5]<u>more so than it required expensive equipment that cost a lot</u>.\n\n[Paragraph 4]\n\n(1) The archive soon raised questions that no photograph could answer. (2) Why did two apparently identical machines sound different? (3) Had their parts worn unevenly, or had their owners cared for them in different ways? (4) Instead of guessing, Imani asked a repair specialist to examine the machines. (5) The specialist explained how small changes in tension could alter the pitch of a mechanism. [7] (6) These observations [6]<u>added context to the recordings, making</u> the archive useful to researchers as well as visitors.\n\n[Paragraph 5]\n\nFor the public exhibition, the museum installed listening stations beside selected objects. Each station offered a short recording and a caption describing how the recording had been made. Visitors could listen without operating fragile equipment. The museum also provided transcripts for spoken explanations and adjustable volume [8]<u>controls, features, that made</u> the exhibition more accessible. Imani hoped future visitors would recognize that history was not only something to look at; [9]<u>something people once heard every day as well</u>.",
     "questions": [
       {
         "number": 1,
         "difficulty": "easy",
-        "skill": "Clarity",
-        "prompt": "Which wording best states the problem with the existing displays?",
+        "skill": "colon vs. semicolon",
+        "prompt": "Choose the best answer for question 1.",
         "choices": {
-          "A": "something important was missing",
-          "B": "there was a situation with something",
-          "C": "a thing was somewhere",
-          "D": "important was missing something"
+          "A": "NO CHANGE",
+          "B": "missing: the",
+          "C": "missing the",
+          "D": "missing, and the"
         },
-        "answer": "A",
-        "explanation": "The wording clearly introduces the missing sounds."
+        "answer": "B",
+        "explanationByChoice": {
+          "A": "A semicolon must be followed by a complete sentence; \"the sounds that had once accompanied ordinary work\" isn't one.",
+          "B": "Correct. A colon introduces an explanation of what was missing.",
+          "C": "Without punctuation, \"missing the sounds\" changes the meaning (Imani missing something).",
+          "D": "\"And\" has no second clause to join; what follows is not a complete sentence."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 2,
         "difficulty": "easy",
-        "skill": "Verb form",
-        "prompt": "Which verb phrase fits the museum's proposed plan?",
+        "skill": "verb form",
+        "prompt": "Choose the best answer for question 2.",
         "choices": {
-          "A": "will recorded",
-          "B": "recording would",
-          "C": "would recorded",
-          "D": "would record"
+          "A": "NO CHANGE",
+          "B": "would recorded",
+          "C": "will recorded",
+          "D": "recording"
         },
-        "answer": "D",
-        "explanation": "Would record expresses a planned action viewed from the past."
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. \"Would record\" describes the planned action, matching \"the museum would invite.\"",
+          "B": "\"Would\" must be followed by the base form \"record.\"",
+          "C": "\"Will\" must be followed by \"record,\" and \"will\" shifts the tense.",
+          "D": "\"Recording\" leaves the sentence without a main verb."
+        },
+        "type": "editing",
+        "originalCorrect": true
       },
       {
         "number": 3,
         "difficulty": "easy",
-        "skill": "Example",
-        "prompt": "Which transition appropriately introduces the sewing machine detail?",
+        "skill": "transitions",
+        "prompt": "Choose the best answer for question 3.",
         "choices": {
-          "A": "In conclusion,",
-          "B": "On the contrary,",
-          "C": "For example,",
-          "D": "Nevertheless,"
+          "A": "NO CHANGE",
+          "B": "In conclusion,",
+          "C": "Instead,",
+          "D": "For example,"
         },
-        "answer": "C",
-        "explanation": "The sewing machine illustrates the kinds of sounds being collected."
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "\"However\" signals contrast, but the sewing machine detail illustrates the recordings.",
+          "B": "This isn't a conclusion; the passage continues.",
+          "C": "\"Instead\" suggests replacing something, which doesn't fit.",
+          "D": "Correct. The sewing machine is an example of the sounds recorded."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 4,
         "difficulty": "medium",
-        "skill": "Purpose",
-        "prompt": "Which introductory phrase clearly expresses the team's goal?",
+        "skill": "dangling modifier",
+        "prompt": "Choose the best answer for question 4.",
         "choices": {
-          "A": "Having noise reduced by,",
-          "B": "To reduce this noise,",
-          "C": "Although this noise,",
-          "D": "Despite reducing noise,"
+          "A": "NO CHANGE",
+          "B": "Thick curtains, to reduce this noise, covering the hard surfaces",
+          "C": "To reduce this noise, the team covered the hard surfaces with thick curtains",
+          "D": "To reduce this noise, the hard surfaces were covered by thick curtains by the team"
         },
-        "answer": "B",
-        "explanation": "The infinitive phrase clearly states the purpose of the changes."
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "The phrase \"To reduce this noise\" seems to describe the curtains, as if curtains decided to reduce noise. \"They\" in the next sentence then has no clear person to refer to.",
+          "B": "\"Covering\" leaves the clause without a main verb.",
+          "C": "Correct. \"The team\" is who reduced the noise, and it gives \"They\" in the next sentence a clear meaning.",
+          "D": "Wordy, passive, and repeats \"by.\""
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 5,
         "difficulty": "medium",
-        "skill": "Concision",
-        "prompt": "Which choice best summarizes the recording process?",
+        "skill": "redundancy",
+        "prompt": "Choose the best answer for question 5.",
         "choices": {
-          "A": "required patience rather than expensive equipment",
-          "B": "was a process that had a requirement of patience",
-          "C": "needed a lot of patience that was patient",
-          "D": "was something involving equipment and patience and things"
+          "A": "NO CHANGE",
+          "B": "more than costly and expensive equipment",
+          "C": "instead of equipment that was expensive and cost much",
+          "D": "rather than expensive equipment"
         },
-        "answer": "A",
-        "explanation": "The original makes a concise, meaningful comparison."
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "\"Expensive\" and \"cost a lot\" say the same thing, and the phrasing is wordy.",
+          "B": "\"Costly and expensive\" is redundant.",
+          "C": "Redundant and wordy.",
+          "D": "Correct. Clear and concise."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 6,
         "difficulty": "medium",
-        "skill": "Transitions",
-        "prompt": "Which transition best introduces Imani's evidence-based response?",
+        "skill": "sentence structure",
+        "prompt": "Choose the best answer for question 6.",
         "choices": {
-          "A": "In the same way as guessing,",
-          "B": "Before guessing about nothing,",
-          "C": "As a result of a guess,",
-          "D": "Instead of guessing,"
+          "A": "NO CHANGE",
+          "B": "added context to the recordings; making",
+          "C": "added context to the recordings, they made",
+          "D": "adding context to the recordings, making"
         },
-        "answer": "D",
-        "explanation": "The phrase contrasts speculation with consulting an expert."
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. The main verb \"added\" is followed by a phrase (\"making…\") describing the result.",
+          "B": "A semicolon must be followed by a complete sentence; \"making the archive useful…\" isn't one.",
+          "C": "Comma splice: two complete sentences joined by only a comma.",
+          "D": "\"Adding\" leaves the sentence with no main verb."
+        },
+        "type": "editing",
+        "originalCorrect": true
       },
       {
         "number": 7,
         "difficulty": "medium",
-        "skill": "Precision",
-        "prompt": "Which phrase most accurately describes the specialist's contribution?",
+        "skill": "add a sentence",
+        "prompt": "At point 7, the writer is considering adding the following sentence:\n*\"Tension refers to how tightly a spring or belt inside a machine is stretched.\"*\nShould the writer make this addition here?",
         "choices": {
-          "A": "gave recordings some stuff",
-          "B": "changed all the recordings completely",
-          "C": "added context to the recordings",
-          "D": "made sounds into things"
+          "A": "Yes, because it defines a term that readers may not know and that is key to the specialist's explanation.",
+          "B": "Yes, because it shows that Imani repaired the machines herself.",
+          "C": "No, because it repeats information from Sentence 3.",
+          "D": "No, because it introduces a topic unrelated to the archive."
         },
-        "answer": "C",
-        "explanation": "Added context explains the value of the specialist's observations."
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. It clarifies \"tension,\" which is central to why the machines sounded different.",
+          "B": "Nothing in the sentence says Imani did repairs; the specialist examined the machines.",
+          "C": "Sentence 3 is about wear and care, not tension.",
+          "D": "Tension directly explains the archive's question about different sounds."
+        },
+        "type": "add_delete",
+        "originalCorrect": false
       },
       {
         "number": 8,
-        "difficulty": "medium",
-        "skill": "Accessibility",
-        "prompt": "Which sentence explains the practical advantage of listening stations?",
+        "difficulty": "hard",
+        "skill": "commas with a restrictive clause",
+        "prompt": "Choose the best answer for question 8.",
         "choices": {
-          "A": "The stations eliminated the need for any museum staff.",
-          "B": "Visitors could listen without operating fragile equipment.",
-          "C": "Visitors could repair every machine themselves.",
-          "D": "All machines were safe to operate without supervision."
+          "A": "NO CHANGE",
+          "B": "controls; features that made",
+          "C": "controls, features which making",
+          "D": "controls, features that made"
         },
-        "answer": "B",
-        "explanation": "The stations provide access while protecting fragile objects."
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "The comma after \"features\" wrongly separates \"features\" from the clause that defines them (\"that made…\").",
+          "B": "A semicolon must be followed by a complete sentence; \"features that made…\" isn't one.",
+          "C": "\"Making\" can't serve as the verb of the clause.",
+          "D": "Correct. One comma introduces the summary phrase, and \"that made…\" directly describes \"features.\""
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 9,
-        "difficulty": "hard",
-        "skill": "Organization",
-        "prompt": "Which sentence best introduces the accessibility measures that follow?",
+        "difficulty": "medium",
+        "skill": "semicolon needs a full sentence",
+        "prompt": "Choose the best answer for question 9.",
         "choices": {
-          "A": "These features made the exhibition more accessible.",
-          "B": "The museum had painted the entrance blue.",
-          "C": "The sewing machine was the oldest object.",
-          "D": "Some visitors arrived on bicycles."
+          "A": "NO CHANGE",
+          "B": "and it being something people once heard every day",
+          "C": "it was also something people once heard every day",
+          "D": "heard every day too"
         },
-        "answer": "A",
-        "explanation": "The sentence synthesizes transcripts and volume controls."
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "After a semicolon you need a complete sentence; this has no verb.",
+          "B": "\"It being\" is not a complete verb.",
+          "C": "Correct. A complete sentence that finishes the contrast (\"not only … also\").",
+          "D": "A fragment with no subject."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 10,
         "difficulty": "hard",
-        "skill": "Conclusion",
-        "prompt": "Which ending best echoes the passage's central idea?",
+        "skill": "writer's goal",
+        "prompt": "Suppose the writer's goal had been to describe how a museum used technology to replace its physical objects. Would this essay accomplish that goal?",
         "choices": {
-          "A": "it was only a matter of looking at things.",
-          "B": "it was entirely silent in the past.",
-          "C": "it was mainly about the cost of microphones.",
-          "D": "it was also something people once heard every day."
+          "A": "Yes, because the listening stations allowed the museum to remove its fragile equipment.",
+          "B": "Yes, because the archive was built from recordings found on the internet.",
+          "C": "No, because the essay describes recordings that add to the museum's objects rather than replace them.",
+          "D": "No, because the museum decided not to record any objects."
         },
-        "answer": "D",
-        "explanation": "The conclusion reinforces sound as a way to understand history."
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "The stations sit *beside* the objects; nothing was removed.",
+          "B": "The museum specifically chose *not* to use internet recordings.",
+          "C": "Correct. The recordings are placed next to the objects and add context; they don't replace them.",
+          "D": "The museum recorded many objects."
+        },
+        "type": "goal",
+        "originalCorrect": false
       }
     ],
-    "words": 348,
-    "model": "human-authored",
-    "reviewModel": "gemini-2.5-flash",
     "aiReview": {
-      "verdict": "pass",
-      "issues": [],
-      "summary": "All ten English editing questions have a unique correct answer, the provided key is accurate for each, and the questions align perfectly with their corresponding numbered underlines in the passage. The explanations for each answer are clear and correct. No issues were found."
-    }
+      "verdict": "pending",
+      "summary": "Exact owner-provided final draft, pending owner approval."
+    },
+    "sourceDocument": "docs/english-passages-final.md"
   },
   {
     "title": "The Bridge of Paper",
-    "passage": "The engineering club had only one afternoon to build a bridge. Their materials were modest: recycled paper, glue, string, and two wooden blocks that represented opposite riverbanks. The bridge needed to support a stack of small weights without touching the table below. At first, the students [underline]assumed[/underline] that using more paper would automatically make their design stronger.\n\nTheir teacher challenged that assumption by placing a flat sheet between the blocks. It bent under a single weight. Then she folded another sheet into a series of ridges. [underline]Although it used the same amount of paper,[/underline] the folded sheet supported several weights. The students realized that shape could matter as much as quantity. [underline]Therefore,[/underline] they began testing different folds before constructing a full bridge.\n\nOne group rolled paper into narrow tubes, while another folded strips into triangles. Each team recorded the length of its pieces, the amount of glue used, and the weight its structure could hold. [underline]These measurements allowed the students to compare their designs fairly.[/underline] When a tube collapsed, the team did not simply throw it away. They inspected the crease where it had failed and [underline]adjusted the next version[/underline] to distribute weight more evenly.\n\nAs the deadline approached, disagreements became harder to avoid. Some students wanted to reinforce every joint; others worried that extra glue would add weight and take too long to dry. [underline]To settle the question,[/underline] the club tested two otherwise identical joints, one with extra glue and one without it. The reinforced joint held slightly more weight, but it also required a longer drying time. The result [underline]gave the team a trade-off to consider[/underline], not a universal rule.\n\nIn the final trial, the bridge held the required weights for a full minute. The students cheered, then carefully dismantled the structure to examine its weak points. [underline]Success did not end the investigation.[/underline] They wrote down which choices had helped and which would need more testing. The next meeting would begin with a new question: [underline]could a lighter bridge support the same load?[/underline] By the end of the afternoon, the club understood that engineering involved [underline]testing ideas and revising them in response to evidence.[/underline]",
+    "passage": "[Paragraph 1]\n\nThe engineering club had only one afternoon to build a bridge. Their materials were modest: recycled paper, glue, string, and two wooden blocks that represented opposite riverbanks. The bridge needed to support a stack of small weights without touching the table below. At first, the students assumed that using more paper would automatically make [1]<u>there</u> design stronger.\n\n[Paragraph 2]\n\nTheir teacher challenged that assumption by placing a flat sheet between the blocks. It bent under a single weight. Then she folded another sheet into a series of ridges. [2]<u>Although it used the same amount of paper. The folded sheet</u> supported several weights. The students realized that shape could matter as much as quantity, and they began testing different folds before building a full bridge.\n\n[Paragraph 3]\n\nOne group rolled paper into narrow tubes, while another folded strips into triangles. Each team recorded the length of its pieces, the amount of glue used, and the weight [3]<u>that their structure could hold</u>. These measurements allowed the students to compare their designs fairly. When a tube collapsed, the students did not simply throw it away. [4]<u>Instead, they</u> inspected the crease where it had failed and adjusted the next version to spread the weight more evenly.\n\n[Paragraph 4]\n\n(1) As the deadline approached, disagreements became harder to avoid. (2) Some students wanted to reinforce every joint; others worried that extra glue would add weight and take too long to dry. (3) The reinforced joint held slightly more weight, [5]<u>but it also required</u> a longer drying time. (4) To settle the question, the club tested two otherwise identical joints, one with extra glue and one without it. (5) The result gave the team a trade-off to consider, not a universal rule.\n\n[Paragraph 5]\n\nIn the final trial, the bridge held the required weights for a full minute. The students [7]<u>cheered then they carefully dismantled</u> the structure to examine its weak points. [8] They wrote down which choices had helped and which would need more testing. The next meeting would begin with a new question: could a lighter bridge support the same load? By the end of the afternoon, the club understood that engineering [9]<u>involved testing ideas, and then revising them, and doing this</u> in response to evidence. [10]<u>It had been a long afternoon.</u>",
     "questions": [
       {
         "number": 1,
         "difficulty": "easy",
-        "skill": "Verb tense",
-        "prompt": "Which verb correctly fits the narrative?",
+        "skill": "there / their / they're",
+        "prompt": "Choose the best answer for question 1.",
         "choices": {
-          "A": "assumed",
-          "B": "assume",
-          "C": "assuming",
-          "D": "will assume"
+          "A": "NO CHANGE",
+          "B": "their",
+          "C": "they're",
+          "D": "its"
         },
-        "answer": "A",
-        "explanation": "Assumed matches the passage's past-tense narration."
+        "answer": "B",
+        "explanationByChoice": {
+          "A": "\"There\" refers to a place, not ownership.",
+          "B": "Correct. \"Their\" shows the design belongs to the students.",
+          "C": "\"They're\" means \"they are.\"",
+          "D": "\"Its\" is singular, but it refers to the plural \"students.\""
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 2,
         "difficulty": "easy",
-        "skill": "Subordination",
-        "prompt": "Which introductory clause correctly establishes the comparison?",
+        "skill": "sentence fragment",
+        "prompt": "Choose the best answer for question 2.",
         "choices": {
-          "A": "Although using the same paper amount it",
-          "B": "Although it use the same paper,",
-          "C": "Although the same amount of paper it used,",
-          "D": "Although it used the same amount of paper,"
+          "A": "NO CHANGE",
+          "B": "Although it used the same amount of paper; the folded sheet",
+          "C": "It used the same amount of paper, the folded sheet",
+          "D": "Although it used the same amount of paper, the folded sheet"
         },
         "answer": "D",
-        "explanation": "The original forms a complete subordinate clause followed by a comma."
+        "explanationByChoice": {
+          "A": "\"Although it used the same amount of paper.\" is a fragment; it can't stand alone.",
+          "B": "A semicolon can't follow a dependent \"although\" clause.",
+          "C": "Comma splice: two complete sentences joined by only a comma.",
+          "D": "Correct. The \"although\" clause is joined to the main sentence with a comma."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 3,
-        "difficulty": "easy",
-        "skill": "Transition",
-        "prompt": "Which transition best introduces the students' next action?",
+        "difficulty": "medium",
+        "skill": "pronoun agreement",
+        "prompt": "Choose the best answer for question 3.",
         "choices": {
-          "A": "For instance,",
-          "B": "Meanwhile,",
-          "C": "Therefore,",
-          "D": "However,"
+          "A": "NO CHANGE",
+          "B": "that it's structure could hold",
+          "C": "that its structure could hold",
+          "D": "its structure could have held"
         },
         "answer": "C",
-        "explanation": "Therefore indicates that their observation led to testing folds."
+        "explanationByChoice": {
+          "A": "\"Their\" is plural, but it refers to \"each team\" (singular), which already uses \"its pieces.\"",
+          "B": "\"It's\" means \"it is.\"",
+          "C": "Correct. \"Its\" matches \"each team\" and the earlier \"its pieces.\"",
+          "D": "\"Could have held\" changes the meaning to something that didn't happen."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 4,
         "difficulty": "medium",
-        "skill": "Evidence",
-        "prompt": "Which sentence best explains the value of recording measurements?",
+        "skill": "transitions",
+        "prompt": "Choose the best answer for question 4.",
         "choices": {
-          "A": "The measurements were unrelated to the experiment.",
-          "B": "These measurements allowed the students to compare their designs fairly.",
-          "C": "The measurements made every design identical.",
-          "D": "Measurements guaranteed that no bridge would collapse."
+          "A": "NO CHANGE",
+          "B": "However, they",
+          "C": "Similarly, they",
+          "D": "In addition, they"
         },
-        "answer": "B",
-        "explanation": "Consistent measurements support a fair comparison."
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. \"Instead\" contrasts throwing the tube away with what they actually did.",
+          "B": "\"However\" contrasts awkwardly; the sentence offers an alternative action, which \"Instead\" expresses.",
+          "C": "\"Similarly\" signals likeness, but these are opposite actions.",
+          "D": "\"In addition\" suggests they threw it away *and* inspected it."
+        },
+        "type": "editing",
+        "originalCorrect": true
       },
       {
         "number": 5,
         "difficulty": "medium",
-        "skill": "Precision",
-        "prompt": "Which phrase best describes how the students used failure?",
+        "skill": "sentence structure",
+        "prompt": "Choose the best answer for question 5.",
         "choices": {
-          "A": "adjusted the next version",
-          "B": "did a thing with the next version",
-          "C": "changed everything everywhere",
-          "D": "made the earlier version never happen"
+          "A": "NO CHANGE",
+          "B": "but it also requiring",
+          "C": "it also required",
+          "D": "but also it required that"
         },
         "answer": "A",
-        "explanation": "Adjusted the next version precisely identifies the revision."
+        "explanationByChoice": {
+          "A": "Correct. \"But\" joins the two contrasting clauses after the comma.",
+          "B": "\"Requiring\" can't be the main verb of the second clause.",
+          "C": "Comma splice.",
+          "D": "Awkward word order, and \"that\" makes no sense before \"a longer drying time.\""
+        },
+        "type": "editing",
+        "originalCorrect": true
       },
       {
         "number": 6,
-        "difficulty": "medium",
-        "skill": "Purpose",
-        "prompt": "Which introductory phrase most clearly explains the joint test?",
+        "difficulty": "hard",
+        "skill": "sentence placement",
+        "prompt": "For the sake of logic and cohesion, Sentence 4 in Paragraph 4 should be placed:",
         "choices": {
-          "A": "Settling by the question,",
-          "B": "The question being settled by,",
-          "C": "In a question of settling,",
-          "D": "To settle the question,"
+          "A": "where it is now.",
+          "B": "before Sentence 1.",
+          "C": "after Sentence 2.",
+          "D": "after Sentence 5."
         },
-        "answer": "D",
-        "explanation": "The infinitive phrase states the purpose of the controlled test."
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "As placed, the paragraph gives the test result (Sentence 3) before describing the test.",
+          "B": "\"The question\" refers to the disagreement in Sentence 2, which hasn't happened yet.",
+          "C": "Correct. Sentence 2 raises the question, Sentence 4 describes the test that settles it, and Sentence 3 gives the result.",
+          "D": "The test must come before the result and before the conclusion about it."
+        },
+        "type": "placement",
+        "originalCorrect": false
       },
       {
         "number": 7,
         "difficulty": "medium",
-        "skill": "Nuance",
-        "prompt": "Which wording accurately interprets the glue experiment?",
+        "skill": "run-on",
+        "prompt": "Choose the best answer for question 7.",
         "choices": {
-          "A": "showed that glue never works",
-          "B": "meant that no future tests were needed",
-          "C": "gave the team a trade-off to consider",
-          "D": "proved that extra glue is always best"
+          "A": "NO CHANGE",
+          "B": "cheered, then they carefully dismantled",
+          "C": "cheered; then carefully dismantling",
+          "D": "cheered and then carefully dismantled"
         },
-        "answer": "C",
-        "explanation": "The result revealed competing benefits and costs, not a universal rule."
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "Run-on: two complete sentences with no punctuation or joining word.",
+          "B": "Comma splice: \"then\" isn't a joining word, so the comma can't join two sentences.",
+          "C": "After the semicolon, \"then carefully dismantling\" isn't a complete sentence.",
+          "D": "Correct. One subject (\"The students\") with two verbs joined by \"and.\""
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 8,
         "difficulty": "medium",
-        "skill": "Reasoning",
-        "prompt": "Which sentence best bridges the successful trial and further analysis?",
+        "skill": "add a sentence",
+        "prompt": "At point 8, the writer is considering adding the following sentence:\n*\"Success did not end the investigation.\"*\nShould the writer make this addition here?",
         "choices": {
-          "A": "Every design would now work equally well.",
-          "B": "Success did not end the investigation.",
-          "C": "The club would never need another meeting.",
-          "D": "The bridge could not possibly be improved."
+          "A": "Yes, because it explains why the students kept studying the bridge after it passed the test.",
+          "B": "Yes, because it shows that the bridge failed the final trial.",
+          "C": "No, because it contradicts the statement that the students cheered.",
+          "D": "No, because it repeats the first sentence of the paragraph."
         },
-        "answer": "B",
-        "explanation": "The sentence explains why analysis continued after success."
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. It links the successful trial to the continued analysis that follows.",
+          "B": "The bridge passed the trial.",
+          "C": "Cheering and continuing to study the bridge don't conflict.",
+          "D": "The first sentence reports the result; this one introduces a new idea."
+        },
+        "type": "add_delete",
+        "originalCorrect": false
       },
       {
         "number": 9,
-        "difficulty": "hard",
-        "skill": "Organization",
-        "prompt": "Which question provides the most logical direction for the next experiment?",
+        "difficulty": "easy",
+        "skill": "concision",
+        "prompt": "Choose the best answer for question 9.",
         "choices": {
-          "A": "could a lighter bridge support the same load?",
-          "B": "what color should the classroom walls be?",
-          "C": "how many students liked the school lunch?",
-          "D": "could the wooden blocks be painted?"
+          "A": "NO CHANGE",
+          "B": "involved testing ideas and revising them",
+          "C": "involved testing ideas, then revising those ideas that were tested,",
+          "D": "involves to test ideas and revise them"
         },
-        "answer": "A",
-        "explanation": "The question builds directly on the bridge's strength and weight."
+        "answer": "B",
+        "explanationByChoice": {
+          "A": "Wordy; \"and doing this\" adds nothing.",
+          "B": "Correct. Clear and concise.",
+          "C": "Repetitive (\"ideas … ideas that were tested\").",
+          "D": "\"Involves to test\" is not standard English, and \"involves\" shifts the tense."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 10,
         "difficulty": "hard",
-        "skill": "Conclusion",
-        "prompt": "Which phrase best captures the engineering process described?",
+        "skill": "effective conclusion",
+        "prompt": "Which choice most effectively concludes the essay by returning to the students' first assumption?",
         "choices": {
-          "A": "choosing a design once and never changing it.",
-          "B": "using as much material as possible.",
-          "C": "avoiding all measurements and experiments.",
-          "D": "testing ideas and revising them in response to evidence."
+          "A": "NO CHANGE",
+          "B": "Paper, they noticed, was cheaper than wood.",
+          "C": "The club had learned that a strong bridge depended less on how much paper they used than on how they shaped it.",
+          "D": "Many of the students planned to join the club again next year."
         },
-        "answer": "D",
-        "explanation": "The phrase synthesizes iterative testing and evidence-based revision."
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "Doesn't connect to the essay's ideas.",
+          "B": "Cost was never part of the students' assumption.",
+          "C": "Correct. It directly answers Paragraph 1's assumption that more paper means more strength.",
+          "D": "Introduces an unrelated detail."
+        },
+        "type": "editing",
+        "originalCorrect": false
       }
     ],
-    "words": 356,
-    "model": "human-authored",
-    "reviewModel": "gemini-2.5-flash",
     "aiReview": {
-      "verdict": "pass",
-      "issues": [],
-      "summary": "All ten English editing questions have a unique correct answer, the provided key is accurate for each, and the questions align perfectly with their corresponding numbered underlines in the passage. The difficulty levels, skills, prompts, choices, and explanations are appropriate and well-constructed."
-    }
+      "verdict": "pending",
+      "summary": "Exact owner-provided final draft, pending owner approval."
+    },
+    "sourceDocument": "docs/english-passages-final.md"
   },
   {
     "title": "Seeds on the Roof",
-    "passage": "During a particularly hot September, students at Westbrook School noticed that the top-floor classrooms felt warmer than the rooms below. Their science teacher suggested investigating the roof. Most of it was covered with dark material that absorbed sunlight. A small section, however, held planter boxes filled with herbs. The students [underline]wondered[/underline] whether the plants affected the temperature nearby.\n\nThey designed a simple study with two thermometers. One measured the air above the planted section; the other measured air above an exposed part of the roof. The students placed both instruments at the same height and checked them at identical times. [underline]By keeping those conditions consistent,[/underline] they hoped to make the comparison more meaningful. They also recorded cloud cover and wind speed, since weather could influence both readings. [underline]For several days,[/underline] the two areas showed only small differences.\n\nThen a stretch of clear afternoons arrived. The planted area was often cooler, especially when the soil was moist. [underline]However,[/underline] the students resisted announcing a dramatic discovery. Their sample was small, and the roof's different surfaces might have influenced the readings. They discussed how water evaporating from leaves could remove heat, [underline]a process known as transpiration[/underline]. The explanation was plausible, but their measurements alone could not prove it was the only cause.\n\nThe class decided to improve its method. They added more sensors and rotated them between locations to check whether one device read consistently high. They also measured the temperature of the roof surface itself. [underline]These changes helped separate instrument error from actual temperature differences.[/underline] Students graphed the readings, looking for patterns across several weeks rather than focusing on the hottest afternoon. [underline]A longer record made their conclusions more cautious and more useful.[/underline]\n\nAt the school assembly, the students presented their results without claiming that every rooftop garden would have the same effect. [underline]Their evidence came from one roof during one season.[/underline] They recommended [underline]continued monitoring[/underline] and suggested that the school explore other benefits, including habitat for insects. The project had begun with a question about warm classrooms, [underline]but it ended with a lesson about measuring carefully before drawing conclusions.[/underline]",
+    "passage": "[Paragraph 1]\n\nDuring an especially hot September, students at Westbrook High School noticed that the top-floor classrooms felt warmer than the rooms below. Their science teacher suggested investigating the roof. Most of it was covered with dark material that absorbed sunlight. A small section, however, held planter boxes filled with herbs. The students [1]<u>wondered weather</u> the plants affected the temperature nearby.\n\n[Paragraph 2]\n\nThey designed a simple study with two thermometers. One measured the air above the planted section; [2]<u>the other measured the air</u> above an exposed part of the roof. The students placed both instruments at the same height and checked them at identical times. By keeping those conditions consistent, they hoped to make the comparison fair. They also recorded cloud cover and wind speed, since weather could influence both readings. [3]<u>For several days the two areas showed, only small differences.</u>\n\n[Paragraph 3]\n\nThen a stretch of clear afternoons arrived. The planted area was often cooler, especially when the soil was moist. [4]<u>Therefore,</u> the students resisted announcing a dramatic discovery. Their sample was small, and the roof's different surfaces might have influenced the readings. They discussed how water evaporating from leaves can remove heat, [5]<u>a process that is called and known as</u> transpiration. The explanation was reasonable, but their measurements alone could not prove that it was the only cause.\n\n[Paragraph 4]\n\n(1) The class decided to improve its method. (2) They added more sensors and rotated them between locations to check whether one device read consistently high. (3) They also measured the temperature of the roof surface itself. [6] (4) Students graphed the readings, looking for patterns across several weeks rather than focusing on the hottest afternoon. (5) A longer record made their conclusions more cautious [7]<u>and more useful</u>.\n\n[Paragraph 5]\n\nAt the school assembly, the students presented their results without claiming that every rooftop garden would have the same effect. [8]<u>There evidence came</u> from one roof during one season. They recommended continued monitoring and suggested that the school explore other benefits, including habitat for insects. [9]<u>The project had begun with a question about warm classrooms, it ended</u> with a lesson about measuring carefully before drawing conclusions.",
     "questions": [
       {
         "number": 1,
         "difficulty": "easy",
-        "skill": "Verb tense",
-        "prompt": "Which verb correctly describes the students' initial question?",
+        "skill": "weather / whether",
+        "prompt": "Choose the best answer for question 1.",
         "choices": {
-          "A": "wondered",
-          "B": "wonder",
-          "C": "wondering",
-          "D": "will wondered"
+          "A": "NO CHANGE",
+          "B": "wondered whether",
+          "C": "wondered if weather",
+          "D": "wonder whether"
         },
-        "answer": "A",
-        "explanation": "Wondered maintains the passage's past tense."
+        "answer": "B",
+        "explanationByChoice": {
+          "A": "\"Weather\" means rain, sun, etc.; \"whether\" introduces a possibility.",
+          "B": "Correct. \"Wondered whether\" is the right word in the past tense.",
+          "C": "Still uses \"weather.\"",
+          "D": "\"Wonder\" shifts to the present tense."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 2,
         "difficulty": "easy",
-        "skill": "Method",
-        "prompt": "Which phrase best introduces why the students controlled the measurements?",
+        "skill": "semicolon",
+        "prompt": "Choose the best answer for question 2.",
         "choices": {
-          "A": "By the conditions consistency,",
-          "B": "Keeping the conditions it consistent,",
-          "C": "The conditions by keeping consistent,",
-          "D": "By keeping those conditions consistent,"
+          "A": "NO CHANGE",
+          "B": ", the other measured the air",
+          "C": "the other measuring the air",
+          "D": "and the other measured the air"
         },
-        "answer": "D",
-        "explanation": "The introductory phrase explains how the comparison was made fairer."
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. A semicolon correctly joins two complete, closely related sentences.",
+          "B": "Replacing the semicolon with a comma creates a comma splice.",
+          "C": "\"Measuring\" can't be the main verb after a semicolon.",
+          "D": "A semicolon shouldn't be followed by \"and\" here; use either the semicolon or \", and.\""
+        },
+        "type": "editing",
+        "originalCorrect": true
       },
       {
         "number": 3,
         "difficulty": "easy",
-        "skill": "Punctuation",
-        "prompt": "Which introductory phrase is punctuated correctly?",
+        "skill": "comma placement",
+        "prompt": "Choose the best answer for question 3.",
         "choices": {
-          "A": "For several days;",
-          "B": "For several days:",
-          "C": "For several days,",
-          "D": "For several days"
+          "A": "NO CHANGE",
+          "B": "For several days the two areas, showed only small differences.",
+          "C": "For several days, the two areas showed only small differences.",
+          "D": "For several days; the two areas showed only small differences."
         },
         "answer": "C",
-        "explanation": "A comma appropriately separates the introductory phrase."
+        "explanationByChoice": {
+          "A": "The comma wrongly separates the verb \"showed\" from what was shown.",
+          "B": "The comma wrongly separates the subject from its verb.",
+          "C": "Correct. The comma sets off the introductory phrase.",
+          "D": "A semicolon can't follow an introductory phrase."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 4,
         "difficulty": "medium",
-        "skill": "Transitions",
-        "prompt": "Which transition best signals caution despite encouraging results?",
+        "skill": "transitions",
+        "prompt": "Choose the best answer for question 4.",
         "choices": {
-          "A": "Similarly,",
-          "B": "However,",
-          "C": "Therefore,",
-          "D": "For example,"
+          "A": "NO CHANGE",
+          "B": "For example,",
+          "C": "Similarly,",
+          "D": "However,"
         },
-        "answer": "B",
-        "explanation": "However contrasts the cooler readings with the students' restraint."
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "\"Therefore\" suggests cooler readings caused the students to hold back, but the result would normally encourage a big claim.",
+          "B": "Holding back isn't an example of the cooler readings.",
+          "C": "\"Similarly\" signals likeness, not contrast.",
+          "D": "Correct. Despite encouraging results, the students stayed cautious."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 5,
         "difficulty": "medium",
-        "skill": "Definition",
-        "prompt": "Which phrase most clearly identifies the process being discussed?",
+        "skill": "redundancy",
+        "prompt": "Choose the best answer for question 5.",
         "choices": {
-          "A": "a process known as transpiration",
-          "B": "a process called the process",
-          "C": "some kind of process",
-          "D": "something that might happen"
+          "A": "NO CHANGE",
+          "B": "a process, it is called",
+          "C": "a process known as",
+          "D": "which processes are known as"
         },
-        "answer": "A",
-        "explanation": "The phrase gives the specific scientific name."
+        "answer": "C",
+        "explanationByChoice": {
+          "A": "\"Called and known as\" says the same thing twice.",
+          "B": "Creates a comma splice (\"it is called\" is a full clause).",
+          "C": "Correct. Clear and concise.",
+          "D": "\"Which processes\" is plural and awkward."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 6,
         "difficulty": "medium",
-        "skill": "Precision",
-        "prompt": "Which sentence best explains why sensors were rotated?",
+        "skill": "add a sentence",
+        "prompt": "At point 6, the writer is considering adding the following sentence:\n*\"These changes helped separate errors in the instruments from real differences in temperature.\"*\nShould the writer make this addition here?",
         "choices": {
-          "A": "These changes proved that every thermometer was perfect.",
-          "B": "The sensors eliminated all possible weather effects.",
-          "C": "The class no longer needed to collect data.",
-          "D": "These changes helped separate instrument error from actual temperature differences."
+          "A": "Yes, because it explains the purpose of rotating sensors and measuring the roof surface.",
+          "B": "Yes, because it shows that all the sensors were broken.",
+          "C": "No, because it repeats Sentence 4.",
+          "D": "No, because it contradicts the idea that the class improved its method."
         },
-        "answer": "D",
-        "explanation": "Rotating devices helps detect systematic instrument error."
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. It explains why Sentences 2 and 3 matter.",
+          "B": "Nothing suggests the sensors were broken; the class checked whether one read high.",
+          "C": "Sentence 4 is about graphing over several weeks, a different idea.",
+          "D": "It supports the improved method."
+        },
+        "type": "add_delete",
+        "originalCorrect": false
       },
       {
         "number": 7,
         "difficulty": "medium",
-        "skill": "Interpretation",
-        "prompt": "Which statement best explains the value of a longer data set?",
+        "skill": "parallel structure",
+        "prompt": "Choose the best answer for question 7.",
         "choices": {
-          "A": "Longer records always remove every source of error.",
-          "B": "The readings no longer required interpretation.",
-          "C": "A longer record made their conclusions more cautious and more useful.",
-          "D": "One afternoon was enough to establish a universal rule."
+          "A": "NO CHANGE",
+          "B": "and, more useful",
+          "C": "and usefulness",
+          "D": "and more usefully"
         },
-        "answer": "C",
-        "explanation": "More observations reduce dependence on one unusual day."
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. \"More cautious and more useful\" are parallel adjectives describing the conclusions.",
+          "B": "The comma after \"and\" is unnecessary.",
+          "C": "\"Usefulness\" is a noun, which breaks the parallel structure.",
+          "D": "\"Usefully\" is an adverb, which can't describe \"conclusions.\""
+        },
+        "type": "editing",
+        "originalCorrect": true
       },
       {
         "number": 8,
         "difficulty": "medium",
-        "skill": "Evidence",
-        "prompt": "Which sentence best qualifies the students' claim?",
+        "skill": "there / their",
+        "prompt": "Choose the best answer for question 8.",
         "choices": {
-          "A": "The data showed that plants never affect temperature.",
-          "B": "Their evidence came from one roof during one season.",
-          "C": "Their results proved that all roofs behave alike.",
-          "D": "The class studied roofs on every continent."
+          "A": "NO CHANGE",
+          "B": "They're evidence came",
+          "C": "There evidence had come",
+          "D": "Their evidence came"
         },
-        "answer": "B",
-        "explanation": "The study's narrow setting limits generalization."
+        "answer": "D",
+        "explanationByChoice": {
+          "A": "\"There\" refers to a place, not ownership.",
+          "B": "\"They're\" means \"they are.\"",
+          "C": "Still uses \"there,\" and \"had come\" changes the tense unnecessarily.",
+          "D": "Correct. \"Their\" shows the evidence belonged to the students."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 9,
         "difficulty": "hard",
-        "skill": "Organization",
-        "prompt": "Which recommendation best follows from the limits of the experiment?",
+        "skill": "comma splice",
+        "prompt": "Choose the best answer for question 9.",
         "choices": {
-          "A": "continued monitoring",
-          "B": "immediate cancellation",
-          "C": "unlimited certainty",
-          "D": "fewer observations"
+          "A": "NO CHANGE",
+          "B": "classrooms, but it ended",
+          "C": "classrooms; but it ended",
+          "D": "classrooms it ended"
         },
-        "answer": "A",
-        "explanation": "Further seasonal monitoring directly addresses the study's limits."
+        "answer": "B",
+        "explanationByChoice": {
+          "A": "Comma splice: two complete sentences joined by only a comma.",
+          "B": "Correct. \"But\" joins the two contrasting sentences after the comma.",
+          "C": "A semicolon followed by \"but\" is incorrect here.",
+          "D": "Run-on with no punctuation or joining word."
+        },
+        "type": "editing",
+        "originalCorrect": false
       },
       {
         "number": 10,
         "difficulty": "hard",
-        "skill": "Conclusion",
-        "prompt": "Which ending best reflects the central lesson?",
+        "skill": "writer's goal",
+        "prompt": "Suppose the writer's goal had been to show students using a scientific approach to reach a careful conclusion. Would this essay accomplish that goal?",
         "choices": {
-          "A": "and it proved that plants solve every heating problem.",
-          "B": "although no one ever measured anything.",
-          "C": "because the students wanted to avoid graphs.",
-          "D": "but it ended with a lesson about measuring carefully before drawing conclusions."
+          "A": "Yes, because it describes how the students controlled their measurements, improved their method, and limited their claims.",
+          "B": "Yes, because it proves that rooftop gardens always cool buildings.",
+          "C": "No, because the students never collected any data.",
+          "D": "No, because the essay focuses mainly on the herbs grown in the planter boxes."
         },
-        "answer": "D",
-        "explanation": "The ending emphasizes evidence and responsible interpretation."
+        "answer": "A",
+        "explanationByChoice": {
+          "A": "Correct. The essay shows fair testing, better methods, and cautious conclusions.",
+          "B": "The students specifically avoid claiming this.",
+          "C": "They collected temperature data for weeks.",
+          "D": "The herbs are barely described; the focus is the study."
+        },
+        "type": "goal",
+        "originalCorrect": false
       }
     ],
-    "words": 348,
-    "model": "human-authored",
-    "reviewModel": "gemini-2.5-flash",
     "aiReview": {
-      "verdict": "pass",
-      "issues": [],
-      "summary": "All ten English editing questions have a unique correct answer, the provided key matches the correct answer, and each question and its answer are perfectly aligned with the corresponding numbered underline in the passage. The explanations are clear and accurate. The difficulty levels seem appropriate for the questions asked."
-    }
+      "verdict": "pending",
+      "summary": "Exact owner-provided final draft, pending owner approval."
+    },
+    "sourceDocument": "docs/english-passages-final.md"
   }
 ]

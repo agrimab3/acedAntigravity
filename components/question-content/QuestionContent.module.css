@@ -40,3 +40,5 @@
   font-size: 1.05em;
   overflow-wrap: anywhere;
 }
+
+.pointMarker { font-weight: 750; margin: 0 0.2em; white-space: nowrap; }

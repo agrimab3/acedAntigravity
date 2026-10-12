@@ -122,6 +122,7 @@ export default function QuestionContent({
     .replace(/<u>([\s\S]*?)<\/u>/gi, "[underline]$1[/underline]")
     .replace(/__([\s\S]*?)__/g, "[underline]$1[/underline]");
 
+  const hasNumberedMarkers = /\[\d+\](?:\[underline\])?/.test(normalized);
   const lines = normalized.split("\n");
   const underlineCount = (normalized.match(/\[underline\]/gi) ?? []).length;
   let underlineIndex = 0;
@@ -136,15 +137,18 @@ export default function QuestionContent({
   return (
     <>
       {lines.map((line, lineIndex) => {
-        const segments = line.split(/(\[underline\][\s\S]*?\[\/underline\])/gi);
+        const segments = line.split(/(\[\d+\]\[underline\][\s\S]*?\[\/underline\]|\[underline\][\s\S]*?\[\/underline\]|\[\d+\](?!\[underline\]))/gi);
 
         return (
           <Fragment key={`line-${lineIndex}`}>
             {segments.map((segment, segmentIndex) => {
-              const match = segment.match(/^\[underline\]([\s\S]*?)\[\/underline\]$/i);
+              const numbered = segment.match(/^\[(\d+)\]\[underline\]([\s\S]*?)\[\/underline\]$/i);
+              const match = numbered ? [segment, numbered[2]] : segment.match(/^\[underline\]([\s\S]*?)\[\/underline\]$/i);
+              const point = segment.match(/^\[(\d+)\]$/);
 
               if (match) {
                 const ordinal = ++underlineIndex;
+                const displayNumber = numbered ? Number(numbered[1]) : underlineCount > 1 ? ordinal : questionNumber;
                 const isFirstUnderline =
                   lineIndex === firstUnderlineLineIndex &&
                   segmentIndex === firstUnderlineSegmentIndex;
@@ -152,21 +156,22 @@ export default function QuestionContent({
                 return (
                   <span
                     key={`underline-${lineIndex}-${segmentIndex}`}
-                    ref={(underlineOrdinal ? ordinal === underlineOrdinal : isFirstUnderline) ? activeRef : undefined}
+                    ref={(underlineOrdinal ? (numbered ? Number(numbered[1]) === underlineOrdinal : ordinal === underlineOrdinal) : isFirstUnderline) ? activeRef : undefined}
                     className={
-                      activeUnderline && (underlineOrdinal ? ordinal === underlineOrdinal : isFirstUnderline)
+                      activeUnderline && (underlineOrdinal ? (numbered ? Number(numbered[1]) === underlineOrdinal : ordinal === underlineOrdinal) : isFirstUnderline)
                         ? `${styles.underline} ${styles.activeUnderline}`
                         : styles.underline
                     }
                   >
                     {renderMathAwareText(match[1], `u-${lineIndex}-${segmentIndex}`)}
-                    {questionNumber != null ? (
-                      <sup className={styles.questionNumber}>{underlineCount > 1 ? ordinal : questionNumber}</sup>
+                    {(questionNumber != null || hasNumberedMarkers) ? (
+                      <sup className={styles.questionNumber}>{displayNumber}</sup>
                     ) : null}
                   </span>
                 );
               }
 
+              if (point) return <span key={`point-${lineIndex}-${segmentIndex}`} className={styles.pointMarker}>[{point[1]}]</span>;
               return (
                 <Fragment key={`segment-${lineIndex}-${segmentIndex}`}>
                   {renderMathAwareText(segment, `s-${lineIndex}-${segmentIndex}`)}
