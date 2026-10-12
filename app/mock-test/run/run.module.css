@@ -1783,3 +1783,5 @@
  .mainArea.longPassageLayout .passageCard { position:relative; margin-bottom:8px; }
  .mainArea.longPassageLayout .questionColumn { position:relative; padding-top:12px; }
 }
+
+.deviceNote { margin: 10px 0 0; color: #9AA5B5; font-size: 12px; line-height: 1.5; text-align: center; font-weight: 400; }

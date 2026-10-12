@@ -1267,6 +1267,7 @@ export default function MockTestRunner({
             >
               {busy ? "starting…" : canStart ? "start English →" : "test not open yet"}
             </button>
+            <p className={styles.deviceNote}>Best on a laptop or desktop, like the real ACT. Phones work, but the passages are easier to read on a bigger screen.</p>
             <div className={styles.accountLine}>{email}</div>
             {error ? <div className={styles.error}>{error}</div> : null}
           </section>

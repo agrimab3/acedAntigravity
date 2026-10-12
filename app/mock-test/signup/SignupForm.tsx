@@ -404,6 +404,8 @@ export default function SignupForm({
             {checkoutBusy ? "opening checkout…" : "pay & save my seat ✦"}
           </button>
 
+          <p className={styles.deviceNote}>Best on a laptop or desktop, like the real ACT. Phones work, but the passages are easier to read on a bigger screen.</p>
+
           {checkoutError ? (
             <p className={styles.checkoutError} role="alert">
               {checkoutError}
