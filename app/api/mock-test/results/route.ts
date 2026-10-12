@@ -1,3 +1,4 @@
+import { groupTopicResults } from "@/lib/mockTest/category-breakdown";
 import { and, asc, eq, isNotNull, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import {
@@ -193,14 +194,7 @@ export async function GET(request: Request) {
     .from(mockTestTopicResults)
     .where(eq(mockTestTopicResults.registrationId, registration.id));
 
-  const topicBreakdown = topicRows
-    .map((item) => ({
-      ...item,
-      accuracyPct: item.total
-        ? Math.round((item.correct / item.total) * 100)
-        : 0,
-    }))
-    .sort((a, b) => a.accuracyPct - b.accuracyPct || b.total - a.total);
+  const topicBreakdown = groupTopicResults(topicRows);
 
   const distribution = mockTest.compositeDistribution ?? {};
   const cohortCount = Object.values(distribution).reduce(

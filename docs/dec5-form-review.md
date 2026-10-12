@@ -25,6 +25,11 @@ Generated October 12, 2026 from the reviewed snapshot. Form contains **171 quest
 - ⚠️ reading 34: short-reading-stem, low-demand-reading-ask
 - ⚠️ reading 35: low-demand-reading-ask
 - ⚠️ reading 36: short-reading-stem, low-demand-reading-ask
+- ⚠️ science 36: weak-science-signal
+- ⚠️ science 37: weak-science-signal
+- ⚠️ science 38: weak-science-signal
+- ⚠️ science 39: weak-science-signal
+- ⚠️ science 40: weak-science-signal
 
 ## Bank-wide explanation contradiction scan
 
@@ -2130,704 +2135,878 @@ PASSAGE B
 
 # Science
 
-## Passage / set for SCIENCE questions 1, 2, 3, 4, 5
+## Passage / set for SCIENCE questions 1, 2, 3, 4, 5, 6
 
-**Title:** Mineral Weathering in Acidic Environments
+**Title:** Seeds and Soil Temperature
 
-A geochemist investigated how soil pH affects the weathering (mass loss) of two common minerals, Calcite and Quartz. Three different soil environments were prepared with pH levels of 4.0, 5.5, and 7.0. For each environment, a 10,000 mg sample of Calcite and a 10,000 mg sample of Quartz were buried. The mass of the mineral lost to weathering was measured after 30 days and again after 60 days.
+Farmers often plant seeds when the soil reaches a certain temperature. Scientists tested how soil temperature affects *germination* (the sprouting of a seed) in three crop species: lettuce, tomato, and pepper.
 
-Table 1: Mass Loss of Minerals (mg)
-Calcite at pH 4.0: 450 mg (30 days), 890 mg (60 days)
-Calcite at pH 5.5: 120 mg (30 days), 235 mg (60 days)
-Calcite at pH 7.0: 15 mg (30 days), 32 mg (60 days)
-Quartz at pH 4.0: 12 mg (30 days), 25 mg (60 days)
-Quartz at pH 5.5: 8 mg (30 days), 16 mg (60 days)
-Quartz at pH 7.0: 5 mg (30 days), 10 mg (60 days)
+For each species, 100 seeds were placed in trays of moist soil kept at a constant temperature. Trays were kept at 10°C, 15°C, 20°C, 25°C, 30°C, or 35°C. Each day for 14 days, the number of germinated seeds was counted.
 
-*Science tables, figures, and experimental descriptions are reproduced from the stored set text above. Image-only figures require manual visual review.*
+**Table 1: Percent of seeds germinated after 14 days**
 
+| Soil temperature (°C) | Lettuce | Tomato | Pepper |
+|---|---|---|---|
+| 10 | 62 | 5 | 0 |
+| 15 | 88 | 38 | 12 |
+| 20 | 95 | 80 | 55 |
+| 25 | 90 | 94 | 83 |
+| 30 | 41 | 92 | 96 |
+| 35 | 8 | 60 | 74 |
 
-### SCIENCE 1 — Data Representation (easy)
+**Table 2: Number of days until 50% of seeds had germinated**
 
-**Question:** Based on the table, which mineral lost the greatest amount of mass at a pH of 4.0 over the first 30 days?
+| Soil temperature (°C) | Lettuce | Tomato | Pepper |
+|---|---|---|---|
+| 10 | 9 | — | — |
+| 15 | 5 | — | — |
+| 20 | 3 | 6 | 9 |
+| 25 | 3 | 4 | 6 |
+| 30 | — | 4 | 5 |
+| 35 | — | 8 | 7 |
 
-- A. Calcite
-- B. Quartz
-- C. Both lost an identical amount of mass.
-- D. The mass loss cannot be determined from the data provided.
-
-**Answer:** A
-
-**Explanation:** The table directly displays the mass loss at 30 days for a pH of 4.0. Calcite lost 450 mg, while Quartz lost only 12 mg. Calcite clearly lost a greater amount of mass.
-
-### SCIENCE 2 — Data Representation (easy)
-
-**Question:** For the Calcite samples at 60 days, what is the general trend in mass loss as the soil pH increases from 4.0 to 7.0?
-
-- A. Mass loss increases.
-- B. Mass loss remains constant.
-- C. Mass loss decreases.
-- D. Mass loss increases, then decreases.
-
-**Answer:** C
-
-**Explanation:** Looking at the Calcite data at 60 days, the mass loss is 890 mg at pH 4.0, 235 mg at pH 5.5, and 32 mg at pH 7.0. As the pH value gets larger, the mass loss becomes smaller, indicating a decreasing trend.
-
-### SCIENCE 3 — Data Representation (hard)
-
-**Question:** A geochemist claims that lowering soil pH from 7.0 to 4.0 has a much larger effect on 60-day weathering of Calcite than on 60-day weathering of Quartz. Which comparison best supports this claim?
-
-- A. Calcite mass loss increases by 858 mg, while Quartz mass loss increases by 15 mg.
-- B. Calcite mass loss increases by 32 mg, while Quartz mass loss increases by 10 mg.
-- C. Calcite mass loss increases by 655 mg, while Quartz mass loss increases by 9 mg.
-- D. Calcite mass loss increases by 440 mg, while Quartz mass loss increases by 13 mg.
-
-**Answer:** A
-
-**Explanation:** At 60 days, Calcite increases from 32 mg lost at pH 7.0 to 890 mg at pH 4.0, a difference of 858 mg. Quartz increases from 10 mg to 25 mg, a difference of 15 mg. The much larger change for Calcite supports the claim.
-
-### SCIENCE 4 — Data Representation (medium)
-
-**Question:** Compare the amount of mass lost by Calcite at pH 4.0 during the first 30 days to the amount of mass lost during the second 30 days (from day 30 to day 60). How do these two rates compare?
-
-- A. Mass was lost much faster during the first 30 days.
-- B. Mass was lost much faster during the second 30 days.
-- C. Mass loss only occurred during the first 30 days.
-- D. Mass was lost at an approximately equal rate during both periods.
-
-**Answer:** D
-
-**Explanation:** Calcite lost 450 mg in the first 30 days. At 60 days, the total loss was 890 mg, meaning the mineral lost 440 mg during the second 30-day period (890 - 450 = 440). These two amounts are very close, indicating the rate of mass loss remained approximately equal over time.
-
-### SCIENCE 5 — Data Representation (medium)
-
-**Question:** At 60 days, at which pH was the difference in mass loss between Calcite and Quartz greatest?
-
-- A. pH 4.0
-- B. pH 5.5
-- C. pH 7.0
-- D. The difference was the same at all three pH values.
-
-**Answer:** A
-
-**Explanation:** At 60 days, the Calcite–Quartz differences are 890 − 25 = 865 mg at pH 4.0, 235 − 16 = 219 mg at pH 5.5, and 32 − 10 = 22 mg at pH 7.0. The largest difference occurs at pH 4.0.
-
-## Passage / set for SCIENCE questions 6, 7, 8, 9, 10
-
-**Title:** Performance of Artificial Solar Pigments
-
-Engineers developed four artificial pigments (Alpha, Beta, Gamma, and Delta) for use in next-generation solar cells. Table 1 shows each pigment's peak absorbance wavelength, effective absorption range, and energy transfer efficiency (the percentage of absorbed light successfully converted into electrical energy).
-
-Table 1: Pigment Properties
-Pigment | Peak Absorbance (nm) | Absorption Range (nm) | Energy Transfer Efficiency (%)
-Alpha | 450 | 400 - 500 | 85%
-Beta | 550 | 500 - 600 | 60%
-Gamma | 650 | 600 - 700 | 75%
-Delta | 480 | 420 - 560 | 40%
-
-Table 2 displays the light intensity output of the standard test lamp used in the laboratory across different wavelength bands.
-
-Table 2: Test Lamp Output
-Wavelength Band | Intensity
-400 - 500 nm | High
-500 - 600 nm | Medium
-600 - 700 nm | Low
+*— = fewer than 50% of seeds germinated within 14 days*
 
 *Science tables, figures, and experimental descriptions are reproduced from the stored set text above. Image-only figures require manual visual review.*
 
 
-### SCIENCE 6 — Data Representation (easy)
+### SCIENCE 1 — Interpretation of Data / reading a table (easy)
 
-**Question:** Based on Table 1, which pigment is capable of absorbing light across the widest total range of wavelengths?
+**Question:** According to Table 1, at 25°C, which species had the highest percent of seeds germinated?
 
-- A. Alpha
-- B. Beta
-- C. Gamma
-- D. Delta
-
-**Answer:** D
-
-**Explanation:** Alpha, Beta, and Gamma each span 100 nm, while Delta spans 420 to 560 nm, or 140 nm.
-
-### SCIENCE 7 — Data Representation (easy)
-
-**Question:** According to Table 1, which pigment successfully converts the highest percentage of absorbed light into electrical energy?
-
-- A. Delta
-- B. Gamma
-- C. Alpha
-- D. Beta
-
-**Answer:** C
-
-**Explanation:** Alpha has the highest listed energy transfer efficiency at 85%.
-
-### SCIENCE 8 — Data Representation (hard)
-
-**Question:** A technician proposes that pigments with peak absorbance at longer wavelengths will always exhibit lower energy transfer efficiencies than pigments with peak absorbance at shorter wavelengths. Does the data support this proposition?
-
-- A. Yes, because efficiency steadily decreases from Alpha to Beta to Gamma to Delta.
-- B. Yes, because Gamma has a longer peak absorbance wavelength than Alpha and a lower efficiency.
-- C. No, because Gamma has a longer peak absorbance wavelength than Beta but a higher energy transfer efficiency.
-- D. No, because Delta has the shortest peak absorbance wavelength but the highest energy transfer efficiency.
-
-**Answer:** C
-
-**Explanation:** Gamma peaks at 650 nm and has 75% efficiency, while Beta peaks at 550 nm and has 60% efficiency. This counterexample shows that longer peak wavelength does not always mean lower efficiency.
-
-### SCIENCE 9 — Data Representation (medium)
-
-**Question:** If a specialized solar cell requires a pigment that can absorb light at 630 nm and has an energy transfer efficiency greater than 70%, which pigment should be selected?
-
-- A. Gamma
-- B. Beta
-- C. Alpha
-- D. Delta
+- A. Tomato
+- B. Lettuce
+- C. Pepper
+- D. All three species had the same percent.
 
 **Answer:** A
 
-**Explanation:** Only Gamma has an absorption range that includes 630 nm, and its efficiency is 75%, which exceeds 70%.
+**Explanation:** A: Correct. At 25°C, tomato had 94%, compared with 90% for lettuce and 83% for pepper.
+B: Lettuce had 90% at 25°C, less than tomato's 94%.
+C: Pepper had 83% at 25°C, the lowest of the three.
+D: The percents were 90, 94, and 83, which are not equal.
 
-### SCIENCE 10 — Data Representation (medium)
+### SCIENCE 2 — Interpretation of Data / trend (easy)
 
-**Question:** Which pigment absorbs light within the wavelength band where the test lamp output is High, but has an energy transfer efficiency below 50%?
+**Question:** According to Table 1, as soil temperature increased from 10°C to 35°C, the percent of lettuce seeds germinated:
 
-- A. Alpha
-- B. Delta
-- C. Beta
-- D. Gamma
+- A. increased only.
+- B. increased and then decreased.
+- C. decreased only.
+- D. decreased and then increased.
 
 **Answer:** B
 
-**Explanation:** The High-intensity band is 400–500 nm. Alpha and Delta absorb in that band, but only Delta has efficiency below 50%, at 40%.
+**Explanation:** A: Lettuce fell after 20°C (95% → 90% → 41% → 8%).
+B: Correct. Lettuce rose from 62% to a peak of 95% at 20°C, then fell to 8% at 35°C.
+C: Lettuce rose from 10°C to 20°C (62% → 95%).
+D: This is the reverse of the actual pattern.
 
-## Passage / set for SCIENCE questions 11, 12, 13, 14, 15
+### SCIENCE 3 — Interpretation of Data / comparing data (medium)
 
-**Title:** Wind Turbine Power Output by Wind Speed and Blade Length
+**Question:** Based on Table 1, at which temperature did all three species have at least 80% of their seeds germinate?
 
-Engineers measured the electrical power produced by three wind turbines that were identical except for blade length: 20 m, 30 m, or 40 m. Each turbine has a control system that limits its output to a maximum value so the machine is not damaged in strong winds. Power output was recorded in kilowatts (kW) while the wind blew steadily at 4, 6, 8, 10, or 12 meters per second (m/s). Each value in Table 1 is the average of 20 one-minute readings.
+- A. 20°C
+- B. 25°C
+- C. 30°C
+- D. 35°C
 
-Table 1: Average power output (kW)
+**Answer:** B
 
-Wind speed (m/s) | 20 m blades | 30 m blades | 40 m blades
-4                | 20          | 45          | 80
-6                | 70          | 155         | 275
-8                | 165         | 370         | 655
-10               | 320         | 720         | 1,000
-12               | 320         | 720         | 1,000
+**Explanation:** A: At 20°C, pepper had only 55%.
+B: Correct. At 25°C: lettuce 90%, tomato 94%, pepper 83%. All are at least 80%.
+C: At 30°C, lettuce had only 41%.
+D: At 35°C, lettuce had 8% and tomato 60%.
+
+### SCIENCE 4 — Interpretation of Data / interpolation (medium)
+
+**Question:** Based on Table 1, if pepper seeds had been tested at 22°C, the percent germinated would most likely have been closest to:
+
+- A. 10%
+- B. 40%
+- C. 68%
+- D. 97%
+
+**Answer:** C
+
+**Explanation:** A: 10% is below the 20°C value (55%); at 22°C the value should be higher.
+B: 40% is below the 20°C value (55%), but germination was rising with temperature.
+C: Correct. 22°C is between 20°C (55%) and 25°C (83%), so the value should be between 55% and 83%.
+D: 97% is higher than pepper's value at 25°C (83%).
+
+### SCIENCE 5 — Interpretation of Data / trend (medium)
+
+**Question:** According to Table 2, as soil temperature increased from 20°C to 30°C, the number of days for tomato seeds to reach 50% germination:
+
+- A. decreased and then stayed the same.
+- B. increased only.
+- C. decreased only.
+- D. stayed the same and then increased.
+
+**Answer:** A
+
+**Explanation:** A: Correct. Tomato went from 6 days (20°C) to 4 days (25°C) to 4 days (30°C).
+B: The number of days went down, not up.
+C: It went down from 6 to 4, but then stayed at 4 instead of decreasing further.
+D: It decreased first (6 → 4), then stayed the same.
+
+### SCIENCE 6 — Evaluation of Models, Inferences, and Experimental Results / evaluating a claim (hard)
+
+**Question:** A student claims: "For each species, the temperature with the highest percent germinated (Table 1) was also a temperature with the fewest days to reach 50% germination (Table 2)." Do the data support this claim?
+
+- A. Yes, but it is true only for lettuce and tomato.
+- B. Yes; this is true for lettuce, tomato, and pepper.
+- C. No; it is not true for pepper.
+- D. No; it is not true for lettuce.
+
+**Answer:** B
+
+**Explanation:** A: It is also true for pepper (96% and 5 days, both at 30°C).
+B: Correct. Lettuce: highest 95% at 20°C, fewest days (3) at 20°C. Tomato: highest 94% at 25°C, fewest days (4) at 25°C. Pepper: highest 96% at 30°C, fewest days (5) at 30°C.
+C: For pepper, 30°C has both the highest percent (96%) and the fewest days (5).
+D: For lettuce, 20°C has both the highest percent (95%) and the fewest days (3, tied with 25°C).
+
+## Passage / set for SCIENCE questions 7, 8, 9, 10, 11, 12
+
+**Title:** Ocean Acidity and Snail Shells
+
+When seawater absorbs carbon dioxide (CO₂) from the air, its *pH* drops, meaning it becomes more acidic. Lower pH also lowers the amount of *carbonate ions* in the water. Many sea animals use carbonate ions to build their shells.
+
+Scientists raised young sea snails in tanks of seawater for 30 days. The tanks differed in pH and in water temperature (15°C or 20°C). Each snail's shell was weighed at the start and end of the study. A positive change means the shell gained mass; a negative change means it lost mass.
+
+**Table 1: Average change in shell mass (mg) after 30 days**
+
+| Seawater pH | 15°C | 20°C |
+|---|---|---|
+| 8.1 | +12 | +15 |
+| 7.9 | +9 | +10 |
+| 7.7 | +5 | +4 |
+| 7.5 | +1 | −2 |
+| 7.3 | −4 | −8 |
+
+**Table 2: Carbonate ion concentration of the seawater**
+
+| Seawater pH | Carbonate ions (µmol/kg) |
+|---|---|
+| 8.1 | 200 |
+| 7.9 | 140 |
+| 7.7 | 95 |
+| 7.5 | 62 |
+| 7.3 | 40 |
+
+*µmol/kg = micromoles per kilogram of seawater*
 
 *Science tables, figures, and experimental descriptions are reproduced from the stored set text above. Image-only figures require manual visual review.*
 
 
-### SCIENCE 11 — Data Representation (easy)
+### SCIENCE 7 — Interpretation of Data / reading a table (easy)
 
-**Question:** At a wind speed of 8 m/s, how much more power did the turbine with 40 m blades produce than the turbine with 20 m blades?
+**Question:** According to Table 1, what was the average change in shell mass for snails at pH 7.7 and 20°C?
 
-- A. 285 kW
-- B. 205 kW
-- C. 490 kW
-- D. 345 kW
-
-**Answer:** C
-
-**Explanation:** At 8 m/s, the 40 m turbine produced 655 kW and the 20 m turbine produced 165 kW. The difference is 655 − 165 = 490 kW. A difference of 285 kW compares the 40 m and 30 m turbines, and 205 kW compares the 30 m and 20 m turbines.
-
-### SCIENCE 12 — Data Representation (easy)
-
-**Question:** For the turbine with 30 m blades, how did power output change as wind speed increased from 4 m/s to 12 m/s?
-
-- A. It increased at every step from 4 m/s to 12 m/s.
-- B. It increased up to 10 m/s and then decreased.
-- C. It stayed about the same at every wind speed.
-- D. It increased up to 10 m/s and then did not change.
-
-**Answer:** D
-
-**Explanation:** With 30 m blades, output rose from 45 kW to 155, 370, and then 720 kW at 10 m/s. At 12 m/s it was still 720 kW, so output stopped increasing after 10 m/s rather than rising further or falling.
-
-### SCIENCE 13 — Data Representation (hard)
-
-**Question:** A town needs a single turbine that produces at least 600 kW. Which of the following lists ALL the tested combinations of blade length and wind speed that meet this requirement?
-
-- A. 40 m blades at 8, 10, and 12 m/s only
-- B. 30 m and 40 m blades at 10 and 12 m/s only
-- C. 30 m blades at 10 and 12 m/s, and 40 m blades at 8, 10, and 12 m/s
-- D. 30 m and 40 m blades at 8, 10, and 12 m/s
-
-**Answer:** C
-
-**Explanation:** The 20 m turbine never exceeds 320 kW, so it never qualifies. The 30 m turbine reaches 720 kW at 10 and 12 m/s but only 370 kW at 8 m/s. The 40 m turbine produces 655 kW at 8 m/s and 1,000 kW at 10 and 12 m/s, so it qualifies at all three of those speeds. Together that gives five qualifying combinations.
-
-### SCIENCE 14 — Data Representation (medium)
-
-**Question:** For the turbine with 20 m blades at 6 m/s, which change would increase power output more: raising the wind speed to 8 m/s, or switching to 30 m blades at 6 m/s?
-
-- A. Switching to 30 m blades, by 10 kW
-- B. Raising the wind speed, by 10 kW
-- C. Both changes would increase output by the same amount
-- D. Raising the wind speed, by 95 kW
+- A. −2 mg
+- B. +4 mg
+- C. +5 mg
+- D. +10 mg
 
 **Answer:** B
 
-**Explanation:** Raising the wind speed from 6 to 8 m/s with 20 m blades increases output from 70 to 165 kW, a gain of 95 kW. Switching to 30 m blades at 6 m/s increases output from 70 to 155 kW, a gain of 85 kW. Raising the wind speed gives the larger gain, by 95 − 85 = 10 kW.
+**Explanation:** A: −2 mg is the value at pH 7.5 and 20°C.
+B: Correct. The table shows +4 mg at pH 7.7 and 20°C.
+C: +5 mg is the value at pH 7.7 and 15°C.
+D: +10 mg is the value at pH 7.9 and 20°C.
 
-### SCIENCE 15 — Data Representation (medium)
+### SCIENCE 8 — Interpretation of Data / trend (easy)
 
-**Question:** An engineer claims, "At every wind speed tested, the turbine with 40 m blades produced at least 3 times as much power as the turbine with 20 m blades." Do the data support this claim?
+**Question:** According to Table 2, as pH decreased from 8.1 to 7.3, the carbonate ion concentration:
 
-- A. Yes; the 40 m output divided by the 20 m output was at least 3 at every wind speed.
-- B. No; the 40 m output was less than 3 times the 20 m output at 10 and 12 m/s.
-- C. No; the 40 m turbine produced less power than the 20 m turbine at 4 m/s.
-- D. Yes; the 40 m output was exactly 4 times the 20 m output at every wind speed.
+- A. decreased only.
+- B. increased only.
+- C. increased and then decreased.
+- D. stayed about the same.
 
 **Answer:** A
 
-**Explanation:** The ratio of 40 m output to 20 m output is 80 ÷ 20 = 4.0 at 4 m/s, 275 ÷ 70 ≈ 3.9 at 6 m/s, 655 ÷ 165 ≈ 4.0 at 8 m/s, and 1,000 ÷ 320 ≈ 3.1 at both 10 and 12 m/s. Every ratio is at least 3, so the claim is supported, even though the ratio is not exactly 4 at every speed.
+**Explanation:** A: Correct. It fell at every step: 200 → 140 → 95 → 62 → 40.
+B: The values went down, not up.
+C: There was no increase at any point.
+D: It dropped from 200 to 40, which is a large change.
 
-## Passage / set for SCIENCE questions 16, 17, 18, 19, 20
+### SCIENCE 9 — Interpretation of Data / reading a table (medium)
 
-**Title:** Kinetic Friction of Ice Skate Blades
+**Question:** According to Table 1, at 20°C, what is the highest pH at which shells lost mass on average?
 
-Sports physicists evaluated the kinetic friction coefficient (μk) of two different ice skate blades gliding over ice under varying conditions. A lower μk indicates less friction and faster gliding.
+- A. 8.1
+- B. 7.9
+- C. 7.5
+- D. 7.3
 
-Experiment 1
-The physicists tested Blade A (carbon steel) and Blade B (stainless steel) on smooth indoor ice at three different temperatures. The tests were conducted at a constant speed.
-At -10°C: Blade A = 0.015, Blade B = 0.018
-At -6°C: Blade A = 0.011, Blade B = 0.014
-At -2°C: Blade A = 0.008, Blade B = 0.010
+**Answer:** C
 
-Experiment 2
-To simulate outdoor conditions, the physicists tested Blade A at a constant temperature of -6°C on ice surfaces containing varying amounts of sand impurities, measured in grams per square meter (g/m²).
-0 g/m²: 0.011
-5 g/m²: 0.025
-10 g/m²: 0.045
-20 g/m²: 0.080
+**Explanation:** A: At pH 8.1, shells gained 15 mg.
+B: At pH 7.9, shells gained 10 mg.
+C: Correct. At pH 7.5, the change was −2 mg, the first loss as pH drops. At 7.3 shells also lost mass, but 7.5 is the higher pH.
+D: Shells lost mass at 7.3, but 7.5 is a higher pH where mass was also lost.
+
+### SCIENCE 10 — Interpretation of Data / combining tables (medium)
+
+**Question:** Based on Tables 1 and 2, at 15°C, shells lost mass on average only when the carbonate ion concentration was:
+
+- A. greater than 200 µmol/kg.
+- B. between 140 and 200 µmol/kg.
+- C. between 62 and 95 µmol/kg.
+- D. less than 62 µmol/kg.
+
+**Answer:** D
+
+**Explanation:** A: No tank had more than 200 µmol/kg.
+B: At 140–200 µmol/kg (pH 7.9–8.1), shells gained mass at 15°C.
+C: At 62–95 µmol/kg (pH 7.5–7.7), shells still gained mass (+1 and +5 mg).
+D: Correct. The only loss at 15°C was at pH 7.3, where carbonate was 40 µmol/kg, less than 62.
+
+### SCIENCE 11 — Interpretation of Data / extrapolation (medium)
+
+**Question:** If snails had also been raised at pH 7.1 and 15°C, the average change in shell mass would most likely have been closest to:
+
+- A. +6 mg
+- B. +1 mg
+- C. −4 mg
+- D. −9 mg
+
+**Answer:** D
+
+**Explanation:** A: Shell mass change fell as pH fell, so a gain is unlikely below pH 7.3.
+B: +1 mg was the value at pH 7.5; lower pH gave lower values.
+C: −4 mg was the value at pH 7.3; the trend suggests an even larger loss at 7.1.
+D: Correct. At 15°C each 0.2 drop in pH lowered the change by 3–5 mg, so pH 7.1 should be below −4 mg.
+
+### SCIENCE 12 — Evaluation of Models, Inferences, and Experimental Results / drawing conclusions (hard)
+
+**Question:** Which statement about the effect of warmer water (20°C compared with 15°C) is best supported by Table 1?
+
+- A. Warmer water increased shell growth at every pH.
+- B. Warmer water increased shell growth at higher pH but increased shell loss at lower pH.
+- C. Warmer water decreased shell growth at every pH.
+- D. Warmer water had no effect on shell mass at any pH.
+
+**Answer:** B
+
+**Explanation:** A: At pH 7.7, 7.5, and 7.3, the 20°C snails did worse than the 15°C snails.
+B: Correct. At pH 8.1 and 7.9, 20°C snails gained more (+15 vs. +12, +10 vs. +9). At pH 7.5 and 7.3, they did worse (−2 vs. +1, −8 vs. −4).
+C: At pH 8.1 and 7.9, the 20°C snails gained more.
+D: The values differ at every pH.
+
+## Passage / set for SCIENCE questions 13, 14, 15, 16, 17, 18, 19
+
+**Title:** Enzyme Activity
+
+*Catalase* is an enzyme found in many living things, including potatoes. It speeds up the breakdown of hydrogen peroxide (H₂O₂) into water and oxygen gas (O₂). Students used potato extract (a liquid containing catalase) to study how conditions affect catalase activity.
+
+In each trial, potato extract was added to a flask containing 10 mL of 3% H₂O₂. The flask was connected by a tube to an upside-down, water-filled graduated cylinder, so that the O₂ produced pushed water out of the cylinder. The volume of O₂ collected in 60 seconds was recorded. More O₂ means greater catalase activity.
+
+**Experiment 1**
+
+Students added 1.0 mL of extract to the H₂O₂ at pH 7. The extract and H₂O₂ were brought to a different temperature in each trial.
+
+**Table 1**
+
+| Temperature (°C) | O₂ collected (mL) |
+|---|---|
+| 10 | 12 |
+| 20 | 21 |
+| 30 | 33 |
+| 40 | 38 |
+| 50 | 19 |
+| 60 | 4 |
+
+**Experiment 2**
+
+Students added 1.0 mL of extract to the H₂O₂ at 30°C. A different buffer solution was used in each trial to set the pH.
+
+**Table 2**
+
+| pH | O₂ collected (mL) |
+|---|---|
+| 4 | 6 |
+| 5 | 15 |
+| 6 | 27 |
+| 7 | 33 |
+| 8 | 29 |
+| 9 | 17 |
+
+**Experiment 3**
+
+Students used 30°C and pH 7 for every trial but changed the volume of extract added.
+
+**Table 3**
+
+| Extract volume (mL) | O₂ collected (mL) |
+|---|---|
+| 0.5 | 17 |
+| 1.0 | 33 |
+| 1.5 | 48 |
+| 2.0 | 61 |
 
 *Science tables, figures, and experimental descriptions are reproduced from the stored set text above. Image-only figures require manual visual review.*
 
 
-### SCIENCE 16 — Research Summaries (easy)
+### SCIENCE 13 — Interpretation of Data / reading a table (easy)
 
-**Question:** In Experiment 1, what effect does increasing the ice temperature from -10°C to -2°C have on the kinetic friction coefficient of the blades?
+**Question:** In Experiment 1, the greatest volume of O₂ was collected at which temperature?
 
-- A. It increases the friction for Blade A but decreases it for Blade B.
-- B. It decreases the friction for both Blade A and Blade B.
-- C. It increases the friction for both Blade A and Blade B.
-- D. It has no measurable effect on the friction of either blade.
+- A. 30°C
+- B. 40°C
+- C. 50°C
+- D. 60°C
 
 **Answer:** B
 
-**Explanation:** From -10°C to -2°C, Blade A drops from 0.015 to 0.008 and Blade B drops from 0.018 to 0.010, so friction decreases for both.
+**Explanation:** A: At 30°C, 33 mL was collected, less than at 40°C.
+B: Correct. 38 mL at 40°C is the largest value in Table 1.
+C: At 50°C, only 19 mL was collected.
+D: At 60°C, only 4 mL was collected.
 
-### SCIENCE 17 — Research Summaries (easy)
+### SCIENCE 14 — Scientific Investigation / experimental design (easy)
 
-**Question:** Based on Experiment 1, which blade material consistently exhibited lower friction across all tested temperatures?
+**Question:** Which variable was intentionally changed in Experiment 2?
 
-- A. Blade B (stainless steel)
-- B. The blades exhibited identical friction at -6°C.
-- C. Blade A (carbon steel)
-- D. Blade A at lower temperatures, but Blade B at higher temperatures.
-
-**Answer:** C
-
-**Explanation:** At every tested temperature, Blade A's μk is lower than Blade B's corresponding value.
-
-### SCIENCE 18 — Research Summaries (hard)
-
-**Question:** An engineer claims that, at -6°C, choosing Blade A instead of Blade B affects friction more than changing the ice from clean to 20 g/m² of sand impurities. Is this claim supported by the tested data?
-
-- A. Yes; changing blade material changes μk by 0.069, while sand changes it by 0.003.
-- B. Yes; Blade A always had lower friction than Blade B.
-- C. No; changing blade material changes μk by 0.003, while adding 20 g/m² of sand changes Blade A's μk by 0.069.
-- D. No; both changes alter μk by exactly 0.011.
-
-**Answer:** C
-
-**Explanation:** At -6°C on smooth ice, Blade A and Blade B differ by 0.014 − 0.011 = 0.003. For Blade A at -6°C, changing sand from 0 to 20 g/m² changes μk by 0.080 − 0.011 = 0.069. The tested sand effect is much larger.
-
-### SCIENCE 19 — Research Summaries (medium)
-
-**Question:** Comparing the two experiments, which independent variable caused the greatest maximum absolute change in the kinetic friction coefficient for Blade A?
-
-- A. Changing sand impurities from 0 to 20 g/m² caused a much larger absolute change than changing temperature from -2°C to -10°C.
-- B. Changing temperature from -2°C to -10°C caused a much larger absolute change than changing sand impurities from 0 to 20 g/m².
-- C. Both variables caused exactly the same maximum absolute change in friction.
-- D. Switching from Blade B to Blade A caused a larger absolute change than either temperature or sand impurities.
+- A. pH
+- B. Temperature
+- C. Volume of extract
+- D. Volume of H₂O₂
 
 **Answer:** A
 
-**Explanation:** For Blade A, the temperature range changes μk by 0.015 − 0.008 = 0.007, while the tested sand range changes μk by 0.080 − 0.011 = 0.069. Sand produces the larger change.
+**Explanation:** A: Correct. Each trial used a different buffer to set a different pH.
+B: Temperature was kept at 30°C in Experiment 2.
+C: Every trial in Experiment 2 used 1.0 mL of extract.
+D: Every trial used 10 mL of H₂O₂.
 
-### SCIENCE 20 — Research Summaries (medium)
+### SCIENCE 15 — Scientific Investigation / experimental design (medium)
 
-**Question:** For Blade A at -6°C, increasing sand impurities from 0 to 10 g/m² raised μk from 0.011 to 0.045. How does this increase compare with the total change in Blade A's μk from -10°C to -2°C on smooth ice?
+**Question:** The 1.0 mL trial in Experiment 3 was performed under the same conditions as which trial in Experiment 1?
 
-- A. The sand-related increase is 0.027 smaller.
-- B. The sand-related increase is 0.027 larger.
-- C. The two changes are equal at 0.034.
-- D. The sand-related increase is 0.041 larger.
+- A. The trial at 20°C
+- B. The trial at 30°C
+- C. The trial at 40°C
+- D. The trial at 50°C
 
 **Answer:** B
 
-**Explanation:** Adding sand from 0 to 10 g/m² increases μk by 0.034. Across -10°C to -2°C on smooth ice, Blade A changes by 0.007. The sand-related increase is therefore 0.027 larger.
+**Explanation:** A: Experiment 3 used 30°C, not 20°C.
+B: Correct. Both used 1.0 mL of extract, pH 7, and 30°C, and both collected 33 mL of O₂.
+C: Experiment 3 used 30°C, not 40°C.
+D: Experiment 3 used 30°C, not 50°C.
 
-## Passage / set for SCIENCE questions 21, 22, 23, 24, 25
+### SCIENCE 16 — Interpretation of Data / trend (medium)
 
-**Title:** How Far Water Climbs Up Paper Strips
+**Question:** According to Table 3, when the extract volume was doubled from 0.5 mL to 1.0 mL, the volume of O₂ collected:
 
-Students investigated how far water climbs up strips of paper when the bottom edge of each strip is dipped in water. In every trial, a strip 15 cm long was hung vertically with its bottom 0.5 cm below the surface of dyed water at 21°C. The height of the dye line above the water surface was measured with a ruler. Each condition was tested with 5 strips, and the average height was calculated.
+- A. stayed about the same.
+- B. about doubled.
+- C. decreased by about half.
+- D. increased about 10 times.
 
-Experiment 1
-Strips 2 cm wide were cut from four types of paper: filter paper, paper towel, newspaper, and printer paper. The dye height was measured after 10 minutes.
+**Answer:** B
 
-Table 1: Average dye height after 10 minutes (cm)
-Filter paper  | 9.6
-Paper towel   | 7.2
-Newspaper     | 4.8
-Printer paper | 1.5
+**Explanation:** A: It changed from 17 to 33 mL, a large increase.
+B: Correct. It went from 17 mL to 33 mL, almost exactly double.
+C: It increased; it did not decrease.
+D: Ten times 17 would be 170 mL, far more than 33 mL.
 
-Experiment 2
-Only filter paper was used. Strips were cut 1 cm, 2 cm, or 4 cm wide, and the dye height was measured after 2, 5, and 10 minutes.
+### SCIENCE 17 — Interpretation of Data / extrapolation (medium)
 
-Table 2: Average dye height (cm)
-Strip width | 2 min | 5 min | 10 min
-1 cm        | 4.1   | 6.8   | 9.7
-2 cm        | 4.0   | 6.7   | 9.6
-4 cm        | 4.2   | 6.9   | 9.5
+**Question:** If Experiment 3 had included a trial with 2.5 mL of extract, the volume of O₂ collected would most likely have been closest to:
+
+- A. 33 mL
+- B. 55 mL
+- C. 74 mL
+- D. 120 mL
+
+**Answer:** C
+
+**Explanation:** A: 33 mL is the value for 1.0 mL of extract; more extract gave more O₂.
+B: 55 mL is less than the 61 mL collected with 2.0 mL of extract.
+C: Correct. Each extra 0.5 mL added about 13–16 mL of O₂, so 61 + about 13 ≈ 74 mL.
+D: 120 mL would be a jump of almost 60 mL, far larger than the pattern.
+
+### SCIENCE 18 — Evaluation of Models, Inferences, and Experimental Results / scientific reasoning (hard)
+
+**Question:** Which of the following best explains why less O₂ was collected at 50°C and 60°C than at 40°C in Experiment 1?
+
+- A. High temperatures changed the shape of the catalase, making it less able to work.
+- B. High temperatures made the H₂O₂ break down faster.
+- C. The flasks at 50°C and 60°C contained less H₂O₂.
+- D. More extract was added in the trials at 50°C and 60°C.
+
+**Answer:** A
+
+**Explanation:** A: Correct. Enzymes are proteins; too much heat changes (denatures) their shape, so activity drops above an ideal temperature.
+B: If H₂O₂ broke down faster, more O₂ would be collected, not less.
+C: Every trial used 10 mL of 3% H₂O₂.
+D: Every trial in Experiment 1 used 1.0 mL of extract.
+
+### SCIENCE 19 — Evaluation of Models, Inferences, and Experimental Results / evaluating a hypothesis (hard)
+
+**Question:** A student predicted that catalase works best in slightly acidic conditions (pH 5–6). Do the results of Experiment 2 support this prediction?
+
+- A. Yes; the most O₂ was collected at pH 5.
+- B. Yes; the most O₂ was collected at pH 6.
+- C. No; the most O₂ was collected at pH 9.
+- D. No; the most O₂ was collected at pH 7.
+
+**Answer:** D
+
+**Explanation:** A: Only 15 mL was collected at pH 5.
+B: 27 mL at pH 6 is less than 33 mL at pH 7.
+C: Only 17 mL was collected at pH 9; the peak was at pH 7.
+D: Correct. The peak was 33 mL at pH 7, which is neutral, not acidic.
+
+## Passage / set for SCIENCE questions 20, 21, 22, 23, 24, 25, 26
+
+**Title:** Plants and Light
+
+Plants use light to make food through photosynthesis. Different colors of light can affect how plants grow. Two studies were done with bean seedlings.
+
+In both studies, all seeds came from the same package and were planted in identical pots with the same soil. Each pot received the same amount of water each day, and room temperature was kept at 24°C. Each group had 20 plants. After 14 days, the height of each plant was measured, and its leaves were removed and weighed.
+
+**Study 1**
+
+Four groups of plants were grown under LED lights of different colors. All lights had the same brightness and were on for 12 hours per day.
+
+**Table 1**
+
+| Light color | Average height (cm) | Average leaf mass (g) |
+|---|---|---|
+| White | 18.2 | 2.4 |
+| Red | 22.5 | 1.9 |
+| Blue | 12.1 | 2.6 |
+| Green | 9.4 | 1.1 |
+
+**Study 2**
+
+Five groups of plants were grown under white LED lights of the same brightness as in Study 1. Each group received light for a different number of hours per day.
+
+**Table 2**
+
+| Hours of light per day | Average height (cm) | Average leaf mass (g) |
+|---|---|---|
+| 4 | 8.3 | 0.9 |
+| 8 | 13.6 | 1.7 |
+| 12 | 18.2 | 2.4 |
+| 16 | 20.9 | 2.9 |
+| 20 | 21.4 | 3.0 |
 
 *Science tables, figures, and experimental descriptions are reproduced from the stored set text above. Image-only figures require manual visual review.*
 
 
-### SCIENCE 21 — Research Summaries (easy)
+### SCIENCE 20 — Interpretation of Data / reading a table (easy)
 
-**Question:** Which factor did the students deliberately vary in Experiment 2 that was kept the same in Experiment 1?
+**Question:** In Study 1, plants grown under which color of light had the greatest average height?
 
-- A. The width of the paper strip
-- B. The type of paper
-- C. The height of the dye line
-- D. The temperature of the water
+- A. Red
+- B. White
+- C. Blue
+- D. Green
 
 **Answer:** A
 
-**Explanation:** Every strip in Experiment 1 was 2 cm wide, while Experiment 2 used strips 1, 2, and 4 cm wide. Paper type was varied in Experiment 1 but fixed as filter paper in Experiment 2. The dye height was the measured result, and the water was 21°C in all trials.
+**Explanation:** A: Correct. Red-light plants averaged 22.5 cm, the tallest in Table 1.
+B: White-light plants averaged 18.2 cm, shorter than red.
+C: Blue-light plants averaged 12.1 cm.
+D: Green-light plants averaged 9.4 cm, the shortest.
 
-### SCIENCE 22 — Research Summaries (easy)
+### SCIENCE 21 — Scientific Investigation / experimental design (easy)
 
-**Question:** In Experiment 1, how did the average dye height in paper towel compare with that in newspaper?
+**Question:** Which variable was intentionally changed in Study 2?
 
-- A. It was 2.4 cm lower in paper towel.
-- B. It was 5.7 cm higher in paper towel.
-- C. It was 4.8 cm higher in paper towel.
-- D. It was 2.4 cm higher in paper towel.
-
-**Answer:** D
-
-**Explanation:** After 10 minutes, the dye reached 7.2 cm in paper towel and 4.8 cm in newspaper. Since 7.2 − 4.8 = 2.4, the dye climbed 2.4 cm higher in paper towel. A 5.7 cm difference compares paper towel with printer paper, and 4.8 cm compares filter paper with newspaper.
-
-### SCIENCE 23 — Research Summaries (hard)
-
-**Question:** A student predicts that newspaper strips 4 cm wide would reach a dye height of about 4.8 cm after 10 minutes. Is this prediction justified by the two experiments?
-
-- A. Yes; Experiment 2 showed that width does not affect how high water climbs in paper.
-- B. Yes; Experiment 1 showed that newspaper strips reached 4.8 cm after 10 minutes.
-- C. No; Experiment 2 showed that wider strips reach lower dye heights.
-- D. Not with certainty; width was tested only with filter paper, so its effect on newspaper is unknown.
-
-**Answer:** D
-
-**Explanation:** Experiment 1 measured newspaper only with 2 cm strips, and Experiment 2 tested different widths only with filter paper. Width had little effect in filter paper, but no data show whether the same holds for newspaper, which behaved very differently in Experiment 1. The prediction is reasonable but goes beyond what was tested. The small differences among filter paper widths (9.5 to 9.7 cm at 10 minutes) also do not show a meaningful decrease with width.
-
-### SCIENCE 24 — Research Summaries (medium)
-
-**Question:** Based on the 2 cm strips in Experiment 2, how did the rate at which water climbed change over the 10 minutes?
-
-- A. Water climbed at a constant rate throughout the 10 minutes.
-- B. Water climbed fastest in the first 2 minutes and more slowly afterward.
-- C. Water climbed slowly at first and faster in the last 5 minutes.
-- D. Water climbed farther from 5 to 10 minutes than in the first 2 minutes.
-
-**Answer:** B
-
-**Explanation:** The 2 cm strips gained 4.0 cm in the first 2 minutes (2.0 cm per minute), 2.7 cm in the next 3 minutes (0.9 cm per minute), and 2.9 cm in the last 5 minutes (about 0.6 cm per minute). The climbing rate dropped over time. The 2.9 cm gained from 5 to 10 minutes is also less than the 4.0 cm gained in the first 2 minutes.
-
-### SCIENCE 25 — Research Summaries (medium)
-
-**Question:** Which conclusion about filter paper is best supported by the results of Experiment 2?
-
-- A. Wider strips allowed water to climb much higher at every time measured.
-- B. Narrower strips allowed water to climb much higher at every time measured.
-- C. Strip width had little effect on dye height at every time measured.
-- D. Water stopped climbing after the first 5 minutes.
+- A. The color of the light
+- B. The amount of water given
+- C. The number of hours of light per day
+- D. The type of seed
 
 **Answer:** C
 
-**Explanation:** At each time, the three widths gave nearly identical heights: 4.0 to 4.2 cm at 2 minutes, 6.7 to 6.9 cm at 5 minutes, and 9.5 to 9.7 cm at 10 minutes. These differences of 0.2 cm or less show no consistent pattern with width. The water also kept climbing, rising about 3 cm between 5 and 10 minutes.
+**Explanation:** A: All Study 2 plants were grown under white light.
+B: All pots received the same amount of water.
+C: Correct. Each group in Study 2 got a different number of hours of light (4 to 20).
+D: All seeds came from the same package.
 
-## Passage / set for SCIENCE questions 26, 27, 28, 29, 30
+### SCIENCE 22 — Scientific Investigation / experimental design (medium)
 
-**Title:** Gas Production by Two Yeast Strains in Bread Dough
+**Question:** Which group in Study 1 was grown under the same conditions as the 12-hour group in Study 2?
 
-Yeast are tiny organisms that release gas as they feed, which makes bread dough rise. A baker tested how sugar and temperature affect gas production by two yeast strains, X and Y. In each trial, 100 g of flour, 60 mL of water, and 2 g of yeast were mixed into a dough and sealed in a flask attached to a gas collection tube. The volume of gas collected in 60 minutes was recorded. Each condition was tested 4 times, and the averages are shown.
+- A. The red-light group
+- B. The blue-light group
+- C. The green-light group
+- D. The white-light group
 
-Experiment 1
-Dough was made with Strain X or Strain Y and with 0, 5, or 10 g of sugar. All flasks were kept at 30°C.
+**Answer:** D
 
-Table 1: Average gas volume after 60 minutes (mL)
-Sugar (g) | Strain X | Strain Y
-0         | 40       | 20
-5         | 90       | 60
-10        | 120      | 100
+**Explanation:** A: Study 2 used white light, not red.
+B: Study 2 used white light, not blue.
+C: Study 2 used white light, not green.
+D: Correct. Both had white light, the same brightness, and 12 hours per day, and both averaged 18.2 cm and 2.4 g.
 
-Experiment 2
-Only Strain X was used, with 5 g of sugar in each dough. Flasks were kept at 20°C, 30°C, or 40°C.
+### SCIENCE 23 — Interpretation of Data / comparing data (medium)
 
-Table 2: Average gas volume after 60 minutes (mL)
-Temperature (°C) | Strain X
-20               | 50
-30               | 90
-40               | 70
+**Question:** In Study 2, how did the increase in average height from 16 to 20 hours compare with the increase from 4 to 8 hours?
+
+- A. It was about the same.
+- B. It was much larger.
+- C. It was much smaller.
+- D. It was a decrease rather than an increase.
+
+**Answer:** C
+
+**Explanation:** A: 0.5 cm and 5.3 cm are very different.
+B: 0.5 cm is smaller than 5.3 cm, not larger.
+C: Correct. 16 → 20 hours added 0.5 cm (20.9 → 21.4), while 4 → 8 hours added 5.3 cm (8.3 → 13.6).
+D: Height still increased slightly from 20.9 to 21.4 cm.
+
+### SCIENCE 24 — Interpretation of Data / extrapolation (medium)
+
+**Question:** If a group in Study 2 had received light for 24 hours per day, its average leaf mass would most likely have been closest to:
+
+- A. 1.5 g
+- B. 2.4 g
+- C. 3.0 g
+- D. 4.5 g
+
+**Answer:** C
+
+**Explanation:** A: 1.5 g is less than the 8-hour group's 1.7 g; more hours of light gave more leaf mass.
+B: 2.4 g is the 12-hour value; more hours gave more mass.
+C: Correct. Leaf mass was leveling off (2.9 g at 16 hours, 3.0 g at 20 hours), so 24 hours should give about 3.0 g.
+D: A jump to 4.5 g doesn't fit the leveling-off pattern.
+
+### SCIENCE 25 — Evaluation of Models, Inferences, and Experimental Results / evaluating a claim (hard)
+
+**Question:** A student claims that in these studies, taller plants always had greater leaf mass. Which result is inconsistent with this claim?
+
+- A. Green-light plants were the shortest and had the least leaf mass.
+- B. In Study 2, plants with 20 hours of light were tallest and had the most leaf mass.
+- C. Blue-light plants were taller than green-light plants and had more leaf mass.
+- D. Red-light plants were taller than white-light plants but had less leaf mass.
+
+**Answer:** D
+
+**Explanation:** A: Shortest with least mass fits the claim.
+B: Tallest with most mass fits the claim.
+C: Taller with more mass fits the claim.
+D: Correct. Red: 22.5 cm and 1.9 g; white: 18.2 cm and 2.4 g. The taller group had less leaf mass.
+
+### SCIENCE 26 — Scientific Investigation / experimental design (medium)
+
+**Question:** Why did the researchers use seeds from the same package and give every pot the same soil, water, and temperature?
+
+- A. So that the plants would grow as tall as possible
+- B. So that each group would need less light
+- C. So that the plants would all have the same leaf mass
+- D. So that differences in growth could be linked to the light and not to other factors
+
+**Answer:** D
+
+**Explanation:** A: Keeping conditions equal doesn't make plants grow taller; it makes the comparison fair.
+B: Controlling these factors doesn't change how much light the plants need.
+C: The groups ended with different leaf masses, so this was not the goal.
+D: Correct. Keeping other factors the same (controlled variables) makes light the only thing that differs between groups.
+
+## Passage / set for SCIENCE questions 27, 28, 29, 30, 31, 32, 33
+
+**Title:** Blocks on Ramps
+
+A physics class studied how a wooden block slides down a ramp. In each trial, the block was placed at rest at the top of a ramp and released. The time it took to slide 1.0 m down the ramp was measured with a motion sensor. Each time shown is the average of 5 trials. A shorter time means the block sped up more quickly.
+
+**Experiment 1**
+
+A 0.4 kg block was placed on a ramp with a wood surface. The angle of the ramp was changed in each trial.
+
+**Table 1**
+
+| Ramp angle | Time to slide 1.0 m (s) |
+|---|---|
+| 15° | did not move |
+| 20° | 1.84 |
+| 25° | 1.16 |
+| 30° | 0.92 |
+| 35° | 0.79 |
+| 40° | 0.70 |
+
+**Experiment 2**
+
+The 0.4 kg block was placed on a ramp set at 30°. The ramp was covered with a different surface material in each trial.
+
+**Table 2**
+
+| Ramp surface | Time to slide 1.0 m (s) |
+|---|---|
+| Glass | 0.70 |
+| Wood | 0.92 |
+| Sandpaper | 1.74 |
+| Rubber | did not move |
+
+**Experiment 3**
+
+Blocks of different mass were placed on a wood-surface ramp set at 30°.
+
+**Table 3**
+
+| Block mass (kg) | Time to slide 1.0 m (s) |
+|---|---|
+| 0.2 | 0.92 |
+| 0.4 | 0.92 |
+| 0.8 | 0.91 |
 
 *Science tables, figures, and experimental descriptions are reproduced from the stored set text above. Image-only figures require manual visual review.*
 
 
-### SCIENCE 26 — Research Summaries (easy)
+### SCIENCE 27 — Interpretation of Data / trend (easy)
 
-**Question:** Which of the following was held constant for all trials in Experiment 1?
+**Question:** According to Table 1, as the ramp angle increased from 20° to 40°, the time for the block to slide 1.0 m:
 
-- A. The amount of sugar in the dough
-- B. The temperature of the dough
-- C. The strain of yeast used
-- D. The volume of gas collected
-
-**Answer:** B
-
-**Explanation:** All flasks in Experiment 1 were kept at 30°C, so temperature did not change. Sugar amount (0, 5, or 10 g) and yeast strain (X or Y) were both varied, and gas volume was the measured result.
-
-### SCIENCE 27 — Research Summaries (easy)
-
-**Question:** In Experiment 1, with 10 g of sugar, how did the gas volume from Strain X compare with that from Strain Y?
-
-- A. Strain X produced 20 mL less.
-- B. Strain X produced 30 mL more.
-- C. Strain X produced 80 mL more.
-- D. Strain X produced 20 mL more.
-
-**Answer:** D
-
-**Explanation:** With 10 g of sugar, Strain X produced 120 mL and Strain Y produced 100 mL, so Strain X produced 120 − 100 = 20 mL more. A 30 mL difference comes from the 5 g row, and 80 mL compares Strain X at 10 g with Strain X at 0 g.
-
-### SCIENCE 28 — Research Summaries (hard)
-
-**Question:** A student claims, "Strain Y responds more strongly to added sugar than Strain X does." Based on the change from 0 g to 10 g of sugar in Experiment 1, which evaluation of this claim is best?
-
-- A. Not supported; both strains gained 80 mL, so they responded equally in every way.
-- B. Supported only in relative terms; both gained 80 mL, but Strain Y's gas increased 5-fold and Strain X's only 3-fold.
-- C. Supported in absolute terms; Strain Y gained more milliliters of gas than Strain X.
-- D. Not supported; Strain X produced more gas at every sugar level, so Strain X responded more strongly.
-
-**Answer:** B
-
-**Explanation:** From 0 g to 10 g of sugar, Strain X rose from 40 to 120 mL and Strain Y rose from 20 to 100 mL, so each gained 80 mL. Relative to its starting amount, however, Strain X's gas tripled (120 ÷ 40 = 3) while Strain Y's increased five times (100 ÷ 20 = 5). The claim holds for the relative change but not the absolute change, and producing more total gas does not mean a strain responded more to sugar.
-
-### SCIENCE 29 — Research Summaries (medium)
-
-**Question:** Which statement best describes the effect of temperature on gas production in Experiment 2?
-
-- A. Gas volume increased steadily from 20°C to 40°C.
-- B. Gas volume decreased steadily from 20°C to 40°C.
-- C. Gas volume was highest at 30°C and lower at both 20°C and 40°C.
-- D. Gas volume was about the same at all three temperatures.
+- A. increased only.
+- B. increased and then decreased.
+- C. decreased only.
+- D. stayed the same.
 
 **Answer:** C
 
-**Explanation:** Strain X produced 50 mL at 20°C, 90 mL at 30°C, and 70 mL at 40°C. Gas volume rose from 20°C to 30°C and then fell from 30°C to 40°C, so the middle temperature gave the most gas. The trend was neither steadily up nor steadily down.
+**Explanation:** A: The times got shorter, not longer.
+B: There was no increase at any point.
+C: Correct. The time dropped at every step: 1.84 → 1.16 → 0.92 → 0.79 → 0.70 s.
+D: The time changed from 1.84 s to 0.70 s.
 
-### SCIENCE 30 — Research Summaries (medium)
+### SCIENCE 28 — Interpretation of Data / reading a table (easy)
 
-**Question:** Based on both experiments, which dough produced more gas in 60 minutes: Strain X with 5 g of sugar at 20°C, or Strain Y with 5 g of sugar at 30°C?
+**Question:** According to Table 2, the block slid 1.0 m in the shortest time on which surface?
 
-- A. Strain Y at 30°C, by 10 mL
-- B. Strain X at 20°C, by 10 mL
-- C. Both produced the same volume
-- D. Strain Y at 30°C, by 40 mL
+- A. Glass
+- B. Wood
+- C. Sandpaper
+- D. Rubber
 
 **Answer:** A
 
-**Explanation:** Experiment 2 shows that Strain X with 5 g of sugar at 20°C produced 50 mL. Experiment 1 shows that Strain Y with 5 g of sugar at 30°C produced 60 mL. Strain Y produced 60 − 50 = 10 mL more, even though Strain X produced more gas than Strain Y when both were at 30°C.
+**Explanation:** A: Correct. Glass had the shortest time, 0.70 s.
+B: Wood took 0.92 s, longer than glass.
+C: Sandpaper took 1.74 s.
+D: On rubber, the block did not move at all.
 
-## Passage / set for SCIENCE questions 31, 32, 33, 34, 35
+### SCIENCE 29 — Evaluation of Models, Inferences, and Experimental Results / drawing conclusions (medium)
 
-**Title:** Light Color, Light Duration, and Duckweed Growth
+**Question:** The results of Experiment 3 best support which conclusion about the block's mass?
 
-Duckweed is a tiny plant that floats on water and reproduces by splitting into new plants. A student investigated how the color and duration of light affect how quickly duckweed populations grow.
+- A. Mass had little or no effect on the time to slide 1.0 m.
+- B. Heavier blocks slid 1.0 m in much less time.
+- C. Heavier blocks slid 1.0 m in much more time.
+- D. Only the 0.4 kg block was able to slide.
 
-Experiment 1
-Twelve identical glass tanks were each filled with 2 L of the same pond water and given 20 duckweed plants. Three tanks were assigned to each light color: white, red, blue, or green. Each tank was lit from above by a lamp of its assigned color for 12 hours per day, and all lamps were adjusted to the same light intensity. Water temperature in every tank was kept at 24°C. After 14 days, the student counted the plants in each tank.
+**Answer:** A
 
-Table 1: Number of plants after 14 days (Experiment 1)
+**Explanation:** A: Correct. Doubling and quadrupling the mass changed the time by at most 0.01 s.
+B: The 0.8 kg block took 0.91 s, almost the same as the 0.2 kg block (0.92 s).
+C: The heavier block did not take longer.
+D: All three blocks slid.
 
-Light color | Tank 1 | Tank 2 | Tank 3 | Average
-White       | 62     | 58     | 60     | 60
-Red         | 54     | 50     | 52     | 52
-Blue        | 46     | 44     | 48     | 46
-Green       | 26     | 24     | 22     | 24
+### SCIENCE 30 — Scientific Investigation / experimental design (medium)
 
-Experiment 2
-The procedure of Experiment 1 was repeated with 9 new tanks, except that all tanks received white light, and three tanks each were lit for 8, 12, or 16 hours per day.
+**Question:** The wood trial in Experiment 2 was performed under the same conditions as which trial in Experiment 1?
 
-Table 2: Average number of plants after 14 days (Experiment 2)
+- A. The trial at 20°
+- B. The trial at 25°
+- C. The trial at 30°
+- D. The trial at 40°
 
-Hours of light per day | Average
-8                      | 34
-12                     | 60
-16                     | 72
+**Answer:** C
+
+**Explanation:** A: Experiment 2 used a 30° ramp.
+B: Experiment 2 used a 30° ramp.
+C: Correct. Both used the 0.4 kg block on wood at 30°, and both took 0.92 s.
+D: Experiment 2 used a 30° ramp.
+
+### SCIENCE 31 — Interpretation of Data / extrapolation (medium)
+
+**Question:** If Experiment 1 had included a trial at 45°, the time to slide 1.0 m would most likely have been closest to:
+
+- A. 0.64 s
+- B. 0.75 s
+- C. 0.92 s
+- D. 1.20 s
+
+**Answer:** A
+
+**Explanation:** A: Correct. Times kept getting shorter as the angle increased (0.79 s at 35°, 0.70 s at 40°), so 45° should be a bit less than 0.70 s.
+B: 0.75 s is longer than the 40° time; steeper ramps gave shorter times.
+C: 0.92 s is the 30° time.
+D: 1.20 s is close to the 25° time; a 45° ramp should be faster.
+
+### SCIENCE 32 — Evaluation of Models, Inferences, and Experimental Results / scientific reasoning (hard)
+
+**Question:** Which of the following best explains why the block did not move at 15° on wood (Experiment 1) and at 30° on rubber (Experiment 2)?
+
+- A. The block was too light for gravity to act on it.
+- B. Gravity pulls only on blocks placed on steep ramps.
+- C. The motion sensor could not detect the block on those surfaces.
+- D. Friction between the block and the surface was strong enough to balance the pull of gravity down the ramp.
+
+**Answer:** D
+
+**Explanation:** A: The same 0.4 kg block slid in other trials, so it wasn't too light.
+B: Gravity acts on the block at every angle.
+C: Nothing suggests a sensor problem; the block didn't move.
+D: Correct. The block stays still when friction can match the part of gravity pulling it down the ramp. A low angle or a grippy surface makes this happen.
+
+### SCIENCE 33 — Evaluation of Models, Inferences, and Experimental Results / applying results (hard)
+
+**Question:** Based on Experiments 1 and 2, if the students wanted the block to slide down a sandpaper ramp in about 0.92 s, they should most likely have:
+
+- A. used an angle greater than 30°.
+- B. used an angle less than 30°.
+- C. kept the angle at 30° and used a heavier block.
+- D. kept the angle at 30° and used a lighter block.
+
+**Answer:** A
+
+**Explanation:** A: Correct. On sandpaper at 30°, the block took 1.74 s, too slow. Experiment 1 shows that steeper angles make the time shorter.
+B: A smaller angle would make the time even longer than 1.74 s.
+C: Experiment 3 shows that mass has almost no effect on the time.
+D: Experiment 3 shows that mass has almost no effect on the time.
+
+## Passage / set for SCIENCE questions 34, 35, 36, 37, 38, 39, 40
+
+**Title:** Where Did the Moon Come From?
+
+Scientists have long debated how Earth's Moon formed. Some facts are known:
+
+- The Moon's average density is about 3.3 g/cm³, while Earth's is about 5.5 g/cm³.
+- Earth has a large iron core. The Moon has only a very small iron core.
+- Earth's *mantle* (the rocky layer above the core) contains little iron.
+
+Three students explain the Moon's origin.
+
+**Student 1**
+
+Early Earth spun very fast, completing one rotation in just a few hours. This fast spin caused part of Earth's outer layers to bulge out at the equator and break away. That material formed the Moon. Because it came from Earth's mantle, the Moon has little iron and a low density. Rocks from the Moon should have nearly the same chemical makeup as rocks from Earth's mantle.
+
+**Student 2**
+
+The Moon formed in a different part of the solar system, where less iron was available. Later, it passed close to Earth and was captured by Earth's gravity. Because the Moon formed far from Earth, from different material, Moon rocks should have a chemical makeup that is clearly different from that of Earth rocks.
+
+**Student 3**
+
+Soon after Earth formed, a planet-sized body about the size of Mars crashed into it. The collision blasted rock from the mantles of both bodies into orbit around Earth, and this material came together to form the Moon. Most of the iron from both bodies' cores ended up in Earth. The heat of the collision boiled away substances that turn into gas easily, such as water. So Moon rocks should be similar to Earth's mantle rocks but contain much less water.
 
 *Science tables, figures, and experimental descriptions are reproduced from the stored set text above. Image-only figures require manual visual review.*
 
 
-### SCIENCE 31 — Research Summaries (easy)
+### SCIENCE 34 — Evaluation of Models, Inferences, and Experimental Results / understanding a viewpoint (easy)
 
-**Question:** In Experiment 1, which factor did the student deliberately vary from one group of tanks to another?
+**Question:** According to Student 2, the Moon formed:
 
-- A. The number of plants after 14 days
-- B. The number of hours of light per day
-- C. The temperature of the water
-- D. The color of the light
-
-**Answer:** D
-
-**Explanation:** In Experiment 1, groups of three tanks were assigned white, red, blue, or green light, so light color was the variable the student changed. Every tank received 12 hours of light at 24°C, and the number of plants after 14 days was the result being measured. Hours of light per day was the variable changed in Experiment 2, not Experiment 1.
-
-### SCIENCE 32 — Research Summaries (easy)
-
-**Question:** In Experiment 1, compared with tanks under blue light, tanks under red light ended with:
-
-- A. 6 fewer plants on average.
-- B. 6 more plants on average.
-- C. 8 more plants on average.
-- D. 28 more plants on average.
-
-**Answer:** B
-
-**Explanation:** Red-light tanks averaged 52 plants and blue-light tanks averaged 46 plants. Since 52 − 46 = 6, red light produced 6 more plants on average. A difference of 8 compares white and red, and 28 compares red and green.
-
-### SCIENCE 33 — Research Summaries (hard)
-
-**Question:** The student wants to find out whether red light still produces fewer plants than white light when both are given 16 hours of light per day. Which new experiment would best test this?
-
-- A. Light 3 tanks with red light for 16 hours per day, and compare them with the white-light tanks from Experiment 1, which received 12 hours per day.
-- B. Light 3 tanks with red light for 16 hours per day, and compare them with the red-light tanks from Experiment 1.
-- C. Light 3 tanks with red light and 3 with white light, both for 16 hours per day, but start the red tanks with 30 plants instead of 20.
-- D. Light 3 tanks with red light and 3 with white light, both for 16 hours per day, with all other conditions the same as Experiment 1.
-
-**Answer:** D
-
-**Explanation:** To compare red and white light at 16 hours per day, both colors must receive 16 hours while everything else (starting plants, water, intensity, temperature, and 14 days) stays the same, so color is the only difference. Comparing red at 16 hours with white at 12 hours changes two factors at once, and comparing red at 16 hours with red at 12 hours tests duration, not color. Starting the red tanks with more plants would add a second difference that could affect the final counts.
-
-### SCIENCE 34 — Research Summaries (medium)
-
-**Question:** Based on Experiment 2, which statement best describes the effect of adding 4 hours of light per day?
-
-- A. Each 4-hour increase added the same number of plants.
-- B. Increasing from 12 to 16 hours added more plants than increasing from 8 to 12 hours.
-- C. Increasing from 8 to 12 hours added more plants than increasing from 12 to 16 hours.
-- D. Increasing beyond 12 hours reduced the number of plants.
+- A. from material that broke off Earth's equator.
+- B. from debris after a collision with Earth.
+- C. in a different part of the solar system from Earth.
+- D. at the same time and place as Earth's core.
 
 **Answer:** C
 
-**Explanation:** Raising light from 8 to 12 hours increased the average from 34 to 60 plants, a gain of 26. Raising it from 12 to 16 hours increased the average from 60 to 72, a gain of only 12. More light still helped, but the second 4-hour increase added fewer plants than the first.
+**Explanation:** A: This is Student 1's view.
+B: This is Student 3's view.
+C: Correct. Student 2 says the Moon "formed in a different part of the solar system" and was later captured.
+D: No student says this.
 
-### SCIENCE 35 — Research Summaries (medium)
+### SCIENCE 35 — Evaluation of Models, Inferences, and Experimental Results / comparing viewpoints (easy)
 
-**Question:** Which conclusion about light duration is NOT supported by the two experiments?
+**Question:** Which students state that at least some of the Moon's material came from Earth?
 
-- A. Under white light, increasing daily light from 8 to 16 hours increased the average number of plants.
-- B. The effect of increasing light duration would be the same under red, blue, and green light as under white light.
-- C. White light given for 12 hours per day produced the same average in both experiments.
-- D. Experiment 2 varied daily light duration while keeping light color constant.
-
-**Answer:** B
-
-**Explanation:** Experiment 2 tested different light durations only under white light. It therefore supports conclusions about duration under white light, but it does not show that red, blue, and green light would respond to added hours in the same way.
-
-## Passage / set for SCIENCE questions 36, 37, 38, 39, 40
-
-**Title:** Evaporation Rates Under Different Temperatures and Fan Speeds
-
-A student studied how air temperature and air movement affect how much water evaporates from an open dish. In each trial, a shallow dish holding 100.0 g of water was placed inside a closed chamber. The air temperature in the chamber was held at 20°C, 30°C, 40°C, or 50°C. A fan blew air across the dish at 0 m/s (fan off), 2 m/s, or 4 m/s. After 60 minutes, the dish was weighed, and the mass of water lost to evaporation was recorded. All dishes had the same size and shape, and all other conditions were kept constant.
-
-Table 1: Mass of water lost (g) after 60 minutes
-
-Temperature | Fan 0 m/s | Fan 2 m/s | Fan 4 m/s
-20°C        | 2.0       | 3.0       | 4.0
-30°C        | 3.5       | 5.0       | 6.5
-40°C        | 5.5       | 7.5       | 9.5
-50°C        | 8.0       | 10.5      | 13.0
-
-*Science tables, figures, and experimental descriptions are reproduced from the stored set text above. Image-only figures require manual visual review.*
-
-
-### SCIENCE 36 — Data Representation (easy)
-
-**Question:** According to Table 1, at 30°C, as fan speed increased from 0 m/s to 4 m/s, the mass of water lost:
-
-- A. decreased from 6.5 g to 3.5 g.
-- B. increased from 3.5 g to 6.5 g.
-- C. increased from 2.0 g to 4.0 g.
-- D. increased from 3.5 g to 13.0 g.
-
-**Answer:** B
-
-**Explanation:** At 30°C, the table shows 3.5 g lost at 0 m/s, 5.0 g at 2 m/s, and 6.5 g at 4 m/s. Therefore, increasing fan speed from 0 m/s to 4 m/s increased water loss from 3.5 g to 6.5 g.
-
-### SCIENCE 37 — Data Representation (easy)
-
-**Question:** Based on Table 1, which trial lost more water, and by how much: the trial at 40°C with the fan off, or the trial at 30°C with the fan at 4 m/s?
-
-- A. The 30°C, 4 m/s trial lost 1.0 g more.
-- B. The 40°C, 0 m/s trial lost 1.0 g more.
-- C. Both trials lost the same mass of water.
-- D. The 30°C, 4 m/s trial lost 3.0 g more.
-
-**Answer:** A
-
-**Explanation:** The 40°C, 0 m/s trial lost 5.5 g, while the 30°C, 4 m/s trial lost 6.5 g. The difference is 6.5 − 5.5 = 1.0 g, so the 30°C, 4 m/s trial lost 1.0 g more.
-
-### SCIENCE 38 — Data Representation (hard)
-
-**Question:** A researcher proposes that temperature and fan speed affect evaporation independently, meaning that increasing fan speed from 0 m/s to 4 m/s should increase water loss by the same amount at every tested temperature. Which statement best evaluates this proposal using Table 1?
-
-- A. The proposal is supported because water loss was greater at 4 m/s than at 0 m/s at every temperature.
-- B. The proposal is supported because water loss increased as temperature increased at every fan speed.
-- C. The proposal is not supported because the 0-to-4 m/s increase in water loss grew from 2.0 g at 20°C to 5.0 g at 50°C.
-- D. The proposal is not supported because the water loss at 4 m/s was different at each temperature.
-
-**Answer:** C
-
-**Explanation:** If the fan-speed effect were independent of temperature as defined in the proposal, changing the fan from 0 m/s to 4 m/s would add the same amount of water loss at every temperature. Instead, the increase is 2.0 g at 20°C, 3.0 g at 30°C, 4.0 g at 40°C, and 5.0 g at 50°C, so the effect of fan speed becomes larger as temperature rises.
-
-### SCIENCE 39 — Data Representation (medium)
-
-**Question:** Which of the following statements about the effect of fan speed is best supported by Table 1?
-
-- A. At each temperature, increasing fan speed from 0 m/s to 2 m/s increased the mass lost more than increasing it from 2 m/s to 4 m/s.
-- B. At each temperature, each 2 m/s increase in fan speed increased the mass lost by the same amount, and that amount was the same at all temperatures.
-- C. At each temperature, each 2 m/s increase in fan speed increased the mass lost by the same amount, and that amount was larger at higher temperatures.
-- D. At each temperature, each 2 m/s increase in fan speed increased the mass lost by the same amount, and that amount was smaller at higher temperatures.
-
-**Answer:** C
-
-**Explanation:** Within each temperature row, the increase from 0 to 2 m/s equals the increase from 2 to 4 m/s. Those equal step sizes are 1.0 g at 20°C, 1.5 g at 30°C, 2.0 g at 40°C, and 2.5 g at 50°C, so the effect of each 2 m/s fan-speed increase grows as temperature rises.
-
-### SCIENCE 40 — Data Representation (medium)
-
-**Question:** For which fan speed did raising the temperature from 20°C to 50°C cause the greatest increase in the mass of water lost?
-
-- A. 0 m/s
-- B. 2 m/s
-- C. The increase was the same for all three fan speeds.
-- D. 4 m/s
+- A. Student 1 only
+- B. Students 2 and 3 only
+- C. Students 1, 2, and 3
+- D. Students 1 and 3 only
 
 **Answer:** D
 
-**Explanation:** From 20°C to 50°C, water loss increased by 6.0 g at 0 m/s, 7.5 g at 2 m/s, and 9.0 g at 4 m/s. The greatest increase was 9.0 g at 4 m/s.
+**Explanation:** A: Student 3 also says the material came partly from Earth's mantle.
+B: Student 2 says the Moon formed from different material, far from Earth.
+C: Student 2 does not say any of the Moon came from Earth.
+D: Correct. Student 1 says it broke off Earth; Student 3 says it came from both bodies' mantles, including Earth's.
+
+### SCIENCE 36 — Evaluation of Models, Inferences, and Experimental Results / weakening a viewpoint (medium)
+
+**Question:** Studies show that the oxygen in Moon rocks has nearly the same chemical makeup as the oxygen in Earth's mantle rocks. This finding most weakens the view of which student?
+
+- A. Student 1
+- B. Student 3
+- C. None of the students
+- D. Student 2
+
+**Answer:** D
+
+**Explanation:** A: Student 1 predicts Moon rocks should match Earth's mantle, so this supports Student 1.
+B: Student 3 predicts Moon rocks should be similar to Earth's mantle, so this supports Student 3.
+C: It conflicts with Student 2's prediction.
+D: Correct. Student 2 predicts Moon rocks should be "clearly different" from Earth rocks.
+
+### SCIENCE 37 — Evaluation of Models, Inferences, and Experimental Results / strengthening a viewpoint (medium)
+
+**Question:** Moon rocks have been found to contain much less water than Earth rocks. This finding most strongly supports which student's view?
+
+- A. Student 1
+- B. Student 3
+- C. Student 2
+- D. Students 1 and 2 equally
+
+**Answer:** B
+
+**Explanation:** A: Student 1 predicts Moon rocks should be nearly the same as Earth's mantle, which doesn't explain less water.
+B: Correct. Only Student 3 predicts that Moon rocks should contain much less water, because the collision's heat boiled it away.
+C: Student 2 predicts different makeup but says nothing about water specifically.
+D: Neither Student 1 nor Student 2 predicts low water.
+
+### SCIENCE 38 — Evaluation of Models, Inferences, and Experimental Results / comparing viewpoints (medium)
+
+**Question:** Students 1 and 3 would most likely agree that the Moon has a small iron core because:
+
+- A. the Moon formed far from the Sun, where little iron was available.
+- B. the Moon formed mostly from mantle material, which contains little iron.
+- C. the Moon's iron was boiled away by heat.
+- D. iron from Earth's core moved to the Moon.
+
+**Answer:** B
+
+**Explanation:** A: This reason is Student 2's.
+B: Correct. Student 1 says the Moon came from Earth's mantle; Student 3 says it came from the mantles of two bodies. Both point to iron-poor mantle rock.
+C: Student 3 says heat boiled away water and similar substances, not iron.
+D: Neither student says iron moved from Earth to the Moon; Student 3 says the iron went into Earth.
+
+### SCIENCE 39 — Evaluation of Models, Inferences, and Experimental Results / weakening a viewpoint (medium)
+
+**Question:** Calculations show that early Earth could never have spun fast enough to throw off material from its equator. This finding most weakens the view of which student?
+
+- A. Student 2
+- B. Student 3
+- C. Students 2 and 3
+- D. Student 1
+
+**Answer:** D
+
+**Explanation:** A: Student 2's view doesn't depend on Earth's spin.
+B: Student 3's view depends on a collision, not on Earth's spin.
+C: Neither Student 2 nor Student 3 relies on fast spin.
+D: Correct. Student 1's explanation depends on Earth spinning fast enough for material to break away.
+
+### SCIENCE 40 — Evaluation of Models, Inferences, and Experimental Results / comparing viewpoints (hard)
+
+**Question:** Which statement is consistent with the views of both Student 2 and Student 3 but NOT with the view of Student 1?
+
+- A. The Moon formed entirely from Earth's mantle.
+- B. The Moon's density is greater than Earth's.
+- C. The Moon's origin involved a body that formed separately from Earth.
+- D. Moon rocks contain less water than Earth rocks.
+
+**Answer:** C
+
+**Explanation:** A: Only Student 1 says this.
+B: The passage states the Moon's density (3.3) is less than Earth's (5.5); no student disagrees.
+C: Correct. For Student 2, the Moon itself formed separately; for Student 3, the Mars-sized body did. Student 1 says the Moon came only from Earth.
+D: Only Student 3 says this; Student 2 doesn't mention water.

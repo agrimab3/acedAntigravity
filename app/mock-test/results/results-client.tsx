@@ -38,6 +38,7 @@ type ReleasedPayload = {
     correct: number;
     total: number;
     accuracyPct: number;
+    skills: Array<{name:string;correct:number;total:number}>;
   }>;
   compositeDistribution: Record<string, number>;
   cohortCount: number;
@@ -1038,6 +1039,18 @@ export default function ResultsClient({
                   </Link>
                 </div>
               </article>
+            </section>
+
+            <section aria-label="ACT category breakdown" style={{margin:'32px auto',maxWidth:1050,padding:'0 16px'}}>
+              <h2 style={{fontSize:22,marginBottom:8}}>Your category breakdown</h2>
+              <p style={{opacity:.72,marginBottom:20}}>Three ACT reporting categories per English, Reading, and Science section. Skills are shown as details, not separate category rows.</p>
+              {(['english','reading','science'] as SectionKey[]).map(section=><div key={section} style={{marginBottom:22}}>
+                <h3 style={{textTransform:'capitalize',marginBottom:10}}>{section}</h3>
+                {released.topicBreakdown.filter(group=>group.sectionKey===section).map(group=><div key={group.topicId} style={{border:'1px solid #35475b',borderRadius:10,padding:'12px 16px',marginBottom:9}}>
+                  <div style={{display:'flex',justifyContent:'space-between',gap:12,fontWeight:650}}><span>{group.topicName}</span><span>{group.correct}/{group.total} · {group.accuracyPct}%</span></div>
+                  {group.skills.length>0?<details style={{fontSize:12,opacity:.78,marginTop:8}}><summary style={{cursor:'pointer'}}>Skill details</summary><div style={{marginTop:8,display:'flex',flexWrap:'wrap',gap:8}}>{group.skills.map((skill,i)=><span key={i} style={{border:'1px solid #35475b',borderRadius:6,padding:'3px 7px'}}>{skill.name}: {skill.correct}/{skill.total}</span>)}</div></details>:null}
+                </div>)}
+              </div>)}
             </section>
 
             <section className={styles.resultsBottom}>

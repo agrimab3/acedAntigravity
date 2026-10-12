@@ -640,5 +640,327 @@
    "skill": "comparing passages",
    "category": "Integration of Knowledge and Ideas"
   }
+ ],
+ "science": [
+  {
+   "q": 1,
+   "passage": 1,
+   "passage_type": "Data Representation",
+   "difficulty": "easy",
+   "skill": "reading a table",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 2,
+   "passage": 1,
+   "passage_type": "Data Representation",
+   "difficulty": "easy",
+   "skill": "trend",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 3,
+   "passage": 1,
+   "passage_type": "Data Representation",
+   "difficulty": "medium",
+   "skill": "comparing data",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 4,
+   "passage": 1,
+   "passage_type": "Data Representation",
+   "difficulty": "medium",
+   "skill": "interpolation",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 5,
+   "passage": 1,
+   "passage_type": "Data Representation",
+   "difficulty": "medium",
+   "skill": "trend",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 6,
+   "passage": 1,
+   "passage_type": "Data Representation",
+   "difficulty": "hard",
+   "skill": "evaluating a claim",
+   "category": "Evaluation of Models, Inferences, and Experimental Results"
+  },
+  {
+   "q": 7,
+   "passage": 2,
+   "passage_type": "Data Representation",
+   "difficulty": "easy",
+   "skill": "reading a table",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 8,
+   "passage": 2,
+   "passage_type": "Data Representation",
+   "difficulty": "easy",
+   "skill": "trend",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 9,
+   "passage": 2,
+   "passage_type": "Data Representation",
+   "difficulty": "medium",
+   "skill": "reading a table",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 10,
+   "passage": 2,
+   "passage_type": "Data Representation",
+   "difficulty": "medium",
+   "skill": "combining tables",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 11,
+   "passage": 2,
+   "passage_type": "Data Representation",
+   "difficulty": "medium",
+   "skill": "extrapolation",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 12,
+   "passage": 2,
+   "passage_type": "Data Representation",
+   "difficulty": "hard",
+   "skill": "drawing conclusions",
+   "category": "Evaluation of Models, Inferences, and Experimental Results"
+  },
+  {
+   "q": 13,
+   "passage": 3,
+   "passage_type": "Research Summaries",
+   "difficulty": "easy",
+   "skill": "reading a table",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 14,
+   "passage": 3,
+   "passage_type": "Research Summaries",
+   "difficulty": "easy",
+   "skill": "experimental design",
+   "category": "Scientific Investigation"
+  },
+  {
+   "q": 15,
+   "passage": 3,
+   "passage_type": "Research Summaries",
+   "difficulty": "medium",
+   "skill": "experimental design",
+   "category": "Scientific Investigation"
+  },
+  {
+   "q": 16,
+   "passage": 3,
+   "passage_type": "Research Summaries",
+   "difficulty": "medium",
+   "skill": "trend",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 17,
+   "passage": 3,
+   "passage_type": "Research Summaries",
+   "difficulty": "medium",
+   "skill": "extrapolation",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 18,
+   "passage": 3,
+   "passage_type": "Research Summaries",
+   "difficulty": "hard",
+   "skill": "scientific reasoning",
+   "category": "Evaluation of Models, Inferences, and Experimental Results"
+  },
+  {
+   "q": 19,
+   "passage": 3,
+   "passage_type": "Research Summaries",
+   "difficulty": "hard",
+   "skill": "evaluating a hypothesis",
+   "category": "Evaluation of Models, Inferences, and Experimental Results"
+  },
+  {
+   "q": 20,
+   "passage": 4,
+   "passage_type": "Research Summaries",
+   "difficulty": "easy",
+   "skill": "reading a table",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 21,
+   "passage": 4,
+   "passage_type": "Research Summaries",
+   "difficulty": "easy",
+   "skill": "experimental design",
+   "category": "Scientific Investigation"
+  },
+  {
+   "q": 22,
+   "passage": 4,
+   "passage_type": "Research Summaries",
+   "difficulty": "medium",
+   "skill": "experimental design",
+   "category": "Scientific Investigation"
+  },
+  {
+   "q": 23,
+   "passage": 4,
+   "passage_type": "Research Summaries",
+   "difficulty": "medium",
+   "skill": "comparing data",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 24,
+   "passage": 4,
+   "passage_type": "Research Summaries",
+   "difficulty": "medium",
+   "skill": "extrapolation",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 25,
+   "passage": 4,
+   "passage_type": "Research Summaries",
+   "difficulty": "hard",
+   "skill": "evaluating a claim",
+   "category": "Evaluation of Models, Inferences, and Experimental Results"
+  },
+  {
+   "q": 26,
+   "passage": 4,
+   "passage_type": "Research Summaries",
+   "difficulty": "medium",
+   "skill": "experimental design",
+   "category": "Scientific Investigation"
+  },
+  {
+   "q": 27,
+   "passage": 5,
+   "passage_type": "Research Summaries",
+   "difficulty": "easy",
+   "skill": "trend",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 28,
+   "passage": 5,
+   "passage_type": "Research Summaries",
+   "difficulty": "easy",
+   "skill": "reading a table",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 29,
+   "passage": 5,
+   "passage_type": "Research Summaries",
+   "difficulty": "medium",
+   "skill": "drawing conclusions",
+   "category": "Evaluation of Models, Inferences, and Experimental Results"
+  },
+  {
+   "q": 30,
+   "passage": 5,
+   "passage_type": "Research Summaries",
+   "difficulty": "medium",
+   "skill": "experimental design",
+   "category": "Scientific Investigation"
+  },
+  {
+   "q": 31,
+   "passage": 5,
+   "passage_type": "Research Summaries",
+   "difficulty": "medium",
+   "skill": "extrapolation",
+   "category": "Interpretation of Data"
+  },
+  {
+   "q": 32,
+   "passage": 5,
+   "passage_type": "Research Summaries",
+   "difficulty": "hard",
+   "skill": "scientific reasoning",
+   "category": "Evaluation of Models, Inferences, and Experimental Results"
+  },
+  {
+   "q": 33,
+   "passage": 5,
+   "passage_type": "Research Summaries",
+   "difficulty": "hard",
+   "skill": "applying results",
+   "category": "Evaluation of Models, Inferences, and Experimental Results"
+  },
+  {
+   "q": 34,
+   "passage": 6,
+   "passage_type": "Conflicting Viewpoints",
+   "difficulty": "easy",
+   "skill": "understanding a viewpoint",
+   "category": "Evaluation of Models, Inferences, and Experimental Results"
+  },
+  {
+   "q": 35,
+   "passage": 6,
+   "passage_type": "Conflicting Viewpoints",
+   "difficulty": "easy",
+   "skill": "comparing viewpoints",
+   "category": "Evaluation of Models, Inferences, and Experimental Results"
+  },
+  {
+   "q": 36,
+   "passage": 6,
+   "passage_type": "Conflicting Viewpoints",
+   "difficulty": "medium",
+   "skill": "weakening a viewpoint",
+   "category": "Evaluation of Models, Inferences, and Experimental Results"
+  },
+  {
+   "q": 37,
+   "passage": 6,
+   "passage_type": "Conflicting Viewpoints",
+   "difficulty": "medium",
+   "skill": "strengthening a viewpoint",
+   "category": "Evaluation of Models, Inferences, and Experimental Results"
+  },
+  {
+   "q": 38,
+   "passage": 6,
+   "passage_type": "Conflicting Viewpoints",
+   "difficulty": "medium",
+   "skill": "comparing viewpoints",
+   "category": "Evaluation of Models, Inferences, and Experimental Results"
+  },
+  {
+   "q": 39,
+   "passage": 6,
+   "passage_type": "Conflicting Viewpoints",
+   "difficulty": "medium",
+   "skill": "weakening a viewpoint",
+   "category": "Evaluation of Models, Inferences, and Experimental Results"
+  },
+  {
+   "q": 40,
+   "passage": 6,
+   "passage_type": "Conflicting Viewpoints",
+   "difficulty": "hard",
+   "skill": "comparing viewpoints",
+   "category": "Evaluation of Models, Inferences, and Experimental Results"
+  }
  ]
 }
