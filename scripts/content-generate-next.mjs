@@ -1,6 +1,7 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import pg from "pg";
+import { FACTORY_JOB_TIMEOUT_MS, describeFactoryProcessError } from "../lib/content-factory-process.mjs";
 import {
   CONTENT_DIFFICULTIES,
   getCellTarget,
@@ -207,7 +208,7 @@ try {
       const child = await execFileAsync("node", childArgs, {
         cwd: process.cwd(),
         env: process.env,
-        timeout: 300000,
+        timeout: FACTORY_JOB_TIMEOUT_MS,
         maxBuffer: 1024 * 1024 * 6,
       });
       const summary = extractJsonSummary(child.stdout);
@@ -224,10 +225,17 @@ try {
         model: summary.model ?? null,
       });
     } catch (error) {
+      // Nonzero provider exits may still include an authoritative progress summary.
+      let partial = {};
+      try { partial = extractJsonSummary(error.stdout || ""); } catch {}
       results.push({
         ...job,
-        inserted: 0,
-        error: error instanceof Error ? `${error.message} ${error.stdout || ""} ${error.stderr || ""}`.slice(-3500) : "unknown generation error",
+        inserted: Number(partial.inserted ?? 0),
+        skipped: Number(partial.skipped ?? 0),
+        reviewRejected: Number(partial.reviewRejected ?? 0),
+        runState: partial.runState ?? "failed",
+        providerFailure: partial.topics?.find(topic => topic.providerFailure)?.providerFailure ?? null,
+        error: describeFactoryProcessError(error, FACTORY_JOB_TIMEOUT_MS, process.env.CONTENT_FACTORY_GEMINI_API_KEY),
       });
     }
     if (results.at(-1)?.runState === "paused_due_to_provider" || results.at(-1)?.error) {
