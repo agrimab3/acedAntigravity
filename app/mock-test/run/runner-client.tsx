@@ -11,6 +11,7 @@ import {
 import AcedCalculator from "@/components/calculator/AcedCalculator";
 import NightSky from "@/components/NightSky";
 import QuestionContent from "@/components/question-content/QuestionContent";
+import ReadingPassage from "@/components/question-content/ReadingPassage";
 import {
   MOCK_SECTIONS,
   NEXT_MOCK,
@@ -1698,7 +1699,7 @@ export default function MockTestRunner({
               {currentQuestion.questionSetTitle ? (
                 <h2>{currentQuestion.questionSetTitle}</h2>
               ) : null}
-              <div className={styles.passageText}><QuestionContent text={currentQuestion.passage ?? ""} questionNumber={session.section.key === "english" ? currentQuestion.position : undefined} underlineOrdinal={activePassageOrdinal} activeUnderline={session.section.key === "english"} /></div>
+              <div className={styles.passageText}>{session.section.key === "reading" && /^001 (?:¶ |  )/.test(currentQuestion.passage ?? "") ? <ReadingPassage text={currentQuestion.passage ?? ""} /> : <QuestionContent text={currentQuestion.passage ?? ""} questionNumber={session.section.key === "english" ? currentQuestion.position : undefined} underlineOrdinal={activePassageOrdinal} activeUnderline={session.section.key === "english"} />}</div>
             </article>
           ) : null}
 

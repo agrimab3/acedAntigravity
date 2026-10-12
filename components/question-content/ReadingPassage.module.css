@@ -1,0 +1,9 @@
+.scroller { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+.passage { width: max-content; min-width: 100%; padding: 8px 4px 16px; color: inherit; font-family: Georgia, 'Times New Roman', serif; font-size: 15px; line-height: 1.65; }
+.intro { font-style: italic; white-space: normal; max-width: 62ch; margin: 0 0 20px 2.5em; }
+.heading { text-align: center; font-weight: bold; margin: 24px 0 14px; text-transform: capitalize; }
+.line { display: flex; white-space: pre; min-height: 1.65em; }
+.number { flex: 0 0 2.5em; text-align: right; padding-right: 0.9em; color: #777; font: 12px/2.05 system-ui, sans-serif; user-select: none; }
+.words { white-space: pre; }
+.paragraph { white-space: pre; padding-left: 1.4em; }
+@media(max-width:600px) { .passage { font-size: 13px; line-height: 1.6; } .number { font-size: 10px; line-height: 2.08; } }

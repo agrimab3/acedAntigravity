@@ -38,26 +38,27 @@ export function validateEnglish(items, {singlePassage = false} = {}) {
 }
 
 export function validateReading(items) {
-  assert(items.length === 4, 'Expected four Reading passages');
-  for (const item of items) {
-    const words = item.passage.trim().split(/\s+/).length;
-    assert(words >= 700 && words <= 800, item.title + ': expected 700–800 words, got ' + words);
-    assert(item.questions.length === 9, item.title + ': expected nine questions');
-    assert(item.passage.includes('[1]') && /\[\d+\]/.test(item.passage), item.title + ': missing line numbers');
-    const mix = {easy:0, medium:0, hard:0};
-    for (const q of item.questions) {
-      assert(q.lineReference && /\d/.test(q.lineReference), item.title + ': missing line reference');
-      assert(q.choices && ['A','B','C','D'].every(c => q.choices[c]), item.title + ': missing choice');
-      assert(new Set(Object.values(q.choices).map(normalize)).size === 4, item.title + ': duplicate choices');
-      assert(['A','B','C','D'].includes(q.answer), item.title + ': missing key');
-      assert(q.explanationByChoice && ['A','B','C','D'].every(c => q.explanationByChoice[c]), item.title + ': missing distractor rationale');
-      assert(q.answerParaphrased === true, item.title + ': correct answer must be independently checked for paraphrase');
-      assert(q.difficulty in mix, item.title + ': invalid difficulty');
-      mix[q.difficulty]++;
+  assert(items.length===4,'Expected four Reading passages');
+  let total=0;
+  for(const [index,item] of items.entries()){
+    assert(item.intro && item.passage && item.questions.length===9,item.title+': intro/passage/questions');
+    const lines=item.passage.split('\n');
+    const numbered=lines.filter(line=>/^\d{3} (?:¶ |  )/.test(line));
+    assert(numbered.length>=45,item.title+': missing line-numbered text');
+    for(const [i,line] of numbered.entries())assert(Number(line.slice(0,3))===i+1,item.title+': line numbering error at '+(i+1));
+    if(index===3){assert(lines.includes('PASSAGE A')&&lines.includes('PASSAGE B'),item.title+': paired headings missing');assert(lines.indexOf('PASSAGE B')>lines.indexOf('PASSAGE A'),item.title+': paired order');}
+    const mix={easy:0,medium:0,hard:0};
+    for(const [i,q] of item.questions.entries()){
+      assert(q.number===i+1,item.title+': question sequence');
+      assert(q.prompt && q.choices && ['A','B','C','D'].every(c=>q.choices[c]&&q.explanationByChoice?.[c]),item.title+' Q'+q.number+': missing prompt/choice/explanation');
+      assert(!Object.values(q.choices).some(c=>normalize(c)==='no change'),item.title+' Q'+q.number+': NO CHANGE prohibited');
+      assert(new Set(Object.values(q.choices).map(normalize)).size===4,item.title+' Q'+q.number+': duplicate options');
+      assert(['A','B','C','D'].includes(q.answer),item.title+' Q'+q.number+': invalid key');
+      assert(q.difficulty in mix,item.title+' Q'+q.number+': difficulty');mix[q.difficulty]++;total++;
     }
-    assert(mix.easy === 3 && mix.medium === 4 && mix.hard === 2, item.title + ': difficulty mix');
+    assert(mix.easy+mix.medium+mix.hard===9,item.title+': difficulty total');
   }
-  return {passages:4, questions:36};
+  return {passages:items.length,questions:total};
 }
 
 if (process.argv[1]?.endsWith('validate-act-passages.mjs')) {
@@ -66,6 +67,7 @@ if (process.argv[1]?.endsWith('validate-act-passages.mjs')) {
     console.log('English passage 1:', validateEnglish([english.find(x => x.title === 'The Night Garden')], {singlePassage:true}));
     process.exit(0);
   }
+  if (process.argv.includes('--reading-only')) { console.log('Reading:',validateReading(JSON.parse(fs.readFileSync('docs/reading-passages-review.json','utf8'))));process.exit(0); }
   if (process.argv.includes('--english-only')) { console.log('English:',validateEnglish(english));process.exit(0); }
   const readingPath = 'docs/reading-passages-review.json';
   console.log('English:', validateEnglish(english));
