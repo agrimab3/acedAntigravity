@@ -873,3 +873,18 @@ export const feedback = pgTable("feedback", {
   check("feedback_nonempty_ck", sql`${table.rating} is not null or coalesce(array_length(${table.tags},1),0) > 0 or nullif(trim(${table.message}),'') is not null`),
   uniqueIndex("feedback_user_context_idx").on(table.userId, table.contextId).where(sql`${table.userId} is not null and ${table.contextId} is not null`),
 ]);
+
+export const waitlistSignups = pgTable("waitlist_signups", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: text("email").notNull().unique(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const joinRequests = pgTable("join_requests", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  firstName: text("first_name").notNull(),
+  email: text("email").notNull(),
+  roles: text("roles").array().notNull(),
+  note: text("note"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});

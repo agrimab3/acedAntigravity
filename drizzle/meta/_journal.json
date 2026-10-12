@@ -204,6 +204,13 @@
       "when": 1791760000000,
       "tag": "0028_content_factory_runs",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1791840000000,
+      "tag": "0029_public_signups",
+      "breakpoints": true
     }
   ]
 }

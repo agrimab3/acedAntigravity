@@ -7,6 +7,7 @@ import FirstTimeWalkthrough, { type WalkthroughTargetKey } from "@/app/dashboard
 import MockTestCard from "@/components/MockTestCard";
 import NightSky from "@/components/NightSky";
 import MockTestNavTab from "@/components/MockTestNavTab";
+import ThemeToggle from "@/components/ThemeToggle";
 import { getTopicByName } from "@/lib/act-taxonomy";
 import { getDisplayFirstName } from "@/lib/onboarding";
 import { useOnboardingState } from "@/lib/use-onboarding-state";
@@ -1223,6 +1224,7 @@ export default function Dashboard() {
               justifySelf: "center",
             }}
           >
+            <ThemeToggle />
             <button
               style={{
                 background: "transparent",

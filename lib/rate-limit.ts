@@ -12,6 +12,7 @@ export const RATE_LIMITS = {
   tutor: { limit: 30, windowMs: 60 * 60_000 },
   checkout: { limit: 5, windowMs: 60_000 },
   waitlist: { limit: 5, windowMs: 60_000 },
+  publicSignup: { limit: 5, windowMs: 60_000 },
   loginAccount: { limit: 12, windowMs: 60_000 },
   loginIp: { limit: 240, windowMs: 60_000 },
 } satisfies Record<string, RateLimitPolicy>;

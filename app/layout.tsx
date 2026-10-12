@@ -25,6 +25,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`h-full antialiased ${dmSans.variable} ${playfair.variable}`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('aced-theme')||'dark';document.documentElement.classList.add(t==='light'?'aced-light':'aced-dark')}catch(e){document.documentElement.classList.add('aced-dark')}})();` }} />
+      </head>
       <body className="min-h-full flex flex-col">
         <SiteChrome>{children}</SiteChrome>
       </body>

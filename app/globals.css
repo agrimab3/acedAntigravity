@@ -90,6 +90,8 @@ h6 {
   color: #78dfbe;
 }
 
+.policyCard table{width:100%;border-collapse:collapse;margin:12px 0 32px;text-align:left;font-size:.9rem}.policyCard th,.policyCard td{padding:10px;border-bottom:1px solid rgba(255,255,255,.14);vertical-align:top}.policyCard th{color:#93a4b8}.policyCard td{overflow-wrap:anywhere}
+
 .policyBack {
   margin-top: 2.4rem;
 }
