@@ -1023,7 +1023,7 @@ export function reviewQuestionQuality(row: {
   if (
     row.section === "english" &&
     /\b(identify|what is the function|which punctuation mark|what is the subject|define|part of speech|best synonym)\b/.test(
-      combinedText
+      row.question_text.toLowerCase()
     )
   ) {
     pushFlag(
@@ -1210,7 +1210,7 @@ export function reviewQuestionQuality(row: {
       );
     }
 
-    if (promptWordCount < 9) {
+    if (promptWordCount < 9 && !/\[\d+\](?:\[underline\])?/i.test(row.passage ?? "")) {
       pushFlag(
         flags,
         "warn",

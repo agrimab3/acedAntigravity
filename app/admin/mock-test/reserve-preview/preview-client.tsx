@@ -17,6 +17,7 @@ export default function ReservePreviewClient({section,title,prompt,passage,choic
  <section className={styles.questionColumn}>
  <div className={styles.questionHeader}><h1>question <span>{number}</span> <small>of {total}</small></h1></div>
  <div className={styles.questionMeta}>{section} · {difficulty} · admin preview</div>
+ {section==='reading'&&number===28?<p className={styles.questionText} role="note">Questions 28–30 ask about Passage A. Questions 31–33 ask about Passage B. Questions 34–36 ask about both passages.</p>:null}
  <div className={styles.questionText}><QuestionContent text={section==='english'?globalEnglishPrompt(prompt,number):prompt} questionNumber={number} activeUnderline={section==='english'}/></div>
  <fieldset className={styles.choiceFieldset}><legend className={styles.srOnly}>Select an answer</legend>
  {(['A','B','C','D'] as Letter[]).map(letter=><label key={letter} className={styles.choiceRow} style={{borderColor:selected===letter?'#7bd7fa':undefined,background:selected===letter?'#1c334b':undefined}}>

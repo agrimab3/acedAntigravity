@@ -386,3 +386,15 @@ test("math pack-size distractor issue is retained as a warning", () => {
   assert(review.warningFlags.some((flag) => flag.code === "non-diagnostic-pack-distractors"));
   assert.equal(review.shouldServe, true);
 });
+
+test('passage-based English editing with short stem and punctuation explanation is not falsely flagged', () => {
+  const review = reviewQuestionQuality({
+    id: 'english-passage-editing', section: 'english', topic: 'Conventions of Standard English', difficulty: 'medium',
+    passage: 'The curator prepared the exhibition carefully. [1][underline]However[/underline], the labels still needed editing. Visitors would read the labels as they entered the gallery, and the curator wanted each sentence to be clear.',
+    question_text: 'Choose the best answer for question 1.',
+    choices: { A: 'NO CHANGE', B: 'However;', C: 'However:', D: 'However' },
+    correct_answer: 'A',
+    explanation: 'The punctuation after However is appropriate because it separates the introductory transition from the independent clause. Choice A preserves the intended meaning.',
+  });
+  assert(!review.warningFlags.some(flag => flag.code === 'thin-english-stem' || flag.code === 'english-terminology-quiz'));
+});

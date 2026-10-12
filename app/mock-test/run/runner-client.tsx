@@ -1750,6 +1750,10 @@ export default function MockTestRunner({
                   {currentQuestion.topic} · {currentQuestion.difficulty}
                 </div>
 
+                {session.section.key === "reading" && currentQuestion.position === 28 ? (
+                  <p className={styles.questionText} role="note">Questions 28–30 ask about Passage A. Questions 31–33 ask about Passage B. Questions 34–36 ask about both passages.</p>
+                ) : null}
+
                 {currentQuestion.question_text ? (
                   <div className={styles.questionText}><QuestionContent text={session.section.key === "english" ? globalEnglishPrompt(currentQuestion.question_text, currentQuestion.position) : currentQuestion.question_text} questionNumber={session.section.key === "english" ? currentQuestion.position : undefined} activeUnderline={session.section.key === "english"} /></div>
                 ) : null}
