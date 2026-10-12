@@ -42,3 +42,5 @@
 }
 
 .pointMarker { font-weight: 750; margin: 0 0.2em; white-space: nowrap; }
+
+.paragraphLabel { display:block; text-align:center; color:#8794a5; font: 12px/1.5 system-ui, sans-serif; letter-spacing:0.06em; margin: 16px 0 10px; }

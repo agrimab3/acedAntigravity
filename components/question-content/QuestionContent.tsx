@@ -137,6 +137,8 @@ export default function QuestionContent({
   return (
     <>
       {lines.map((line, lineIndex) => {
+        const paragraphLabel = line.trim().match(/^\[Paragraph\s+(\d+)\]$/i);
+        if (paragraphLabel) return <div key={`paragraph-${lineIndex}`} className={styles.paragraphLabel}>[{paragraphLabel[1]}]</div>;
         const segments = line.split(/(\[\d+\]\[underline\][\s\S]*?\[\/underline\]|\[underline\][\s\S]*?\[\/underline\]|\[\d+\](?!\[underline\]))/gi);
 
         return (

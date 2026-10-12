@@ -1770,3 +1770,16 @@
   .mainArea.longPassageLayout .passageCard { max-height:46dvh; overflow:auto; }
   .mainArea.longPassageLayout .questionColumn { max-height:65dvh; overflow-y:auto; }
 }
+
+/* Passage uses a consistent serif; question text and answer choices remain sans-serif. */
+.passageText { font-family: Georgia, 'Times New Roman', serif; }
+.questionText, .choiceText { font-family: var(--font-dm-sans), 'DM Sans', sans-serif; }
+@media(min-width:761px) {
+ .mainArea.longPassageLayout { min-height:calc(100dvh - 205px); align-items:stretch; }
+ .mainArea.longPassageLayout .passageCard, .mainArea.longPassageLayout .questionColumn { height:calc(100dvh - 205px); max-height:none; min-height:400px; overflow-y:auto; }
+}
+@media(max-width:760px) {
+ .mainArea.longPassageLayout { align-content:start; row-gap:28px; }
+ .mainArea.longPassageLayout .passageCard { position:relative; margin-bottom:8px; }
+ .mainArea.longPassageLayout .questionColumn { position:relative; padding-top:12px; }
+}
