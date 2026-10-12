@@ -3,8 +3,8 @@ import pg from "pg";
 import { reviewQuestionQuality } from "../lib/question-utils.ts";
 
 const { Client } = pg;
-if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required.");
 const snapshotPath = process.argv.find(arg => arg.startsWith('--snapshot='))?.slice('--snapshot='.length);
+if (!snapshotPath && !process.env.DATABASE_URL) throw new Error("DATABASE_URL is required when no snapshot is supplied.");
 let rows;
 if (snapshotPath) {
   const payload = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
@@ -122,7 +122,7 @@ for (const row of rows) {
 
 let output = `# Dec 5 Form A Review
 
-Generated October 10, 2026. Form contains **171 questions**: English 50, Math 45, Reading 36, Science 40.
+Generated October 12, 2026 from the reviewed snapshot. Form contains **171 questions**: English 50, Math 45, Reading 36, Science 40.
 
 ## Suspicious-item scan
 
@@ -164,7 +164,7 @@ for (const section of ["english", "math", "reading", "science"]) {
         let annotated = String(passage);
         let index = 0;
         annotated = annotated.replace(/<u>([\s\S]*?)<\/u>|\[underline\]([\s\S]*?)\[\/underline\]|__([\s\S]*?)__/gi,
-          (_match, html, bracket, markdown) => `**[${group[Math.min(index++, group.length - 1)].position}] ${html || bracket || markdown}**`);
+          (_match, html, bracket, markdown) => `**${html || bracket || markdown}**`);
         output += `${annotated}\n\n`;
       } else output += `${formatPassage(passage, section, row.position)}\n\n`;
       if (section === "science") output += `*Science tables, figures, and experimental descriptions are reproduced from the stored set text above. Image-only figures require manual visual review.*\n\n`;

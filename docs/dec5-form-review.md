@@ -1,15 +1,57 @@
 # Dec 5 Form A Review
 
-Generated October 10, 2026. Form contains **171 questions**: English 50, Math 45, Reading 36, Science 40.
+Generated October 12, 2026 from the reviewed snapshot. Form contains **171 questions**: English 50, Math 45, Reading 36, Science 40.
 
 ## Suspicious-item scan
 
-- ⚠️ english 1: thin-english-stem
-- ⚠️ english 11: thin-english-stem
+- ⚠️ english 4: thin-english-stem
+- ⚠️ english 5: thin-english-stem
+- ⚠️ english 6: thin-english-stem
+- ⚠️ english 7: thin-english-stem
+- ⚠️ english 13: thin-english-stem
 - ⚠️ english 14: thin-english-stem
-- ⚠️ english 16: thin-english-stem
-- ⚠️ english 19: thin-english-stem
-- ⚠️ english 21: thin-english-context
+- ⚠️ english 15: thin-english-stem
+- ⚠️ english 17: thin-english-stem
+- ⚠️ english 21: english-terminology-quiz
+- ⚠️ english 22: english-terminology-quiz
+- ⚠️ english 23: english-terminology-quiz
+- ⚠️ english 24: english-terminology-quiz, thin-english-stem
+- ⚠️ english 25: english-terminology-quiz, thin-english-stem
+- ⚠️ english 26: english-terminology-quiz, thin-english-stem
+- ⚠️ english 27: english-terminology-quiz
+- ⚠️ english 28: english-terminology-quiz, thin-english-stem
+- ⚠️ english 29: english-terminology-quiz, thin-english-stem
+- ⚠️ english 30: english-terminology-quiz
+- ⚠️ english 33: thin-english-stem
+- ⚠️ english 34: thin-english-stem
+- ⚠️ english 35: thin-english-stem
+- ⚠️ english 37: thin-english-stem
+- ⚠️ english 44: thin-english-stem
+- ⚠️ english 45: thin-english-stem
+- ⚠️ english 47: thin-english-stem
+- ⚠️ english 48: thin-english-stem
+- ⚠️ english 49: thin-english-stem
+- ⚠️ reading 5: low-demand-reading-ask
+- ⚠️ reading 6: low-demand-reading-ask
+- ⚠️ reading 8: short-reading-stem, low-demand-reading-ask
+- ⚠️ reading 9: low-demand-reading-ask
+- ⚠️ reading 10: short-reading-stem
+- ⚠️ reading 14: low-demand-reading-ask
+- ⚠️ reading 15: low-demand-reading-ask
+- ⚠️ reading 16: low-demand-reading-ask
+- ⚠️ reading 18: low-demand-reading-ask
+- ⚠️ reading 21: low-demand-reading-ask
+- ⚠️ reading 22: low-demand-reading-ask
+- ⚠️ reading 23: low-demand-reading-ask
+- ⚠️ reading 25: low-demand-reading-ask
+- ⚠️ reading 26: low-demand-reading-ask
+- ⚠️ reading 27: low-demand-reading-ask
+- ⚠️ reading 29: short-reading-stem, low-demand-reading-ask
+- ⚠️ reading 30: low-demand-reading-ask
+- ⚠️ reading 32: low-demand-reading-ask
+- ⚠️ reading 34: short-reading-stem, low-demand-reading-ask
+- ⚠️ reading 35: low-demand-reading-ask
+- ⚠️ reading 36: short-reading-stem, low-demand-reading-ask
 
 ## Bank-wide explanation contradiction scan
 
@@ -18,905 +60,782 @@ The preparation pass scanned every non-empty explanation in the question bank fo
 
 # English
 
-## Passage / set for ENGLISH question 1
+## Passage / set for ENGLISH questions 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 
-The biologist compared measurements taken at three different times of day. The afternoon readings were consistently higher than the morning readings, but the evening readings were closer to the morning values. Because the pattern was unexpected, the team repeated the experiment to determine **[1] whether the difference was caused by temperature or another environmental factor**.
+[Paragraph 1]
+
+On the edge of a busy neighborhood, a narrow strip of land lay between a parking lot and a brick wall. During the day, people hurried past it without looking. At night, however, the space became the setting for an unusual experiment. A group of volunteers wanted to discover whether a small garden could support moths and other insects that visit flowers after sunset.
+
+[Paragraph 2]
+
+The volunteers [1]**was** careful not to begin with a shopping trip. First, they spent two evenings observing the site. They recorded which lights stayed on, where rainwater collected, and how the wind moved between the buildings. [2]**Afterward; they** drew a plan that placed taller plants near the wall and shorter flowers beside the sidewalk. The plan left out a bright decorative lamp, [3]**since** the volunteers knew that artificial light could disturb the insects they hoped to observe.
+
+[Paragraph 3]
+
+Choosing flowers required more research than anyone expected. Some plants opened their blossoms in the morning; others released their strongest scent at dusk. The group selected several native species [4]**which blooms** at different times so that the garden would offer food throughout the season. Instead of replacing all the soil, the volunteers tested it and added compost only where it was needed. This slower approach [5]**was something that resulted in the saving of** money and materials.
+
+[Paragraph 4]
+
+The first week brought little excitement. A few flowers drooped in the heat, and one volunteer wondered whether the experiment had failed. [6]**Similarly,** the group kept taking notes rather than making sudden changes. By the third week, observers had counted several kinds of moths and noticed tiny beetles moving among the leaves. [7]**Walking quietly between the beds, several insects were photographed by the volunteers.** Each visitor was recorded without being touched and then compared with pictures in a local field guide.
+
+[Paragraph 5]
+
+(1) The project did not prove that every vacant strip should become a garden. (2) Its results came from one small site observed during a single summer. [9] (3) Still, the volunteers had learned something useful: careful observation could turn an overlooked place into a source of questions. (4) They also invited neighbors to share what they noticed. (5) For their next step, they planned to repeat the count in autumn. (6) By opening their notebooks to the neighborhood, the volunteers made the project a shared investigation rather than a private experiment.
 
 
-### ENGLISH 1 — Grammar & Usage (medium)
+### ENGLISH 1 — Organization & Flow (easy)
 
-**Question:** Which choice best completes the sentence?
+**Question:** Choose the best answer for question 1.
 
-- A. whether the difference was caused by temperature or another environmental factor
-- B. whether was the difference caused by temperature or another environmental factor
-- C. if the difference had been caused by temperature or another environmental factor
-- D. whether the difference had caused by temperature or another environmental factor
+- A. NO CHANGE
+- B. were
+- C. has been
+- D. being
+
+**Answer:** B
+
+**Explanation:** A: "Was" is singular, but the subject "volunteers" is plural. | B: Correct. "Were" agrees with the plural subject and keeps the past tense. | C: "Has been" is singular and shifts out of the past tense. | D: "Being" cannot serve as the main verb of a sentence.
+
+### ENGLISH 2 — Organization & Flow (easy)
+
+**Question:** Choose the best answer for question 2.
+
+- A. NO CHANGE
+- B. Afterward, they
+- C. Afterward: they
+- D. Afterward, and they
+
+**Answer:** B
+
+**Explanation:** A: A semicolon must join two complete sentences; "Afterward" alone is not one. | B: Correct. A comma sets off the introductory word. | C: A colon must follow a complete sentence; "Afterward" is not one. | D: "And" has nothing to join; "Afterward" is not a clause.
+
+### ENGLISH 3 — Organization & Flow (easy)
+
+**Question:** Choose the best answer for question 3.
+
+- A. NO CHANGE
+- B. although
+- C. unless
+- D. so
 
 **Answer:** A
 
-**Explanation:** Choice A correctly uses "whether" to introduce the two possible explanations and maintains the tense of the passage. The other choices either shift tense unnecessarily or are grammatically incorrect.
+**Explanation:** A: Correct. "Since" shows the reason the lamp was left out: light disturbs insects. | B: "Although" signals contrast, but the second idea explains the first. | C: "Unless" creates a condition that makes no sense here. | D: "So" reverses cause and effect (the lamp being left out did not cause the volunteers' knowledge).
 
-## Passage / set for ENGLISH question 2
+### ENGLISH 4 — Organization & Flow (medium)
 
-When the town's only bookstore closed, many residents assumed they would have to drive an hour to buy a new novel. Then a retired teacher set a wooden cabinet full of used books outside her house, with a sign inviting neighbors to take one and leave one. Within a year, a dozen similar cabinets had appeared on porches and fence posts across town. Some were painted to match the houses behind them; one was built from an old radio cabinet. **[2] The cabinets come in many shapes and sizes.**
-
-
-### ENGLISH 2 — Organization & Flow (hard)
-
-**Question:** Which choice provides the most effective conclusion to the paragraph?
-
-- A. The cabinets come in many shapes and sizes.
-- B. The town still has no bookstore, but its residents no longer need to travel far to find something new to read.
-- C. Book-sharing cabinets have become popular in towns around the world.
-- D. Several of the cabinets have been featured in the local newspaper.
-
-**Answer:** B
-
-**Explanation:** The paragraph opens with a problem (the bookstore closed and residents expected a long drive) and shows how neighbors solved it. B completes that arc by returning to the bookstore and the drive and showing how things turned out. A merely restates the detail in the sentence before it. C sounds like a strong general conclusion, but it shifts away from this town's story to a broad claim the paragraph never supports. D introduces a new detail instead of concluding.
-
-## Passage / set for ENGLISH question 3
-
-The historian studied letters written by residents during the winter of 1912. Many letters mention a shortage of coal, but one writer provides unusually specific details about how families adapted. The writer **[3] saved and preserved a small supply of coal** for cooking after the local deliveries stopped.
-
-
-### ENGLISH 3 — Precision & Concision (medium)
-
-**Question:** Which choice best conveys the intended meaning without unnecessary repetition?
-
-- A. saved and preserved a small supply of coal
-- B. preserved a small supply of coal
-- C. saved, kept, and preserved a small supply of coal
-- D. made sure to save and preserve a small supply of coal
-
-**Answer:** B
-
-**Explanation:** "Preserved" already conveys the idea of keeping the coal for later use, so B states the meaning directly. A, C, and D unnecessarily repeat the same idea with multiple verbs.
-
-## Passage / set for ENGLISH question 4
-
-The city planner presented two distinct proposals for the vacant waterfront lot: **[4] a public park with native flora, and an urban wetland designed for storm runoff.** The city council ultimately selected the second option due to impending environmental regulations.
-
-
-### ENGLISH 4 — Punctuation (medium)
-
-**Question:** Which choice maintains correct punctuation following a colon that introduces a two-item list?
+**Question:** Choose the best answer for question 4.
 
 - A. NO CHANGE
-- B. a public park with native flora and an urban wetland designed for storm runoff.
-- C. a public park with native flora; and an urban wetland designed for storm runoff.
-- D. a public park with native flora, and, an urban wetland designed for storm runoff.
-
-**Answer:** B
-
-**Explanation:** When a colon introduces a simple list of two items connected by 'and', no comma is necessary between the two items unless necessary to prevent misreading. Choice B cleanly connects the two noun phrases without superfluous commas or misplaced semicolons.
-
-## Passage / set for ENGLISH question 5
-
-The architect's renovation plan preserves the theater's original entrance while replacing the damaged interior seating. **[5] Because the entrance has remained largely unchanged since the building opened, visitors can still recognize the theater's original design, the renovation will make the rest of the space more accessible.** The plan also includes improved lighting and wider aisles.
-
-
-### ENGLISH 5 — Sentence Structure (hard)
-
-**Question:** Which choice most clearly expresses the contrast between preserving the entrance and renovating the rest of the theater while maintaining correct sentence structure?
-
-- A. Because the entrance has remained largely unchanged since the building opened, visitors can still recognize the theater's original design; the renovation will make the rest of the space more accessible.
-- B. Because the entrance has remained largely unchanged since the building opened; visitors can still recognize the theater's original design, and the renovation will make the rest of the space more accessible.
-- C. Because the entrance has remained largely unchanged since the building opened, visitors can still recognize the theater's original design and the renovation will make the rest of the space more accessible.
-- D. Because the entrance has remained largely unchanged since the building opened, visitors can still recognize the theater's original design, while the renovation will make the rest of the space more accessible.
-
-**Answer:** D
-
-**Explanation:** Choice D correctly attaches the opening 'Because' clause to the idea it explains and uses 'while' to make the preservation-versus-renovation contrast explicit. A is grammatically possible but does not state that contrast as clearly; B mispunctuates the dependent opening clause, and C weakens the relationship between the ideas.
-
-## Passage / set for ENGLISH question 6
-
-My grandmother rarely spoke about her childhood in the mountains, but she kept one photograph from those years on her dresser: a stone house with a crooked chimney and a single pine tree beside the door. When I finally visited her village as an adult, I found the house still standing. The pine had grown taller than the roof, and **[6] the chimney was super crooked, just like in the picture**.
-
-
-### ENGLISH 6 — Style & Tone (medium)
-
-**Question:** Which choice best maintains the voice of the passage?
-
-- A. the chimney was super crooked, just like in the picture
-- B. the chimney's angle of inclination corresponded to that documented in the photograph
-- C. the chimney leaned a bunch, which was pretty cool to see
-- D. the chimney leaned at exactly the angle I remembered from the photograph
-
-**Answer:** D
-
-**Explanation:** The narrator writes in a reflective, personal voice that is clear but not casual. D matches that voice and keeps the focus on the narrator's memory of the photograph. A and C use slang ('super,' 'a bunch,' 'pretty cool') that clashes with the thoughtful tone, and B sounds like a technical report, which is too stiff for a personal reflection.
-
-## Passage / set for ENGLISH question 7
-
-The composer first sketched the melody in a notebook. She then experimented with several rhythms before choosing one that fit the lyrics. **[7] Next, she recorded a rough version so that she could evaluate the arrangement as a whole**. Only after that recording did she decide which instruments to include.
-
-
-### ENGLISH 7 — Transitions & Cohesion (medium)
-
-**Question:** Which transition best establishes the relationship between the steps?
-
-- A. Nevertheless, she recorded a rough version so that she could evaluate the arrangement as a whole
-- B. For instance, she recorded a rough version so that she could evaluate the arrangement as a whole
-- C. In contrast, she recorded a rough version so that she could evaluate the arrangement as a whole
-- D. Next, she recorded a rough version so that she could evaluate the arrangement as a whole
-
-**Answer:** D
-
-**Explanation:** "Next" signals the chronological step that follows experimenting with rhythms and precedes the decision about instrumentation. The other choices indicate contrast or example rather than sequence.
-
-## Passage / set for ENGLISH question 8
-
-During the restoration of the eighteenth-century fresco, conservators discovered that previous repair crews had applied synthetic lacquers over the natural pigments. To avoid stripping the original brushwork, the team worked **[8] more meticulously** than any previous restoration crew had.
-
-
-### ENGLISH 8 — Grammar & Usage (medium)
-
-**Question:** Which choice best completes the sentence according to standard idiom and comparative forms?
-
-- A. NO CHANGE
-- B. more meticulous
-- C. most meticulously
-- D. so meticulous
-
-**Answer:** A
-
-**Explanation:** The adverb 'more meticulously' correctly modifies the verb 'worked' and establishes a clear, grammatically sound comparative comparison with 'than any previous restoration crew had'.
-
-## Passage / set for ENGLISH question 9
-
-The report explains how the conservators determined which pigments appeared in an old painting. **[9] Because the researchers had a reason to believe that some pigments might have been added during a later restoration, they conducted additional tests before drawing conclusions about the painting's original colors**. The extra testing revealed that two pigments were indeed added decades after the painting was completed.
-
-
-### ENGLISH 9 — Precision & Concision (hard)
-
-**Question:** Which choice best improves precision and concision without weakening the author's claim?
-
-- A. Because some pigments were possibly added during a later restoration, the researchers had a reason to conduct additional tests before making conclusions about the painting's original colors
-- B. Because the researchers believed that some pigments might have been added during a later restoration, they conducted additional tests before making any conclusions whatsoever about the painting's original colors
-- C. Because the researchers suspected that some pigments might have been added during a later restoration, they conducted additional tests before concluding what the painting's original colors were
-- D. Because the researchers had reason to suspect that some pigments might have been added during a later restoration, they conducted additional tests before drawing conclusions about the painting's original colors
+- B. that blooms
+- C. that bloom
+- D. they bloom
 
 **Answer:** C
 
-**Explanation:** Choice C replaces the wordier "had a reason to believe" with "suspected" and uses the concise phrase "before concluding." D is grammatical but retains unnecessary wording, while A and B are less direct or overly qualified.
+**Explanation:** A: "Blooms" is singular, but it refers to "species," which is plural here ("several species"). | B: Still uses the singular "blooms." | C: Correct. "That bloom" agrees with the plural "species" and correctly limits which species were chosen. | D: Creates a run-on: "several native species they bloom" joins two clauses with no connector.
 
-## Passage / set for ENGLISH question 10
+### ENGLISH 5 — Organization & Flow (medium)
 
-The university archive preserves notebooks kept by students who studied astronomy in the early twentieth century. The notebooks contain observations of the night sky as well as sketches of instruments used in the campus observatory. **[10] One notebook is especially detailed, recording observations on dozens of evenings and including careful drawings of the moon**. Because of that unusually rich record, the archive's curator plans to feature this notebook in an upcoming display about student research.
+**Question:** Choose the best answer for question 5.
 
+- A. NO CHANGE
+- B. ended up being a savings of
+- C. was a saving for
+- D. saved
+
+**Answer:** D
+
+**Explanation:** A: Wordy; "was something that resulted in the saving of" buries the action. | B: Still wordy and awkward ("being a savings of money"). | C: Changes the meaning; the approach didn't save "for" money. | D: Correct. "Saved money and materials" is direct and clear.
+
+### ENGLISH 6 — Organization & Flow (medium)
+
+**Question:** Choose the best answer for question 6.
+
+- A. NO CHANGE
+- B. Consequently,
+- C. Nevertheless,
+- D. For instance,
+
+**Answer:** C
+
+**Explanation:** A: "Similarly" signals likeness, but continuing despite doubt is a contrast. | B: "Consequently" suggests the doubt caused the group to keep going, which is illogical. | C: Correct. "Nevertheless" shows the group kept working despite the discouraging first week. | D: "For instance" introduces an example, but this sentence is not an example of the doubt.
+
+### ENGLISH 7 — Organization & Flow (medium)
+
+**Question:** Choose the best answer for question 7.
+
+- A. NO CHANGE
+- B. Several insects were photographed walking quietly between the beds by the volunteers.
+- C. The volunteers, several insects photographed, walking quietly between the beds.
+- D. Walking quietly between the beds, the volunteers photographed several insects.
+
+**Answer:** D
+
+**Explanation:** A: The opening phrase "Walking quietly between the beds" seems to describe the insects, which is illogical. | B: Still suggests the insects were walking, and the passive wording is awkward. | C: Not a complete sentence; it has no main verb. | D: Correct. "The volunteers" comes right after the phrase, so it's clear who was walking.
+
+### ENGLISH 8 — Organization & Flow (hard)
+
+**Question:** For the sake of logic and cohesion, Sentence 4 in Paragraph 5 should be placed:
+
+- A. where it is now.
+- B. before Sentence 1.
+- C. after Sentence 5.
+- D. after Sentence 6.
+
+**Answer:** C
+
+**Explanation:** A: "Also" needs an earlier action to add to; Sentence 3 is about what they learned, not an action. | B: Inviting neighbors makes no sense before the paragraph explains the project's limits. | C: Correct. "Also" adds to the plan in Sentence 5, and Sentence 6 ("By opening their notebooks to the neighborhood") directly builds on the invitation. | D: Sentence 6 already refers to involving neighbors, so the invitation must come before it.
+
+### ENGLISH 9 — Organization & Flow (hard)
+
+**Question:** At point 9, the writer is considering adding the following sentence:
+*"Moths are most active on warm, humid nights."*
+Should the writer make this addition here?
+
+- A. Yes, because it explains why the volunteers chose to observe in summer.
+- B. Yes, because it supports the claim that the results came from one small site.
+- C. No, because it contradicts the earlier statement that moths visited the garden.
+- D. No, because it interrupts the discussion of what the project could and could not show with a general fact about moths.
+
+**Answer:** D
+
+**Explanation:** A: The paragraph is about the project's limits, not about why summer was chosen. | B: The sentence says nothing about how many sites were studied. | C: It doesn't contradict anything; moths did visit the garden. | D: Correct. The paragraph weighs the project's results, and this general fact breaks that line of thought.
 
 ### ENGLISH 10 — Organization & Flow (medium)
 
-**Question:** Where should the underlined sentence be placed to best prepare for the curator's decision to feature one notebook?
+**Question:** Suppose the writer's goal had been to show how a small community project can produce useful knowledge even when its conclusions are limited. Would this essay accomplish that goal?
 
-- A. Where it is now
-- B. Before the sentence about what the notebooks contain
-- C. After the sentence about the upcoming display
-- D. At the beginning of the passage
-
-**Answer:** A
-
-**Explanation:** The underlined sentence must come immediately before the final sentence because the phrase 'Because of that unusually rich record' refers directly to the detailed notebook just described. This creates a clear collection-to-example-to-selection progression.
-
-## Passage / set for ENGLISH question 11
-
-The traveling puppet company spends each summer on the road, performing in town squares and old theaters. This year, it will visit three cities that have never hosted it before: **[11] Grenoble, France, Turin, Italy, and Geneva**, Switzerland. At each stop, the puppeteers will also lead free workshops for local children.
-
-
-### ENGLISH 11 — Punctuation (medium)
-
-**Question:** Which choice is best for the underlined portion?
-
-- A. Grenoble, France, Turin, Italy, and Geneva
-- B. Grenoble, France; Turin, Italy; and Geneva
-- C. Grenoble; France, Turin; Italy, and Geneva
-- D. Grenoble France; Turin Italy; and Geneva
-
-**Answer:** B
-
-**Explanation:** Each item in this list already contains a comma between a city and its country, so semicolons are needed to separate the items themselves (B). With commas alone (A), the list reads like six separate places. C puts the semicolons in the wrong spots, splitting each city from its own country, and D removes the commas that belong between each city and its country.
-
-## Passage / set for ENGLISH question 12
-
-When the town asked an independent committee to study the future of the old train station, residents expected a fierce debate. The committee's report, however, was careful and balanced. It noted that restoring the building would cost considerably more than tearing it down, but it also pointed out that the station's brick arches and tiled waiting room were among the last of their kind in the region. The report concluded that **[12] restoration is the only responsible choice for a town that values its architectural heritage**.
-
-
-### ENGLISH 12 — Style & Tone (hard)
-
-**Question:** Which choice best maintains the tone the passage attributes to the report?
-
-- A. the town should weigh the higher cost of restoration against the value of preserving a rare piece of its architectural history
-- B. restoration is the only responsible choice for a town that values its architectural heritage
-- C. the higher cost of restoration makes demolition the more sensible option
-- D. the station's beauty far outweighs any concerns about cost
+- A. Yes, because it shows volunteers carefully observing a small site and then admitting what their results could not prove.
+- B. Yes, because it proves that every vacant strip of land should become a garden.
+- C. No, because it focuses only on how the volunteers chose their plants.
+- D. No, because the volunteers never record any observations.
 
 **Answer:** A
 
-**Explanation:** The passage describes the report as 'careful and balanced' and says it presented both the cost of restoration and the building's historical value. A preserves that balance by asking the town to weigh those two factors against each other. B and C are written in formal, reasonable-sounding language, which makes them tempting, but each takes a side: B favors restoration and C favors demolition. D also takes a side and adds an emotional judgment that a balanced report would avoid.
+**Explanation:** A: Correct. The essay covers careful observation, real findings, and clearly stated limits. | B: Paragraph 5 says the project did *not* prove this. | C: Plant choice is only one paragraph; the essay also covers observation and results. | D: The volunteers take notes, count moths, and photograph insects.
 
-## Passage / set for ENGLISH question 13
+## Passage / set for ENGLISH questions 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
 
-The archivist preserved the fragile documents, which were written on handmade vellum, by sealing them in acid-free enclosures. **[13] This practice not only protects the organic fibers from humidity fluctuations, but it also shields the historic iron gall ink from light degradation.**
+[Paragraph 1]
+
+When Mara joined the coastal survey team, she expected to spend most of her time drawing lines on maps. Instead, her first assignment involved standing in ankle-deep water and holding a measuring pole while a colleague recorded the position of the reeds. The marsh they were studying changed [1]**it's** shape after nearly every storm. A channel that appeared wide in spring might be almost invisible by late summer.
+
+[Paragraph 2]
+
+(1) Older maps showed the marsh as a fixed border between land and sea. (2) Mara soon realized that this border was anything but fixed. (3) Sediment moved with the tides, and plants slowed the water enough for new patches of ground to form. (4) At the same time, stronger waves could wash away a bank overnight. (5) [2]**For instance,** the team needed repeated measurements rather than a single perfect drawing.
+
+[Paragraph 3]
+
+Each morning, the researchers checked their instruments before setting out. They used satellite coordinates to locate their stations, [3]**but they also kept** handwritten notebooks. A battery could [4]**fail, however a** pencil could still record a measurement. Mara labeled each sketch with the date, the weather, and the tide level. Those details mattered because a line on a map meant little without the conditions [5]**under which it was drawn, recorded at the time it was drawn**.
+
+[Paragraph 4]
+
+(1) One afternoon, Mara found that a narrow island shown on last year's map had split into two pieces. (2) She was tempted to erase the old shape and replace it. (3) Her supervisor suggested another approach: preserve both outlines and note when each had been observed. (4) That way, future readers could see the marsh changing rather than mistake the difference for an error. (5) Mara began to think of maps not as finished portraits but as records of ongoing change.
+
+[Paragraph 5]
+
+At the end of the season, the team published a digital map with a timeline. Users could move a slider to compare different surveys, [7]**revealed** where the shoreline had shifted. Mara wrote a short note explaining the limits of the data: the team had measured selected locations, not every inch of the coast. [8] She hoped the map would help planners ask better questions [9]**rather then pretend** that the coastline would remain still.
 
 
-### ENGLISH 13 — Sentence Structure (medium)
+### ENGLISH 11 — Organization & Flow (easy)
 
-**Question:** Which choice provides the most grammatically balanced parallel construction?
+**Question:** Choose the best answer for question 1.
 
 - A. NO CHANGE
-- B. This practice not only protects the organic fibers from humidity fluctuations but also shielding the historic iron gall ink from light degradation.
-- C. This practice protects not only the organic fibers from humidity fluctuations, but also shielding the historic iron gall ink from light degradation.
-- D. This practice not only protects the organic fibers from humidity fluctuations but also shields the historic iron gall ink from light degradation.
-
-**Answer:** D
-
-**Explanation:** The correlative conjunction 'not only... but also' requires parallel grammatical elements following each half. Choice D pairs two active verbs in direct parallelism: 'not only protects... but also shields'.
-
-## Passage / set for ENGLISH question 14
-
-The seed bank was built to protect the world's food crops from disaster. Its vaults are carved deep into a mountainside, where the rock stays frozen year-round. The entrance sits high above sea level, out of reach of any flood, and the seeds are sealed in moisture-proof packets. **[14] Otherwise,** every part of the facility is designed to keep its collection alive for decades, even if no one is there to tend it.
-
-
-### ENGLISH 14 — Transitions & Cohesion (medium)
-
-**Question:** Which choice is best for the underlined portion?
-
-- A. For instance,
-- B. Even so,
-- C. In short,
-- D. Otherwise,
-
-**Answer:** C
-
-**Explanation:** The last sentence sums up the details before it (frozen rock, high entrance, sealed packets) into one general statement, so 'In short' (C) is correct. 'For instance' (A) would introduce a specific example, not a summary. 'Even so' (B) signals a contrast with the earlier details, and 'Otherwise' (D) means 'if not,' which makes no sense here.
-
-## Passage / set for ENGLISH question 15
-
-Researchers at the Mount Ardent observatory track ground swelling with GPS stations placed around the crater. Last March, the stations recorded **[15] an uplift of six centimeters over three weeks**, the fastest rate measured since monitoring began in 1994.
-
-
-### ENGLISH 15 — Precision & Concision (hard)
-
-**Question:** Which choice is most concise while keeping the information needed to support the claim at the end of the sentence?
-
-- A. an uplift of six centimeters
-- B. a rapid uplift of six centimeters over three weeks that happened quickly
-- C. an uplift
-- D. an uplift of six centimeters over three weeks
-
-**Answer:** D
-
-**Explanation:** The sentence calls this the 'fastest rate,' and a rate requires both an amount and a time period, which D gives with no extra words. A is the most tempting because it is shorter and still specific, but without 'over three weeks' the reader cannot see a rate at all. C drops all the numbers, and B says the same thing three times ('rapid,' 'over three weeks,' 'quickly').
-
-## Passage / set for ENGLISH question 16
-
-Late in the second half, Jordan stole the ball at midfield and passed it to Eli. **[16] He** dribbled past two defenders and scored from six yards out, giving the Falcons a 2–1 lead. It was the first goal of Eli's varsity career.
-
-
-### ENGLISH 16 — Grammar & Usage (medium)
-
-**Question:** Which choice makes clear who scored the goal?
-
-- A. He
-- B. Him
-- C. Eli
-- D. They
-
-**Answer:** C
-
-**Explanation:** Two players were just mentioned, so 'He' could mean either Jordan or Eli; naming Eli removes the confusion and matches the last sentence. A is the most tempting because it is grammatically correct, but it is unclear. B is the wrong pronoun form for a subject, and D wrongly suggests both players scored.
-
-## Passage / set for ENGLISH question 17
-
-A report about a restored river ferry begins by describing the vessel's original purpose. It then explains that the ferry stopped operating after a bridge was built nearby. **[17] During restoration, workers found that much of the original wooden decking was still intact**. The report concludes by describing how the ferry is now used for educational trips.
-
-
-### ENGLISH 17 — Organization & Flow (medium)
-
-**Question:** Suppose the writer wants to emphasize the sequence from the ferry's decline to its restoration and eventual reuse. Where should the underlined sentence be placed?
-
-- A. Before the sentence explaining the ferry's original purpose
-- B. Immediately before the sentence about educational trips
-- C. Immediately after the sentence about the bridge being built
-- D. At the end of the report
-
-**Answer:** C
-
-**Explanation:** The discovery of intact decking occurred during restoration, which logically follows the explanation of why regular ferry service ended. Placing the sentence immediately after the bridge sentence keeps the historical decline, restoration, and present use in sequence.
-
-## Passage / set for ENGLISH question 18
-
-We left the cabin before dawn. The snow had stopped, and the woods were quiet. My brother walked ahead, breaking trail, and I followed in his tracks. Neither of us spoke. At the ridge he stopped and pointed. Below us, the lake lay frozen and white. **[18] We stood there, transfixed by the sublime, crystalline majesty of the frozen expanse below, before descending.**
-
-
-### ENGLISH 18 — Style & Tone (hard)
-
-**Question:** Which choice best maintains the style of the passage?
-
-- A. We stood there a while, then started down.
-- B. We stood there, transfixed by the sublime, crystalline majesty of the frozen expanse below, before descending.
-- C. Honestly, it was one of the most beautiful things I have ever seen in my entire life.
-- D. Following a brief period of observation, we commenced our descent.
-
-**Answer:** A
-
-**Explanation:** The passage is written in short, plain sentences that let simple details carry the feeling, so the closing sentence should be equally spare (A). B is tempting because its vivid description seems fitting for a dramatic view, but its piled-up adjectives break the restrained style the writer has established. C shifts into a gushing, conversational voice that tells the reader how to feel instead of showing it. D is plain but stiff and clinical, which clashes with the quiet, personal narration.
-
-## Passage / set for ENGLISH question 19
-
-The manuscript contains several marginal notes, but one is especially revealing. **[19] The note, written in a different hand from the main text, suggests that the author revised the final chapter**. Scholars are using the handwriting to determine when the revision occurred.
-
-
-### ENGLISH 19 — Punctuation (medium)
-
-**Question:** Which choice best punctuates the underlined sentence?
-
-- A. The note written in a different hand from the main text suggests that the author revised the final chapter.
-- B. The note, written in a different hand from the main text suggests that the author revised the final chapter.
-- C. The note, written in a different hand from the main text, suggests that the author revised the final chapter.
-- D. The note written in a different hand, from the main text, suggests that the author revised the final chapter.
-
-**Answer:** C
-
-**Explanation:** The phrase "written in a different hand from the main text" is nonessential information, so it should be enclosed by matching commas. The other choices either omit one comma or interrupt the phrase incorrectly.
-
-## Passage / set for ENGLISH question 20
-
-Proponents of open-plan office layouts argue that removing walls fosters spontaneous collaboration among team members. **[20] Consequently,** recent workplace studies demonstrate that open layouts frequently lead to elevated noise levels, frequent interruptions, and a net decline in deep focused work.
-
-
-### ENGLISH 20 — Transitions & Cohesion (medium)
-
-**Question:** Which choice provides the most accurate transition between the opposing arguments?
-
-- A. NO CHANGE
-- B. Instead,
-- C. To that end,
-- D. In reality,
-
-**Answer:** D
-
-**Explanation:** The first sentence states an intended benefit of open layouts, while the second presents empirical study findings that reveal the actual outcome. 'In reality' effectively contrasts theory with empirical evidence.
-
-## Passage / set for ENGLISH question 21
-
-Perched atop the granite ledge overlooking the valley, **[21] the soaring red-tailed hawk swept its broad wings upward before diving toward the meadow below.**
-
-
-### ENGLISH 21 — Sentence Structure (medium)
-
-**Question:** Which choice maintains clear modifier placement and logical sentence structure?
-
-- A. NO CHANGE
-- B. the broad wings of the red-tailed hawk swept upward before diving toward the meadow below.
-- C. diving toward the meadow below, the soaring red-tailed hawk swept its broad wings upward.
-- D. the valley below was visible to the red-tailed hawk as it swept its broad wings upward.
-
-**Answer:** A
-
-**Explanation:** The modifier 'Perched atop the granite ledge overlooking the valley' logically describes 'the soaring red-tailed hawk'. Choice A places the hawk immediately after the phrase, avoiding misplaced or dangling modifiers.
-
-## Passage / set for ENGLISH question 22
-
-For three weeks, I used the city's new TransitNow app on my daily commute. Its real-time arrival estimates were accurate to within a minute on most routes, and its trip planner found connections I had never considered. On the other hand, the app crashed twice during my trial, and running it continuously drained my phone battery by midafternoon. **[22] For daily commuters willing to tolerate an occasional glitch, the app is a useful, if imperfect, tool.**
-
-
-### ENGLISH 22 — Style & Tone (hard)
-
-**Question:** Which choice best concludes the review in a way that is consistent with the writer's evaluation in the preceding sentences?
-
-- A. For daily commuters willing to tolerate an occasional glitch, the app is a useful, if imperfect, tool.
-- B. The app is an extraordinary achievement that every resident should download immediately.
-- C. The app's flaws make it essentially unusable for anyone who depends on public transit.
-- D. Whether the app is worth using is, in the end, simply a matter of personal opinion.
-
-**Answer:** A
-
-**Explanation:** The review weighs real strengths against real problems, and A gives a verdict that reflects both. D is the strongest distractor because it sounds neutral, but the writer has been making a clear evaluation, and D abandons it instead of concluding it. B ignores the crashes and battery drain, and C ignores the accurate estimates and helpful planner.
-
-## Passage / set for ENGLISH question 23
-
-During the Great Migration, millions of African Americans moved from the rural South to industrial cities in the North and West. **[23] This massive demographic movement reshaped American music, literature, and urban culture, fueling the artistic flowering known as the Harlem Renaissance.**
-
-
-### ENGLISH 23 — Organization & Flow (medium)
-
-**Question:** If the writer were to delete the underlined sentence, the paragraph would primarily lose:
-
-- A. an explanation of the cultural and artistic impact resulting from the demographic movement.
-- B. a detailed statistical breakdown of the cities affected by the Great Migration.
-- C. a chronological timeline of major events in twentieth-century urban history.
-- D. a description of the specific agricultural conditions that prompted rural migration.
-
-**Answer:** A
-
-**Explanation:** The underlined sentence directly identifies the cultural outcomes of the Great Migration (music, literature, Harlem Renaissance). Deleting it removes the statement explaining its broader cultural impact.
-
-## Passage / set for ENGLISH question 24
-
-The box of hand-painted tiles that Ana ordered from Puebla **[24] sits** unopened on her workshop counter; she plans to wait until the new kiln arrives before starting the mosaic.
-
-
-### ENGLISH 24 — Grammar & Usage (easy)
-
-**Question:** Which choice is correct?
-
-- A. sits
-- B. sit
-- C. are sitting
-- D. have sat
-
-**Answer:** A
-
-**Explanation:** The subject is 'box,' which is singular, so the verb must be singular: 'sits.' B is the most tempting because the plural word 'tiles' sits right before the verb, but 'tiles' is part of a describing phrase, not the subject. C and D are also plural.
-
-## Passage / set for ENGLISH question 25
-
-The author describes the archive's decision to digitize the newspapers. **[25] In order to be able to make the newspapers accessible to researchers who are unable to visit the archive in person, the staff created high-resolution scans**. The scans can now be viewed remotely.
-
-
-### ENGLISH 25 — Precision & Concision (medium)
-
-**Question:** Which choice best preserves the intended meaning while improving concision?
-
-- A. In order to make the newspapers accessible to researchers who cannot visit the archive in person, the staff created high-resolution scans
-- B. To make the newspapers accessible to researchers unable to visit the archive in person, the staff created high-resolution scans
-- C. To make the newspapers accessible to researchers who are unable to visit the archive personally in person, the staff created high-resolution scans
-- D. In order that the newspapers could be made accessible to researchers who could not visit the archive in person, the staff created high-resolution scans
-
-**Answer:** B
-
-**Explanation:** Choice B removes unnecessary wording while retaining the precise condition that some researchers cannot visit the archive. A is grammatical but slightly less concise, while C and D add unnecessary or indirect phrasing.
-
-## Passage / set for ENGLISH question 26
-
-For her twelfth birthday, Lena received a watercolor kit from her aunt. The wooden box held everything a beginner would need to get **[26] started: three** sable brushes, a mixing palette, a pad of heavy paper, and twelve small cakes of paint.
-
-
-### ENGLISH 26 — Punctuation (easy)
-
-**Question:** Which choice is best for the underlined portion?
-
-- A. started; three
-- B. started: three
-- C. started three
-- D. started. Three
-
-**Answer:** B
-
-**Explanation:** A colon can follow a complete sentence to introduce a list that explains it, which is exactly what happens here, so B is correct. A semicolon (A) should join two complete sentences, but the list is not a complete sentence. C runs the sentence directly into the list without a break, and D turns the list into a sentence fragment.
-
-## Passage / set for ENGLISH question 27
-
-The museum first displayed the recovered photographs in chronological order. Visitors could see how the neighborhood changed over several decades. **[27] For example, the final section includes photographs of buildings that had been replaced by a public plaza**. These images help visitors connect the earlier streetscape with the area they see today.
-
-
-### ENGLISH 27 — Transitions & Cohesion (medium)
-
-**Question:** Which transition best introduces the information in the underlined sentence?
-
-- A. Nevertheless, the final section includes photographs of buildings that had been replaced by a public plaza
-- B. As a result, the final section includes photographs of buildings that had been replaced by a public plaza
-- C. For example, the final section includes photographs of buildings that had been replaced by a public plaza
-- D. Meanwhile, the final section includes photographs of buildings that had been replaced by a public plaza
-
-**Answer:** C
-
-**Explanation:** "For example" correctly introduces a specific instance of how the chronological display helps visitors understand change. The other transitions indicate contrast, cause and effect, or simultaneous action, none of which fits the relationship.
-
-## Passage / set for ENGLISH question 28
-
-The ice on Mille Lacs Lake was eight inches thick by late January**[28] , so the** annual fishing derby went ahead as planned.
-
-
-### ENGLISH 28 — Sentence Structure (easy)
-
-**Question:** Which choice is correct?
-
-- A. , the
-- B.  the
-- C. , it meant the
-- D. , so the
-
-**Answer:** D
-
-**Explanation:** The sentence joins two complete thoughts, and a comma plus 'so' links them correctly while showing cause and effect. A is the most tempting, but a comma alone cannot join two complete sentences. B runs them together with no punctuation, and C adds a new subject and verb, which creates the same comma error as A.
-
-## Passage / set for ENGLISH question 29
-
-Marisol has been blind since birth, but she has built tables, chairs, and cabinets in her garage workshop for more than twenty years. Her tools look much like anyone else's, with a few small changes. **[29] Her tape measure has a tiny notch cut into its edge at every quarter inch.** To mark a board, she slides her thumbnail along the tape, counting notches until she reaches the length she wants, and presses a sharp awl into the wood at that spot.
-
-
-### ENGLISH 29 — Organization & Flow (medium)
-
-**Question:** The writer is considering deleting the underlined sentence. Should the sentence be kept or deleted?
-
-- A. Kept, because it explains the notches that she relies on in the following sentence.
-- B. Kept, because it shows that her tools are more precise than ordinary ones.
-- C. Deleted, because it interrupts the description of her workshop with a technical detail.
-- D. Deleted, because it repeats information that is given in the following sentence.
-
-**Answer:** A
-
-**Explanation:** The underlined sentence gives an example of the 'few small changes' mentioned before it, and it explains what the notches are and where they are placed. Without it, the next sentence's reference to 'counting notches' would be unclear, so it should be kept (A). B is tempting, but the passage never claims her tools are more precise than ordinary ones, only that they have been adapted. D is also tempting, but the following sentence mentions notches without saying what they are or how far apart they are, so nothing is repeated. C mistakes a necessary detail for a distraction.
-
-## Passage / set for ENGLISH question 30
-
-Constructed in the early twentieth century, the masonry arch bridge had withstood decades of seasonal flooding. However, after recent inspections revealed micro-fractures along the primary abutment, engineers **[30] has determined** that structural retrofitting was urgently required to prevent catastrophic failure during future high-water events.
-
-
-### ENGLISH 30 — Grammar & Usage (easy)
-
-**Question:** Which choice best maintains consistent verb tense throughout the sentence?
-
-- A. NO CHANGE
-- B. determines
-- C. determined
-- D. will determine
-
-**Answer:** C
-
-**Explanation:** The main clause is set in the past tense ('had withstood', 'revealed', 'was urgently required'). The past-tense verb 'determined' maintains tense consistency across the passage.
-
-## Passage / set for ENGLISH question 31
-
-The research team concluded that while the synthetic compound accelerated chemical reactions under laboratory conditions, its commercial viability remained uncertain because **[31] the costs required to synthesize the chemical were too expensive for large-scale manufacturing operations.**
-
-
-### ENGLISH 31 — Precision & Concision (medium)
-
-**Question:** Which choice provides the most concise and precise revision?
-
-- A. NO CHANGE
-- B. the compound was too expensive to synthesize at a commercial scale.
-- C. synthesis costs were overly expensive and costly for large-scale operations.
-- D. the expense required to produce and synthesize it was too high in cost for mass production.
-
-**Answer:** B
-
-**Explanation:** The original choice repeats 'costs', 'synthesize', and 'expensive'. Choice B conveys all necessary information ('too expensive to synthesize at a commercial scale') cleanly, preserving accuracy and concision.
-
-## Passage / set for ENGLISH question 32
-
-On weekends, the science museum's **[32] childrens'** gallery fills with families. Young visitors can build towers from foam blocks, race toy boats down a long water table, and crawl through a full-size model of a beaver lodge.
-
-
-### ENGLISH 32 — Punctuation (easy)
-
-**Question:** Which choice is best for the underlined portion?
-
-- A. children's
-- B. childrens'
-- C. childrens
-- D. childrens's
-
-**Answer:** A
-
-**Explanation:** 'Children' is already plural, so its possessive is formed by adding an apostrophe and s: 'children's' (A). 'Childrens' (C) is not a word, and B and D build on that same incorrect plural.
-
-## Passage / set for ENGLISH question 33
-
-This brochure was written for families visiting the botanical garden, and many of its readers are young children. It explains that the garden's tallest trees, the coast redwoods, can live for more than a thousand years. It also points out that **[33] their bark, which can be a foot thick, protects them from fire**.
-
-
-### ENGLISH 33 — Style & Tone (medium)
-
-**Question:** Which choice best suits the audience and purpose of the brochure?
-
-- A. their bark, which can be a foot thick, protects them from fire
-- B. their bark, owing to its considerable thickness, renders them largely impervious to fire
-- C. their bark is crazy thick and basically fireproof
-- D. their bark's substantial thickness confers thermal protection during combustion events
-
-**Answer:** A
-
-**Explanation:** The brochure is meant for families with young children, so the wording should be simple and clear. A explains the idea in plain, accurate language. B and D use formal or technical vocabulary ('renders ... impervious,' 'confers thermal protection') that young readers would struggle with. C is easy to read, but its slang is out of place in a published brochure, and 'basically fireproof' overstates what the bark does.
-
-## Passage / set for ENGLISH question 34
-
-The theater's old posters were stored in flat boxes. They had become brittle after years of exposure to changing temperatures. **[34] Because the archivists wanted to preserve them. They moved the boxes to a climate-controlled room.**
-
-
-### ENGLISH 34 — Sentence Structure (easy)
-
-**Question:** Which choice best completes the sentence fragment?
-
-- A. The archivists wanted to preserve them. They moved the boxes to a climate-controlled room.
-- B. Because the archivists wanted to preserve them; they moved the boxes to a climate-controlled room.
-- C. Because the archivists wanted to preserve them, they moved the boxes to a climate-controlled room.
-- D. Because the archivists wanted to preserve them, and they moved the boxes to a climate-controlled room.
-
-**Answer:** C
-
-**Explanation:** Choice C joins the dependent 'Because' clause to the independent clause with a comma and clearly expresses cause and effect. The other choices either remove the intended subordinate relationship or use faulty punctuation/conjunctions.
-
-## Passage / set for ENGLISH question 35
-
-The conservator expected the oldest pages of the manuscript to be the most difficult to read. Surprisingly, several later pages were more damaged because they had been stored near a leaking window. **[35] Although the oldest pages were more fragile, the later pages required more extensive repair**. The conservator therefore changed the order in which the pages would be treated.
-
-
-### ENGLISH 35 — Transitions & Cohesion (medium)
-
-**Question:** Which transition best expresses the relationship between the two conditions described in the underlined sentence?
-
-- A. As a result, the oldest pages were more fragile, but the later pages required more extensive repair
-- B. For example, the oldest pages were more fragile, but the later pages required more extensive repair
-- C. Although the oldest pages were more fragile, the later pages required more extensive repair
-- D. Similarly, the oldest pages were more fragile, and the later pages required more extensive repair
-
-**Answer:** C
-
-**Explanation:** "Although" introduces the concession that the oldest pages were more fragile while emphasizing the unexpected fact that the later pages required more repair. A incorrectly suggests a result, B incorrectly introduces an example, and D suggests similarity rather than concession.
-
-## Passage / set for ENGLISH question 36
-
-The collection of oral histories includes interviews with longtime residents. Although the recordings span several decades, each interview **[36] offer** a detailed account of a particular period in the neighborhood's history.
-
-
-### ENGLISH 36 — Grammar & Usage (easy)
-
-**Question:** Which choice best completes the sentence?
-
-- A. offers
-- B. offer
-- C. have offered
-- D. are offering
-
-**Answer:** A
-
-**Explanation:** The subject is the singular noun "each," so the singular verb "offers" is required. The other choices use plural verbs or an unnecessarily different tense.
-
-## Passage / set for ENGLISH question 37
-
-A historian is writing about a lighthouse that guided ships along a rocky coast. The lighthouse was automated in the 1960s, after which its keeper's quarters were no longer needed. The building later became part of a coastal heritage site. **[37] Today, visitors to that site can enter the former keeper's quarters and see the narrow staircase that once connected the rooms**. The historian then turns from the keeper's quarters to the lighthouse's light mechanism, describing how that equipment was modernized.
-
-
-### ENGLISH 37 — Organization & Flow (medium)
-
-**Question:** The writer wants to move from the history of the lighthouse building to a description of what visitors can see today, before returning to the lighthouse's equipment. Where should the underlined sentence be placed?
-
-- A. Where it is now
-- B. After the sentence about the lighthouse's light mechanism
-- C. Immediately after the sentence about the lighthouse being automated
-- D. At the beginning of the passage
-
-**Answer:** A
-
-**Explanation:** The underlined sentence belongs after the heritage-site sentence because 'that site' clearly refers to the coastal heritage site just introduced. It also completes the discussion of the keeper's quarters before the final sentence explicitly shifts to the light mechanism.
-
-## Passage / set for ENGLISH question 38
-
-The observatory installed a new instrument that can detect faint signals from distant objects. Unlike the older equipment, the instrument can process several observations at once. This change means that researchers can **[38] make observations in a more efficient manner** during periods when the sky is especially clear.
-
-
-### ENGLISH 38 — Precision & Concision (medium)
-
-**Question:** Which choice best maintains the passage's meaning while improving concision?
-
-- A. make observations in an efficiency that is greater
-- B. make more efficiently observations
-- C. observe in a way that is more efficient
-- D. observe more efficiently
-
-**Answer:** D
-
-**Explanation:** Choice D expresses the same idea in the most direct form: researchers can "observe more efficiently." A, B, and C retain unnecessary wording or awkward word order.
-
-## Passage / set for ENGLISH question 39
-
-Each June, the coastal town holds a festival to welcome the fishing fleet home after the long spring season. The boats are strung with colored flags, and the **[39] sailors families** set up tables along the harbor to sell smoked fish, knitted caps, and hand-tied nets.
-
-
-### ENGLISH 39 — Punctuation (easy)
-
-**Question:** Which choice is best for the underlined portion?
-
-- A. sailor's families
-- B. sailors families
-- C. sailors's families
-- D. sailors' families
-
-**Answer:** D
-
-**Explanation:** The families belong to the sailors, so a possessive is needed. Because there are many sailors (the passage describes a whole fleet), the plural possessive sailors' (D) is correct. B has no apostrophe, so it is not possessive. A refers to a single sailor, which does not fit a fleet, and C adds an unnecessary 's to a plural noun that already ends in s.
-
-## Passage / set for ENGLISH question 40
-
-The acoustic paneling absorbed sound reflection throughout the **[40] auditorium, it enabled** the orchestra's woodwind section to be heard clearly from the upper balcony seats.
-
-
-### ENGLISH 40 — Sentence Structure (easy)
-
-**Question:** Which choice best corrects the comma splice in the underlined portion?
-
-- A. auditorium, it enabled
-- B. auditorium; enabling
-- C. auditorium, thereby enabling
-- D. auditorium, it thereby enabled
-
-**Answer:** C
-
-**Explanation:** The original sentence joins two independent clauses with only a comma, creating a comma splice. Choice C converts the second clause into a dependent participial phrase ('thereby enabling...'), resolving the structural error.
-
-## Passage / set for ENGLISH question 41
-
-The legal scholar published an analysis of intellectual property disputes in the digital music industry. The paper concluded that current copyright frameworks struggle to address AI-generated compositions, arguing that courts must establish clearer guidelines regarding **[41] authorial attribution and fair compensation for original creators.**
-
-
-### ENGLISH 41 — Style & Tone (medium)
-
-**Question:** Which choice best preserves the formal legal register of the paper?
-
-- A. NO CHANGE
-- B. credit for authorship and payment to creators whose work influenced generated compositions.
-- C. rules assigning ownership whenever a composition incorporates algorithmically generated material.
-- D. financial remedies for musicians whose recordings are reproduced without authorization.
-
-**Answer:** A
-
-**Explanation:** The original phrase is broad enough to address both authorship and compensation while maintaining precise legal register. The alternatives narrow or alter the paper's claim.
-
-## Passage / set for ENGLISH question 42
-
-The botanist expected the plants near the stream to grow more quickly because they received more water. The measurements did show faster growth there. **[42] However, the difference was smaller than the botanist had predicted**. The results suggested that water availability was only one factor affecting growth.
-
-
-### ENGLISH 42 — Transitions & Cohesion (medium)
-
-**Question:** Which choice best connects the measurement to the next idea?
-
-- A. For example, the difference was smaller than the botanist had predicted
-- B. Similarly, the difference was smaller than the botanist had predicted
-- C. As a result, the difference was smaller than the botanist had predicted
-- D. However, the difference was smaller than the botanist had predicted
-
-**Answer:** D
-
-**Explanation:** "However" signals the contrast between the expected large difference and the smaller-than-predicted difference. The other transitions do not capture that contrast.
-
-## Passage / set for ENGLISH question 43
-
-The violin that arrived at the repair shop last week was nearly three hundred years old. Over the centuries, **[43] it's** varnish had darkened to a deep amber, and a long crack ran down the front. The repairer spent two full days studying the instrument before she touched it with a single tool.
-
-
-### ENGLISH 43 — Grammar & Usage (easy)
-
-**Question:** Which choice is best for the underlined portion?
-
-- A. it's
 - B. its
 - C. its'
 - D. their
 
 **Answer:** B
 
-**Explanation:** The varnish belongs to the violin, so the sentence needs the possessive pronoun 'its' (B). 'It's' (A) is a contraction of 'it is' or 'it has,' which makes no sense here. 'Its'' (C) is not a word, and 'their' (D) is plural, but it refers to a single violin.
+**Explanation:** A: "It's" means "it is," which doesn't fit ("changed it is shape"). | B: Correct. "Its" is the possessive form for the marsh. | C: "Its'" is not a word. | D: "Their" is plural, but "marsh" is singular.
 
-## Passage / set for ENGLISH question 44
+### ENGLISH 12 — Organization & Flow (easy)
 
-Many early films had no recorded sound, but audiences rarely watched them in silence. **[44] Movie theaters in that era were often small.** In larger cities, some theaters even employed full orchestras that performed scores written specifically for a film. The music told audiences when to feel tense, when to laugh, and when the hero was about to arrive.
+**Question:** Choose the best answer for question 2.
 
-
-### ENGLISH 44 — Organization & Flow (medium)
-
-**Question:** Which choice most effectively supports the claim in the preceding sentence and leads into the sentence that follows?
-
-- A. Movie theaters in that era were often small.
-- B. Silent films were usually much shorter than films are today.
-- C. Tickets to these films often cost only a few cents.
-- D. Most theaters hired a pianist or organist to play along with the action on the screen.
+- A. NO CHANGE
+- B. Nevertheless,
+- C. Similarly,
+- D. Consequently,
 
 **Answer:** D
 
-**Explanation:** The preceding sentence claims that silent films were not watched in silence, and D supports that claim with the specific fact that theaters hired musicians. D also prepares for the next sentence, where 'even employed full orchestras' builds on the idea of a single pianist or organist. A, B, and C offer true-sounding details about early movies, but none of them explains why audiences did not watch in silence, and none connects to the orchestras.
+**Explanation:** A: Repeated measurements aren't an example of erosion; they're a result of the constant change. | B: "Nevertheless" signals contrast, but this sentence follows logically from the changes described. | C: "Similarly" signals likeness, which doesn't fit. | D: Correct. Because the marsh kept changing, the team needed repeated measurements.
 
-## Passage / set for ENGLISH question 45
+### ENGLISH 13 — Organization & Flow (medium)
 
-The baker arrives at four in the morning so that the bread will be ready when the shop opens. By six o'clock, the smell of warm loaves drifts out onto the street, and a line of customers has already **[45] formed** at the door.
+**Question:** Choose the best answer for question 3.
 
-
-### ENGLISH 45 — Precision & Concision (easy)
-
-**Question:** Which choice is best for the underlined portion?
-
-- A. formed
-- B. shaped
-- C. constructed
-- D. composed
+- A. NO CHANGE
+- B. but they also keeping
+- C. they also kept
+- D. but also keeping
 
 **Answer:** A
 
-**Explanation:** When people gather into a line on their own, the line is said to 'form,' so 'formed' (A) is the precise word. 'Shaped' and 'constructed' suggest someone deliberately building the line, and 'composed' means 'made up of,' which does not describe a line gathering at a door.
+**Explanation:** A: Correct. "But" properly joins two complete clauses after the comma. | B: "Keeping" can't be the main verb of the second clause. | C: Creates a comma splice: two complete sentences joined only by a comma. | D: "Keeping" leaves the second part without a proper verb and has no subject.
 
-## Passage / set for ENGLISH question 46
+### ENGLISH 14 — Organization & Flow (medium)
 
-At sunrise, volunteers gathered along the riverbank to begin the annual bird count. Each group received a map and a checklist before setting out. **[46] After a brief orientation the volunteers spread out** along the trails and observation platforms.
+**Question:** Choose the best answer for question 4.
 
+- A. NO CHANGE
+- B. fail however a
+- C. fail; however, a
+- D. fail, however, a
 
-### ENGLISH 46 — Punctuation (easy)
+**Answer:** C
 
-**Question:** Which choice best punctuates the underlined portion?
+**Explanation:** A: Comma splice: "however" isn't a joining word, so a comma alone can't connect two sentences. | B: Run-on with no punctuation at all. | C: Correct. A semicolon joins the two sentences, and a comma follows "however." | D: Still a comma splice; commas on both sides of "however" don't fix it.
 
-- A. After a brief orientation the volunteers spread out
-- B. After a brief orientation, the volunteers spread out
-- C. After a brief orientation; the volunteers spread out
-- D. After a brief orientation: the volunteers spread out
+### ENGLISH 15 — Organization & Flow (medium)
+
+**Question:** Choose the best answer for question 5.
+
+- A. NO CHANGE
+- B. that were present and existed when drawing happened
+- C. of drawing it at the time of its drawing
+- D. under which it was drawn
+
+**Answer:** D
+
+**Explanation:** A: Redundant: "recorded at the time it was drawn" repeats "under which it was drawn." | B: Wordy and redundant ("present and existed"). | C: Awkward and repetitive ("drawing … drawing"). | D: Correct. Clear and concise.
+
+### ENGLISH 16 — Organization & Flow (medium)
+
+**Question:** The writer is considering deleting Sentence 4 from Paragraph 4. Should the writer make this deletion?
+
+- A. Yes, because it repeats the information in Sentence 3.
+- B. Yes, because it contradicts Mara's later view of maps.
+- C. No, because it explains why the supervisor's approach was useful.
+- D. No, because it describes how the island split into two pieces.
+
+**Answer:** C
+
+**Explanation:** A: Sentence 3 gives the approach; Sentence 4 gives a new idea, its benefit. | B: It supports Mara's view of maps as records of change; it doesn't contradict it. | C: Correct. Without it, the reader doesn't learn why keeping both outlines matters. | D: Sentence 1 describes the split; Sentence 4 doesn't.
+
+### ENGLISH 17 — Organization & Flow (medium)
+
+**Question:** Choose the best answer for question 7.
+
+- A. NO CHANGE
+- B. revealing
+- C. and it revealing
+- D. which revealed them
 
 **Answer:** B
 
-**Explanation:** The introductory phrase "After a brief orientation" should be followed by a comma before the independent clause. A lacks the needed punctuation, while C and D incorrectly use stronger punctuation between the introductory phrase and the clause.
+**Explanation:** A: "Revealed" creates a second main verb with no subject or joining word. | B: Correct. "Revealing" describes what comparing the surveys does. | C: "It revealing" is not a complete verb. | D: "Them" has nothing clear to refer to and makes the sentence ungrammatical.
 
-## Passage / set for ENGLISH question 47
+### ENGLISH 18 — Organization & Flow (hard)
 
-A literary journal is publishing an essay about a poet's late work. The essay argues that the poet's language became more restrained even as the subjects of the poems grew more personal. **[47] The later poems are basically a whole different thing, with the poet tossing around fewer words but somehow making them hit harder**. The essay then examines several poems in which ordinary objects carry emotional significance.
+**Question:** At point 8, the writer is considering adding the following sentence:
+*"Satellite images, which show large areas at once, are often used to track coastlines."*
+Should the writer make this addition here?
 
-
-### ENGLISH 47 — Style & Tone (medium)
-
-**Question:** Which choice best preserves the analytical tone of the essay while retaining its central observation?
-
-- A. The later poems are basically a whole different thing, using fewer words but making them hit harder.
-- B. The later poems are really different from the earlier work, with the poet using fewer words that have a bigger impact.
-- C. The later poems are essentially different from the earlier work, using fewer words while giving each one greater emotional weight.
-- D. The later poems are a dramatic change from the earlier work, with the poet throwing around fewer words to stronger effect.
+- A. Yes, because it explains why the team did not need field measurements.
+- B. Yes, because it supports the note's point about the limits of the data.
+- C. No, because it shifts the focus from Mara's note and her hopes for the map to a general statement about satellite images.
+- D. No, because it contradicts the earlier statement that the team used satellite coordinates.
 
 **Answer:** C
 
-**Explanation:** Choice C expresses the same observation in precise analytical language and avoids the conversational idioms in the other choices. The alternatives retain phrases such as "whole different thing," "really different," "bigger impact," or "throwing around," which are less consistent with a literary-critical essay.
+**Explanation:** A: The team clearly did take field measurements, so this reasoning is false. | B: The sentence is about other methods, not about the limits of this team's data. | C: Correct. It's a general fact that breaks the flow between the note and Mara's hope. | D: There's no contradiction; using coordinates and using images are different things.
 
-## Passage / set for ENGLISH question 48
+### ENGLISH 19 — Organization & Flow (easy)
 
-The software update addressed several critical security **[48] vulnerabilities, it also streamlined** the user interface for desktop devices. Users reported noticeable improvements in processing speed immediately following installation.
-
-
-### ENGLISH 48 — Sentence Structure (easy)
-
-**Question:** Which choice best corrects the comma splice in the underlined portion?
-
-- A. vulnerabilities, it also streamlined
-- B. vulnerabilities, and it also, streamlined
-- C. vulnerabilities, furthermore streamlining
-- D. vulnerabilities; it also streamlined
-
-**Answer:** D
-
-**Explanation:** The original text connects two independent clauses with only a comma, creating a comma splice. Using a semicolon between the two complete thoughts resolves the structural error.
-
-## Passage / set for ENGLISH question 49
-
-Early telegraph systems relied on manual operators to translate messages into Morse code line by line. **[49] Nevertheless,** automated teleprinters were introduced in the 1920s, enabling messages to be typed directly on standard typewriter keyboards and transmitted electronically.
-
-
-### ENGLISH 49 — Transitions & Cohesion (medium)
-
-**Question:** Which choice provides the most appropriate transition between the sentences?
+**Question:** Choose the best answer for question 9.
 
 - A. NO CHANGE
-- B. On the other hand,
-- C. In addition,
-- D. Later,
+- B. rather then pretending
+- C. rather than pretended
+- D. rather than pretend
 
 **Answer:** D
 
-**Explanation:** The passage describes a chronological progression from early manual operators to 1920s automated systems. 'Later' accurately signals this chronological transition.
+**Explanation:** A: "Then" refers to time; comparisons use "than." | B: Still uses "then." | C: "Pretended" doesn't match "ask" (both should follow "would help planners"). | D: Correct. "Rather than pretend" matches "ask" and uses "than."
 
-## Passage / set for ENGLISH question 50
+### ENGLISH 20 — Organization & Flow (hard)
 
-The historical archive contains hundreds of regional newspapers printed during the nineteenth century. When researchers examined the fragile newsprint under a microscope, **[50] they found** that high acid content in early wood-pulp paper had accelerated the decay of several rare editions.
+**Question:** The writer wants to add the following sentence to Paragraph 2:
+*"In other words, the coastline was growing and shrinking at the same time."*
+The sentence would most logically be placed after Sentence:
+
+- A. 1.
+- B. 2.
+- C. 3.
+- D. 4.
+
+**Answer:** D
+
+**Explanation:** A: Nothing about growing or shrinking has been described yet. | B: Mara has only said the border wasn't fixed; the two processes come later. | C: Only growth (new ground forming) has been described so far. | D: Correct. After Sentence 4, both growth (Sentence 3) and loss (Sentence 4) have been described, so "In other words" sums them up before the result in Sentence 5.
+
+## Passage / set for ENGLISH questions 21, 22, 23, 24, 25, 26, 27, 28, 29, 30
+
+[Paragraph 1]
+
+At the city museum, visitors could examine old cameras, typewriters, and kitchen tools. Yet curator Imani Brooks noticed that the displays were strangely quiet. A visitor could see a mechanical cash register but could not hear its bell. To Imani, something important was [1]**missing; the** sounds that had once accompanied ordinary work.
+
+[Paragraph 2]
+
+She proposed creating a sound archive. Rather than collecting recordings from the internet, the museum would invite people to bring working objects to a temporary studio. Staff members [2]**would record** each object in a quiet room, noting its age and the story of its owner. They began with a sewing machine, a bicycle bell, and a hand-cranked pencil sharpener. [3]**However,** the sewing machine made a steady clicking rhythm that changed whenever its operator increased the speed.
+
+[Paragraph 3]
+
+Recording was not as simple as pressing a button. Microphones picked up the hum of ventilation and the scrape of shoes against the floor. [4]**To reduce this noise, thick curtains covered the hard surfaces** and sessions were scheduled before opening hours. They also recorded a few seconds of silence in each session, allowing editors to identify background sounds. The process required patience [5]**more so than it required expensive equipment that cost a lot**.
+
+[Paragraph 4]
+
+(1) The archive soon raised questions that no photograph could answer. (2) Why did two apparently identical machines sound different? (3) Had their parts worn unevenly, or had their owners cared for them in different ways? (4) Instead of guessing, Imani asked a repair specialist to examine the machines. (5) The specialist explained how small changes in tension could alter the pitch of a mechanism. [7] (6) These observations [6]**added context to the recordings, making** the archive useful to researchers as well as visitors.
+
+[Paragraph 5]
+
+For the public exhibition, the museum installed listening stations beside selected objects. Each station offered a short recording and a caption describing how the recording had been made. Visitors could listen without operating fragile equipment. The museum also provided transcripts for spoken explanations and adjustable volume [8]**controls, features, that made** the exhibition more accessible. Imani hoped future visitors would recognize that history was not only something to look at; [9]**something people once heard every day as well**.
 
 
-### ENGLISH 50 — Grammar & Usage (easy)
+### ENGLISH 21 — Organization & Flow (easy)
 
-**Question:** Which choice completes the sentence so that it conforms to the conventions of Standard English?
+**Question:** Choose the best answer for question 1.
 
-- A. one found
-- B. it found
-- C. NO CHANGE
-- D. he found
+- A. NO CHANGE
+- B. missing: the
+- C. missing the
+- D. missing, and the
+
+**Answer:** B
+
+**Explanation:** A: A semicolon must be followed by a complete sentence; "the sounds that had once accompanied ordinary work" isn't one. | B: Correct. A colon introduces an explanation of what was missing. | C: Without punctuation, "missing the sounds" changes the meaning (Imani missing something). | D: "And" has no second clause to join; what follows is not a complete sentence.
+
+### ENGLISH 22 — Organization & Flow (easy)
+
+**Question:** Choose the best answer for question 2.
+
+- A. NO CHANGE
+- B. would recorded
+- C. will recorded
+- D. recording
+
+**Answer:** A
+
+**Explanation:** A: Correct. "Would record" describes the planned action, matching "the museum would invite." | B: "Would" must be followed by the base form "record." | C: "Will" must be followed by "record," and "will" shifts the tense. | D: "Recording" leaves the sentence without a main verb.
+
+### ENGLISH 23 — Organization & Flow (easy)
+
+**Question:** Choose the best answer for question 3.
+
+- A. NO CHANGE
+- B. In conclusion,
+- C. Instead,
+- D. For example,
+
+**Answer:** D
+
+**Explanation:** A: "However" signals contrast, but the sewing machine detail illustrates the recordings. | B: This isn't a conclusion; the passage continues. | C: "Instead" suggests replacing something, which doesn't fit. | D: Correct. The sewing machine is an example of the sounds recorded.
+
+### ENGLISH 24 — Organization & Flow (medium)
+
+**Question:** Choose the best answer for question 4.
+
+- A. NO CHANGE
+- B. Thick curtains, to reduce this noise, covering the hard surfaces
+- C. To reduce this noise, the team covered the hard surfaces with thick curtains
+- D. To reduce this noise, the hard surfaces were covered by thick curtains by the team
 
 **Answer:** C
 
-**Explanation:** The pronoun refers back to the plural noun 'researchers'. The third-person plural pronoun 'they' correctly agrees in number with its antecedent.
+**Explanation:** A: The phrase "To reduce this noise" seems to describe the curtains, as if curtains decided to reduce noise. "They" in the next sentence then has no clear person to refer to. | B: "Covering" leaves the clause without a main verb. | C: Correct. "The team" is who reduced the noise, and it gives "They" in the next sentence a clear meaning. | D: Wordy, passive, and repeats "by."
+
+### ENGLISH 25 — Organization & Flow (medium)
+
+**Question:** Choose the best answer for question 5.
+
+- A. NO CHANGE
+- B. more than costly and expensive equipment
+- C. instead of equipment that was expensive and cost much
+- D. rather than expensive equipment
+
+**Answer:** D
+
+**Explanation:** A: "Expensive" and "cost a lot" say the same thing, and the phrasing is wordy. | B: "Costly and expensive" is redundant. | C: Redundant and wordy. | D: Correct. Clear and concise.
+
+### ENGLISH 26 — Organization & Flow (medium)
+
+**Question:** Choose the best answer for question 6.
+
+- A. NO CHANGE
+- B. added context to the recordings; making
+- C. added context to the recordings, they made
+- D. adding context to the recordings, making
+
+**Answer:** A
+
+**Explanation:** A: Correct. The main verb "added" is followed by a phrase ("making…") describing the result. | B: A semicolon must be followed by a complete sentence; "making the archive useful…" isn't one. | C: Comma splice: two complete sentences joined by only a comma. | D: "Adding" leaves the sentence with no main verb.
+
+### ENGLISH 27 — Organization & Flow (medium)
+
+**Question:** At point 7, the writer is considering adding the following sentence:
+*"Tension refers to how tightly a spring or belt inside a machine is stretched."*
+Should the writer make this addition here?
+
+- A. Yes, because it defines a term that readers may not know and that is key to the specialist's explanation.
+- B. Yes, because it shows that Imani repaired the machines herself.
+- C. No, because it repeats information from Sentence 3.
+- D. No, because it introduces a topic unrelated to the archive.
+
+**Answer:** A
+
+**Explanation:** A: Correct. It clarifies "tension," which is central to why the machines sounded different. | B: Nothing in the sentence says Imani did repairs; the specialist examined the machines. | C: Sentence 3 is about wear and care, not tension. | D: Tension directly explains the archive's question about different sounds.
+
+### ENGLISH 28 — Organization & Flow (hard)
+
+**Question:** Choose the best answer for question 8.
+
+- A. NO CHANGE
+- B. controls; features that made
+- C. controls, features which making
+- D. controls, features that made
+
+**Answer:** D
+
+**Explanation:** A: The comma after "features" wrongly separates "features" from the clause that defines them ("that made…"). | B: A semicolon must be followed by a complete sentence; "features that made…" isn't one. | C: "Making" can't serve as the verb of the clause. | D: Correct. One comma introduces the summary phrase, and "that made…" directly describes "features."
+
+### ENGLISH 29 — Organization & Flow (medium)
+
+**Question:** Choose the best answer for question 9.
+
+- A. NO CHANGE
+- B. and it being something people once heard every day
+- C. it was also something people once heard every day
+- D. heard every day too
+
+**Answer:** C
+
+**Explanation:** A: After a semicolon you need a complete sentence; this has no verb. | B: "It being" is not a complete verb. | C: Correct. A complete sentence that finishes the contrast ("not only … also"). | D: A fragment with no subject.
+
+### ENGLISH 30 — Organization & Flow (hard)
+
+**Question:** Suppose the writer's goal had been to describe how a museum used technology to replace its physical objects. Would this essay accomplish that goal?
+
+- A. Yes, because the listening stations allowed the museum to remove its fragile equipment.
+- B. Yes, because the archive was built from recordings found on the internet.
+- C. No, because the essay describes recordings that add to the museum's objects rather than replace them.
+- D. No, because the museum decided not to record any objects.
+
+**Answer:** C
+
+**Explanation:** A: The stations sit *beside* the objects; nothing was removed. | B: The museum specifically chose *not* to use internet recordings. | C: Correct. The recordings are placed next to the objects and add context; they don't replace them. | D: The museum recorded many objects.
+
+## Passage / set for ENGLISH questions 31, 32, 33, 34, 35, 36, 37, 38, 39, 40
+
+[Paragraph 1]
+
+The engineering club had only one afternoon to build a bridge. Their materials were modest: recycled paper, glue, string, and two wooden blocks that represented opposite riverbanks. The bridge needed to support a stack of small weights without touching the table below. At first, the students assumed that using more paper would automatically make [1]**there** design stronger.
+
+[Paragraph 2]
+
+Their teacher challenged that assumption by placing a flat sheet between the blocks. It bent under a single weight. Then she folded another sheet into a series of ridges. [2]**Although it used the same amount of paper. The folded sheet** supported several weights. The students realized that shape could matter as much as quantity, and they began testing different folds before building a full bridge.
+
+[Paragraph 3]
+
+One group rolled paper into narrow tubes, while another folded strips into triangles. Each team recorded the length of its pieces, the amount of glue used, and the weight [3]**that their structure could hold**. These measurements allowed the students to compare their designs fairly. When a tube collapsed, the students did not simply throw it away. [4]**Instead, they** inspected the crease where it had failed and adjusted the next version to spread the weight more evenly.
+
+[Paragraph 4]
+
+(1) As the deadline approached, disagreements became harder to avoid. (2) Some students wanted to reinforce every joint; others worried that extra glue would add weight and take too long to dry. (3) The reinforced joint held slightly more weight, [5]**but it also required** a longer drying time. (4) To settle the question, the club tested two otherwise identical joints, one with extra glue and one without it. (5) The result gave the team a trade-off to consider, not a universal rule.
+
+[Paragraph 5]
+
+In the final trial, the bridge held the required weights for a full minute. The students [7]**cheered then they carefully dismantled** the structure to examine its weak points. [8] They wrote down which choices had helped and which would need more testing. The next meeting would begin with a new question: could a lighter bridge support the same load? By the end of the afternoon, the club understood that engineering [9]**involved testing ideas, and then revising them, and doing this** in response to evidence. [10]**It had been a long afternoon.**
+
+
+### ENGLISH 31 — Organization & Flow (easy)
+
+**Question:** Choose the best answer for question 1.
+
+- A. NO CHANGE
+- B. their
+- C. they're
+- D. its
+
+**Answer:** B
+
+**Explanation:** A: "There" refers to a place, not ownership. | B: Correct. "Their" shows the design belongs to the students. | C: "They're" means "they are." | D: "Its" is singular, but it refers to the plural "students."
+
+### ENGLISH 32 — Organization & Flow (easy)
+
+**Question:** Choose the best answer for question 2.
+
+- A. NO CHANGE
+- B. Although it used the same amount of paper; the folded sheet
+- C. It used the same amount of paper, the folded sheet
+- D. Although it used the same amount of paper, the folded sheet
+
+**Answer:** D
+
+**Explanation:** A: "Although it used the same amount of paper." is a fragment; it can't stand alone. | B: A semicolon can't follow a dependent "although" clause. | C: Comma splice: two complete sentences joined by only a comma. | D: Correct. The "although" clause is joined to the main sentence with a comma.
+
+### ENGLISH 33 — Organization & Flow (medium)
+
+**Question:** Choose the best answer for question 3.
+
+- A. NO CHANGE
+- B. that it's structure could hold
+- C. that its structure could hold
+- D. its structure could have held
+
+**Answer:** C
+
+**Explanation:** A: "Their" is plural, but it refers to "each team" (singular), which already uses "its pieces." | B: "It's" means "it is." | C: Correct. "Its" matches "each team" and the earlier "its pieces." | D: "Could have held" changes the meaning to something that didn't happen.
+
+### ENGLISH 34 — Organization & Flow (medium)
+
+**Question:** Choose the best answer for question 4.
+
+- A. NO CHANGE
+- B. However, they
+- C. Similarly, they
+- D. In addition, they
+
+**Answer:** A
+
+**Explanation:** A: Correct. "Instead" contrasts throwing the tube away with what they actually did. | B: "However" contrasts awkwardly; the sentence offers an alternative action, which "Instead" expresses. | C: "Similarly" signals likeness, but these are opposite actions. | D: "In addition" suggests they threw it away *and* inspected it.
+
+### ENGLISH 35 — Organization & Flow (medium)
+
+**Question:** Choose the best answer for question 5.
+
+- A. NO CHANGE
+- B. but it also requiring
+- C. it also required
+- D. but also it required that
+
+**Answer:** A
+
+**Explanation:** A: Correct. "But" joins the two contrasting clauses after the comma. | B: "Requiring" can't be the main verb of the second clause. | C: Comma splice. | D: Awkward word order, and "that" makes no sense before "a longer drying time."
+
+### ENGLISH 36 — Organization & Flow (hard)
+
+**Question:** For the sake of logic and cohesion, Sentence 4 in Paragraph 4 should be placed:
+
+- A. where it is now.
+- B. before Sentence 1.
+- C. after Sentence 2.
+- D. after Sentence 5.
+
+**Answer:** C
+
+**Explanation:** A: As placed, the paragraph gives the test result (Sentence 3) before describing the test. | B: "The question" refers to the disagreement in Sentence 2, which hasn't happened yet. | C: Correct. Sentence 2 raises the question, Sentence 4 describes the test that settles it, and Sentence 3 gives the result. | D: The test must come before the result and before the conclusion about it.
+
+### ENGLISH 37 — Organization & Flow (medium)
+
+**Question:** Choose the best answer for question 7.
+
+- A. NO CHANGE
+- B. cheered, then they carefully dismantled
+- C. cheered; then carefully dismantling
+- D. cheered and then carefully dismantled
+
+**Answer:** D
+
+**Explanation:** A: Run-on: two complete sentences with no punctuation or joining word. | B: Comma splice: "then" isn't a joining word, so the comma can't join two sentences. | C: After the semicolon, "then carefully dismantling" isn't a complete sentence. | D: Correct. One subject ("The students") with two verbs joined by "and."
+
+### ENGLISH 38 — Organization & Flow (medium)
+
+**Question:** At point 8, the writer is considering adding the following sentence:
+*"Success did not end the investigation."*
+Should the writer make this addition here?
+
+- A. Yes, because it explains why the students kept studying the bridge after it passed the test.
+- B. Yes, because it shows that the bridge failed the final trial.
+- C. No, because it contradicts the statement that the students cheered.
+- D. No, because it repeats the first sentence of the paragraph.
+
+**Answer:** A
+
+**Explanation:** A: Correct. It links the successful trial to the continued analysis that follows. | B: The bridge passed the trial. | C: Cheering and continuing to study the bridge don't conflict. | D: The first sentence reports the result; this one introduces a new idea.
+
+### ENGLISH 39 — Organization & Flow (easy)
+
+**Question:** Choose the best answer for question 9.
+
+- A. NO CHANGE
+- B. involved testing ideas and revising them
+- C. involved testing ideas, then revising those ideas that were tested,
+- D. involves to test ideas and revise them
+
+**Answer:** B
+
+**Explanation:** A: Wordy; "and doing this" adds nothing. | B: Correct. Clear and concise. | C: Repetitive ("ideas … ideas that were tested"). | D: "Involves to test" is not standard English, and "involves" shifts the tense.
+
+### ENGLISH 40 — Organization & Flow (hard)
+
+**Question:** Which choice most effectively concludes the essay by returning to the students' first assumption?
+
+- A. NO CHANGE
+- B. Paper, they noticed, was cheaper than wood.
+- C. The club had learned that a strong bridge depended less on how much paper they used than on how they shaped it.
+- D. Many of the students planned to join the club again next year.
+
+**Answer:** C
+
+**Explanation:** A: Doesn't connect to the essay's ideas. | B: Cost was never part of the students' assumption. | C: Correct. It directly answers Paragraph 1's assumption that more paper means more strength. | D: Introduces an unrelated detail.
+
+## Passage / set for ENGLISH questions 41, 42, 43, 44, 45, 46, 47, 48, 49, 50
+
+[Paragraph 1]
+
+During an especially hot September, students at Westbrook High School noticed that the top-floor classrooms felt warmer than the rooms below. Their science teacher suggested investigating the roof. Most of it was covered with dark material that absorbed sunlight. A small section, however, held planter boxes filled with herbs. The students [1]**wondered weather** the plants affected the temperature nearby.
+
+[Paragraph 2]
+
+They designed a simple study with two thermometers. One measured the air above the planted section; [2]**the other measured the air** above an exposed part of the roof. The students placed both instruments at the same height and checked them at identical times. By keeping those conditions consistent, they hoped to make the comparison fair. They also recorded cloud cover and wind speed, since weather could influence both readings. [3]**For several days the two areas showed, only small differences.**
+
+[Paragraph 3]
+
+Then a stretch of clear afternoons arrived. The planted area was often cooler, especially when the soil was moist. [4]**Therefore,** the students resisted announcing a dramatic discovery. Their sample was small, and the roof's different surfaces might have influenced the readings. They discussed how water evaporating from leaves can remove heat, [5]**a process that is called and known as** transpiration. The explanation was reasonable, but their measurements alone could not prove that it was the only cause.
+
+[Paragraph 4]
+
+(1) The class decided to improve its method. (2) They added more sensors and rotated them between locations to check whether one device read consistently high. (3) They also measured the temperature of the roof surface itself. [6] (4) Students graphed the readings, looking for patterns across several weeks rather than focusing on the hottest afternoon. (5) A longer record made their conclusions more cautious [7]**and more useful**.
+
+[Paragraph 5]
+
+At the school assembly, the students presented their results without claiming that every rooftop garden would have the same effect. [8]**There evidence came** from one roof during one season. They recommended continued monitoring and suggested that the school explore other benefits, including habitat for insects. [9]**The project had begun with a question about warm classrooms, it ended** with a lesson about measuring carefully before drawing conclusions.
+
+
+### ENGLISH 41 — Organization & Flow (easy)
+
+**Question:** Choose the best answer for question 1.
+
+- A. NO CHANGE
+- B. wondered whether
+- C. wondered if weather
+- D. wonder whether
+
+**Answer:** B
+
+**Explanation:** A: "Weather" means rain, sun, etc.; "whether" introduces a possibility. | B: Correct. "Wondered whether" is the right word in the past tense. | C: Still uses "weather." | D: "Wonder" shifts to the present tense.
+
+### ENGLISH 42 — Organization & Flow (easy)
+
+**Question:** Choose the best answer for question 2.
+
+- A. NO CHANGE
+- B. , the other measured the air
+- C. the other measuring the air
+- D. and the other measured the air
+
+**Answer:** A
+
+**Explanation:** A: Correct. A semicolon correctly joins two complete, closely related sentences. | B: Replacing the semicolon with a comma creates a comma splice. | C: "Measuring" can't be the main verb after a semicolon. | D: A semicolon shouldn't be followed by "and" here; use either the semicolon or ", and."
+
+### ENGLISH 43 — Organization & Flow (easy)
+
+**Question:** Choose the best answer for question 3.
+
+- A. NO CHANGE
+- B. For several days the two areas, showed only small differences.
+- C. For several days, the two areas showed only small differences.
+- D. For several days; the two areas showed only small differences.
+
+**Answer:** C
+
+**Explanation:** A: The comma wrongly separates the verb "showed" from what was shown. | B: The comma wrongly separates the subject from its verb. | C: Correct. The comma sets off the introductory phrase. | D: A semicolon can't follow an introductory phrase.
+
+### ENGLISH 44 — Organization & Flow (medium)
+
+**Question:** Choose the best answer for question 4.
+
+- A. NO CHANGE
+- B. For example,
+- C. Similarly,
+- D. However,
+
+**Answer:** D
+
+**Explanation:** A: "Therefore" suggests cooler readings caused the students to hold back, but the result would normally encourage a big claim. | B: Holding back isn't an example of the cooler readings. | C: "Similarly" signals likeness, not contrast. | D: Correct. Despite encouraging results, the students stayed cautious.
+
+### ENGLISH 45 — Organization & Flow (medium)
+
+**Question:** Choose the best answer for question 5.
+
+- A. NO CHANGE
+- B. a process, it is called
+- C. a process known as
+- D. which processes are known as
+
+**Answer:** C
+
+**Explanation:** A: "Called and known as" says the same thing twice. | B: Creates a comma splice ("it is called" is a full clause). | C: Correct. Clear and concise. | D: "Which processes" is plural and awkward.
+
+### ENGLISH 46 — Organization & Flow (medium)
+
+**Question:** At point 6, the writer is considering adding the following sentence:
+*"These changes helped separate errors in the instruments from real differences in temperature."*
+Should the writer make this addition here?
+
+- A. Yes, because it explains the purpose of rotating sensors and measuring the roof surface.
+- B. Yes, because it shows that all the sensors were broken.
+- C. No, because it repeats Sentence 4.
+- D. No, because it contradicts the idea that the class improved its method.
+
+**Answer:** A
+
+**Explanation:** A: Correct. It explains why Sentences 2 and 3 matter. | B: Nothing suggests the sensors were broken; the class checked whether one read high. | C: Sentence 4 is about graphing over several weeks, a different idea. | D: It supports the improved method.
+
+### ENGLISH 47 — Organization & Flow (medium)
+
+**Question:** Choose the best answer for question 7.
+
+- A. NO CHANGE
+- B. and, more useful
+- C. and usefulness
+- D. and more usefully
+
+**Answer:** A
+
+**Explanation:** A: Correct. "More cautious and more useful" are parallel adjectives describing the conclusions. | B: The comma after "and" is unnecessary. | C: "Usefulness" is a noun, which breaks the parallel structure. | D: "Usefully" is an adverb, which can't describe "conclusions."
+
+### ENGLISH 48 — Organization & Flow (medium)
+
+**Question:** Choose the best answer for question 8.
+
+- A. NO CHANGE
+- B. They're evidence came
+- C. There evidence had come
+- D. Their evidence came
+
+**Answer:** D
+
+**Explanation:** A: "There" refers to a place, not ownership. | B: "They're" means "they are." | C: Still uses "there," and "had come" changes the tense unnecessarily. | D: Correct. "Their" shows the evidence belonged to the students.
+
+### ENGLISH 49 — Organization & Flow (hard)
+
+**Question:** Choose the best answer for question 9.
+
+- A. NO CHANGE
+- B. classrooms, but it ended
+- C. classrooms; but it ended
+- D. classrooms it ended
+
+**Answer:** B
+
+**Explanation:** A: Comma splice: two complete sentences joined by only a comma. | B: Correct. "But" joins the two contrasting sentences after the comma. | C: A semicolon followed by "but" is incorrect here. | D: Run-on with no punctuation or joining word.
+
+### ENGLISH 50 — Organization & Flow (hard)
+
+**Question:** Suppose the writer's goal had been to show students using a scientific approach to reach a careful conclusion. Would this essay accomplish that goal?
+
+- A. Yes, because it describes how the students controlled their measurements, improved their method, and limited their claims.
+- B. Yes, because it proves that rooftop gardens always cool buildings.
+- C. No, because the students never collected any data.
+- D. No, because the essay focuses mainly on the herbs grown in the planter boxes.
+
+**Answer:** A
+
+**Explanation:** A: Correct. The essay shows fair testing, better methods, and cautious conclusions. | B: The students specifically avoid claiming this. | C: They collected temperature data for weeks. | D: The herbs are barely described; the focus is the study.
 
 # Math
 
@@ -1516,616 +1435,725 @@ kx + 6y = c
 
 # Reading
 
-## Passage / set for READING questions 1, 2, 3, 4, 5
+## Passage / set for READING questions 1, 2, 3, 4, 5, 6, 7, 8, 9
 
-**Title:** The Last Loop at Halverson Park
-
-The course at Halverson Park ran mostly through woods, and by the second mile the runners had stretched into a thin, uneven line, each one alone with the sound of his own breathing and the crunch of the person ahead.
-
-Teo had been told what to do. Coach Abrams had told him at the starting line, one hand on Teo's shoulder and the other pointing at Ruben, who was retying a shoe that did not need retying. "His ankle's not right," the coach had said. "Stay on him. Don't let him go out too fast, and don't let him quit. Top fifteen goes to state. He can still make it if somebody keeps him honest."
-
-So Teo stayed on him. Through the first mile he ran a step behind Ruben's left shoulder, close enough to see the white tape above his sock and the slight hitch every time that foot came down. Ruben had beaten Teo in every race for two years. He had a long, loose stride that made the rest of them look like they were working, and Teo had spent most of those races watching that stride pull away from him around the first bend. It was strange to be this close to it. It was stranger to notice that the stride was not pulling away.
-
-At the two-mile marker a volunteer was calling places. Fourteen. Fifteen. Teo heard the numbers and did the arithmetic without wanting to. Ruben was fifteenth. He was sixteenth.
-
-The trail climbed toward the last loop around the reservoir. Ruben's breathing had changed; it came in short, ragged pulls, and twice he glanced down at his ankle as if it belonged to someone else. Teo moved up beside him. "Easy," he said, because that was what he had been told to say. "Just hold this."
-
-Ruben nodded without looking at him.
-
-On the climb, Teo found that his own legs were good. Not just good enough, but good. The hill that usually made him want to walk felt short. He could feel the distance between himself and the runner ahead, a boy in a green singlet, the way you can feel a wall in a dark room. He could close it. He knew that with a certainty he had never had before in a race, and he understood, almost at the same moment, that closing it would mean leaving Ruben behind.
-
-He thought about the coach's hand on his shoulder. He thought about the two years of watching Ruben's back disappear into the trees, and about how no one had ever told Ruben to stay with him.
-
-At the top of the hill, Ruben slowed, and Teo did not.
-
-He did not decide to go so much as notice that he was already going. The green singlet came back to him in thirty seconds. Another runner, wheezing, came back to him on the flat stretch along the water. The crowd noise from the finish grew from a murmur to a roar, and someone was shouting his name, though he could not tell who.
-
-He crossed the line twelfth. A volunteer pressed a card into his hand and steered him into the chute, and he stood there with his hands on his knees while the other runners came through.
-
-He watched for Ruben. Fourteenth came through, then fifteenth, then a long gap. When Ruben finally appeared, he was not running so much as carrying himself, his face gray, his left foot landing flat and careful. He finished nineteenth.
-
-Teo held his card. It had a number on it and nothing else. Across the chute, Coach Abrams had his clipboard against his chest and was looking at Ruben, not at Teo. After a while Teo walked over to the water table, filled two cups, and carried them back toward the place where Ruben was sitting in the grass. He did not know yet what he would say. He held out one of the cups anyway.
+001 ¶ My uncle Teo did not believe in instructions. When I arrived
+002   at his boatyard the summer I turned sixteen, he handed me a
+003   sanding block and pointed at the hull of a wooden rowboat that
+004   rested upside down on two sawhorses. "Take it down to the
+005   wood," he said, and then he walked back into the shed, where a
+006   radio was playing a baseball game nobody seemed to be
+007   listening to.
+008 ¶ I had expected a speech. My mother, who is Teo's younger
+009   sister, had warned me that he was "a man of few words," but I
+010   had assumed she was exaggerating the way she exaggerated most
+011   things about her childhood. By the end of the first afternoon,
+012   my arms ached and the hull looked almost exactly as it had
+013   when I started. Teo came out once, ran his palm along the area
+014   I had sanded, and said, "Less pressure. Let the block do the
+015   work." Then he went back inside.
+016 ¶ For the first week, I measured my progress in blisters. I
+017   sanded in the morning before the heat settled over the yard,
+018   and in the afternoon I swept curls of old varnish into piles
+019   that the wind promptly scattered again. I began to suspect
+020   that Teo had given me the job simply to keep me out of his
+021   way. When I said so to my mother on the phone, she laughed in
+022   a way that made me feel younger than I was. "He gave you the
+023   boat," she said. "That's not nothing."
+024 ¶ I didn't understand what she meant until the following
+025   Saturday. A man in a pressed shirt drove in with a fiberglass
+026   dinghy strapped to his trailer and asked whether Teo could
+027   patch a crack before the weekend. Teo looked at the crack for
+028   a long time without touching it. Then he said he could do it,
+029   but not by Sunday, and not cheaply. The man argued. Teo
+030   listened, nodded, and repeated exactly what he had said
+031   before, in exactly the same tone, until the man got back in
+032   his car and drove away with the dinghy still cracked.
+033 ¶ "You could have just done it fast," I said.
+034 ¶ "I could have done it fast once," Teo said. He picked up my
+035   sanding block, turned it over in his hand, and gave it back to
+036   me. "Then it would have been my name on a boat that sank."
+037 ¶ After that, I watched him differently. I noticed that he spent
+038   more time looking than working, and that when he finally
+039   picked up a tool, he rarely had to put it down to try
+040   something else. I noticed, too, that the rowboat was not a
+041   random chore. It had belonged to my grandfather, who had built
+042   it the year my mother was born. Teo never told me this. I
+043   learned it from a faded photograph pinned above the workbench,
+044   in which a young man with Teo's narrow shoulders stood beside
+045   the same hull, painted a blue that I had spent two weeks
+046   removing.
+047 ¶ By August, the wood had begun to show its grain, a pale gold
+048   streaked with darker lines like the rings inside a tree. Teo
+049   walked around the boat twice and then did something he had not
+050   done all summer: he sat down on an overturned bucket beside me
+051   and stayed. He showed me how to fill the small cracks along
+052   the keel, pressing the filler in with a flexible knife and
+053   scraping the excess away in a single motion. His instructions
+054   were still short, but now he explained the reasons. "Too thick
+055   and it shrinks," he said. "Too thin and it doesn't hold."
+056 ¶ On my last evening, we turned the boat right side up for the
+057   first time. It was lighter than I had expected, and when we
+058   set it down on the grass, it rocked once and then sat still.
+059   Teo stood with his hands in his pockets, looking at it the way
+060   he had looked at the cracked dinghy, as if he were reading
+061   something written on its surface.
+062 ¶ "Next summer," he said, "we paint it."
+063 ¶ He did not say what color, and I did not ask. I already knew.
 
 
 ### READING 1 — Literary Narrative (easy)
 
-**Question:** Based on the passage, which statement accurately describes Teo and Ruben's results in earlier races?
+**Question:** The passage is told from the point of view of:
 
-- A. Teo usually finished just ahead of Ruben.
-- B. The two of them often finished side by side.
-- C. Ruben had sometimes been asked to pace Teo.
-- D. Ruben had consistently finished ahead of Teo.
+- A. Teo, who describes teaching a young relative to restore a boat.
+- B. the narrator's mother, who remembers her own childhood summers.
+- C. an outside observer who describes Teo and the narrator equally.
+- D. a narrator looking back on a summer spent working at an uncle's boatyard.
 
 **Answer:** D
 
-**Explanation:** The narration states that Ruben had beaten Teo in every race for two years and that Teo spent those races watching Ruben's stride pull away from him. Later, Teo reflects that no one had ever told Ruben to stay with him, so Ruben had not been asked to pace Teo.
+**Explanation:** A: Teo is described from the outside; the "I" is the young relative, not Teo. | B: The mother appears only on the phone (lines 21–23); she is not the narrator. | C: The narrator is a character in the story ("I"), not an outside observer. | D: Correct. The narrator uses "I" and describes the summer at Teo's boatyard (lines 1–3).
 
-### READING 2 — Literary Narrative (easy)
+### READING 2 — Literary Narrative (medium)
 
-**Question:** The central conflict Teo faces during the race is between:
+**Question:** Which statement best describes the main development of the passage?
 
-- A. following his coach's instruction to stay with an injured teammate and taking a chance to qualify for state himself.
-- B. his resentment of the coach's favoritism toward Ruben and his wish to quit the team after the race.
-- C. his fear that his own injury will worsen and his desire to finish ahead of the runner in the green singlet.
-- D. his loyalty to Ruben and his need to win the race outright in front of the crowd at the finish.
+- A. The narrator's frustration gradually gives way to an understanding of Teo's care and of what the boat means.
+- B. The narrator decides to become a boat builder like Teo.
+- C. Teo begins explaining his methods after the narrator complains to him.
+- D. The narrator and Teo argue over how the boat should be restored.
 
 **Answer:** A
 
-**Explanation:** The coach tells Teo to stay with Ruben, whose ankle is hurt, so Ruben can still finish in the top fifteen. On the climb, Teo realizes he could pass the runner ahead but that doing so would mean leaving Ruben behind, and he was sixteenth at the time. The injury belongs to Ruben, not Teo, and Teo finishes twelfth, so the conflict concerns qualifying, not winning outright.
+**Explanation:** A: Correct. Early on the narrator thinks the job is busywork (lines 19–21); later the narrator sees Teo's care and learns the boat was the grandfather's (lines 37–46). | B: The passage never says the narrator plans a career in boats. | C: The narrator complains to the mother, not to Teo, and the passage never says Teo changes because of a complaint. | D: The only argument is between Teo and the man with the dinghy (lines 25–32).
 
-### READING 3 — Literary Narrative (hard)
+### READING 3 — Literary Narrative (easy)
 
-**Question:** Taken together, the details in the final paragraph most strongly suggest that Teo:
+**Question:** According to the passage, the man with the fiberglass dinghy left without having it repaired because:
 
-- A. is proud of qualifying and goes to Ruben hoping to be congratulated on his result.
-- B. regrets his choice so deeply that he has decided to give his place at state to Ruben.
-- C. finds his result less settling than he expected and reaches out to Ruben without knowing what to say.
-- D. is upset that the coach ignored him and goes to Ruben to complain about the coach's attention.
+- A. Teo said the crack could not be fixed.
+- B. the narrator had damaged the dinghy.
+- C. Teo would not agree to finish the repair quickly or cheaply.
+- D. the man decided to fix the dinghy himself.
 
 **Answer:** C
 
-**Explanation:** Teo's card has a number on it and nothing else, which makes the achievement seem flat, and the coach looks at Ruben rather than at him. Teo then brings Ruben water even though he does not yet know what he will say. These details show an unresolved feeling and a gesture of connection, not pride, a firm decision to give up his spot, or a plan to complain.
+**Explanation:** A: Teo said he "could do it" (line 28). | B: The narrator never touches the dinghy. | C: Correct. Teo said he could do it "but not by Sunday, and not cheaply" and would not change his answer (lines 28–32). | D: The passage doesn't say what the man planned to do; it only says he drove away with the dinghy still cracked.
 
 ### READING 4 — Literary Narrative (medium)
 
-**Question:** What does Teo's observation that Ruben's stride was not pulling away most strongly suggest about Ruben at that point in the race?
+**Question:** In context, the mother's statement "That's not nothing" (line 23) most strongly suggests that she believes:
 
-- A. Ruben was deliberately holding back so that Teo could keep up with him.
-- B. Teo was running faster than he ever had from the very start of the race.
-- C. Ruben's injury was slowing him, and the usual gap between the two had not opened.
-- D. the narrow trail through the woods was keeping all the runners close together.
+- A. the narrator should be paid more for the work.
+- B. Teo had trusted the narrator with something meaningful.
+- C. Teo planned to sell the boat at the end of the summer.
+- D. the narrator was exaggerating how hard the work was.
 
-**Answer:** C
+**Answer:** B
 
-**Explanation:** The same paragraph mentions the tape above Ruben's sock and the hitch in his step, and it notes that for two years Teo had watched Ruben's stride pull away early in races. Seeing it fail to pull away signals that the injury is affecting Ruben. Nothing suggests Ruben was holding back on purpose, and Teo's own strength does not emerge until the later climb.
+**Explanation:** A: Pay is never mentioned. | B: Correct. She says "He gave you the boat"; the narrator later learns the boat was built by the grandfather (lines 40–42), so it mattered to Teo. | C: Nothing suggests selling; Teo plans to paint it "next summer" (line 62). | D: She laughs, but her words are about the boat being a meaningful gift, not about the narrator exaggerating.
 
 ### READING 5 — Literary Narrative (medium)
 
-**Question:** What is the main purpose of Teo's thought that no one had ever told Ruben to stay with him?
+**Question:** Teo's comment in lines 34–36 ("I could have done it fast once... a boat that sank") mainly shows that he:
 
-- A. reveal that Teo had in fact been the faster runner on the team all along.
-- B. suggest that Teo recognizes the support on the team had always run in one direction.
-- C. show that Ruben had refused to help Teo when Teo struggled in earlier races.
-- D. indicate that the coach had failed to notice Ruben's injury before the race.
+- A. regrets turning away a paying customer.
+- B. believes rushed work could lead to a failure that would be blamed on him.
+- C. thinks the narrator is working too slowly.
+- D. has repaired many boats that later sank.
 
 **Answer:** B
 
-**Explanation:** This thought comes just after Teo remembers the coach's hand on his shoulder and two years of watching Ruben pull away. It highlights that Teo is being asked to help Ruben, while no one ever asked Ruben to help him, and it comes right before Teo keeps going at the top of the hill. The passage gives no evidence that Ruben refused help or that Teo was usually faster.
+**Explanation:** A: He shows no regret; he calmly repeats his terms (lines 29–32). | B: Correct. A fast, careless repair might fail ("a boat that sank"), and it would be "my name" on it. | C: He hands the narrator's sanding block back without criticizing the pace; the comment is about the dinghy. | D: He is describing what could happen, not something that has happened.
 
-## Passage / set for READING questions 6, 7, 8, 9, 10
+### READING 6 — Literary Narrative (medium)
 
-**Title:** The Way Into a Room
+**Question:** As it is used in line 17, the word *settled* most nearly means:
 
-Most of us remember the rooms of buildings we love. Fewer of us remember how we entered them. Yet the moments between the street and the room, the door, the vestibule, the corridor, the stair, do much of the work of preparing us for what we are about to see. I have come to believe that an architect's skill shows most clearly not in the grand spaces themselves but in the passages that lead to them.
+- A. paid.
+- B. decided.
+- C. calmed.
+- D. came to rest.
 
-Consider the public library in the city where I grew up. From the street, its entrance is almost disappointing: a modest door set into a heavy stone wall, opening onto a low, dim hallway barely taller than a raised hand. The hallway turns once, and then, without warning, the ceiling lifts away. The reading room beyond rises three stories, lit from high windows, and stepping into it is close to a physical sensation, like the moment a held breath is released. I have walked into that room hundreds of times and still feel it. The room alone, entered directly from the street, would be handsome. Approached through the low hallway, it becomes something closer to astonishing.
+**Answer:** D
 
-Architects sometimes call this technique compression and release. A narrow or low space makes the body briefly aware of its own confinement, and the larger space that follows feels larger by contrast. The principle is old and simple, and it would be easy to dismiss it as a trick. But I think it reflects something true about how we experience buildings: not as a set of separate rooms but as a sequence, each part shaping how we perceive the next. A building is closer to a piece of music than to a photograph. It unfolds in time.
+**Explanation:** A: "Settled" can mean paying a bill, but heat can't pay anything. | B: "Settled" can mean decided, but heat doesn't make decisions. | C: Heat arriving makes the yard hotter, not calmer. | D: Correct. The heat came down and stayed over the yard, so the narrator worked before it arrived.
 
-The opposite approach has its own advocates, and their argument deserves a hearing. Many recent museums and offices greet visitors with a wall of glass, so that the entire interior is visible from the sidewalk before anyone opens the door. The intention is generous. These entrances invite people in rather than making them earn their arrival, and they avoid the slightly forbidding quality of a dark hallway. For a building that wants to seem open to everyone, this may be the right choice, and I would not want every lobby to resemble a tunnel.
+### READING 7 — Literary Narrative (easy)
 
-Still, something is lost. When the whole interior is revealed at once, there is nothing left for the entrance to do. The visitor walks in already knowing what she will find, and the building has, in a sense, told its story before she arrived. The glass entrance welcomes, but it does not prepare.
+**Question:** The narrator learns that the rowboat was built by the narrator's grandfather from:
 
-Compression and release can also fail. I once visited a concert hall whose architects had clearly admired the approach and pushed it further: a long, black corridor with a ceiling so low that tall visitors stooped. By the time the hall itself appeared, most people I saw looked relieved rather than moved. The corridor had gone from preparing them to punishing them. A threshold must be brief enough that the visitor trusts it is leading somewhere. Beyond a certain point, anticipation curdles into discomfort.
-
-What I admire in the library, then, is not the low hallway or the tall room but the proportion between them, the architect's judgment about how much to withhold, and for how long. That judgment cannot be reduced to a rule. It depends on the building's purpose, its audience, and the light of the particular site. But it begins with recognizing that the way into a room is part of the room, and that we arrive in a space with our bodies before we arrive with our eyes.
-
-
-### READING 6 — Humanities (easy)
-
-**Question:** The author's central argument is that:
-
-- A. glass entrances are the most welcoming and effective design for public buildings.
-- B. a low entrance hallway will always make the room beyond it more impressive.
-- C. entrances shape how we experience the rooms they lead to, and the best ones reflect careful judgment about proportion.
-- D. libraries show architectural skill more clearly than any other type of building.
-
-**Answer:** C
-
-**Explanation:** The author says the passages leading to grand spaces do much of the work of preparing visitors, and concludes that what makes the library succeed is the proportion between the low hallway and the tall room. The concert hall example shows that low entrances do not always work, and the author argues that glass entrances welcome visitors but do not prepare them. The library is one example, not a claim about all building types.
-
-### READING 7 — Humanities (easy)
-
-**Question:** The author compares a building to a piece of music mainly to emphasize that buildings are:
-
-- A. experienced as a sequence over time rather than all at once.
-- B. most successful when they include spaces for performance.
-- C. less carefully composed than most pieces of music.
-- D. best understood in a single glance, much like a photograph.
+- A. a photograph pinned above the workbench.
+- B. a conversation with Teo.
+- C. a phone call with the narrator's mother.
+- D. markings carved into the hull.
 
 **Answer:** A
 
-**Explanation:** Just before the comparison, the author says we experience buildings not as separate rooms but as a sequence in which each part shapes the next. The comparison ends with the statement that a building unfolds in time. A photograph is the contrasting example, the thing a building is said to be less like.
+**Explanation:** A: Correct. "Teo never told me this. I learned it from a faded photograph" (lines 42–43). | B: The passage says "Teo never told me this" (line 42). | C: The mother says "He gave you the boat" but never explains its history. | D: No markings are mentioned; the hull had been painted blue.
 
-### READING 8 — Humanities (hard)
+### READING 8 — Literary Narrative (hard)
 
-**Question:** Based on the passage, which entrance design would best support the author's main idea about how a building should prepare visitors for a room?
+**Question:** The paragraph in lines 47–55 mainly serves to:
 
-- A. A glass front that lets passersby see the entire tall gallery from the sidewalk
-- B. A long, very low, unlit corridor that reaches a tall gallery after several minutes
-- C. A tall entrance hall that opens directly into an equally tall gallery
-- D. A short, somewhat low passage that turns once before opening into a tall gallery
-
-**Answer:** D
-
-**Explanation:** The author praises the library for a brief, low hallway that turns once before revealing a tall room, and stresses the proportion between withholding and revealing. A glass front reveals everything at once, which the author says welcomes without preparing. A long, very low corridor repeats the concert hall's mistake, and a tall hall opening into an equally tall gallery provides no contrast to make the room feel larger.
-
-### READING 9 — Humanities (medium)
-
-**Question:** What is the main purpose of the concert-hall example within the essay as a whole?
-
-- A. provide a second example of compression and release working as intended.
-- B. argue that concert halls should adopt glass entrances instead of corridors.
-- C. prove that low ceilings make visitors uncomfortable in any building.
-- D. show that the technique the author praises can fail when pushed too far.
+- A. explain why the boat was originally painted blue.
+- B. reveal that Teo is unhappy with the narrator's sanding.
+- C. describe Teo's plans for the boat after the summer.
+- D. show a change in the way Teo works with and teaches the narrator.
 
 **Answer:** D
 
-**Explanation:** The concert hall used the same approach as the library but stretched it into a long, very low corridor, so visitors felt relieved rather than moved. The author concludes that a threshold must be brief enough to be trusted. This sets up the final point that what matters is proportion, not the low space itself, and it does not condemn low ceilings in general, since the library's low hallway works.
+**Explanation:** A: The blue paint is mentioned earlier (line 45), and no reason for the color is ever given. | B: Teo stays and shows the narrator the next step; nothing suggests he is unhappy. | C: Plans for next summer come in line 62, not in this paragraph. | D: Correct. For the first time Teo sits beside the narrator "and stayed" (lines 50–51), and "now he explained the reasons" (line 54).
 
-### READING 10 — Humanities (medium)
+### READING 9 — Literary Narrative (hard)
 
-**Question:** The author's attitude toward entrances that use a wall of glass is best described as:
+**Question:** The last sentence of the passage ("I already knew") most strongly suggests that the narrator expects the boat to be painted:
 
-- A. dismissive, since the author regards them as careless and unwelcoming.
-- B. appreciative of their openness but convinced that they give something up.
-- C. fully enthusiastic, since they avoid the problems of dark hallways.
-- D. uncertain, since the author does not say what such entrances achieve.
-
-**Answer:** B
-
-**Explanation:** The author calls their intention generous, says they may be right for buildings that want to seem open to everyone, and does not want every lobby to resemble a tunnel. In the next paragraph, however, the author says something is lost, because a glass entrance welcomes but does not prepare. This combination of respect and reservation rules out both outright dismissal and full enthusiasm.
-
-## Passage / set for READING questions 11, 12, 13, 14, 15
-
-**Title:** A Landscape Built in Layers
-
-When people imagine how a landscape changes over time, they often picture a sequence in which one community of organisms replaces another: bare ground becomes grassland, grassland becomes shrubland, and eventually a more complex community develops. Ecologists sometimes call such broad patterns succession. Yet landscapes do not always move neatly from one stage to another. A patch of ground can carry several histories at once, and those histories can influence what appears there next.
-
-Consider a fictional hillside called Alder Ridge. A storm once stripped vegetation from its upper slope, while a lower section remained covered by mature shrubs. Years later, both sections contained grasses, but the grasses did not appear in identical arrangements. On the upper slope, exposed patches between plants remained common. On the lower slope, grasses often grew beneath or beside established shrubs. If an observer looked only at the species present, the two areas might seem to be following the same trajectory. Their physical arrangement, however, suggested that the communities were responding to different starting conditions.
-
-Ecologists studying such patterns distinguish between what is present in a place and the conditions that make particular organisms likely to establish there. A seed arriving on bare soil encounters a different environment from one arriving beneath an existing canopy. Shade, retained moisture, accumulated organic material, and competition can all influence whether a newcomer persists. These factors do not operate independently. A plant that changes the amount of shade near the ground may also change which other plants can survive there. In this way, organisms can become part of the conditions that shape later stages of community development.
-
-This idea complicates the common image of succession as a simple ladder. Suppose two nearby patches contain the same kinds of plants but differ in how those plants are distributed. A dense cluster in one patch may alter light and moisture enough to encourage a different set of later arrivals than an evenly spaced collection of the same species. The difference is not merely visual. Arrangement can influence interactions, and interactions can influence subsequent composition.
-
-The influence of earlier communities can also persist after those communities are no longer obvious. Decaying roots, accumulated plant material, and changes in shade or soil moisture can leave conditions different from those on nearby ground that looks similar at first glance. Later arrivals therefore respond not only to the climate of the moment but also to conditions partly inherited from what occupied the site before. Such legacies need not determine a single outcome, but they can make two apparently comparable patches diverge over time.
-
-At the same time, ecologists caution against treating every difference between patches as evidence that organisms are reshaping their own environment. Weather, soil depth, animal activity, and chance events can produce differences before plants have had much opportunity to affect local conditions. This is why explanations of succession often need to consider both external influences and feedback from the community itself.
-
-The value of viewing landscapes as layered histories is therefore not that it supplies a single rule for predicting what will appear next. Instead, it changes the question. Rather than asking only, "Which stage is this patch in?" an observer can ask what conditions were present before the current community developed, how organisms have altered those conditions, and which outside forces may still be operating. Such questions do not make succession perfectly predictable. They make its apparent irregularities more intelligible by treating them as consequences of interacting histories rather than deviations from a fixed sequence.
-
-
-### READING 11 — Natural Science (easy)
-
-**Question:** What central idea does the passage develop about ecological succession?
-
-- A. It always proceeds through the same fixed sequence of communities.
-- B. It can be predicted accurately by identifying the species currently present.
-- C. It occurs only after major storms or other disturbances.
-- D. It is best understood by considering how history, local conditions, and interactions shape community development.
-
-**Answer:** D
-
-**Explanation:** The passage repeatedly complicates a simple sequence model by emphasizing starting conditions, organism-environment feedback, external influences, and the layered histories of particular patches.
-
-### READING 12 — Natural Science (easy)
-
-**Question:** According to the final paragraph, how does the layered-history approach change the way an observer studies a landscape?
-
-- A. It encourages the observer to identify the single species responsible for each stage.
-- B. It shifts attention from predicting a fixed sequence to examining prior conditions, interactions, and outside influences.
-- C. It allows the observer to ignore current environmental conditions.
-- D. It replaces ecological observation with historical reconstruction.
-
-**Answer:** B
-
-**Explanation:** The conclusion recommends asking what conditions existed before the current community, how organisms altered those conditions, and what outside forces remain active rather than simply assigning the patch to a predetermined stage.
-
-### READING 13 — Natural Science (hard)
-
-**Question:** What would the passage most strongly suggest if two nearby patches began with similar soil and weather conditions but later developed different plant arrangements?
-
-- A. The difference necessarily proves that one patch experienced a stronger disturbance.
-- B. The difference could result from early chance events that altered interactions, which then helped produce different local conditions over time.
-- C. The difference shows that the patches must represent separate stages of a universal succession sequence.
-- D. The difference can be explained only if the patches contain different species from the beginning.
-
-**Answer:** B
-
-**Explanation:** The passage combines two ideas: chance events can create early differences, and organisms can then modify local conditions through interactions. Together, those mechanisms could allow initially similar patches to diverge without requiring a different disturbance or a fixed sequence.
-
-### READING 14 — Natural Science (medium)
-
-**Question:** What is the main purpose of the fifth paragraph in the passage's discussion of organism-environment feedback?
-
-- A. It demonstrates that external factors are irrelevant once plants become established.
-- B. It provides a historical example showing that succession has been studied for centuries.
-- C. It qualifies the feedback explanation by noting that outside forces can also produce differences between patches.
-- D. It suggests that plant interactions occur only after succession has reached a mature stage.
+- A. a color the narrator will choose alone.
+- B. pale gold to match the grain of the wood.
+- C. the same blue it was in the grandfather's photograph.
+- D. a color suggested by the man with the dinghy.
 
 **Answer:** C
 
-**Explanation:** The paragraph warns against attributing every difference to organisms modifying their surroundings and lists weather, soil, animals, and chance as alternative influences.
-
-### READING 15 — Natural Science (medium)
-
-**Question:** What is the main reason the passage emphasizes the arrangement of plants on Alder Ridge rather than only the species present?
-
-- A. Because arrangement can affect environmental conditions and interactions among organisms.
-- B. Because plant species are generally impossible to identify in a developing community.
-- C. Because evenly spaced plants always indicate a later stage of succession.
-- D. Because the physical appearance of a landscape is more important than its biological composition.
-
-**Answer:** A
-
-**Explanation:** The passage explains that arrangement can alter shade, moisture, competition, and other interactions. Thus two patches containing similar species may develop differently because those species occupy the space differently.
-
-## Passage / set for READING questions 16, 17, 18, 19, 20
-
-**Title:** Trees That Answer the Wind
-
-A tree growing alone on a windy ridge rarely looks like a tree of the same species growing in a sheltered valley. The ridge tree tends to be shorter, with a trunk that is thick for its height and branches that are short and stiff. For a long time, it was natural to assume that the wind had simply worn the tree down, breaking off whatever tried to grow too tall. Breakage does play a role. But much of the difference arises before anything breaks. The tree is responding to being bent.
-
-Plants can sense mechanical stress, the pushing, pulling, and bending caused by wind, rain, passing animals, or even the weight of their own branches. When a stem is bent repeatedly, cells along it detect the strain and set off chemical signals that alter how the plant grows. Botanists call this response thigmomorphogenesis, a word built from roots meaning touch, form, and origin: a change in shape caused by physical contact or movement. The typical result is a plant that grows less in height and more in thickness. Its stem and roots become stronger, and its tissues often become stiffer.
-
-The response can be surprisingly sensitive. In greenhouse studies, young plants that are gently brushed or shaken for a few seconds each day often end up noticeably shorter and sturdier than identical plants left undisturbed. The disturbance does not injure them. It simply signals, in effect, that they are growing in a place where movement is common, and they adjust accordingly.
-
-Why should a plant respond this way? Height has obvious advantages. A taller plant can reach more light and spread its seeds or pollen farther. But height also has a cost. A tall, slender stem acts like a long lever: wind pushing on its top places great strain on its base. In a calm place, a plant can afford to invest in height. In a windy one, the same investment could end with the stem snapping. Thickening the stem and strengthening the roots reduce that risk, though they mean the plant devotes less of its growth to reaching upward. The response, then, is a trade-off rather than a pure improvement. The ridge tree is not a better tree than the valley tree; it is a tree built for different conditions.
-
-A striking illustration comes from the practice of staking young trees. Gardeners often tie newly planted trees tightly to stakes to keep them upright. A tree held so firmly that it cannot sway, however, receives little of the bending that would normally prompt it to thicken. When the stake is removed, such a tree may have a slender trunk too weak to support itself in the wind. Many gardeners now recommend loose ties that allow some movement, or removing stakes as soon as the roots are established, so that the young tree can experience enough motion to grow sturdy.
-
-None of this means that every short, thick tree on a windy slope owes its shape to mechanical stress alone. Exposed sites are often also colder and drier, with thinner soil, and each of these conditions can limit growth on its own. Separating the effects of wind from the effects of poor soil or harsh temperatures is difficult outside a controlled setting, which is one reason researchers rely on greenhouse experiments in which bending can be varied while other conditions are held steady.
-
-What thigmomorphogenesis reveals is that a plant's shape is not simply a fixed plan carried out regardless of circumstance. It is partly a record of what the plant has experienced. A plant cannot walk away from the wind, but it can, in its slow way, answer it.
-
-
-### READING 16 — Natural Science (easy)
-
-**Question:** The passage as a whole is chiefly about how:
-
-- A. wind shapes trees mainly by snapping off branches that grow too tall.
-- B. trees on windy ridges are healthier and stronger than trees in valleys.
-- C. plants respond to repeated bending by growing shorter and sturdier, trading height for strength.
-- D. gardeners harm young trees by tying them to stakes after planting.
-
-**Answer:** C
-
-**Explanation:** The passage explains that plants sense bending and respond by growing less in height and more in thickness, then describes this as a trade-off suited to windy conditions. The author says breakage plays a role but that much of the difference arises before anything breaks, and states that the ridge tree is not a better tree. Staking is one illustration, not the main subject.
-
-### READING 17 — Natural Science (easy)
-
-**Question:** According to the passage, the greenhouse studies found that gently brushing or shaking young plants each day:
-
-- A. made them shorter and sturdier without injuring them.
-- B. damaged their stems so that they grew more slowly.
-- C. made them grow taller to reach more of the available light.
-- D. had no effect unless the plants were shaken for hours.
-
-**Answer:** A
-
-**Explanation:** The third paragraph reports that plants brushed or shaken for a few seconds a day often ended up noticeably shorter and sturdier than undisturbed plants, and it states that the disturbance does not injure them. The effect came from brief daily disturbance, not hours of shaking.
-
-### READING 18 — Natural Science (hard)
-
-**Question:** What does the passage most strongly suggest about the shorter, thicker trees on a windy hilltop where the soil is also thin and dry?
-
-- A. The difference shows that bending by wind is the cause of the hilltop trees' shape.
-- B. The difference must be due to the poor soil, since wind affects only greenhouse plants.
-- C. The hilltop trees are better adapted than the valley trees in every respect.
-- D. Wind may contribute to the difference, but soil and dryness could also explain it.
-
-**Answer:** D
-
-**Explanation:** The passage explains that repeated bending can make trees shorter and thicker, so wind is a plausible factor. It also warns that exposed sites are often colder and drier with thinner soil, each of which can limit growth on its own, and that separating these effects is difficult outside a controlled setting. The evidence therefore does not prove that wind alone or soil alone is responsible, and the author says the ridge tree is suited to different conditions, not better in every respect.
-
-### READING 19 — Natural Science (medium)
-
-**Question:** What does the passage suggest is the main reason the plant's response to bending is a trade-off rather than a pure improvement?
-
-- A. a thicker stem helps the plant reach more light than a slender one.
-- B. taller plants are always more likely to survive than shorter ones.
-- C. wind affects only trees growing on high ridges, not in valleys.
-- D. growing stronger against wind comes at the cost of height, which has its own benefits.
-
-**Answer:** D
-
-**Explanation:** The fourth paragraph says height helps a plant reach light and spread seeds or pollen, but a tall, slender stem is at greater risk of snapping in wind. Thickening reduces that risk while devoting less growth to reaching upward. A trade-off means gaining one advantage by giving up another, which is why the author says the ridge tree is not simply better.
-
-### READING 20 — Natural Science (medium)
-
-**Question:** What is the main purpose of the example of tightly staked young trees?
-
-- A. stakes shield trees from stress and therefore make their trunks stronger.
-- B. keeping a tree from swaying can deprive it of the bending that prompts thickening.
-- C. trees grow taller and thicker when they are exposed to strong winds.
-- D. gardeners are responsible for the short trees found on windy ridges.
-
-**Answer:** B
-
-**Explanation:** The passage says a tree held so firmly that it cannot sway receives little of the bending that would normally prompt it to thicken, and may be too weak to stand once the stake is removed. This matches the earlier explanation that repeated bending triggers thicker, stronger growth. The example reverses the idea that protection from stress makes trunks stronger.
-
-## Passage / set for READING questions 21, 22, 23, 24, 25
-
-**Title:** The Bin in the Garage
-
-When the town of Ellery Falls introduced curbside composting, officials faced a choice that seemed minor at the time. Residents could be asked to sign up for the program, or they could be enrolled automatically and given the option to leave. The town chose the second approach for half of its neighborhoods and the first for the other half, partly for administrative reasons and partly out of curiosity. The difference in outcomes was larger than anyone expected, and more complicated.
-
-Choices like this one involve what researchers call a default: the option a person ends up with if he or she takes no action. Defaults matter because many people, faced with a form or a decision, do nothing. They may be busy, uncertain, or simply unwilling to spend effort on a question that seems unimportant. Whatever the reason, inaction delivers them to whatever outcome the default specifies. A person who would never have bothered to sign up for a program may also never bother to leave it.
-
-In Ellery Falls, the effect of the default on enrollment was dramatic. In neighborhoods where residents had to request a compost bin, about one household in five did so in the first year. In neighborhoods where every household received a bin unless it asked not to, fewer than one in ten opted out, meaning more than nine in ten remained enrolled. On paper, the automatic approach had produced more than four times as many participants.
-
-Enrollment, however, is not the same as participation. The town also tracked how many bins were actually set out on collection day, and here the picture changed. In the sign-up neighborhoods, most enrolled households used their bins regularly. These were people who had wanted to compost badly enough to fill out a form. In the automatic neighborhoods, a large share of bins sat in garages or beside houses, empty, week after week. When the town counted households that set out a bin at least twice a month, the automatic neighborhoods still came out ahead, but by a much smaller margin than the enrollment numbers suggested.
-
-There are two ways to read this result. One emphasizes the gain: even after accounting for unused bins, the default produced more composting households, and some of those households might never have started otherwise. The bin in the garage also serves as a quiet reminder, and over time some reluctant participants may begin using it. The other reading emphasizes the cost. Every unused bin had to be purchased and delivered, and each one represents a household that was counted as participating when it was not. A town that judged its program by enrollment alone would badly overestimate its success.
-
-A further complication concerns how residents felt about the approach. In surveys, most households in the automatic neighborhoods said they did not mind being enrolled. A minority, though, described it as presumptuous, and some of those residents reported feeling less favorable toward the town's environmental programs in general. It is not clear whether their irritation reflected the default itself or a broader distrust that existed before the program began; the town did not survey residents beforehand, so it cannot tell.
-
-What Ellery Falls illustrates is that a default is a powerful tool for changing what people end up with, but a weaker tool for changing what they actually do. It can move the starting line without moving the runner. That does not make defaults useless, since a closer starting line still matters, but it does suggest that officials should be careful about which numbers they celebrate. A default that fills a sign-up sheet has accomplished something real. Whether it has accomplished what the program was meant to accomplish is a separate question, and it can only be answered by watching what happens after the form is filed.
-
-
-### READING 21 — Social Science (easy)
-
-**Question:** The author's main point about automatic enrollment in Ellery Falls is that it:
-
-- A. failed to increase the number of households that actually composted.
-- B. was less popular with residents than the sign-up approach was.
-- C. raised enrollment far more than it raised actual composting, so its success must be judged carefully.
-- D. should be abandoned because unused bins cost the town too much money.
-
-**Answer:** C
-
-**Explanation:** Automatic enrollment produced more than four times as many enrolled households, but when the town counted bins actually set out, the advantage was much smaller. The author concludes that defaults change what people end up with more than what they do, and that officials should be careful about which numbers they celebrate. The automatic neighborhoods still came out ahead in real use, and the author says defaults are not useless.
-
-### READING 22 — Social Science (easy)
-
-**Question:** In the final paragraph, the phrase move the starting line without moving the runner most nearly means that a default can:
-
-- A. change what people are signed up for without much changing what they do.
-- B. speed up how quickly people make decisions about public programs.
-- C. reward the residents who participate in a program most actively.
-- D. remove the need for residents to make any decision at all.
-
-**Answer:** A
-
-**Explanation:** The phrase follows the claim that a default is powerful for changing what people end up with but weaker for changing what they actually do. The starting line stands for a person's enrollment status, and the runner stands for the person's behavior, as shown by the many bins that were delivered but sat unused.
-
-### READING 23 — Social Science (hard)
-
-**Question:** What would the author most likely infer about a nearby town that reports 95 percent participation in a recycling program based only on automatic-enrollment records?
-
-- A. praising the figure as clear evidence that the program has succeeded.
-- B. arguing that the town should drop defaults because they do not work.
-- C. cautioning that the figure may overstate how many households actually recycle.
-- D. suggesting that the figure shows many residents resent being enrolled.
-
-**Answer:** C
-
-**Explanation:** In Ellery Falls, more than nine in ten households stayed enrolled, yet many bins were never used, so enrollment overstated real participation. The author warns that a town judging by enrollment alone would overestimate its success and that real success shows only in what happens after enrollment. The author does not call defaults useless, and the passage reports that most automatically enrolled residents did not mind enrollment.
-
-### READING 24 — Social Science (medium)
-
-**Question:** What does the passage suggest is the main reason enrolled households in the sign-up neighborhoods used their bins more consistently than those in the automatic neighborhoods?
-
-- A. received larger bins that were easier to set out on collection day.
-- B. were reminded to compost by bins kept in their garages.
-- C. had been surveyed about composting before the program began.
-- D. had shown enough interest to request a bin in the first place.
-
-**Answer:** D
-
-**Explanation:** The author describes the sign-up households as people who wanted to compost badly enough to fill out a form, while the automatic neighborhoods included many households that never acted at all. Their regular use reflects that earlier interest. The garage reminder applies to the automatic neighborhoods, and the passage notes that the town did not survey residents beforehand.
-
-### READING 25 — Social Science (medium)
-
-**Question:** What is the main purpose of the paragraph that presents two ways to read the result?
-
-- A. argues that the program's gains clearly outweigh its costs.
-- B. shows how the same results can be viewed as a gain or as a cost.
-- C. introduces new figures about the price of each compost bin.
-- D. explains why some residents objected to automatic enrollment.
-
-**Answer:** B
-
-**Explanation:** The paragraph presents one reading that stresses the extra composting households and possible future use, and another that stresses wasted bins and inflated enrollment counts. The author lays out both without declaring a winner here, and gives no specific bin prices. Residents' objections are discussed in the following paragraph.
-
-## Passage / set for READING questions 26, 27, 28, 29, 30
-
-**Title:** The Tilted Letter
-
-There is a hardware store in my town whose front window still carries the name of its founder in gold leaf, painted by hand some sixty years ago—an example of the art of traditional sign lettering. The letters are elegant, but they are not identical. The two lowercase e's in the owner's surname differ slightly in the angle of their crossbars, and the final s leans a fraction farther than its neighbors, as though the painter's arm had grown tired by the end of the word. I have walked past that window for most of my life, and only recently did I notice these differences. Once I noticed them, I could not stop seeing them, and I could not decide whether they were flaws.
-
-The easy answer is that they are. A sign exists to be read, and every inconsistency is a small obstacle to reading. By this standard, the uniform letters produced by a computer and cut from vinyl are an improvement: each e is the same e, every time, and the eye moves across them without snagging. The shop down the street, which opened last year, has such a sign. It is crisp, legible, and entirely forgettable.
-
-I want to resist the easy answer without falling into the opposite one. It would be pleasant to claim that hand-lettered signs are simply better, that something warm and human has been lost to the machine. But that claim is mostly nostalgia, and nostalgia is a poor critic. Many hand-painted signs were clumsy. Many were hard to read from a moving car. The painters who made them were working quickly for modest fees, and plenty of their work deserved to be painted over.
-
-What interests me is not whether hand lettering is better but what its irregularities record. The tilted s on the hardware store window is not a random error. It is a trace of a particular person's posture at the end of a long afternoon, of a brush that held a little less paint than it had at the start of the word. The variation is information. It tells the attentive viewer how the sign was made, in what order, and with what effort. A vinyl letter carries no such history. It could have been cut yesterday or ten years ago, in this town or anywhere.
-
-A friend who designs typefaces for a living once objected to this argument. Digital letters, she pointed out, are also made by people. Someone drew that crisp e on the new shop's sign, adjusting its curves over many hours until it looked right at every size. She is correct, and her point matters. The difference is not that one kind of letter is human and the other is not. It is that the digital letter hides its making behind perfect repetition, while the painted letter displays its making in every small departure from the one before.
-
-This difference explains, I think, why the hardware store's window has become a kind of landmark while its neighbor's sign has not. People do not admire the old window because they can read it more easily. They admire it because, without quite knowing why, they sense that someone stood in that spot with a brush, and that the work could have gone slightly differently. The letters are not just a name. They are a record of an afternoon.
-
-None of this means that the new shop should have hired a sign painter. Its owner wanted a sign that was cheap, quick, and clear, and she got one. But it does mean that when we judge lettering only by how efficiently it can be read, we measure one thing it does and ignore another. A sign can tell us what a place is called. A few signs can also tell us that a place was made.
-
-
-### READING 26 — Humanities (easy)
-
-**Question:** The author's attitude toward the new shop's vinyl sign is best described as:
-
-- A. scornful, since the author treats the sign as a failure of design.
-- B. admiring, since the author prefers its clarity to the hardware store's window.
-- C. accepting of its practical value while finding it unmemorable.
-- D. indifferent, since the author never offers any judgment of the sign.
-
-**Answer:** C
-
-**Explanation:** The author calls the sign crisp and legible but also entirely forgettable. In the final paragraph, the author says the owner wanted something cheap, quick, and clear and got it, and that she did not need to hire a sign painter. The author respects what the sign does while noting what it lacks, which is neither scorn nor admiration.
-
-### READING 27 — Humanities (easy)
+**Explanation:** A: Nothing suggests the narrator will choose; the point is that the answer is already clear. | B: Pale gold describes the bare wood (line 47); painting would cover it. | C: Correct. The narrator has seen the photo of the hull "painted a blue" (line 45) and understands Teo wants to return the boat to how his father made it. | D: That man has nothing to do with this boat.
+
+## Passage / set for READING questions 10, 11, 12, 13, 14, 15, 16, 17, 18
+
+001 ¶ Walk across almost any college campus or city park and you are
+002   likely to find one: a narrow strip of bare earth cutting
+003   diagonally across a lawn, worn into the grass by people who
+004   decided that the paved path was not going where they wanted to
+005   go. Urban planners call these shortcuts "desire lines" or
+006   "desire paths." For much of the twentieth century, they were
+007   treated as a nuisance. Groundskeepers fenced them off, planted
+008   shrubs across them, or posted signs asking pedestrians to keep
+009   off the grass. The paths usually returned within weeks.
+010 ¶ The persistence of desire paths reveals something about how
+011   people move through shared spaces. Designers often draw
+012   walkways that look orderly on paper, with right angles and
+013   symmetrical curves. Pedestrians, however, tend to choose the
+014   shortest route that feels safe and convenient. When a building
+015   entrance sits at an angle to the sidewalk, or when a bus stop
+016   is placed on the far side of a lawn, people will cut across
+017   rather than walk the long way around. Each person who takes
+018   the shortcut makes it slightly more visible, and each visible
+019   path makes the next person more likely to follow it. In this
+020   sense, a desire path is a kind of record: a map drawn not by a
+021   designer but by hundreds of individual decisions.
+022 ¶ Some planners have begun to treat that record as useful
+023   information. Rather than paving walkways before a site opens,
+024   a few universities have waited for a season to see where
+025   students actually walk and then paved the paths that appear.
+026   The approach has an obvious appeal. It costs little, it
+027   reduces the need for fences and signs, and it produces routes
+028   that people are likely to use. One landscape architect
+029   compared the practice to letting water find its own course
+030   before digging a channel.
+031 ¶ The idea is not without critics. Desire paths reflect the
+032   habits of the people who happen to use a space at a particular
+033   moment, and those people may not represent everyone who will
+034   use it later. A path worn by students hurrying between classes
+035   may ignore the needs of someone using a wheelchair, for whom a
+036   steep shortcut across uneven ground is not a shortcut at all.
+037   Critics also point out that the most direct route is not
+038   always the best one. A diagonal path may cut through a lawn
+039   that serves as a gathering place or damage the roots of a tree
+040   that took decades to grow. Paving every desire path, in other
+041   words, could trade long-term value for short-term convenience.
+042 ¶ Still, even critics tend to agree that the paths are worth
+043   paying attention to. A desire path can signal a problem that
+044   has nothing to do with grass: a crosswalk that is too far from
+045   where people need to cross, a gate that is locked at the wrong
+046   hours, or a sidewalk that ends without warning. Some planners
+047   now study photographs of worn paths taken from above and
+048   compare them with records of where pedestrians have been hurt
+049   in traffic. Where the two patterns overlap, a city may add a
+050   crosswalk or move a bus stop rather than simply replant the
+051   grass.
+052 ¶ The broader lesson may be that good design involves listening
+053   as well as drawing. A plan represents what designers expect
+054   people to do; a desire path shows what people actually do.
+055   Neither is complete on its own. The most successful public
+056   spaces, some planners argue, are those that leave room for
+057   revision, in which the first version of a walkway is treated
+058   as a reasonable guess rather than a final answer.
+
+
+### READING 10 — Literary Narrative (medium)
 
 **Question:** The main purpose of the passage is to:
 
-- A. argue that hand-painted signs are easier to read than signs made with computer-cut letters.
-- B. criticize the owner of the new shop for choosing a vinyl sign over a painted one.
-- C. explain the techniques sign painters used to apply gold leaf to shop windows.
-- D. argue that irregularities in hand lettering are valuable as a record of how a sign was made.
+- A. explain what desire paths are and how planners have viewed and used them.
+- B. argue that all walkways should be built only after desire paths appear.
+- C. describe the history of a single university campus.
+- D. criticize groundskeepers for fencing off lawns.
 
-**Answer:** D
+**Answer:** A
 
-**Explanation:** The author shifts from asking whether the uneven letters are flaws to claiming that the variation is information about how, in what order, and with what effort the sign was made. The author grants that vinyl letters are easier to read and says the new shop owner got what she wanted. Gold leaf is mentioned only as a detail of the window.
+**Explanation:** A: Correct. The passage defines desire paths, describes how they were once fought, how some planners now use them, and what critics say. | B: Too extreme. The passage gives critics' concerns (lines 31–41) and says plans and paths are each incomplete (line 55). | C: The passage discusses campuses, parks, and cities in general, not one campus. | D: Groundskeepers' actions are mentioned briefly (lines 7–9) but are not criticized.
 
-### READING 28 — Humanities (hard)
+### READING 11 — Literary Narrative (easy)
 
-**Question:** Suppose a new shop uses computer-printed letters designed to look hand-painted, with the same slight tilt copied exactly onto every letter. Based on the passage, what would the author most likely infer about these letters?
+**Question:** According to the passage, for much of the twentieth century desire paths were generally:
 
-- A. just as valuable as the hardware store's window, since both signs contain visible irregularities.
-- B. better than either existing sign, since they combine digital precision with a handmade appearance.
-- C. lacking what the author values, since their irregularities do not record how the letters were actually made.
-- D. objectionable mainly because a tilted design would be harder to read than plain vinyl letters.
+- A. treated as a problem to be blocked or discouraged.
+- B. studied as a guide to good design.
+- C. paved as soon as they appeared.
+- D. ignored because they rarely lasted.
+
+**Answer:** A
+
+**Explanation:** A: Correct. They were "treated as a nuisance" and fenced off, planted over, or posted with signs (lines 6–9). | B: That newer approach comes later in the passage (lines 22–25). | C: Paving them is described as something only "a few universities" do now. | D: They "usually returned within weeks" (line 9), so they did last.
+
+### READING 12 — Literary Narrative (medium)
+
+**Question:** The author calls a desire path "a kind of record" (line 20) mainly to suggest that the path:
+
+- A. was planned in advance by a designer.
+- B. keeps track of how old a park is.
+- C. shows the combined choices of many people over time.
+- D. proves that pedestrians ignore safety.
 
 **Answer:** C
 
-**Explanation:** The author values irregularities as information about a real process, such as the painter's tiring arm and the brush running low on paint, and notes that painted letters reveal their making in each small departure from the one before. A tilt copied identically onto every letter is perfect repetition, which the author says hides how letters were made. The author's concern is what the variation records, not readability, so a surface imitation would miss the point.
+**Explanation:** A: The passage says the opposite: it was not drawn "by a designer." | B: Age is never discussed. | C: Correct. It is "a map drawn not by a designer but by hundreds of individual decisions" (lines 20–21). | D: People choose the route that "feels safe and convenient" (line 14).
 
-### READING 29 — Humanities (medium)
+### READING 13 — Literary Narrative (easy)
 
-**Question:** The third paragraph primarily serves what purpose in developing the author's argument?
+**Question:** According to the passage, some universities have waited a season before paving walkways in order to:
 
-- A. present evidence that hand-painted signs were usually easier to read from a distance.
-- B. separate the author's position from a simple preference for older, handmade signs.
-- C. introduce the typeface designer's objection to the author's argument.
-- D. describe the history of the hardware store and the painter who made its sign.
-
-**Answer:** B
-
-**Explanation:** Having set aside the view that the irregularities are just flaws, the author also rejects the opposite claim that hand-lettered signs are simply better, calling it mostly nostalgia. The paragraph notes that many painted signs were clumsy and hard to read. This clears the way for the author's actual point about what irregularities record, which is not a claim that old signs are superior.
-
-### READING 30 — Humanities (medium)
-
-**Question:** How does the author respond to the friend's point that digital letters are also made by people, and what does that response suggest about the author's argument?
-
-- A. By accepting the point and refining the claim to focus on whether a letter's making is visible
-- B. By rejecting the point and insisting that digital letters involve no human effort
-- C. By admitting that the point undermines the argument and abandoning the earlier claim
-- D. By using the point to argue that digital letters are superior to painted ones
-
-**Answer:** A
-
-**Explanation:** The author says the friend is correct and that her point matters, then restates the difference: it is not that one kind of letter is human and the other is not, but that digital letters hide their making while painted letters display it. The author keeps the argument but sharpens it in response to the objection.
-
-## Passage / set for READING questions 31, 32, 33, 34, 35, 36
-
-**Title:** The Market Days of Varrow Valley
-
-In the hill country of the fictional Varrow Valley, nine small towns sit along a single winding road, each about a half day's walk from the next. For as long as local records go back, each town has held a weekly market, and almost none of them hold it on the same day as their nearest neighbors. Harlow's market falls on Monday, Fenby's on Tuesday, Coldwater's on Wednesday, and so on up the valley. Visitors often assume the arrangement is a coincidence or a matter of old habit. A closer look suggests that it may be something more deliberate: a solution to a problem that every small market town faces.
-
-The problem is that a single small town rarely has enough buyers to support a full market on its own. A traveling cloth seller or tinsmith cannot make a living from the few dozen households of one village. If every town held its market on the same day, such traders would have to choose one town each week and leave the others unserved. Villagers would find only local farmers' produce, and the traders would find too few customers. When the market days are staggered, however, a trader can move along the road, selling in Harlow on Monday, Fenby on Tuesday, and Coldwater on Wednesday. Each town gets a share of the traveling merchants, and each merchant gets the combined custom of several towns. In effect, the towns share a pool of buyers that none of them could have supported alone.
-
-Several features of the valley fit this explanation. The towns whose market days fall on consecutive days are, almost without exception, those that lie a half day apart, roughly the distance a trader with a loaded cart could cover between the close of one market and the opening of the next. Old account books kept by a family of traveling ironmongers, preserved in Fenby's town hall, record a circuit through five valley towns on five consecutive days, returning to the start each week. And when one town, Ashcombe, moved its market from Thursday to Wednesday some decades ago, so that it clashed with Coldwater's, its market shrank within a few years until the town quietly moved it back.
-
-Not everyone who has studied the valley accepts this account. Some local historians point out that several of the market days coincide with the days on which each town's church once held a weekly service, and they argue that the schedule grew out of religious practice rather than trade. People gathered in town for worship, the reasoning goes, and markets naturally formed around those gatherings. On this view, the convenient spacing for traders may be a happy accident rather than the reason for the pattern.
-
-The two explanations are not entirely at odds. A schedule that began for religious reasons could have persisted because it also happened to suit traveling traders, and towns that tried to change it, like Ashcombe, may have discovered how much they depended on it. The evidence available makes it difficult to decide between these possibilities. The ironmongers' account books cover only about twenty years, long after the market days had been established, and no surviving document records why any town first chose its day. What the records can show is how the schedule worked once it existed, not how it began.
-
-That distinction matters beyond the valley. When a social arrangement seems well suited to its purpose, it is tempting to conclude that it was designed for that purpose. Sometimes it was. But an arrangement can also survive because it proved useful, whatever its origins, and the forces that keep a practice alive are not necessarily the ones that created it. The staggered markets of Varrow Valley may be best understood not as a plan anyone drew up but as a pattern that, once it emerged, gave the towns good reasons to keep it.
-
-
-### READING 31 — Social Science (easy)
-
-**Question:** What is the passage mainly concerned with explaining about Varrow Valley's market schedule?
-
-- A. proving that traveling traders designed the valley's market schedule to increase their profits.
-- B. showing that the valley's market days were set according to the towns' weekly church services.
-- C. describing how one family of ironmongers organized its trading circuit through the valley.
-- D. examining why the towns stagger their market days and what the evidence can and cannot show.
-
-**Answer:** D
-
-**Explanation:** The passage presents a trade-based explanation for the staggered schedule, offers a competing religious explanation, and then explains that the surviving records show how the schedule worked but not how it began. The religious account is a view the author reports without endorsing, the ironmongers' records are one piece of evidence, and the author never claims proof that traders designed the schedule.
-
-### READING 32 — Social Science (easy)
-
-**Question:** According to the trade-based explanation, staggering market days benefits the towns by:
-
-- A. allowing traveling traders to visit several towns, so each town gets merchants it could not support alone.
-- B. allowing local farmers to charge higher prices because fewer outside sellers are present.
-- C. reducing the number of traveling traders who compete for the same customers each week.
-- D. letting neighboring towns compete directly with one another for buyers on the same day.
-
-**Answer:** A
-
-**Explanation:** The second paragraph explains that one small town has too few buyers to support traveling traders, but staggered days let a trader move from town to town. Each town receives a share of the merchants, and each merchant gets the combined custom of several towns. Holding markets on the same day is described as the problem, not the benefit.
-
-### READING 33 — Social Science (hard)
-
-**Question:** What would the author most likely infer about a useful alternating-hours arrangement between two branch libraries if no record explains why the arrangement originally began?
-
-- A. the arrangement's usefulness may explain why it has lasted without showing it was created for that reason.
-- B. the libraries' hours must have been planned from the start to serve patrons who use both branches.
-- C. the alternating hours most likely began by accident, since no planning documents have survived.
-- D. nothing meaningful can be said about the arrangement, since its origins remain unknown.
-
-**Answer:** A
-
-**Explanation:** The final paragraph warns against assuming that a well-suited arrangement was designed for its purpose, noting that a practice can survive because it proved useful whatever its origins. Like the ironmongers' books, the library records show how the arrangement works now but not how it began. The author would not assume it was planned, would not assume it was an accident just because records are missing, and would still treat the usage records as informative about why it persists.
-
-### READING 34 — Social Science (medium)
-
-**Question:** Why does the author suggest that the ironmongers' account books cannot settle the disagreement between the two explanations?
-
-- A. They describe a circuit through only five of the valley's nine towns.
-- B. They come from long after the market days were set, so they show how the schedule worked rather than how it began.
-- C. They were kept by a family whose members also attended the towns' weekly church services.
-- D. They contradict the claim that towns with consecutive market days lie a half day apart.
-
-**Answer:** B
-
-**Explanation:** The disagreement is about how the schedule originated. The author notes that the account books cover only about twenty years, long after the market days were established, and that no document records why any town chose its day, so the books show how the schedule worked once it existed, not how it began. The five-town circuit is a true detail but is not the reason the author gives, and the books support rather than contradict the half-day spacing.
-
-### READING 35 — Social Science (medium)
-
-**Question:** What is the main purpose of the example of Ashcombe moving its market day?
-
-- A. To show that Ashcombe's market originally grew out of a weekly church service
-- B. To suggest that valley towns have often changed their market days over time
-- C. To suggest that keeping the staggered schedule mattered to the health of a town's market
-- D. To show that Ashcombe was located too far from its neighbors to share traders
+- A. give newly planted grass time to grow.
+- B. let students vote on the designs.
+- C. see where students actually walk.
+- D. test which paving materials last longest.
 
 **Answer:** C
 
-**Explanation:** After Ashcombe moved its market to a day that clashed with Coldwater's, its market shrank until the town moved it back. The author lists this among the features that fit the trade explanation and later notes that towns like Ashcombe may have discovered how much they depended on the schedule. The example is a single case, not evidence of frequent change, and it says nothing about Ashcombe's church or its distance from other towns.
+**Explanation:** A: Grass growth is not the reason given. | B: No vote is mentioned. | C: Correct. They "waited for a season to see where students actually walk" (lines 24–25). | D: Materials are never discussed.
 
-### READING 36 — Social Science (medium)
+### READING 14 — Literary Narrative (medium)
 
-**Question:** The distinction the author makes between how an arrangement began and why it persisted primarily serves to:
+**Question:** The landscape architect's comparison in lines 28–30 suggests that waiting to pave walkways:
 
-- A. explain how the market schedule could have been preserved for its trading benefits even if trade did not originally create it.
-- B. prove that the religious explanation for the market schedule is false.
-- C. show that the ironmongers' account books record the first creation of the schedule.
-- D. argue that useful social arrangements are usually designed intentionally from the start.
+- A. is too slow to be practical for most universities.
+- B. is mainly a way to control rainwater on campuses.
+- C. requires engineers to predict exactly how people will walk.
+- D. lets people's natural movement show where a path should go before it is built.
+
+**Answer:** D
+
+**Explanation:** A: The comparison presents the practice positively, not as too slow. | B: The water is a comparison, not a literal drainage plan. | C: The point is the opposite: you watch instead of predicting. | D: Correct. Like water finding its own course before a channel is dug, people show the route first and the paving follows.
+
+### READING 15 — Literary Narrative (medium)
+
+**Question:** The example of a person using a wheelchair (lines 34–36) is used to support the claim that:
+
+- A. a path made by some users may not meet the needs of all users.
+- B. shortcuts are usually safer than paved walkways.
+- C. most desire paths are made by students.
+- D. planners should remove every diagonal path.
 
 **Answer:** A
 
-**Explanation:** The final two paragraphs distinguish a practice's origin from the forces that keep it alive. The author says a schedule could have begun for religious reasons yet persisted because it suited traveling traders. Choice A captures that distinction. The passage does not disprove the religious explanation, the account books come from long after the schedule began, and the author explicitly warns against assuming that usefulness proves intentional design.
+**Explanation:** A: Correct. It supports lines 31–34: the people who wear a path "may not represent everyone who will use it later." | B: The example shows a shortcut that is not a good route for some people. | C: Students are one example, not a claim about most paths. | D: Neither the critics nor the author make this claim.
+
+### READING 16 — Literary Narrative (medium)
+
+**Question:** As it is used in line 43, *signal* most nearly means:
+
+- A. flash a light.
+- B. wave at.
+- C. broadcast.
+- D. point to.
+
+**Answer:** D
+
+**Explanation:** A: A path doesn't flash lights; this is a literal meaning that doesn't fit. | B: A path can't wave; this meaning doesn't fit. | C: "Broadcast" means sending out over radio or TV, which doesn't fit. | D: Correct. A desire path can point to a problem, such as a badly placed crosswalk.
+
+### READING 17 — Literary Narrative (easy)
+
+**Question:** According to the passage, where photographs of worn paths overlap with records of pedestrian injuries, a city may:
+
+- A. fence off the paths.
+- B. simply replant the grass.
+- C. add a crosswalk or move a bus stop.
+- D. close the nearby street to traffic.
+
+**Answer:** C
+
+**Explanation:** A: Fencing is the older response (line 7), not this one. | B: The passage says the city may act "rather than simply replant the grass" (lines 50–51). | C: Correct. Stated in lines 49–51. | D: Closing streets is never mentioned.
+
+### READING 18 — Literary Narrative (hard)
+
+**Question:** Based on the last paragraph (lines 52–58), the author would most likely agree that:
+
+- A. designers' plans are less valuable than desire paths.
+- B. every desire path should eventually be paved.
+- C. public spaces should be built without any plan.
+- D. the first design of a public space should be open to change based on how people actually use it.
+
+**Answer:** D
+
+**Explanation:** A: The author says "Neither is complete on its own" (line 55), so neither is ranked higher. | B: Critics' warnings about this (lines 40–41) are never rejected. | C: The author still values plans; they just need to allow revision. | D: Correct. The author describes a first walkway as "a reasonable guess rather than a final answer" (lines 57–58).
+
+## Passage / set for READING questions 19, 20, 21, 22, 23, 24, 25, 26, 27
+
+001 ¶ When I began restoring old films, I believed my job was to
+002   make them look new. A reel of film from the 1920s usually
+003   arrives in poor condition. The images flicker, the edges are
+004   scratched, and long stretches are spotted with dust. With
+005   modern software, almost all of this can be removed. A restorer
+006   can steady a shaking frame, erase a scratch that runs across a
+007   dozen scenes, and brighten a face that has faded to gray. In
+008   my first years, I did all of these things as thoroughly as I
+009   could, and I was proud of the results.
+010 ¶ I am less certain now. The problem is not that the software
+011   fails; it works remarkably well. The problem is that it works
+012   too well, and a restorer can easily cross the line between
+013   repairing a film and rewriting it. Early filmmakers worked
+014   with the materials they had. Many of their cameras were
+015   cranked by hand, so the speed of the image varied slightly
+016   from shot to shot. Their film stock captured light in a way
+017   that softened edges and deepened shadows. When I smooth every
+018   frame to the same speed and sharpen every outline, I am not
+019   recovering what the filmmaker intended. I am replacing it with
+020   what a modern viewer expects.
+021 ¶ Consider grain, the faint, shifting texture visible in older
+022   films. To a viewer raised on digital video, grain can look
+023   like damage, and removing it is one of the easiest ways to
+024   make a film appear "cleaner." But grain is not dirt on the
+025   image; in a sense, it is the image. It is produced by the tiny
+026   particles in the film that recorded the light. Erase it
+027   entirely and the faces on screen take on a waxy, painted
+028   quality, as though the actors had been replaced by careful
+029   copies of themselves.
+030 ¶ None of this means restorers should do nothing. A film that is
+031   allowed to decay will eventually be lost, and a scratch added
+032   by a careless projectionist in 1950 is not part of anyone's
+033   artistic vision. The challenge is to distinguish between the
+034   marks of time and the marks of the medium. A tear in the film
+035   is an accident; the softness of a lens is a choice, or at
+036   least a condition the filmmaker accepted and worked within.
+037 ¶ Making that distinction requires research as much as technical
+038   skill. Before I begin a restoration, I now try to find out how
+039   the film was originally shown: the speed at which it was
+040   projected, the kind of light in the theater, even the music
+041   that accompanied it. Sometimes the answers surprise me. One
+042   silent comedy I worked on had been tinted in shades of amber
+043   and blue, a detail lost when later copies were printed in
+044   plain black and white. Restoring those colors made the film
+045   look less modern, not more, but it brought today's audience
+046   closer to what viewers saw when the film was new.
+047 ¶ I sometimes think of restoration as a conversation across
+048   time. The filmmaker speaks first, through the choices visible
+049   on the screen. Each generation of viewers responds, bringing
+050   its own expectations. The restorer's role is not to win that
+051   conversation but to keep it going: to make sure that what the
+052   filmmaker said can still be heard clearly, even if it is not
+053   quite what we would have said ourselves.
+
+
+### READING 19 — Literary Narrative (medium)
+
+**Question:** Which statement best expresses the main idea of the passage?
+
+- A. The author believes restorers should stop using modern software.
+- B. The author has come to believe that restoration should preserve a film's original character rather than make it look modern.
+- C. The author regrets choosing film restoration as a career.
+- D. The author thinks old films are better than modern ones.
+
+**Answer:** B
+
+**Explanation:** A: The author says the software "works remarkably well" (line 11) and still restores films; the concern is overusing it. | B: Correct. The author once tried to "make them look new" (lines 1–2) but now warns against "rewriting" a film (line 13) and researches how it was first shown. | C: The author's view of the work has changed, but there is no regret about the career. | D: The passage never compares the quality of old and modern films.
+
+### READING 20 — Literary Narrative (easy)
+
+**Question:** According to the passage, the speed of the image in many early films varied from shot to shot because:
+
+- A. projectionists ran the films at different speeds.
+- B. the film stock softened edges.
+- C. later copies were printed carelessly.
+- D. many cameras were cranked by hand.
+
+**Answer:** D
+
+**Explanation:** A: Projection speed is something the author researches (lines 39–40), but it is not given as the cause. | B: Softened edges are a separate effect of the film stock (lines 16–17). | C: Later copies are discussed only for lost color (lines 43–44). | D: Correct. Stated in lines 14–16.
+
+### READING 21 — Literary Narrative (medium)
+
+**Question:** When the author says the software "works too well" (lines 11–12), the author most nearly means that it:
+
+- A. often damages the film it is used on.
+- B. makes it easy for a restorer to go beyond repairing a film and change it.
+- C. is too expensive for most restorers.
+- D. removes only the most obvious scratches.
+
+**Answer:** B
+
+**Explanation:** A: The author says the software does not fail (lines 10–11). | B: Correct. The author explains that a restorer "can easily cross the line between repairing a film and rewriting it" (lines 12–13). | C: Cost is never mentioned. | D: The author says it can remove "almost all" damage (line 5).
+
+### READING 22 — Literary Narrative (medium)
+
+**Question:** The author's claim that grain "is the image" (line 25) is based on the idea that grain:
+
+- A. is dust that was photographed along with the actors.
+- B. was added by filmmakers after filming for artistic effect.
+- C. comes from the particles in the film that actually recorded the light.
+- D. appears only in films that have been damaged.
+
+**Answer:** C
+
+**Explanation:** A: The author says grain "is not dirt on the image" (line 24). | B: Grain comes from the film itself, not from something added later. | C: Correct. "It is produced by the tiny particles in the film that recorded the light" (lines 25–26). | D: The author says grain can look like damage to modern viewers but is not damage.
+
+### READING 23 — Literary Narrative (medium)
+
+**Question:** The description of faces taking on "a waxy, painted quality" (lines 27–29) mainly serves to:
+
+- A. praise the skill of modern restorers.
+- B. show an unwanted result of removing grain completely.
+- C. describe how makeup was used in early films.
+- D. explain why early actors seemed unnatural on screen.
+
+**Answer:** B
+
+**Explanation:** A: The image is negative, not praise. | B: Correct. The sentence begins "Erase it entirely and..." and describes faces that look like "careful copies." | C: Makeup is never mentioned; the effect comes from removing grain. | D: The waxy look comes from modern over-cleaning, not from the original films.
+
+### READING 24 — Literary Narrative (easy)
+
+**Question:** The author presents a scratch added by a careless projectionist in 1950 (lines 31–33) as an example of:
+
+- A. a mark the filmmaker deliberately chose.
+- B. a detail that should always be preserved.
+- C. damage a restorer can reasonably remove.
+- D. a problem that software cannot fix.
+
+**Answer:** C
+
+**Explanation:** A: The projectionist, not the filmmaker, caused it, and by accident. | B: The author uses it to show that some repair is needed (line 30). | C: Correct. It "is not part of anyone's artistic vision," so fixing it doesn't rewrite the film. | D: The author says software can erase scratches (lines 6–7).
+
+### READING 25 — Literary Narrative (medium)
+
+**Question:** In lines 33–36, the author distinguishes between "the marks of time and the marks of the medium." Which pair from the passage best matches this distinction, in that order?
+
+- A. A tear in the film, and the softness of a lens
+- B. Flickering images, and scratched edges
+- C. Amber tinting, and blue tinting
+- D. The music that accompanied the film, and the light in the theater
+
+**Answer:** A
+
+**Explanation:** A: Correct. A tear "is an accident" (time); the softness of a lens is "a condition the filmmaker accepted" (medium) (lines 34–36). | B: Both are damage that happened over time; neither is a mark of the medium. | C: Both are original color choices; they don't show the difference. | D: These describe how the film was shown, not kinds of marks on the film.
+
+### READING 26 — Literary Narrative (hard)
+
+**Question:** The author most likely includes the example of the silent comedy (lines 41–46) to show that:
+
+- A. most silent films were originally shown in color.
+- B. research into how a film was first shown can lead to choices that look less modern but are more faithful.
+- C. black-and-white copies of old films are worthless.
+- D. today's audiences prefer tinted films to modern ones.
+
+**Answer:** B
+
+**Explanation:** A: The passage gives one example; it makes no claim about most silent films. | B: Correct. Restoring the tints "made the film look less modern, not more," yet brought viewers closer to the original (lines 44–46). | C: The author only says a detail was lost, not that the copies are worthless. | D: Audience preference is never discussed.
+
+### READING 27 — Literary Narrative (hard)
+
+**Question:** In the last paragraph, the comparison of restoration to "a conversation across time" suggests that a restorer should:
+
+- A. decide which generation's view of a film is correct.
+- B. change each film to match the expectations of new audiences.
+- C. keep the filmmaker's original voice clear rather than replace it with modern preferences.
+- D. keep viewers from forming their own opinions.
+
+**Answer:** C
+
+**Explanation:** A: Deciding a winner is exactly what the author says not to do ("not to win"). | B: That would be "replacing" the film with what modern viewers expect, which the author warns against (lines 19–20). | C: Correct. The role is "not to win that conversation but to keep it going," so the filmmaker "can still be heard clearly" (lines 50–53). | D: Viewers "respond" in the conversation; the author welcomes this.
+
+## Passage / set for READING questions 28, 29, 30, 31, 32, 33, 34, 35, 36
+
+PASSAGE A
+001 ¶ In a quiet forest, a songbird's call can travel a long way. In
+002   a city, it must compete with traffic, construction, air
+003   conditioners, and the low rumble of buses. Over the past few
+004   decades, researchers have found that many birds living in
+005   cities sing differently from members of the same species
+006   living in forests. One of the most consistent differences
+007   involves pitch. City birds of several species tend to sing
+008   songs whose lowest notes are higher than those of their rural
+009   relatives.
+010 ¶ The explanation that first drew attention was a simple one.
+011   Most city noise is concentrated at low frequencies; the roar
+012   of an engine, for example, is deep rather than shrill. A bird
+013   whose song overlaps with that roar may not be heard by a
+014   potential mate or a rival. By shifting its song upward, away
+015   from the noise, a bird can make its message easier to detect.
+016   Researchers who recorded the same species at many sites found
+017   that birds in noisier territories generally sang at higher
+018   minimum pitches than birds in quieter ones, a pattern
+019   consistent with this idea.
+020 ¶ Experiments have added support. When researchers played
+021   recordings of low-pitched noise near some birds, several
+022   individuals raised the pitch of their songs within a short
+023   time, and some lowered it again when the noise stopped. This
+024   flexibility suggests that at least part of the change happens
+025   within a single bird's lifetime, as the bird adjusts to its
+026   surroundings.
+027 ¶ The finding has practical importance. If a song must be heard
+028   to attract a mate or defend a territory, then noise may affect
+029   which birds succeed in cities and which species can live there
+030   at all.
+
+PASSAGE B
+031 ¶ That city birds often sing at higher pitches is well
+032   established. Why they do so is less certain, and the most
+033   popular explanation may be incomplete.
+034 ¶ One complication is that pitch and volume are linked. Many
+035   animals, including humans, automatically raise their voices in
+036   noisy settings, a response known as the Lombard effect. When a
+037   bird sings more loudly, the physical effort of producing the
+038   sound can also push its pitch upward. A higher song in a noisy
+039   city, then, might be partly a side effect of singing louder
+040   rather than a targeted shift away from low-pitched noise.
+041 ¶ A second complication concerns how the change arises. Some
+042   birds learn their songs by listening to adults. If young birds
+043   in cities mostly hear high-pitched songs, they may simply copy
+044   what they hear, and the pattern could continue for generations
+045   even in a neighborhood that has grown quieter. Other species
+046   are born with much of their song already fixed, and for them a
+047   change might reflect gradual differences between populations
+048   rather than learning. Telling these possibilities apart
+049   requires following individual birds over time, which is
+050   difficult to do in a busy city.
+051 ¶ Finally, a higher song is not always a better one. In some
+052   species, females appear to prefer lower-pitched songs, which
+053   may signal a larger or healthier male. A bird that shifts
+054   upward may be heard more easily but valued less. The result
+055   could be a trade-off rather than a simple solution.
+056 ¶ None of this means noise is unimportant. It suggests instead
+057   that birdsong in cities is shaped by several forces at once,
+058   and that researchers should be cautious before concluding that
+059   birds have neatly solved the problem of being heard.
+
+
+### READING 28 — Literary Narrative (easy)
+
+**Question:** According to Passage A, city noise can make some birds' songs hard to hear mainly because:
+
+- A. city birds naturally sing more quietly than forest birds.
+- B. city noise is loudest at the times birds usually sing.
+- C. high-pitched city noise drowns out bird calls.
+- D. most city noise is low-pitched and overlaps with the lower parts of songs.
+
+**Answer:** D
+
+**Explanation:** A: Passage A never compares how loudly city and forest birds sing. | B: Timing is never mentioned. | C: The noise is described as low and "deep rather than shrill" (line 12). | D: Correct. "Most city noise is concentrated at low frequencies"; a song that overlaps with it "may not be heard" (lines 11–14).
+
+### READING 29 — Literary Narrative (medium)
+
+**Question:** The experiment described in lines 20–26 suggests that:
+
+- A. individual birds can change the pitch of their songs in response to noise.
+- B. adult birds are unable to change their songs.
+- C. recordings of noise cause birds to stop singing.
+- D. only young birds respond to noise.
+
+**Answer:** A
+
+**Explanation:** A: Correct. Birds raised their pitch during noise and some lowered it after, so the change can happen "within a single bird's lifetime" (lines 24–25). | B: The experiment shows birds changing their songs quickly. | C: The birds kept singing; they changed pitch. | D: Age is not mentioned in the experiment.
+
+### READING 30 — Literary Narrative (medium)
+
+**Question:** The last paragraph of Passage A (lines 27–30) mainly serves to:
+
+- A. introduce a new explanation for the change in pitch.
+- B. explain why the change in birdsong could matter for city birds.
+- C. describe a second experiment.
+- D. question the results of earlier research.
+
+**Answer:** B
+
+**Explanation:** A: No new explanation is given; it discusses consequences. | B: Correct. It says noise may affect "which birds succeed in cities and which species can live there at all." | C: No experiment is described in this paragraph. | D: Passage A supports the research; questioning it is what Passage B does.
+
+### READING 31 — Literary Narrative (easy)
+
+**Question:** According to Passage B, the Lombard effect is the tendency to:
+
+- A. copy songs heard from adults.
+- B. prefer lower-pitched songs in a mate.
+- C. raise one's voice in noisy settings.
+- D. produce a low rumble in city traffic.
+
+**Answer:** C
+
+**Explanation:** A: Learning from adults is a separate idea (lines 41–45). | B: That is the female preference described in lines 51–53. | C: Correct. Defined in lines 35–36. | D: That describes city noise in Passage A, not the Lombard effect.
+
+### READING 32 — Literary Narrative (medium)
+
+**Question:** According to Passage B, if young city birds learn high-pitched songs from adults, the pattern could:
+
+- A. continue for generations even after a neighborhood becomes quieter.
+- B. disappear as soon as the birds hear quieter surroundings.
+- C. make city birds' songs louder than forest birds' songs.
+- D. prove that pitch changes are caused only by noise.
+
+**Answer:** A
+
+**Explanation:** A: Correct. Stated in lines 43–45. | B: Passage B says the opposite: it could continue even when the area is quieter. | C: Learning is linked to pitch here, not loudness. | D: Learning is offered as another possible cause, which works against "only by noise."
+
+### READING 33 — Literary Narrative (easy)
+
+**Question:** Passage B says a higher song could create "a trade-off" (line 55) because the song:
+
+- A. requires birds to sing less often.
+- B. is easier to learn but harder to remember.
+- C. attracts rivals as well as mates.
+- D. may be heard more easily but be less attractive to females.
+
+**Answer:** D
+
+**Explanation:** A: How often birds sing is never discussed. | B: Memory is never mentioned. | C: Rivals are mentioned only in Passage A, and not as a trade-off. | D: Correct. "Heard more easily but valued less" (line 54), since some females prefer lower songs (lines 51–53).
+
+### READING 34 — Literary Narrative (medium)
+
+**Question:** Both passages agree that:
+
+- A. birds raise their pitch only to escape low-pitched noise.
+- B. many city birds sing at higher pitches than birds of the same species in quieter areas.
+- C. city noise has little real effect on birds.
+- D. female birds prefer higher-pitched songs.
+
+**Answer:** B
+
+**Explanation:** A: Passage B argues other causes may be involved. | B: Correct. Passage A reports this (lines 7–9), and Passage B calls it "well established" (lines 31–32). | C: Passage A says noise may affect which species survive, and Passage B says "None of this means noise is unimportant" (line 56). | D: Passage B says some females prefer lower songs; Passage A doesn't discuss this.
+
+### READING 35 — Literary Narrative (hard)
+
+**Question:** The author of Passage B would most likely respond to the claim in Passage A, lines 14–15 ("By shifting its song upward, away from the noise, a bird can make its message easier to detect"), by pointing out that:
+
+- A. most city noise is actually high-pitched.
+- B. a higher pitch might be partly a side effect of singing more loudly.
+- C. birds do not need to be heard by mates or rivals.
+- D. experiments have proven the explanation false.
+
+**Answer:** B
+
+**Explanation:** A: Passage B never disputes that city noise is low-pitched. | B: Correct. Passage B says a higher song "might be partly a side effect of singing louder rather than a targeted shift away from low-pitched noise" (lines 38–40). | C: Passage B assumes being heard matters ("the problem of being heard," line 59). | D: Passage B calls it "incomplete" (line 33), not false.
+
+### READING 36 — Literary Narrative (hard)
+
+**Question:** Compared with Passage A, Passage B focuses more on:
+
+- A. questioning whether one explanation fully accounts for the change in birdsong.
+- B. describing where city birds build their nests.
+- C. reporting the results of a single experiment.
+- D. arguing that cities should reduce noise.
+
+**Answer:** A
+
+**Explanation:** A: Correct. Passage B lists several "complications" and concludes birdsong "is shaped by several forces at once" (line 57). | B: Neither passage discusses nests. | C: Passage A is the one that describes an experiment (lines 20–26). | D: Neither passage argues for a policy.
 
 # Science
 

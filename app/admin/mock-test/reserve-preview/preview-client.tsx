@@ -5,16 +5,16 @@ import QuestionContent from '@/components/question-content/QuestionContent';
 import styles from '@/app/mock-test/run/run.module.css';
 
 type Letter='A'|'B'|'C'|'D';
-export default function ReservePreviewClient({section,title,prompt,passage,choices,difficulty,number}:{section:string;title:string;prompt:string;passage:string;choices:Record<Letter,string>;difficulty:string;number:number}){
+export default function ReservePreviewClient({section,title,prompt,passage,choices,difficulty,number,ordinal,passageNumber,total}:{section:string;title:string;prompt:string;passage:string;choices:Record<Letter,string>;difficulty:string;number:number;ordinal:number;passageNumber:number;total:number}){
  const [selected,setSelected]=useState<Letter|null>(null);
  return <div className={styles.contentFrame}>
  <div className={styles.mainArea+' '+styles.longPassageLayout}>
  <article className={styles.passageCard}>
- <div className={styles.passageLabel}>PASSAGE {section==='reading'?'IV':'I'} · {title}</div>
- <div className={styles.passageText}>{section==='reading'?<ReadingPassage text={passage}/>:<QuestionContent text={passage} questionNumber={number} underlineOrdinal={number} activeUnderline/>}</div>
+ <div className={styles.passageLabel}>PASSAGE {passageNumber} · {title}</div>
+ <div className={styles.passageText}>{section==='reading'?<ReadingPassage text={passage}/>:<QuestionContent text={passage} questionNumber={ordinal} underlineOrdinal={ordinal} activeUnderline/>}</div>
  </article>
  <section className={styles.questionColumn}>
- <div className={styles.questionHeader}><h1>question <span>{number}</span> <small>of {section==='reading'?9:10}</small></h1></div>
+ <div className={styles.questionHeader}><h1>question <span>{number}</span> <small>of {total}</small></h1></div>
  <div className={styles.questionMeta}>{section} · {difficulty} · admin preview</div>
  <div className={styles.questionText}><QuestionContent text={prompt} questionNumber={number} activeUnderline={section==='english'}/></div>
  <fieldset className={styles.choiceFieldset}><legend className={styles.srOnly}>Select an answer</legend>
