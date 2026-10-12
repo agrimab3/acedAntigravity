@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  --font-dm-serif: var(--font-playfair);
   --background: #070B14;
   --foreground: #EEF1F5;
   --sky-base: #070B14;

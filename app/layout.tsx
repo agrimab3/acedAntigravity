@@ -1,19 +1,16 @@
 import type { Metadata } from "next";
-import { DM_Sans, DM_Serif_Display } from "next/font/google";
+import { DM_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import Providers from "./providers";
-import FeedbackFooter from "@/components/FeedbackFooter";
-import TrademarkDisclaimer from "@/components/TrademarkDisclaimer";
+import SiteChrome from "./site-chrome";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-dm-sans",
 });
 
-const dmSerif = DM_Serif_Display({
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  weight: "400",
-  variable: "--font-dm-serif",
+  variable: "--font-playfair",
 });
 
 export const metadata: Metadata = {
@@ -27,11 +24,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`h-full antialiased ${dmSans.variable} ${dmSerif.variable}`}>
+    <html lang="en" className={`h-full antialiased ${dmSans.variable} ${playfair.variable}`}>
       <body className="min-h-full flex flex-col">
-        <Providers>{children}</Providers>
-        <TrademarkDisclaimer />
-        <FeedbackFooter />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );
