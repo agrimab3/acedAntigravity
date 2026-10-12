@@ -1,136 +1,166 @@
-# Five ACT-style English passages — owner review only
+# Five English passages — owner review only
 
-**Status:** Draft mock reserve; not in the locked December 5 Form A. Answers below are for reviewer use only.
+**Passage 1 revised to ACT-style; passages 2–5 remain previous drafts. No Dec 5 form changes.**
 
 ## The Night Garden
 
-Word count: 355. AI review: pass.
+Word count: 370. Review: pending.
 
-On the edge of a busy neighborhood, a narrow strip of land sat between a parking lot and a brick wall. During the day, people hurried past it without looking. At night, however, the space became the setting for an unusual experiment. A group of volunteers wanted to learn whether a small garden could help moths and other insects that visit flowers after sunset.
+[Paragraph 1] On the edge of a busy neighborhood, a narrow strip of land lay between a parking lot and a brick wall. At night, however, the space became the setting for an unusual experiment. A group of volunteers wanted to discover whether a small garden could support moths and other insects that visited flowers after sunset.
 
-The volunteers <u>were</u> careful not to begin with a shopping trip. First, they spent two evenings watching the site. They recorded which lights stayed on, where rainwater collected, and how the wind moved between the buildings. <u>Afterward,</u> they drew a plan that placed taller plants near the wall and shorter flowers along the sidewalk. Their plan included a shallow dish of water, but it did not include a bright decorative lamp. The volunteers knew that artificial light could <u>interfere with</u> the behavior they hoped to observe.
+[Paragraph 2] The volunteers <u>was</u> careful not to begin with a shopping trip. First, they spent two evenings observing the site. They recorded which lights stayed on, where rainwater collected, and how the wind moved between the buildings. <u>Afterward;</u> they drew a plan placing taller plants near the wall and shorter flowers beside the sidewalk. The volunteers knew that artificial light could disturb the insects they hoped to observe.
 
-Choosing flowers required more research than anyone expected. Some plants opened their blossoms in the morning; others released their strongest scent at dusk. The group selected several native species <u>that bloomed at different times</u> so the garden would offer food across the season. Instead of replacing the soil immediately, they tested it and added compost only where it was needed. This slower approach <u>saved both money and materials</u>.
+[Paragraph 3] Choosing flowers required more research than anyone expected. Some plants opened their blossoms in the morning; others released their strongest scent at dusk. The group selected several native species <u>which blooms at different times</u> so the garden would offer food throughout the season. This slower approach <u>was something that resulted in the saving of money and materials</u>.
 
-The first week brought little excitement. A few flowers drooped in the heat, and one volunteer wondered whether the experiment had failed. <u>Nevertheless,</u> the group continued taking notes rather than making sudden changes. By the third week, observers had counted several kinds of moths and noticed tiny beetles moving among the leaves. They photographed each visitor <u>without touching it</u>, then compared their records with a local field guide.
+[Paragraph 4] The first week brought little excitement. A few flowers drooped in the heat, and one volunteer wondered whether the experiment had failed. <u>Similarly,</u> the group continued taking notes rather than making sudden changes. By the third week, observers had counted several kinds of moths and noticed tiny beetles moving among the leaves. <u>Walking quietly between the beds, several insects were photographed by the volunteers.</u> The volunteers <u>recorded each sighting without disturbing the insects</u>, even when an unfamiliar moth stayed still long enough for a closer look.
 
-The project did not prove that every vacant strip should become a garden. <u>Its results were limited to one small site.</u> Still, the volunteers had learned something useful: careful observation could turn an overlooked place into a source of questions. <u>For their next step, they planned to repeat the count in autumn.</u> They also invited neighbors to share observations, <u>making the garden a place for both wildlife and learning.</u>
+[Paragraph 5] The project did not prove that every vacant strip should become a garden. <u>Its results were limited to one small site.</u> Still, the volunteers had learned something useful: careful observation could turn an overlooked place into a source of questions. <u>They also invited neighbors to share observations.</u> For their next step, they planned to repeat the count in autumn. By opening their notebooks to the neighborhood, the volunteers made the project a shared investigation rather than a private experiment. <u>The project ultimately showed how a modest public space could encourage both scientific curiosity and cooperation.</u>
 
-### 1. Which choice correctly completes the sentence?
+### 1. Which choice best completes the sentence?
 
-- A. were
-- B. was
-- C. is
-- D. be
+- A. NO CHANGE
+- B. were
+- C. has been
+- D. being
 
-**Answer: A** · easy · Subject-verb agreement
+**Answer: B** · easy · Subject-verb agreement
 
-Explanation: The plural subject volunteers requires were.
+- **A:** Was is singular, but volunteers is plural.
+- **B:** Were agrees with the plural subject volunteers and fits the past-tense narrative.
+- **C:** Has been is singular and shifts the tense.
+- **D:** Being cannot serve as the finite verb in this sentence.
 
-### 2. Which transition correctly introduces the next step?
+### 2. Which choice correctly punctuates the transition at the start of the sentence?
 
-- A. Afterward
-- B. Afterward;
-- C. Afterward:
-- D. Afterward,
+- A. NO CHANGE
+- B. Afterward:
+- C. Afterward,
+- D. Afterward
 
-**Answer: D** · easy · Punctuation
+**Answer: C** · easy · Punctuation
 
-Explanation: An introductory transition is followed by a comma.
+- **A:** A semicolon cannot separate an introductory adverb from the clause it modifies.
+- **B:** A colon would incorrectly introduce the clause as an explanation or list.
+- **C:** A comma appropriately sets off the introductory transition.
+- **D:** Without punctuation, the transition is less clearly separated from the main clause.
 
-### 3. Which phrase most precisely describes the effect of artificial light?
+### 3. Which choice best maintains standard written English?
 
-- A. do something to
-- B. have things with
-- C. interfere with
-- D. make changes on
+- A. NO CHANGE
+- B. which bloom at different times
+- C. that blooms at different times
+- D. that bloomed at different times
 
-**Answer: C** · easy · Word choice
+**Answer: D** · medium · Agreement and restrictive clauses
 
-Explanation: Interfere with precisely expresses disruption.
+- **A:** Blooms does not agree with the plural noun species, and which is awkward for an essential identifying clause.
+- **B:** Bloom agrees in number, but the present tense is inconsistent with the past-tense account and which is less appropriate for the essential clause.
+- **C:** Blooms is singular and disagrees with species.
+- **D:** That introduces the essential clause; bloomed agrees with the plural subject and the past-tense narration.
 
-### 4. Which choice best preserves the intended meaning?
+### 4. Which choice most effectively expresses the idea without unnecessary wording?
 
-- A. they bloomed at different times
-- B. that bloomed at different times
-- C. which blooming at different times
-- D. that blooms at different times
+- A. NO CHANGE
+- B. saved both money and materials
+- C. was the cause of a reduction in the amount of money and materials used
+- D. made money and materials into savings
 
-**Answer: B** · medium · Grammar
+**Answer: B** · medium · Concision
 
-Explanation: The relative clause correctly modifies species and maintains past tense.
+- **A:** The phrase buries the action in an unnecessarily long construction.
+- **B:** Saved is a direct verb that preserves the intended meaning.
+- **C:** This is also wordy and makes the action less direct.
+- **D:** The wording is imprecise and suggests that the materials themselves became savings.
 
-### 5. Which choice states the benefit most concisely?
+### 5. Which choice best connects the volunteers’ doubts with their decision to continue collecting evidence?
 
-- A. saved both money and materials
-- B. was a thing that saved money and also materials
-- C. was useful in terms of the saving of money and materials
-- D. did the work of saving money and materials
+- A. NO CHANGE
+- B. Consequently,
+- C. Nevertheless,
+- D. For instance,
 
-**Answer: A** · medium · Concision
+**Answer: C** · medium · Logical transitions
 
-Explanation: The original is direct and avoids unnecessary nominalizations.
+- **A:** Similarly signals likeness, not the contrast between discouragement and persistence.
+- **B:** Consequently incorrectly suggests the doubts caused the decision to continue.
+- **C:** Nevertheless accurately signals that they continued despite discouragement.
+- **D:** For instance would introduce an example rather than a contrasting response.
 
-### 6. Which transition best shows the contrast between doubt and persistence?
+### 6. Which choice most clearly identifies who was walking between the beds?
 
-- A. Similarly,
-- B. For example,
-- C. As a result,
-- D. Nevertheless,
+- A. NO CHANGE
+- B. Walking quietly between the beds, the volunteers photographed several insects.
+- C. Several insects were photographed, walking quietly between the beds, by volunteers.
+- D. Photographed by volunteers, several insects were walking quietly between the beds.
 
-**Answer: D** · medium · Transitions
+**Answer: B** · hard · Dangling modifiers
 
-Explanation: Nevertheless signals that the group persisted despite discouragement.
+- **A:** The opening modifier illogically describes insects as walking quietly between the beds.
+- **B:** The volunteers immediately follow the modifier, correctly identifying who was walking.
+- **C:** The modifier still appears to describe the insects and awkwardly interrupts the passive construction.
+- **D:** The sentence changes the intended meaning by making the insects the walkers.
 
-### 7. Which phrase clearly explains how the photographs were taken?
+### 7. Which choice most clearly expresses the volunteers’ method?
 
-- A. which did not touch them
-- B. without it being touch
-- C. without touching it
-- D. and not being touched by it
+- A. NO CHANGE
+- B. recorded each sighting, which did not disturb the insects
+- C. recorded the sightings and the insects were not disturbed by them
+- D. recorded each sighting in a way where no insect disturbance happened
 
-**Answer: C** · medium · Modifier placement
+**Answer: A** · easy · Clarity and concision
 
-Explanation: The phrase modifies photographed and refers to each visitor.
+- **A:** The original directly describes both the action and the volunteers’ care.
+- **B:** Which ambiguously refers to the sighting rather than the volunteers’ actions.
+- **C:** The second clause is unnecessarily passive and leaves them ambiguous.
+- **D:** In a way where is wordy and less idiomatic than without disturbing.
 
-### 8. Which sentence most appropriately limits the conclusion?
+### 8. The writer is considering deleting the underlined sentence in Paragraph 5. Should the writer keep or delete it?
 
-- A. No other garden could produce similar results.
-- B. Its results were limited to one small site.
-- C. Every neighborhood garden attracts the same insects.
-- D. The volunteers proved that gardens always work.
+- A. NO CHANGE
+- B. Delete it because the sentence repeats the first sentence without adding a qualification.
+- C. Delete it because one site is sufficient to establish conclusions about every vacant lot.
+- D. Keep it because the sentence proves the volunteers observed insects in every season.
 
-**Answer: B** · medium · Evidence
+**Answer: A** · medium · Add or delete sentence
 
-Explanation: The evidence comes from a single site and cannot establish a universal claim.
+- **A:** Keep it: the sentence appropriately limits what can be inferred from one small study.
+- **B:** The first sentence gives a general caution; this sentence explains the specific limitation.
+- **C:** A single site cannot establish a universal conclusion.
+- **D:** The sentence does not claim observations were made across seasons.
 
-### 9. Which sentence best sets up a logical follow-up to the summer observations?
+### 9. The underlined sentence currently appears in Paragraph 5 after the sentence beginning “Still, the volunteers.” Which choice gives its most logical placement?
 
-- A. For their next step, they planned to repeat the count in autumn.
-- B. The wall was built from red bricks many years earlier.
-- C. The parking lot had spaces for forty cars.
-- D. Several volunteers preferred tea to coffee.
+- A. NO CHANGE
+- B. At the beginning of Paragraph 1, before the setting is described.
+- C. After the sentence beginning “For their next step” in Paragraph 5.
+- D. Between the first and second sentences of Paragraph 3.
 
-**Answer: A** · hard · Organization
+**Answer: C** · hard · Sentence placement
 
-Explanation: Repeating the count in another season directly extends the study.
+- **A:** The invitation interrupts the transition from the study’s limits to its planned autumn count.
+- **B:** The neighbors have not yet been introduced to the project at that point.
+- **C:** Placing the invitation after the autumn plan groups the two next steps together before the final reflection.
+- **D:** Paragraph 3 discusses plant selection; a neighbor invitation would break that focus.
 
-### 10. Which ending best connects the project to its broader significance?
+### 10. Suppose the writer’s primary goal was to show how a small community experiment can produce useful knowledge without proving a universal claim. Does the passage accomplish that goal?
 
-- A. making it a place with many different kinds of things.
-- B. because there was a wall nearby.
-- C. although no one had ever seen a parking lot.
-- D. making the garden a place for both wildlife and learning.
+- A. NO CHANGE
+- B. No, because the passage concentrates entirely on plant species and provides no account of observation.
+- C. No, because the volunteers establish that every vacant lot should become a garden.
+- D. Yes, because the volunteers conclusively demonstrate that artificial light harms all moths.
 
-**Answer: D** · hard · Conclusion
+**Answer: A** · medium · Writer’s goal
 
-Explanation: The ending connects the garden's ecological and educational purposes.
+- **A:** Yes: the observations, limited conclusions, and plans for further counting support the stated goal.
+- **B:** The passage describes observation and evidence across several paragraphs.
+- **C:** The passage explicitly avoids making a universal recommendation.
+- **D:** The passage notes a concern about light but does not establish such a universal finding.
 
 ---
 
 ## The Last Mapmaker
 
-Word count: 345. AI review: pass.
+Word count: 345. Review: pass.
 
 When Mara joined the coastal survey team, she expected to spend most of her time drawing lines on maps. Instead, her first assignment involved standing in ankle-deep water, holding a measuring pole while a colleague recorded the position of reeds. The marsh they were studying <u>changed</u> shape after nearly every storm. A channel that appeared wide in spring might be almost invisible by late summer.
 
@@ -256,7 +286,7 @@ Explanation: The ending returns to the theme of a changing coastline.
 
 ## A Library of Sounds
 
-Word count: 348. AI review: pass.
+Word count: 348. Review: pass.
 
 At the city museum, visitors could examine old cameras, typewriters, and kitchen tools. Yet curator Imani noticed that the displays were strangely quiet. A visitor could see a mechanical cash register but could not hear its bell. To Imani, <u>something important was missing</u>: the sounds that had once accompanied ordinary work.
 
@@ -382,7 +412,7 @@ Explanation: The conclusion reinforces sound as a way to understand history.
 
 ## The Bridge of Paper
 
-Word count: 356. AI review: pass.
+Word count: 356. Review: pass.
 
 The engineering club had only one afternoon to build a bridge. Their materials were modest: recycled paper, glue, string, and two wooden blocks that represented opposite riverbanks. The bridge needed to support a stack of small weights without touching the table below. At first, the students <u>assumed</u> that using more paper would automatically make their design stronger.
 
@@ -508,7 +538,7 @@ Explanation: The phrase synthesizes iterative testing and evidence-based revisio
 
 ## Seeds on the Roof
 
-Word count: 348. AI review: pass.
+Word count: 348. Review: pass.
 
 During a particularly hot September, students at Westbrook School noticed that the top-floor classrooms felt warmer than the rooms below. Their science teacher suggested investigating the roof. Most of it was covered with dark material that absorbed sunlight. A small section, however, held planter boxes filled with herbs. The students <u>wondered</u> whether the plants affected the temperature nearby.
 
