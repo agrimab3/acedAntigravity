@@ -1,4 +1,5 @@
 "use client";
+import { globalEnglishPassage, globalEnglishPrompt } from "@/lib/mockTest/global-numbering";
 
 import type { CSSProperties } from "react";
 import {
@@ -1700,7 +1701,7 @@ export default function MockTestRunner({
               {currentQuestion.questionSetTitle ? (
                 <h2>{currentQuestion.questionSetTitle}</h2>
               ) : null}
-              <div className={styles.passageText}>{session.section.key === "reading" && /^001 (?:¶ |  )/.test(currentQuestion.passage ?? "") ? <ReadingPassage text={currentQuestion.passage ?? ""} /> : <QuestionContent text={currentQuestion.passage ?? ""} questionNumber={session.section.key === "english" ? currentQuestion.position : undefined} underlineOrdinal={activePassageOrdinal} activeUnderline={session.section.key === "english"} />}</div>
+              <div className={styles.passageText}>{session.section.key === "reading" && /^001 (?:¶ |  )/.test(currentQuestion.passage ?? "") ? <ReadingPassage text={currentQuestion.passage ?? ""} /> : <QuestionContent text={session.section.key === "english" ? globalEnglishPassage(currentQuestion.passage ?? "", currentQuestion.position) : currentQuestion.passage ?? ""} questionNumber={session.section.key === "english" ? currentQuestion.position : undefined} underlineOrdinal={session.section.key === "english" && activePassageOrdinal ? Math.floor((currentQuestion.position - 1) / 10) * 10 + activePassageOrdinal : activePassageOrdinal} activeUnderline={session.section.key === "english"} />}</div>
             </article>
           ) : null}
 
@@ -1750,7 +1751,7 @@ export default function MockTestRunner({
                 </div>
 
                 {currentQuestion.question_text ? (
-                  <div className={styles.questionText}><QuestionContent text={currentQuestion.question_text} questionNumber={session.section.key === "english" ? currentQuestion.position : undefined} activeUnderline={session.section.key === "english"} /></div>
+                  <div className={styles.questionText}><QuestionContent text={session.section.key === "english" ? globalEnglishPrompt(currentQuestion.question_text, currentQuestion.position) : currentQuestion.question_text} questionNumber={session.section.key === "english" ? currentQuestion.position : undefined} activeUnderline={session.section.key === "english"} /></div>
                 ) : null}
 
                 <fieldset className={styles.choiceFieldset}>
