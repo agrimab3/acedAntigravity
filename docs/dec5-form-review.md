@@ -56,7 +56,7 @@ The first week brought little excitement. A few flowers drooped in the heat, and
 (1) The project did not prove that every vacant strip should become a garden. (2) Its results came from one small site observed during a single summer. [9] (3) Still, the volunteers had learned something useful: careful observation could turn an overlooked place into a source of questions. (4) They also invited neighbors to share what they noticed. (5) For their next step, they planned to repeat the count in autumn. (6) By opening their notebooks to the neighborhood, the volunteers made the project a shared investigation rather than a private experiment.
 
 
-### ENGLISH 1 — Organization & Flow (easy)
+### ENGLISH 1 — Conventions of Standard English / subject-verb agreement (easy)
 
 **Question:** Choose the best answer for question 1.
 
@@ -69,7 +69,7 @@ The first week brought little excitement. A few flowers drooped in the heat, and
 
 **Explanation:** A: "Was" is singular, but the subject "volunteers" is plural. | B: Correct. "Were" agrees with the plural subject and keeps the past tense. | C: "Has been" is singular and shifts out of the past tense. | D: "Being" cannot serve as the main verb of a sentence.
 
-### ENGLISH 2 — Organization & Flow (easy)
+### ENGLISH 2 — Conventions of Standard English / punctuation (easy)
 
 **Question:** Choose the best answer for question 2.
 
@@ -82,7 +82,7 @@ The first week brought little excitement. A few flowers drooped in the heat, and
 
 **Explanation:** A: A semicolon must join two complete sentences; "Afterward" alone is not one. | B: Correct. A comma sets off the introductory word. | C: A colon must follow a complete sentence; "Afterward" is not one. | D: "And" has nothing to join; "Afterward" is not a clause.
 
-### ENGLISH 3 — Organization & Flow (easy)
+### ENGLISH 3 — Production of Writing / logical connector (easy)
 
 **Question:** Choose the best answer for question 3.
 
@@ -95,7 +95,7 @@ The first week brought little excitement. A few flowers drooped in the heat, and
 
 **Explanation:** A: Correct. "Since" shows the reason the lamp was left out: light disturbs insects. | B: "Although" signals contrast, but the second idea explains the first. | C: "Unless" creates a condition that makes no sense here. | D: "So" reverses cause and effect (the lamp being left out did not cause the volunteers' knowledge).
 
-### ENGLISH 4 — Organization & Flow (medium)
+### ENGLISH 4 — Conventions of Standard English / agreement in a clause (medium)
 
 **Question:** Choose the best answer for question 4.
 
@@ -108,7 +108,7 @@ The first week brought little excitement. A few flowers drooped in the heat, and
 
 **Explanation:** A: "Blooms" is singular, but it refers to "species," which is plural here ("several species"). | B: Still uses the singular "blooms." | C: Correct. "That bloom" agrees with the plural "species" and correctly limits which species were chosen. | D: Creates a run-on: "several native species they bloom" joins two clauses with no connector.
 
-### ENGLISH 5 — Organization & Flow (medium)
+### ENGLISH 5 — Knowledge of Language / concision (medium)
 
 **Question:** Choose the best answer for question 5.
 
@@ -121,7 +121,7 @@ The first week brought little excitement. A few flowers drooped in the heat, and
 
 **Explanation:** A: Wordy; "was something that resulted in the saving of" buries the action. | B: Still wordy and awkward ("being a savings of money"). | C: Changes the meaning; the approach didn't save "for" money. | D: Correct. "Saved money and materials" is direct and clear.
 
-### ENGLISH 6 — Organization & Flow (medium)
+### ENGLISH 6 — Production of Writing / transitions (medium)
 
 **Question:** Choose the best answer for question 6.
 
@@ -134,7 +134,7 @@ The first week brought little excitement. A few flowers drooped in the heat, and
 
 **Explanation:** A: "Similarly" signals likeness, but continuing despite doubt is a contrast. | B: "Consequently" suggests the doubt caused the group to keep going, which is illogical. | C: Correct. "Nevertheless" shows the group kept working despite the discouraging first week. | D: "For instance" introduces an example, but this sentence is not an example of the doubt.
 
-### ENGLISH 7 — Organization & Flow (medium)
+### ENGLISH 7 — Conventions of Standard English / modifier placement (medium)
 
 **Question:** Choose the best answer for question 7.
 
@@ -147,7 +147,7 @@ The first week brought little excitement. A few flowers drooped in the heat, and
 
 **Explanation:** A: The opening phrase "Walking quietly between the beds" seems to describe the insects, which is illogical. | B: Still suggests the insects were walking, and the passive wording is awkward. | C: Not a complete sentence; it has no main verb. | D: Correct. "The volunteers" comes right after the phrase, so it's clear who was walking.
 
-### ENGLISH 8 — Organization & Flow (hard)
+### ENGLISH 8 — Production of Writing / sentence placement (hard)
 
 **Question:** For the sake of logic and cohesion, Sentence 4 in Paragraph 5 should be placed:
 
@@ -160,7 +160,7 @@ The first week brought little excitement. A few flowers drooped in the heat, and
 
 **Explanation:** A: "Also" needs an earlier action to add to; Sentence 3 is about what they learned, not an action. | B: Inviting neighbors makes no sense before the paragraph explains the project's limits. | C: Correct. "Also" adds to the plan in Sentence 5, and Sentence 6 ("By opening their notebooks to the neighborhood") directly builds on the invitation. | D: Sentence 6 already refers to involving neighbors, so the invitation must come before it.
 
-### ENGLISH 9 — Organization & Flow (hard)
+### ENGLISH 9 — Production of Writing / add a sentence (hard)
 
 **Question:** At point 9, the writer is considering adding the following sentence:
 *"Moths are most active on warm, humid nights."*
@@ -175,7 +175,7 @@ Should the writer make this addition here?
 
 **Explanation:** A: The paragraph is about the project's limits, not about why summer was chosen. | B: The sentence says nothing about how many sites were studied. | C: It doesn't contradict anything; moths did visit the garden. | D: Correct. The paragraph weighs the project's results, and this general fact breaks that line of thought.
 
-### ENGLISH 10 — Organization & Flow (medium)
+### ENGLISH 10 — Production of Writing / writer's goal (medium)
 
 **Question:** Suppose the writer's goal had been to show how a small community project can produce useful knowledge even when its conclusions are limited. Would this essay accomplish that goal?
 
@@ -211,7 +211,7 @@ Each morning, the researchers checked their instruments before setting out. They
 At the end of the season, the team published a digital map with a timeline. Users could move a slider to compare different surveys, [7]**revealed** where the shoreline had shifted. Mara wrote a short note explaining the limits of the data: the team had measured selected locations, not every inch of the coast. [8] She hoped the map would help planners ask better questions [9]**rather then pretend** that the coastline would remain still.
 
 
-### ENGLISH 11 — Organization & Flow (easy)
+### ENGLISH 11 — Conventions of Standard English / its / it's (easy)
 
 **Question:** Choose the best answer for question 1.
 
@@ -224,7 +224,7 @@ At the end of the season, the team published a digital map with a timeline. User
 
 **Explanation:** A: "It's" means "it is," which doesn't fit ("changed it is shape"). | B: Correct. "Its" is the possessive form for the marsh. | C: "Its'" is not a word. | D: "Their" is plural, but "marsh" is singular.
 
-### ENGLISH 12 — Organization & Flow (easy)
+### ENGLISH 12 — Production of Writing / transitions (easy)
 
 **Question:** Choose the best answer for question 2.
 
@@ -237,7 +237,7 @@ At the end of the season, the team published a digital map with a timeline. User
 
 **Explanation:** A: Repeated measurements aren't an example of erosion; they're a result of the constant change. | B: "Nevertheless" signals contrast, but this sentence follows logically from the changes described. | C: "Similarly" signals likeness, which doesn't fit. | D: Correct. Because the marsh kept changing, the team needed repeated measurements.
 
-### ENGLISH 13 — Organization & Flow (medium)
+### ENGLISH 13 — Conventions of Standard English / sentence structure (medium)
 
 **Question:** Choose the best answer for question 3.
 
@@ -250,7 +250,7 @@ At the end of the season, the team published a digital map with a timeline. User
 
 **Explanation:** A: Correct. "But" properly joins two complete clauses after the comma. | B: "Keeping" can't be the main verb of the second clause. | C: Creates a comma splice: two complete sentences joined only by a comma. | D: "Keeping" leaves the second part without a proper verb and has no subject.
 
-### ENGLISH 14 — Organization & Flow (medium)
+### ENGLISH 14 — Conventions of Standard English / comma splice with "however" (medium)
 
 **Question:** Choose the best answer for question 4.
 
@@ -263,7 +263,7 @@ At the end of the season, the team published a digital map with a timeline. User
 
 **Explanation:** A: Comma splice: "however" isn't a joining word, so a comma alone can't connect two sentences. | B: Run-on with no punctuation at all. | C: Correct. A semicolon joins the two sentences, and a comma follows "however." | D: Still a comma splice; commas on both sides of "however" don't fix it.
 
-### ENGLISH 15 — Organization & Flow (medium)
+### ENGLISH 15 — Knowledge of Language / redundancy (medium)
 
 **Question:** Choose the best answer for question 5.
 
@@ -276,7 +276,7 @@ At the end of the season, the team published a digital map with a timeline. User
 
 **Explanation:** A: Redundant: "recorded at the time it was drawn" repeats "under which it was drawn." | B: Wordy and redundant ("present and existed"). | C: Awkward and repetitive ("drawing … drawing"). | D: Correct. Clear and concise.
 
-### ENGLISH 16 — Organization & Flow (medium)
+### ENGLISH 16 — Production of Writing / delete a sentence (medium)
 
 **Question:** The writer is considering deleting Sentence 4 from Paragraph 4. Should the writer make this deletion?
 
@@ -289,7 +289,7 @@ At the end of the season, the team published a digital map with a timeline. User
 
 **Explanation:** A: Sentence 3 gives the approach; Sentence 4 gives a new idea, its benefit. | B: It supports Mara's view of maps as records of change; it doesn't contradict it. | C: Correct. Without it, the reader doesn't learn why keeping both outlines matters. | D: Sentence 1 describes the split; Sentence 4 doesn't.
 
-### ENGLISH 17 — Organization & Flow (medium)
+### ENGLISH 17 — Conventions of Standard English / verb form (medium)
 
 **Question:** Choose the best answer for question 7.
 
@@ -302,7 +302,7 @@ At the end of the season, the team published a digital map with a timeline. User
 
 **Explanation:** A: "Revealed" creates a second main verb with no subject or joining word. | B: Correct. "Revealing" describes what comparing the surveys does. | C: "It revealing" is not a complete verb. | D: "Them" has nothing clear to refer to and makes the sentence ungrammatical.
 
-### ENGLISH 18 — Organization & Flow (hard)
+### ENGLISH 18 — Production of Writing / add a sentence (hard)
 
 **Question:** At point 8, the writer is considering adding the following sentence:
 *"Satellite images, which show large areas at once, are often used to track coastlines."*
@@ -317,7 +317,7 @@ Should the writer make this addition here?
 
 **Explanation:** A: The team clearly did take field measurements, so this reasoning is false. | B: The sentence is about other methods, not about the limits of this team's data. | C: Correct. It's a general fact that breaks the flow between the note and Mara's hope. | D: There's no contradiction; using coordinates and using images are different things.
 
-### ENGLISH 19 — Organization & Flow (easy)
+### ENGLISH 19 — Conventions of Standard English / than / then (easy)
 
 **Question:** Choose the best answer for question 9.
 
@@ -330,7 +330,7 @@ Should the writer make this addition here?
 
 **Explanation:** A: "Then" refers to time; comparisons use "than." | B: Still uses "then." | C: "Pretended" doesn't match "ask" (both should follow "would help planners"). | D: Correct. "Rather than pretend" matches "ask" and uses "than."
 
-### ENGLISH 20 — Organization & Flow (hard)
+### ENGLISH 20 — Production of Writing / add a sentence / placement (hard)
 
 **Question:** The writer wants to add the following sentence to Paragraph 2:
 *"In other words, the coastline was growing and shrinking at the same time."*
@@ -368,7 +368,7 @@ Recording was not as simple as pressing a button. Microphones picked up the hum 
 For the public exhibition, the museum installed listening stations beside selected objects. Each station offered a short recording and a caption describing how the recording had been made. Visitors could listen without operating fragile equipment. The museum also provided transcripts for spoken explanations and adjustable volume [8]**controls, features, that made** the exhibition more accessible. Imani hoped future visitors would recognize that history was not only something to look at; [9]**something people once heard every day as well**.
 
 
-### ENGLISH 21 — Organization & Flow (easy)
+### ENGLISH 21 — Conventions of Standard English / colon vs. semicolon (easy)
 
 **Question:** Choose the best answer for question 1.
 
@@ -381,7 +381,7 @@ For the public exhibition, the museum installed listening stations beside select
 
 **Explanation:** A: A semicolon must be followed by a complete sentence; "the sounds that had once accompanied ordinary work" isn't one. | B: Correct. A colon introduces an explanation of what was missing. | C: Without punctuation, "missing the sounds" changes the meaning (Imani missing something). | D: "And" has no second clause to join; what follows is not a complete sentence.
 
-### ENGLISH 22 — Organization & Flow (easy)
+### ENGLISH 22 — Conventions of Standard English / verb form (easy)
 
 **Question:** Choose the best answer for question 2.
 
@@ -394,7 +394,7 @@ For the public exhibition, the museum installed listening stations beside select
 
 **Explanation:** A: Correct. "Would record" describes the planned action, matching "the museum would invite." | B: "Would" must be followed by the base form "record." | C: "Will" must be followed by "record," and "will" shifts the tense. | D: "Recording" leaves the sentence without a main verb.
 
-### ENGLISH 23 — Organization & Flow (easy)
+### ENGLISH 23 — Production of Writing / transitions (easy)
 
 **Question:** Choose the best answer for question 3.
 
@@ -407,7 +407,7 @@ For the public exhibition, the museum installed listening stations beside select
 
 **Explanation:** A: "However" signals contrast, but the sewing machine detail illustrates the recordings. | B: This isn't a conclusion; the passage continues. | C: "Instead" suggests replacing something, which doesn't fit. | D: Correct. The sewing machine is an example of the sounds recorded.
 
-### ENGLISH 24 — Organization & Flow (medium)
+### ENGLISH 24 — Conventions of Standard English / dangling modifier (medium)
 
 **Question:** Choose the best answer for question 4.
 
@@ -420,7 +420,7 @@ For the public exhibition, the museum installed listening stations beside select
 
 **Explanation:** A: The phrase "To reduce this noise" seems to describe the curtains, as if curtains decided to reduce noise. "They" in the next sentence then has no clear person to refer to. | B: "Covering" leaves the clause without a main verb. | C: Correct. "The team" is who reduced the noise, and it gives "They" in the next sentence a clear meaning. | D: Wordy, passive, and repeats "by."
 
-### ENGLISH 25 — Organization & Flow (medium)
+### ENGLISH 25 — Knowledge of Language / redundancy (medium)
 
 **Question:** Choose the best answer for question 5.
 
@@ -433,7 +433,7 @@ For the public exhibition, the museum installed listening stations beside select
 
 **Explanation:** A: "Expensive" and "cost a lot" say the same thing, and the phrasing is wordy. | B: "Costly and expensive" is redundant. | C: Redundant and wordy. | D: Correct. Clear and concise.
 
-### ENGLISH 26 — Organization & Flow (medium)
+### ENGLISH 26 — Conventions of Standard English / sentence structure (medium)
 
 **Question:** Choose the best answer for question 6.
 
@@ -446,7 +446,7 @@ For the public exhibition, the museum installed listening stations beside select
 
 **Explanation:** A: Correct. The main verb "added" is followed by a phrase ("making…") describing the result. | B: A semicolon must be followed by a complete sentence; "making the archive useful…" isn't one. | C: Comma splice: two complete sentences joined by only a comma. | D: "Adding" leaves the sentence with no main verb.
 
-### ENGLISH 27 — Organization & Flow (medium)
+### ENGLISH 27 — Production of Writing / add a sentence (medium)
 
 **Question:** At point 7, the writer is considering adding the following sentence:
 *"Tension refers to how tightly a spring or belt inside a machine is stretched."*
@@ -461,7 +461,7 @@ Should the writer make this addition here?
 
 **Explanation:** A: Correct. It clarifies "tension," which is central to why the machines sounded different. | B: Nothing in the sentence says Imani did repairs; the specialist examined the machines. | C: Sentence 3 is about wear and care, not tension. | D: Tension directly explains the archive's question about different sounds.
 
-### ENGLISH 28 — Organization & Flow (hard)
+### ENGLISH 28 — Conventions of Standard English / commas with a restrictive clause (hard)
 
 **Question:** Choose the best answer for question 8.
 
@@ -474,7 +474,7 @@ Should the writer make this addition here?
 
 **Explanation:** A: The comma after "features" wrongly separates "features" from the clause that defines them ("that made…"). | B: A semicolon must be followed by a complete sentence; "features that made…" isn't one. | C: "Making" can't serve as the verb of the clause. | D: Correct. One comma introduces the summary phrase, and "that made…" directly describes "features."
 
-### ENGLISH 29 — Organization & Flow (medium)
+### ENGLISH 29 — Conventions of Standard English / semicolon needs a full sentence (medium)
 
 **Question:** Choose the best answer for question 9.
 
@@ -487,7 +487,7 @@ Should the writer make this addition here?
 
 **Explanation:** A: After a semicolon you need a complete sentence; this has no verb. | B: "It being" is not a complete verb. | C: Correct. A complete sentence that finishes the contrast ("not only … also"). | D: A fragment with no subject.
 
-### ENGLISH 30 — Organization & Flow (hard)
+### ENGLISH 30 — Production of Writing / writer's goal (hard)
 
 **Question:** Suppose the writer's goal had been to describe how a museum used technology to replace its physical objects. Would this essay accomplish that goal?
 
@@ -523,7 +523,7 @@ One group rolled paper into narrow tubes, while another folded strips into trian
 In the final trial, the bridge held the required weights for a full minute. The students [7]**cheered then they carefully dismantled** the structure to examine its weak points. [8] They wrote down which choices had helped and which would need more testing. The next meeting would begin with a new question: could a lighter bridge support the same load? By the end of the afternoon, the club understood that engineering [9]**involved testing ideas, and then revising them, and doing this** in response to evidence. [10]**It had been a long afternoon.**
 
 
-### ENGLISH 31 — Organization & Flow (easy)
+### ENGLISH 31 — Conventions of Standard English / there / their / they're (easy)
 
 **Question:** Choose the best answer for question 1.
 
@@ -536,7 +536,7 @@ In the final trial, the bridge held the required weights for a full minute. The 
 
 **Explanation:** A: "There" refers to a place, not ownership. | B: Correct. "Their" shows the design belongs to the students. | C: "They're" means "they are." | D: "Its" is singular, but it refers to the plural "students."
 
-### ENGLISH 32 — Organization & Flow (easy)
+### ENGLISH 32 — Conventions of Standard English / sentence fragment (easy)
 
 **Question:** Choose the best answer for question 2.
 
@@ -549,7 +549,7 @@ In the final trial, the bridge held the required weights for a full minute. The 
 
 **Explanation:** A: "Although it used the same amount of paper." is a fragment; it can't stand alone. | B: A semicolon can't follow a dependent "although" clause. | C: Comma splice: two complete sentences joined by only a comma. | D: Correct. The "although" clause is joined to the main sentence with a comma.
 
-### ENGLISH 33 — Organization & Flow (medium)
+### ENGLISH 33 — Conventions of Standard English / pronoun agreement (medium)
 
 **Question:** Choose the best answer for question 3.
 
@@ -562,7 +562,7 @@ In the final trial, the bridge held the required weights for a full minute. The 
 
 **Explanation:** A: "Their" is plural, but it refers to "each team" (singular), which already uses "its pieces." | B: "It's" means "it is." | C: Correct. "Its" matches "each team" and the earlier "its pieces." | D: "Could have held" changes the meaning to something that didn't happen.
 
-### ENGLISH 34 — Organization & Flow (medium)
+### ENGLISH 34 — Production of Writing / transitions (medium)
 
 **Question:** Choose the best answer for question 4.
 
@@ -575,7 +575,7 @@ In the final trial, the bridge held the required weights for a full minute. The 
 
 **Explanation:** A: Correct. "Instead" contrasts throwing the tube away with what they actually did. | B: "However" contrasts awkwardly; the sentence offers an alternative action, which "Instead" expresses. | C: "Similarly" signals likeness, but these are opposite actions. | D: "In addition" suggests they threw it away *and* inspected it.
 
-### ENGLISH 35 — Organization & Flow (medium)
+### ENGLISH 35 — Conventions of Standard English / sentence structure (medium)
 
 **Question:** Choose the best answer for question 5.
 
@@ -588,7 +588,7 @@ In the final trial, the bridge held the required weights for a full minute. The 
 
 **Explanation:** A: Correct. "But" joins the two contrasting clauses after the comma. | B: "Requiring" can't be the main verb of the second clause. | C: Comma splice. | D: Awkward word order, and "that" makes no sense before "a longer drying time."
 
-### ENGLISH 36 — Organization & Flow (hard)
+### ENGLISH 36 — Production of Writing / sentence placement (hard)
 
 **Question:** For the sake of logic and cohesion, Sentence 4 in Paragraph 4 should be placed:
 
@@ -601,7 +601,7 @@ In the final trial, the bridge held the required weights for a full minute. The 
 
 **Explanation:** A: As placed, the paragraph gives the test result (Sentence 3) before describing the test. | B: "The question" refers to the disagreement in Sentence 2, which hasn't happened yet. | C: Correct. Sentence 2 raises the question, Sentence 4 describes the test that settles it, and Sentence 3 gives the result. | D: The test must come before the result and before the conclusion about it.
 
-### ENGLISH 37 — Organization & Flow (medium)
+### ENGLISH 37 — Conventions of Standard English / run-on (medium)
 
 **Question:** Choose the best answer for question 7.
 
@@ -614,7 +614,7 @@ In the final trial, the bridge held the required weights for a full minute. The 
 
 **Explanation:** A: Run-on: two complete sentences with no punctuation or joining word. | B: Comma splice: "then" isn't a joining word, so the comma can't join two sentences. | C: After the semicolon, "then carefully dismantling" isn't a complete sentence. | D: Correct. One subject ("The students") with two verbs joined by "and."
 
-### ENGLISH 38 — Organization & Flow (medium)
+### ENGLISH 38 — Production of Writing / add a sentence (medium)
 
 **Question:** At point 8, the writer is considering adding the following sentence:
 *"Success did not end the investigation."*
@@ -629,7 +629,7 @@ Should the writer make this addition here?
 
 **Explanation:** A: Correct. It links the successful trial to the continued analysis that follows. | B: The bridge passed the trial. | C: Cheering and continuing to study the bridge don't conflict. | D: The first sentence reports the result; this one introduces a new idea.
 
-### ENGLISH 39 — Organization & Flow (easy)
+### ENGLISH 39 — Knowledge of Language / concision (easy)
 
 **Question:** Choose the best answer for question 9.
 
@@ -642,7 +642,7 @@ Should the writer make this addition here?
 
 **Explanation:** A: Wordy; "and doing this" adds nothing. | B: Correct. Clear and concise. | C: Repetitive ("ideas … ideas that were tested"). | D: "Involves to test" is not standard English, and "involves" shifts the tense.
 
-### ENGLISH 40 — Organization & Flow (hard)
+### ENGLISH 40 — Production of Writing / effective conclusion (hard)
 
 **Question:** Which choice most effectively concludes the essay by returning to the students' first assumption?
 
@@ -678,7 +678,7 @@ Then a stretch of clear afternoons arrived. The planted area was often cooler, e
 At the school assembly, the students presented their results without claiming that every rooftop garden would have the same effect. [8]**There evidence came** from one roof during one season. They recommended continued monitoring and suggested that the school explore other benefits, including habitat for insects. [9]**The project had begun with a question about warm classrooms, it ended** with a lesson about measuring carefully before drawing conclusions.
 
 
-### ENGLISH 41 — Organization & Flow (easy)
+### ENGLISH 41 — Conventions of Standard English / weather / whether (easy)
 
 **Question:** Choose the best answer for question 1.
 
@@ -691,7 +691,7 @@ At the school assembly, the students presented their results without claiming th
 
 **Explanation:** A: "Weather" means rain, sun, etc.; "whether" introduces a possibility. | B: Correct. "Wondered whether" is the right word in the past tense. | C: Still uses "weather." | D: "Wonder" shifts to the present tense.
 
-### ENGLISH 42 — Organization & Flow (easy)
+### ENGLISH 42 — Conventions of Standard English / semicolon (easy)
 
 **Question:** Choose the best answer for question 2.
 
@@ -704,7 +704,7 @@ At the school assembly, the students presented their results without claiming th
 
 **Explanation:** A: Correct. A semicolon correctly joins two complete, closely related sentences. | B: Replacing the semicolon with a comma creates a comma splice. | C: "Measuring" can't be the main verb after a semicolon. | D: A semicolon shouldn't be followed by "and" here; use either the semicolon or ", and."
 
-### ENGLISH 43 — Organization & Flow (easy)
+### ENGLISH 43 — Conventions of Standard English / comma placement (easy)
 
 **Question:** Choose the best answer for question 3.
 
@@ -717,7 +717,7 @@ At the school assembly, the students presented their results without claiming th
 
 **Explanation:** A: The comma wrongly separates the verb "showed" from what was shown. | B: The comma wrongly separates the subject from its verb. | C: Correct. The comma sets off the introductory phrase. | D: A semicolon can't follow an introductory phrase.
 
-### ENGLISH 44 — Organization & Flow (medium)
+### ENGLISH 44 — Production of Writing / transitions (medium)
 
 **Question:** Choose the best answer for question 4.
 
@@ -730,7 +730,7 @@ At the school assembly, the students presented their results without claiming th
 
 **Explanation:** A: "Therefore" suggests cooler readings caused the students to hold back, but the result would normally encourage a big claim. | B: Holding back isn't an example of the cooler readings. | C: "Similarly" signals likeness, not contrast. | D: Correct. Despite encouraging results, the students stayed cautious.
 
-### ENGLISH 45 — Organization & Flow (medium)
+### ENGLISH 45 — Knowledge of Language / redundancy (medium)
 
 **Question:** Choose the best answer for question 5.
 
@@ -743,7 +743,7 @@ At the school assembly, the students presented their results without claiming th
 
 **Explanation:** A: "Called and known as" says the same thing twice. | B: Creates a comma splice ("it is called" is a full clause). | C: Correct. Clear and concise. | D: "Which processes" is plural and awkward.
 
-### ENGLISH 46 — Organization & Flow (medium)
+### ENGLISH 46 — Production of Writing / add a sentence (medium)
 
 **Question:** At point 6, the writer is considering adding the following sentence:
 *"These changes helped separate errors in the instruments from real differences in temperature."*
@@ -758,7 +758,7 @@ Should the writer make this addition here?
 
 **Explanation:** A: Correct. It explains why Sentences 2 and 3 matter. | B: Nothing suggests the sensors were broken; the class checked whether one read high. | C: Sentence 4 is about graphing over several weeks, a different idea. | D: It supports the improved method.
 
-### ENGLISH 47 — Organization & Flow (medium)
+### ENGLISH 47 — Conventions of Standard English / parallel structure (medium)
 
 **Question:** Choose the best answer for question 7.
 
@@ -771,7 +771,7 @@ Should the writer make this addition here?
 
 **Explanation:** A: Correct. "More cautious and more useful" are parallel adjectives describing the conclusions. | B: The comma after "and" is unnecessary. | C: "Usefulness" is a noun, which breaks the parallel structure. | D: "Usefully" is an adverb, which can't describe "conclusions."
 
-### ENGLISH 48 — Organization & Flow (medium)
+### ENGLISH 48 — Conventions of Standard English / there / their (medium)
 
 **Question:** Choose the best answer for question 8.
 
@@ -784,7 +784,7 @@ Should the writer make this addition here?
 
 **Explanation:** A: "There" refers to a place, not ownership. | B: "They're" means "they are." | C: Still uses "there," and "had come" changes the tense unnecessarily. | D: Correct. "Their" shows the evidence belonged to the students.
 
-### ENGLISH 49 — Organization & Flow (hard)
+### ENGLISH 49 — Conventions of Standard English / comma splice (hard)
 
 **Question:** Choose the best answer for question 9.
 
@@ -797,7 +797,7 @@ Should the writer make this addition here?
 
 **Explanation:** A: Comma splice: two complete sentences joined by only a comma. | B: Correct. "But" joins the two contrasting sentences after the comma. | C: A semicolon followed by "but" is incorrect here. | D: Run-on with no punctuation or joining word.
 
-### ENGLISH 50 — Organization & Flow (hard)
+### ENGLISH 50 — Production of Writing / writer's goal (hard)
 
 **Question:** Suppose the writer's goal had been to show students using a scientific approach to reach a careful conclusion. Would this essay accomplish that goal?
 
@@ -1475,7 +1475,7 @@ kx + 6y = c
 063 ¶ He did not say what color, and I did not ask. I already knew.
 
 
-### READING 1 — Literary Narrative (easy)
+### READING 1 — Literary Narrative / Craft and Structure / point of view (easy)
 
 **Question:** The passage is told from the point of view of:
 
@@ -1488,7 +1488,7 @@ kx + 6y = c
 
 **Explanation:** A: Teo is described from the outside; the "I" is the young relative, not Teo. | B: The mother appears only on the phone (lines 21–23); she is not the narrator. | C: The narrator is a character in the story ("I"), not an outside observer. | D: Correct. The narrator uses "I" and describes the summer at Teo's boatyard (lines 1–3).
 
-### READING 2 — Literary Narrative (medium)
+### READING 2 — Literary Narrative / Key Ideas and Details / main idea (medium)
 
 **Question:** Which statement best describes the main development of the passage?
 
@@ -1501,7 +1501,7 @@ kx + 6y = c
 
 **Explanation:** A: Correct. Early on the narrator thinks the job is busywork (lines 19–21); later the narrator sees Teo's care and learns the boat was the grandfather's (lines 37–46). | B: The passage never says the narrator plans a career in boats. | C: The narrator complains to the mother, not to Teo, and the passage never says Teo changes because of a complaint. | D: The only argument is between Teo and the man with the dinghy (lines 25–32).
 
-### READING 3 — Literary Narrative (easy)
+### READING 3 — Literary Narrative / Key Ideas and Details / detail (easy)
 
 **Question:** According to the passage, the man with the fiberglass dinghy left without having it repaired because:
 
@@ -1514,7 +1514,7 @@ kx + 6y = c
 
 **Explanation:** A: Teo said he "could do it" (line 28). | B: The narrator never touches the dinghy. | C: Correct. Teo said he could do it "but not by Sunday, and not cheaply" and would not change his answer (lines 28–32). | D: The passage doesn't say what the man planned to do; it only says he drove away with the dinghy still cracked.
 
-### READING 4 — Literary Narrative (medium)
+### READING 4 — Literary Narrative / Key Ideas and Details / inference (medium)
 
 **Question:** In context, the mother's statement "That's not nothing" (line 23) most strongly suggests that she believes:
 
@@ -1527,7 +1527,7 @@ kx + 6y = c
 
 **Explanation:** A: Pay is never mentioned. | B: Correct. She says "He gave you the boat"; the narrator later learns the boat was built by the grandfather (lines 40–42), so it mattered to Teo. | C: Nothing suggests selling; Teo plans to paint it "next summer" (line 62). | D: She laughs, but her words are about the boat being a meaningful gift, not about the narrator exaggerating.
 
-### READING 5 — Literary Narrative (medium)
+### READING 5 — Literary Narrative / Key Ideas and Details / character (medium)
 
 **Question:** Teo's comment in lines 34–36 ("I could have done it fast once... a boat that sank") mainly shows that he:
 
@@ -1540,7 +1540,7 @@ kx + 6y = c
 
 **Explanation:** A: He shows no regret; he calmly repeats his terms (lines 29–32). | B: Correct. A fast, careless repair might fail ("a boat that sank"), and it would be "my name" on it. | C: He hands the narrator's sanding block back without criticizing the pace; the comment is about the dinghy. | D: He is describing what could happen, not something that has happened.
 
-### READING 6 — Literary Narrative (medium)
+### READING 6 — Literary Narrative / Craft and Structure / vocabulary in context (medium)
 
 **Question:** As it is used in line 17, the word *settled* most nearly means:
 
@@ -1553,7 +1553,7 @@ kx + 6y = c
 
 **Explanation:** A: "Settled" can mean paying a bill, but heat can't pay anything. | B: "Settled" can mean decided, but heat doesn't make decisions. | C: Heat arriving makes the yard hotter, not calmer. | D: Correct. The heat came down and stayed over the yard, so the narrator worked before it arrived.
 
-### READING 7 — Literary Narrative (easy)
+### READING 7 — Literary Narrative / Key Ideas and Details / detail (easy)
 
 **Question:** The narrator learns that the rowboat was built by the narrator's grandfather from:
 
@@ -1566,7 +1566,7 @@ kx + 6y = c
 
 **Explanation:** A: Correct. "Teo never told me this. I learned it from a faded photograph" (lines 42–43). | B: The passage says "Teo never told me this" (line 42). | C: The mother says "He gave you the boat" but never explains its history. | D: No markings are mentioned; the hull had been painted blue.
 
-### READING 8 — Literary Narrative (hard)
+### READING 8 — Literary Narrative / Craft and Structure / function of a paragraph (hard)
 
 **Question:** The paragraph in lines 47–55 mainly serves to:
 
@@ -1579,7 +1579,7 @@ kx + 6y = c
 
 **Explanation:** A: The blue paint is mentioned earlier (line 45), and no reason for the color is ever given. | B: Teo stays and shows the narrator the next step; nothing suggests he is unhappy. | C: Plans for next summer come in line 62, not in this paragraph. | D: Correct. For the first time Teo sits beside the narrator "and stayed" (lines 50–51), and "now he explained the reasons" (line 54).
 
-### READING 9 — Literary Narrative (hard)
+### READING 9 — Literary Narrative / Key Ideas and Details / inference (hard)
 
 **Question:** The last sentence of the passage ("I already knew") most strongly suggests that the narrator expects the boat to be painted:
 
@@ -1654,7 +1654,7 @@ kx + 6y = c
 058   as a reasonable guess rather than a final answer.
 
 
-### READING 10 — Literary Narrative (medium)
+### READING 10 — Social Science / Craft and Structure / main purpose (medium)
 
 **Question:** The main purpose of the passage is to:
 
@@ -1667,7 +1667,7 @@ kx + 6y = c
 
 **Explanation:** A: Correct. The passage defines desire paths, describes how they were once fought, how some planners now use them, and what critics say. | B: Too extreme. The passage gives critics' concerns (lines 31–41) and says plans and paths are each incomplete (line 55). | C: The passage discusses campuses, parks, and cities in general, not one campus. | D: Groundskeepers' actions are mentioned briefly (lines 7–9) but are not criticized.
 
-### READING 11 — Literary Narrative (easy)
+### READING 11 — Social Science / Key Ideas and Details / detail (easy)
 
 **Question:** According to the passage, for much of the twentieth century desire paths were generally:
 
@@ -1680,7 +1680,7 @@ kx + 6y = c
 
 **Explanation:** A: Correct. They were "treated as a nuisance" and fenced off, planted over, or posted with signs (lines 6–9). | B: That newer approach comes later in the passage (lines 22–25). | C: Paving them is described as something only "a few universities" do now. | D: They "usually returned within weeks" (line 9), so they did last.
 
-### READING 12 — Literary Narrative (medium)
+### READING 12 — Social Science / Craft and Structure / meaning of a phrase (medium)
 
 **Question:** The author calls a desire path "a kind of record" (line 20) mainly to suggest that the path:
 
@@ -1693,7 +1693,7 @@ kx + 6y = c
 
 **Explanation:** A: The passage says the opposite: it was not drawn "by a designer." | B: Age is never discussed. | C: Correct. It is "a map drawn not by a designer but by hundreds of individual decisions" (lines 20–21). | D: People choose the route that "feels safe and convenient" (line 14).
 
-### READING 13 — Literary Narrative (easy)
+### READING 13 — Social Science / Key Ideas and Details / detail (easy)
 
 **Question:** According to the passage, some universities have waited a season before paving walkways in order to:
 
@@ -1706,7 +1706,7 @@ kx + 6y = c
 
 **Explanation:** A: Grass growth is not the reason given. | B: No vote is mentioned. | C: Correct. They "waited for a season to see where students actually walk" (lines 24–25). | D: Materials are never discussed.
 
-### READING 14 — Literary Narrative (medium)
+### READING 14 — Social Science / Craft and Structure / analogy (medium)
 
 **Question:** The landscape architect's comparison in lines 28–30 suggests that waiting to pave walkways:
 
@@ -1719,7 +1719,7 @@ kx + 6y = c
 
 **Explanation:** A: The comparison presents the practice positively, not as too slow. | B: The water is a comparison, not a literal drainage plan. | C: The point is the opposite: you watch instead of predicting. | D: Correct. Like water finding its own course before a channel is dug, people show the route first and the paving follows.
 
-### READING 15 — Literary Narrative (medium)
+### READING 15 — Social Science / Craft and Structure / purpose of an example (medium)
 
 **Question:** The example of a person using a wheelchair (lines 34–36) is used to support the claim that:
 
@@ -1732,7 +1732,7 @@ kx + 6y = c
 
 **Explanation:** A: Correct. It supports lines 31–34: the people who wear a path "may not represent everyone who will use it later." | B: The example shows a shortcut that is not a good route for some people. | C: Students are one example, not a claim about most paths. | D: Neither the critics nor the author make this claim.
 
-### READING 16 — Literary Narrative (medium)
+### READING 16 — Social Science / Craft and Structure / vocabulary in context (medium)
 
 **Question:** As it is used in line 43, *signal* most nearly means:
 
@@ -1745,7 +1745,7 @@ kx + 6y = c
 
 **Explanation:** A: A path doesn't flash lights; this is a literal meaning that doesn't fit. | B: A path can't wave; this meaning doesn't fit. | C: "Broadcast" means sending out over radio or TV, which doesn't fit. | D: Correct. A desire path can point to a problem, such as a badly placed crosswalk.
 
-### READING 17 — Literary Narrative (easy)
+### READING 17 — Social Science / Key Ideas and Details / detail (easy)
 
 **Question:** According to the passage, where photographs of worn paths overlap with records of pedestrian injuries, a city may:
 
@@ -1758,7 +1758,7 @@ kx + 6y = c
 
 **Explanation:** A: Fencing is the older response (line 7), not this one. | B: The passage says the city may act "rather than simply replant the grass" (lines 50–51). | C: Correct. Stated in lines 49–51. | D: Closing streets is never mentioned.
 
-### READING 18 — Literary Narrative (hard)
+### READING 18 — Social Science / Integration of Knowledge and Ideas / author's view (hard)
 
 **Question:** Based on the last paragraph (lines 52–58), the author would most likely agree that:
 
@@ -1828,7 +1828,7 @@ kx + 6y = c
 053   quite what we would have said ourselves.
 
 
-### READING 19 — Literary Narrative (medium)
+### READING 19 — Humanities / Key Ideas and Details / main idea (medium)
 
 **Question:** Which statement best expresses the main idea of the passage?
 
@@ -1841,7 +1841,7 @@ kx + 6y = c
 
 **Explanation:** A: The author says the software "works remarkably well" (line 11) and still restores films; the concern is overusing it. | B: Correct. The author once tried to "make them look new" (lines 1–2) but now warns against "rewriting" a film (line 13) and researches how it was first shown. | C: The author's view of the work has changed, but there is no regret about the career. | D: The passage never compares the quality of old and modern films.
 
-### READING 20 — Literary Narrative (easy)
+### READING 20 — Humanities / Key Ideas and Details / detail (easy)
 
 **Question:** According to the passage, the speed of the image in many early films varied from shot to shot because:
 
@@ -1854,7 +1854,7 @@ kx + 6y = c
 
 **Explanation:** A: Projection speed is something the author researches (lines 39–40), but it is not given as the cause. | B: Softened edges are a separate effect of the film stock (lines 16–17). | C: Later copies are discussed only for lost color (lines 43–44). | D: Correct. Stated in lines 14–16.
 
-### READING 21 — Literary Narrative (medium)
+### READING 21 — Humanities / Key Ideas and Details / inference (medium)
 
 **Question:** When the author says the software "works too well" (lines 11–12), the author most nearly means that it:
 
@@ -1867,7 +1867,7 @@ kx + 6y = c
 
 **Explanation:** A: The author says the software does not fail (lines 10–11). | B: Correct. The author explains that a restorer "can easily cross the line between repairing a film and rewriting it" (lines 12–13). | C: Cost is never mentioned. | D: The author says it can remove "almost all" damage (line 5).
 
-### READING 22 — Literary Narrative (medium)
+### READING 22 — Humanities / Integration of Knowledge and Ideas / supporting reason (medium)
 
 **Question:** The author's claim that grain "is the image" (line 25) is based on the idea that grain:
 
@@ -1880,7 +1880,7 @@ kx + 6y = c
 
 **Explanation:** A: The author says grain "is not dirt on the image" (line 24). | B: Grain comes from the film itself, not from something added later. | C: Correct. "It is produced by the tiny particles in the film that recorded the light" (lines 25–26). | D: The author says grain can look like damage to modern viewers but is not damage.
 
-### READING 23 — Literary Narrative (medium)
+### READING 23 — Humanities / Craft and Structure / function (medium)
 
 **Question:** The description of faces taking on "a waxy, painted quality" (lines 27–29) mainly serves to:
 
@@ -1893,7 +1893,7 @@ kx + 6y = c
 
 **Explanation:** A: The image is negative, not praise. | B: Correct. The sentence begins "Erase it entirely and..." and describes faces that look like "careful copies." | C: Makeup is never mentioned; the effect comes from removing grain. | D: The waxy look comes from modern over-cleaning, not from the original films.
 
-### READING 24 — Literary Narrative (easy)
+### READING 24 — Humanities / Craft and Structure / example (easy)
 
 **Question:** The author presents a scratch added by a careless projectionist in 1950 (lines 31–33) as an example of:
 
@@ -1906,7 +1906,7 @@ kx + 6y = c
 
 **Explanation:** A: The projectionist, not the filmmaker, caused it, and by accident. | B: The author uses it to show that some repair is needed (line 30). | C: Correct. It "is not part of anyone's artistic vision," so fixing it doesn't rewrite the film. | D: The author says software can erase scratches (lines 6–7).
 
-### READING 25 — Literary Narrative (medium)
+### READING 25 — Humanities / Craft and Structure / distinction (medium)
 
 **Question:** In lines 33–36, the author distinguishes between "the marks of time and the marks of the medium." Which pair from the passage best matches this distinction, in that order?
 
@@ -1919,7 +1919,7 @@ kx + 6y = c
 
 **Explanation:** A: Correct. A tear "is an accident" (time); the softness of a lens is "a condition the filmmaker accepted" (medium) (lines 34–36). | B: Both are damage that happened over time; neither is a mark of the medium. | C: Both are original color choices; they don't show the difference. | D: These describe how the film was shown, not kinds of marks on the film.
 
-### READING 26 — Literary Narrative (hard)
+### READING 26 — Humanities / Craft and Structure / purpose of an example (hard)
 
 **Question:** The author most likely includes the example of the silent comedy (lines 41–46) to show that:
 
@@ -1932,7 +1932,7 @@ kx + 6y = c
 
 **Explanation:** A: The passage gives one example; it makes no claim about most silent films. | B: Correct. Restoring the tints "made the film look less modern, not more," yet brought viewers closer to the original (lines 44–46). | C: The author only says a detail was lost, not that the copies are worthless. | D: Audience preference is never discussed.
 
-### READING 27 — Literary Narrative (hard)
+### READING 27 — Humanities / Craft and Structure / figurative language (hard)
 
 **Question:** In the last paragraph, the comparison of restoration to "a conversation across time" suggests that a restorer should:
 
@@ -2011,7 +2011,7 @@ PASSAGE B
 059   birds have neatly solved the problem of being heard.
 
 
-### READING 28 — Literary Narrative (easy)
+### READING 28 — Natural Science / Key Ideas and Details / detail (Passage A) (easy)
 
 **Question:** According to Passage A, city noise can make some birds' songs hard to hear mainly because:
 
@@ -2024,7 +2024,7 @@ PASSAGE B
 
 **Explanation:** A: Passage A never compares how loudly city and forest birds sing. | B: Timing is never mentioned. | C: The noise is described as low and "deep rather than shrill" (line 12). | D: Correct. "Most city noise is concentrated at low frequencies"; a song that overlaps with it "may not be heard" (lines 11–14).
 
-### READING 29 — Literary Narrative (medium)
+### READING 29 — Natural Science / Key Ideas and Details / inference (Passage A) (medium)
 
 **Question:** The experiment described in lines 20–26 suggests that:
 
@@ -2037,7 +2037,7 @@ PASSAGE B
 
 **Explanation:** A: Correct. Birds raised their pitch during noise and some lowered it after, so the change can happen "within a single bird's lifetime" (lines 24–25). | B: The experiment shows birds changing their songs quickly. | C: The birds kept singing; they changed pitch. | D: Age is not mentioned in the experiment.
 
-### READING 30 — Literary Narrative (medium)
+### READING 30 — Natural Science / Craft and Structure / function (Passage A) (medium)
 
 **Question:** The last paragraph of Passage A (lines 27–30) mainly serves to:
 
@@ -2050,7 +2050,7 @@ PASSAGE B
 
 **Explanation:** A: No new explanation is given; it discusses consequences. | B: Correct. It says noise may affect "which birds succeed in cities and which species can live there at all." | C: No experiment is described in this paragraph. | D: Passage A supports the research; questioning it is what Passage B does.
 
-### READING 31 — Literary Narrative (easy)
+### READING 31 — Natural Science / Key Ideas and Details / detail (Passage B) (easy)
 
 **Question:** According to Passage B, the Lombard effect is the tendency to:
 
@@ -2063,7 +2063,7 @@ PASSAGE B
 
 **Explanation:** A: Learning from adults is a separate idea (lines 41–45). | B: That is the female preference described in lines 51–53. | C: Correct. Defined in lines 35–36. | D: That describes city noise in Passage A, not the Lombard effect.
 
-### READING 32 — Literary Narrative (medium)
+### READING 32 — Natural Science / Key Ideas and Details / reasoning (Passage B) (medium)
 
 **Question:** According to Passage B, if young city birds learn high-pitched songs from adults, the pattern could:
 
@@ -2076,7 +2076,7 @@ PASSAGE B
 
 **Explanation:** A: Correct. Stated in lines 43–45. | B: Passage B says the opposite: it could continue even when the area is quieter. | C: Learning is linked to pitch here, not loudness. | D: Learning is offered as another possible cause, which works against "only by noise."
 
-### READING 33 — Literary Narrative (easy)
+### READING 33 — Natural Science / Key Ideas and Details / detail (Passage B) (easy)
 
 **Question:** Passage B says a higher song could create "a trade-off" (line 55) because the song:
 
@@ -2089,7 +2089,7 @@ PASSAGE B
 
 **Explanation:** A: How often birds sing is never discussed. | B: Memory is never mentioned. | C: Rivals are mentioned only in Passage A, and not as a trade-off. | D: Correct. "Heard more easily but valued less" (line 54), since some females prefer lower songs (lines 51–53).
 
-### READING 34 — Literary Narrative (medium)
+### READING 34 — Natural Science / Integration of Knowledge and Ideas / comparing passages (medium)
 
 **Question:** Both passages agree that:
 
@@ -2102,7 +2102,7 @@ PASSAGE B
 
 **Explanation:** A: Passage B argues other causes may be involved. | B: Correct. Passage A reports this (lines 7–9), and Passage B calls it "well established" (lines 31–32). | C: Passage A says noise may affect which species survive, and Passage B says "None of this means noise is unimportant" (line 56). | D: Passage B says some females prefer lower songs; Passage A doesn't discuss this.
 
-### READING 35 — Literary Narrative (hard)
+### READING 35 — Natural Science / Integration of Knowledge and Ideas / comparing passages (hard)
 
 **Question:** The author of Passage B would most likely respond to the claim in Passage A, lines 14–15 ("By shifting its song upward, away from the noise, a bird can make its message easier to detect"), by pointing out that:
 
@@ -2115,7 +2115,7 @@ PASSAGE B
 
 **Explanation:** A: Passage B never disputes that city noise is low-pitched. | B: Correct. Passage B says a higher song "might be partly a side effect of singing louder rather than a targeted shift away from low-pitched noise" (lines 38–40). | C: Passage B assumes being heard matters ("the problem of being heard," line 59). | D: Passage B calls it "incomplete" (line 33), not false.
 
-### READING 36 — Literary Narrative (hard)
+### READING 36 — Natural Science / Integration of Knowledge and Ideas / comparing passages (hard)
 
 **Question:** Compared with Passage A, Passage B focuses more on:
 

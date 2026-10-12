@@ -11,7 +11,7 @@ const args=process.argv.slice(2);const mode=args[0];const path=args[1]||'docs/de
 const client=new pg.Client({connectionString:process.env.DATABASE_URL});
 if(!process.env.DATABASE_URL)throw Error('DATABASE_URL missing');
 const formQuery=`select fq.section_key,fq.position,q.* from mock_test_form_questions fq join mock_test_forms f on f.id=fq.form_id join mock_tests mt on mt.id=f.mock_test_id join questions q on q.id=fq.question_id where mt.slug=$1 and f.version='A' order by case fq.section_key when 'english' then 1 when 'math' then 2 when 'reading' then 3 else 4 end,fq.position`;
-const canonical=rows=>rows.map(r=>({section:r.section_key,position:r.position,question:r.id,prompt:r.prompt,passage:r.passage,choices:r.choices,answer:r.correct_answer,explanation:r.explanation,set:r.question_set_id}));
+const canonical=rows=>rows.map(r=>({section:r.section_key,position:r.position,question:r.id,prompt:r.prompt,passage:r.passage,choices:r.choices,answer:r.correct_answer,explanation:r.explanation,set:r.question_set_id,topic:r.topic_id}));
 const validate=rows=>{if(rows.length!==171)throw Error('Expected 171 rows');for(const [section,n] of Object.entries(sections)){const positions=rows.filter(r=>r.section_key===section).map(r=>r.position);if(JSON.stringify(positions)!==JSON.stringify(Array.from({length:n},(_,i)=>i+1)))throw Error('Invalid positions '+section)}};
 const fetchRows=async()=>{const r=await client.query(formQuery,[slug]);validate(r.rows);return r.rows};
 try{
@@ -39,7 +39,7 @@ try{
   if(JSON.stringify(fixedBefore)!==JSON.stringify(fixedTarget))throw Error('ABORT: Math/Science question positions or IDs differ from production');
   if(payload.questions.filter(q=>['english','reading'].includes(q.section_key)).some(q=>q.status!=='published'||q.usage_scope!=='mock_reserve'))throw Error('New English/Reading must be published mock_reserve');
   const form=(await client.query('select * from mock_test_forms where mock_test_id=$1 and version=$2 for update',[test.id,'A'])).rows[0];if(!form||form.status!=='locked')throw Error('Form A not locked');
-  for(const topic of payload.topics){const existing=(await client.query('select * from act_topics where id=$1',[topic.id])).rows[0];if(!existing)throw Error('Missing topic '+topic.id)}
+  for(const topic of payload.topics){const existing=(await client.query('select * from act_topics where id=$1',[topic.id])).rows[0];if(!existing){if(!String(topic.slug).startsWith('dec5-tag-'))throw Error('Missing preexisting topic '+topic.id);await client.query('insert into act_topics (id,section_key,slug,name,display_order,is_active) values ($1,$2,$3,$4,$5,$6)',[topic.id,topic.section_key,topic.slug,topic.name,topic.display_order,topic.is_active])}else if(existing.name!==topic.name||existing.section_key!==topic.section_key)throw Error('Topic metadata collision '+topic.id)}
   const upsert=async(table,columns,obj)=>{const names=columns.map((c,i)=>'"'+c+'"').join(',');const marks=columns.map((_,i)=>'$'+(i+1)).join(',');const changes=columns.filter(c=>c!=='id').map(c=>'"'+c+'"=excluded."'+c+'"').join(',');await client.query(`insert into ${table} (${names}) values (${marks}) on conflict (id) do update set ${changes}`,columns.map(c=>obj[c]??null))};
   await client.query("update mock_test_forms set status='review',locked_at=null,locked_by_user_id=null where id=$1",[form.id]);
   for(const set of payload.sets)await upsert('question_sets',setcols,set);
@@ -58,6 +58,8 @@ try{
   const retained=(await client.query('select id,usage_scope from questions where id=any($1::uuid[])',[oldIds])).rows;
   if(retained.length!==86||retained.some(q=>q.usage_scope!=='mock_reserve'))throw Error('Old E/R questions not preserved in mock_reserve');
   const result=digest(canonical(actual));if(result!==payload.checksum)throw Error('Post-import checksum mismatch');
+  const snapshots=(await client.query('select fq.section_key,fq.position,fq.topic_id_snapshot,fq.topic_name_snapshot,q.topic_id,t.name from mock_test_form_questions fq join questions q on q.id=fq.question_id join act_topics t on t.id=q.topic_id where fq.form_id=$1',[form.id])).rows;
+  if(snapshots.length!==171||snapshots.some(r=>r.topic_id_snapshot!==r.topic_id||r.topic_name_snapshot!==r.name))throw Error('Topic snapshots mismatch');
   await client.query('COMMIT');console.log(JSON.stringify({imported:171,checksum:result,status:'locked',mockStatus:'open',counts}));
  }else throw Error('Use export, compare, or import');
 }catch(e){if(mode==='import')await client.query('ROLLBACK').catch(()=>{});console.error('FAILED:',e.message);process.exitCode=1}finally{await client.end().catch(()=>{})}
