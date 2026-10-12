@@ -1682,13 +1682,13 @@ export default function MockTestRunner({
         <div
           className={
             styles.mainArea +
-            (multiUnderlinePassage ? ` ${styles.longPassageLayout}` : "") +
+            (multiUnderlinePassage || session.section.key === "reading" ? ` ${styles.longPassageLayout}` : "") +
             " " +
             (!hasPassage ? styles.singleColumn : "") +
             " " +
-            (hasPassage && mobilePane === "passage" ? styles.mobileShowPassage : "") +
+            (hasPassage && session.section.key !== "reading" && mobilePane === "passage" ? styles.mobileShowPassage : "") +
             " " +
-            (hasPassage && mobilePane === "question" ? styles.mobileShowQuestion : "")
+            (hasPassage && session.section.key !== "reading" && mobilePane === "question" ? styles.mobileShowQuestion : "")
           }
         >
           {hasPassage && currentQuestion ? (

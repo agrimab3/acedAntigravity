@@ -1759,3 +1759,14 @@
   .mainArea.longPassageLayout .passageCard,.mainArea.longPassageLayout .questionColumn {display:block !important;}
   .mainArea.longPassageLayout .passageCard {max-height:48dvh;overflow-y:auto;}
 }
+
+/* Digital ACT-style fixed-width Reading passage and independently scrolling question. */
+@media(min-width:761px) {
+  .mainArea.longPassageLayout { grid-template-columns: minmax(0, 590px) minmax(0, 1fr); gap: 24px; align-items: start; }
+  .mainArea.longPassageLayout .passageCard { width:100%; max-height:calc(100dvh - 210px); overflow:auto; padding:20px 14px; }
+  .mainArea.longPassageLayout .questionColumn { max-height:calc(100dvh - 210px); overflow-y:auto; padding-right:8px; scrollbar-color:#2A3A50 transparent; }
+}
+@media(max-width:760px) {
+  .mainArea.longPassageLayout .passageCard { max-height:46dvh; overflow:auto; }
+  .mainArea.longPassageLayout .questionColumn { max-height:65dvh; overflow-y:auto; }
+}
