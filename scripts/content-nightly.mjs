@@ -1,5 +1,6 @@
 import {spawnSync} from 'node:child_process';
 import pg from 'pg';
+import { factoryReviewAuditLines } from '../lib/content-factory-review.mjs';
 import { FACTORY_BATCH_TIMEOUT_MS, describeFactoryProcessError, redactFactoryError } from '../lib/content-factory-process.mjs';
 const arg=Object.fromEntries(process.argv.slice(2).filter(x=>x.startsWith('--')).map(x=>x.slice(2).split('=')));
 const limit=Math.min(20,Math.max(1,Number(arg.limit||20)));
@@ -19,6 +20,7 @@ try{
   const child=spawnSync('node',['scripts/content-generate-next.mjs','--scope=practice',`--limit=${limit}`,'--provider=gemini'],{cwd:process.cwd(),env,encoding:'utf8',timeout:FACTORY_BATCH_TIMEOUT_MS,maxBuffer:10*1024*1024});
   const output=child.stdout||'';
   const stderr=child.stderr||'';
+  for(const line of factoryReviewAuditLines(output))console.log(line)
   const safeError=(value)=>redactFactoryError(value,key).slice(0,1400);
   const at=output.lastIndexOf('Generation batch summary:');
   let failureKind = null;

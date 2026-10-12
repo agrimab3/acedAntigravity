@@ -1,6 +1,7 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import pg from "pg";
+import { factoryReviewAuditLines } from "../lib/content-factory-review.mjs";
 import { FACTORY_JOB_TIMEOUT_MS, describeFactoryProcessError } from "../lib/content-factory-process.mjs";
 import {
   CONTENT_DIFFICULTIES,
@@ -211,6 +212,7 @@ try {
         timeout: FACTORY_JOB_TIMEOUT_MS,
         maxBuffer: 1024 * 1024 * 6,
       });
+      for (const line of factoryReviewAuditLines(child.stdout)) console.log(line);
       const summary = extractJsonSummary(child.stdout);
       results.push({
         ...job,
@@ -225,6 +227,7 @@ try {
         model: summary.model ?? null,
       });
     } catch (error) {
+      for (const line of factoryReviewAuditLines(error.stdout)) console.log(line);
       // Nonzero provider exits may still include an authoritative progress summary.
       let partial = {};
       try { partial = extractJsonSummary(error.stdout || ""); } catch {}

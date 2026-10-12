@@ -35,6 +35,11 @@ import {
 } from "./lib/content-generation-resilience.mjs";
 import { generatedTopicMatchesRequested } from "./lib/generation-topic-validation.mjs";
 import { reviewQuestionQuality } from "./lib/question-utils.ts";
+import { createFactoryReviewRunner } from "./lib/content-factory-review.mjs";
+const runFactoryReview = createFactoryReviewRunner();
+const executeReviewOperation = (options) => process.env.CONTENT_FACTORY_GEMINI_API_KEY
+  ? runFactoryReview(options)
+  : executeProviderOperation(options);
 
 const SECTION_KEYS = ["english", "math", "reading", "science"];
 const DIFFICULTIES = ["easy", "medium", "hard"];
@@ -179,7 +184,7 @@ No commentary outside the JSON.
 `.trim();
 
 const databaseUrl = process.env.DATABASE_URL;
-const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+const geminiApiKey = process.env.CONTENT_FACTORY_GEMINI_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 const groqApiKey = process.env.GROQ_API_KEY || "";
 const openRouterApiKey = process.env.OPENROUTER_API_KEY || "";
 const ollamaBaseUrl =
@@ -2894,7 +2899,7 @@ async function reviewGeneratedQuestion(
   };
   const prompt = buildReviewPrompt(topic, question);
   const { primary, fallback, fallbacks } = buildOperationCandidates("review", provider, model);
-  const operationResult = await executeProviderOperation({
+  const operationResult = await executeReviewOperation({
     runState: runProviderState,
     operation: `review:${topic.section_key}/${topic.slug}`,
     primary,
@@ -2921,7 +2926,7 @@ async function reviewGeneratedQuestion(
   });
 
   return {
-    reviewerResult: operationResult.reviewerResult,
+    reviewerResult: { ...operationResult.reviewerResult, provider: operationResult.provider, model: operationResult.model },
     provider: operationResult.provider,
     model: operationResult.model,
   };
@@ -3001,7 +3006,7 @@ async function verifyGeneratedQuestionCorrectness(
   let operationResult;
 
   try {
-    operationResult = await executeProviderOperation({
+    operationResult = await executeReviewOperation({
       runState: runProviderState,
       operation: `verify:${topic.section_key}/${topic.slug}`,
       primary,
@@ -3067,7 +3072,7 @@ async function verifyGeneratedQuestionCorrectness(
   }
 
   return {
-    verifierResult: operationResult.verifierResult,
+    verifierResult: { ...operationResult.verifierResult, provider: operationResult.provider, model: operationResult.model },
     provider: operationResult.provider,
     model: operationResult.model,
   };
@@ -3475,6 +3480,8 @@ function buildReviewNotes({
     disagreement: shadowReview.disagreement,
     deterministicFindings: normalizedQuestion.qualityReview.findings,
     primary: {
+      provider: reviewerResult.provider ?? null,
+      model: reviewerResult.model ?? null,
       correctness: reviewerResult.correctness,
       singleBestAnswer: reviewerResult.single_best_answer,
       uniqueCorrectAnswer: reviewerResult.unique_correct_answer,
@@ -3491,6 +3498,8 @@ function buildReviewNotes({
     },
     verifier: verifierResult
       ? {
+          provider: verifierResult.provider ?? null,
+          model: verifierResult.model ?? null,
           correctnessVerified: verifierResult.correctness_verified,
           uniqueCorrectAnswer: verifierResult.unique_correct_answer,
           answerKeyVerified: verifierResult.answer_key_verified,
@@ -3559,6 +3568,7 @@ async function runReviewPipelineForQuestion({
     const reviewOperation = await reviewGeneratedQuestion(topic, buildQuestionReviewPayload(normalizedQuestion));
     reviewerResult = reviewOperation.reviewerResult;
     reviewProviderUsed = reviewOperation.provider;
+    if (process.env.CONTENT_FACTORY_GEMINI_API_KEY) console.log(`Factory review audit: candidate=${auditCandidateId} stage=primary model=${reviewOperation.model}`);
   } catch (error) {
     if (error instanceof ProviderRunStoppedError) {
       const message = error.message || "review provider became unavailable";
@@ -3712,6 +3722,7 @@ async function runReviewPipelineForQuestion({
       normalizedQuestion.generationProvider ?? reviewProviderUsed
     );
     verifierResult = verificationOperation.verifierResult;
+    if (process.env.CONTENT_FACTORY_GEMINI_API_KEY) console.log(`Factory review audit: candidate=${auditCandidateId} stage=verifier model=${verificationOperation.model}`);
   } catch (error) {
     if (error instanceof ProviderRunStoppedError) {
       if (comparisonMode) {
