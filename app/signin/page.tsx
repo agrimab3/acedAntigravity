@@ -1,8 +1,27 @@
 "use client";
+
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useState, useSyncExternalStore } from "react";
 import NightSky from "@/components/NightSky";
-function SignInCard(){const searchParams=useSearchParams();const requestedCallback=searchParams.get("callbackUrl");const callbackUrl=requestedCallback?.startsWith("/")&&!requestedCallback.startsWith("//")?requestedCallback:"/onboarding";return <section style={{position:"relative",zIndex:1,width:"min(420px,calc(100% - 32px))",padding:36,borderRadius:24,background:"rgba(9,20,36,.8)",border:"1px solid rgba(255,255,255,.16)",textAlign:"center",boxShadow:"0 24px 70px #0008"}}><Link href="/" style={{fontFamily:"var(--font-playfair)",fontSize:32,color:"white",textDecoration:"none"}}>Aced<span style={{color:"#5DCAA5"}}>.</span></Link><h1 style={{fontFamily:"var(--font-playfair)",fontSize:42,margin:"34px 0 12px"}}>welcome back</h1><p style={{color:"#b4bcc8",lineHeight:1.6}}>Pick up where you left off in your constellation.</p><button onClick={()=>void signIn("google",{callbackUrl})} style={{width:"100%",marginTop:24,padding:"15px",borderRadius:999,border:0,fontWeight:700,fontSize:16,cursor:"pointer"}}>Continue with Google</button></section>}
-export default function SignInPage(){return <main style={{minHeight:"100vh",position:"relative",display:"grid",placeItems:"center",background:"#07111d",color:"white",fontFamily:"var(--font-dm-sans)"}}><NightSky density="more"/><Suspense fallback={null}><SignInCard/></Suspense></main>}
+import styles from "./signin.module.css";
+
+function safeNext(value: string | null) { return value?.startsWith("/") && !value.startsWith("//") ? value : "/onboarding"; }
+
+function SignInCard() {
+  const searchParams = useSearchParams();
+  const next = safeNext(searchParams.get("callbackUrl"));
+  const knownVisitor = useSyncExternalStore(() => () => {}, () => { try { return localStorage.getItem("aced-signin-consent") === "complete"; } catch { return false; } }, () => false);
+  const [agreed, setAgreed] = useState(false);
+  const [emailOptIn, setEmailOptIn] = useState(false);
+  const [error, setError] = useState("");
+  const continueWithGoogle = () => {
+    if (!knownVisitor && !agreed) { setError("Please agree to the Terms and Privacy Policy first."); return; }
+    const callbackUrl = knownVisitor ? next : `/signin/complete?next=${encodeURIComponent(next)}&emailOptIn=${emailOptIn ? "1" : "0"}`;
+    void signIn("google", { callbackUrl });
+  };
+  return <main className={styles.page}><NightSky density="more" /><Link className={styles.logo} href="/">Aced<span>.</span></Link><section className={styles.card}><span className={styles.spark}>✦</span><h1>{knownVisitor ? "welcome back" : "welcome to Aced"}</h1><p>{knownVisitor ? "Pick up where you left off in your constellation." : "Your ACT practice universe is waiting."}</p>{!knownVisitor && <div className={styles.checks}><label><input type="checkbox" checked={agreed} onChange={event => { setAgreed(event.target.checked); setError(""); }} /><span>I agree to Aced&apos;s <Link href="/legal?tab=terms">Terms</Link> and <Link href="/legal?tab=privacy">Privacy Policy</Link>.</span></label><label><input type="checkbox" checked={emailOptIn} onChange={event => setEmailOptIn(event.target.checked)} /><span>Email me Aced updates and mock test dates. <em>(optional)</em></span></label></div>}<button type="button" className={styles.google} onClick={continueWithGoogle}><b>G</b>Continue with Google</button>{error && <p className={styles.error} role="alert">{error}</p>}</section><p className={styles.fine}>By continuing, you&apos;ll be able to save your progress and return to your star map anytime.</p></main>;
+}
+
+export default function SignInPage() { return <Suspense fallback={null}><SignInCard /></Suspense>; }

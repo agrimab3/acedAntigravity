@@ -47,6 +47,8 @@ export const users = pgTable("users", {
   targetActScore: integer("target_act_score"),
   onboardingCompletedAt: timestamp("onboarding_completed_at", { withTimezone: true }),
   walkthroughCompletedAt: timestamp("walkthrough_completed_at", { withTimezone: true }),
+  agreedTermsAt: timestamp("agreed_terms_at", { withTimezone: true }),
+  emailOptIn: boolean("email_opt_in").default(false).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
