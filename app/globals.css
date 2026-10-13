@@ -115,8 +115,8 @@ h6 {
 /* Public-site visual controls. These selectors use the root class set before
    paint and the component state, so the persisted preference always wins. */
 .publicMapShell::after { display: none !important; }
-.publicSite.light { --bg:#f8f7f3; --surf:#fff; --surf2:#fbfaf7; --foot:#f1efe9; --bd:#e6e3da; --bd2:#d6d2c6; --ink:#111827; --ink2:#4b5563; --mut:#6b7280; --teal:#12876a; --shadow:#11182714; background:radial-gradient(ellipse at 12% 12%,rgba(93,202,165,.2),transparent 42%),radial-gradient(ellipse at 86% 25%,rgba(175,169,236,.18),transparent 44%),radial-gradient(ellipse at 55% 90%,rgba(240,153,123,.13),transparent 44%),#f8f7f3; }
-.publicSite.light .publicGalaxy { opacity:.14; mix-blend-mode:multiply; }
+.publicSite.light { --bg:#FDFCFA; --surf:#fff; --surf2:#fbfaf7; --foot:#f1efe9; --bd:#e6e3da; --bd2:#d6d2c6; --ink:#111827; --ink2:#4b5563; --mut:#6b7280; --teal:#12876a; --shadow:#11182714; background:#FDFCFA; }
+.publicSite.light .publicGalaxy { opacity:1; mix-blend-mode:normal; background:radial-gradient(760px 360px at 12% -8%,rgba(93,202,165,.36) 0%,rgba(93,202,165,.16) 42%,transparent 74%),radial-gradient(780px 390px at 88% -10%,rgba(175,169,236,.34) 0%,rgba(175,169,236,.15) 44%,transparent 75%),radial-gradient(600px 300px at 53% 4%,rgba(240,153,123,.26) 0%,rgba(240,153,123,.09) 45%,transparent 76%) !important; }
 .publicSite.dark .publicGalaxy { opacity:.96; }
 .sectionScoringBar { display:flex; justify-content:center; gap:18px; flex-wrap:wrap; padding:16px 22px; border:1px solid var(--bd2); border-radius:16px; background:var(--surf); color:var(--ink2); font-size:14px; }
 .sectionScoringBar span + span { border-left:1px solid var(--bd2); padding-left:18px; }
