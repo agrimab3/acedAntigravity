@@ -23,3 +23,11 @@ export function getReservePreviewLocation(params: PreviewParams) {
 export function reservePreviewHref(section: ReservePreviewSection, question: number) {
   return `?section=${section}&question=${question}`;
 }
+
+export function getReservePreviewNavigation(section: ReservePreviewSection, question: number) {
+  const total = RESERVE_PREVIEW_SECTION_TOTALS[section];
+  return {
+    previous: question > 1 ? reservePreviewHref(section, question - 1) : null,
+    next: question < total ? reservePreviewHref(section, question + 1) : null,
+  };
+}

@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { spawnSync } from "node:child_process";
-import { getReservePreviewLocation, reservePreviewHref } from "../lib/mockTest/reservePreview.ts";
+import { getReservePreviewLocation, getReservePreviewNavigation, reservePreviewHref } from "../lib/mockTest/reservePreview.ts";
 
 const form = JSON.parse(fs.readFileSync("docs/dec5-reviewed-form.json", "utf8"));
 const science = form.questions.filter((question) => question.section_key === "science");
@@ -16,6 +16,8 @@ test("Form A Science preview data starts at Q1 and preserves all 40 ordered ques
   assert.equal(lastNotes.questionNumber, 40);
   assert.equal(firstNotes.passageNumber, "I");
   assert.equal(lastNotes.passageNumber, "VI");
+  assert.equal(firstNotes.passageTitle, "Seeds and Soil Temperature");
+  assert.match(science[0].passage, /Farmers often plant seeds/);
 });
 
 test("Science preview URLs start at Q1 and stop at Q40", () => {
@@ -25,6 +27,10 @@ test("Science preview URLs start at Q1 and stop at Q40", () => {
   assert.equal(reservePreviewHref("science", 2), "?section=science&question=2");
   assert.equal(reservePreviewHref("science", 39), "?section=science&question=39");
   assert.equal(reservePreviewHref("science", 40), "?section=science&question=40");
+  assert.deepEqual(getReservePreviewNavigation("science", 1), { previous: null, next: "?section=science&question=2" });
+  assert.deepEqual(getReservePreviewNavigation("science", 40), { previous: "?section=science&question=39", next: null });
+  assert.deepEqual(getReservePreviewLocation({ section: "english" }), { section: "english", question: 1, total: 50 });
+  assert.deepEqual(getReservePreviewLocation({ section: "math" }), { section: "math", question: 1, total: 45 });
   assert.equal(getReservePreviewLocation({ section: "reading" }).question, 35);
 });
 

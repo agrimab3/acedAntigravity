@@ -4,7 +4,7 @@ import {sql} from 'drizzle-orm';
 import {getDb} from '@/lib/db';
 import {requireMockTestAdminPage} from '@/lib/admin/mockTestAdmin';
 import ReservePreviewClient from './preview-client';
-import {getReservePreviewLocation, reservePreviewHref} from '@/lib/mockTest/reservePreview';
+import {getReservePreviewLocation, getReservePreviewNavigation, reservePreviewHref} from '@/lib/mockTest/reservePreview';
 
 export const dynamic='force-dynamic';
 export const metadata={title:'Dec 5 Form A · Admin Runner Preview',robots:{index:false,follow:false}};
@@ -16,6 +16,7 @@ export default async function ReservePreviewPage({searchParams}:{searchParams:Pr
  const db=getDb();if(!db)notFound();
  const params=await searchParams;
  const {section,question:position,total:max}=getReservePreviewLocation(params);
+ const navigation=getReservePreviewNavigation(section,position);
  if(!Number.isInteger(position)||position<1||position>max)notFound();
  // Read the locked Form A, never create a registration or session.
  const rows=await db.execute(sql`select fq.position,q.prompt,q.passage,q.choices,q.difficulty,q.review_notes,q.status,q.usage_scope
@@ -41,9 +42,9 @@ export default async function ReservePreviewPage({searchParams}:{searchParams:Pr
    <span style={{color:'#aab5c5'}}>Preview only · no registration or answers saved</span>
   </div>
   <nav aria-label="Preview question navigation" style={{padding:'12px 24px',display:'flex',alignItems:'center',gap:18,flexWrap:'wrap'}}>
-   {position>1?<Link style={{color:'#9ad9ff'}} href={reservePreviewHref(section,position-1)}>← Previous</Link>:null}
+   {navigation.previous?<Link style={{color:'#9ad9ff'}} href={navigation.previous}>← Previous</Link>:null}
    <span>{section.toUpperCase()} · {position} of {max} · Passage {passageNumber}</span>
-   {position<max?<Link style={{color:'#9ad9ff'}} href={reservePreviewHref(section,position+1)}>Next →</Link>:null}
+   {navigation.next?<Link style={{color:'#9ad9ff'}} href={navigation.next}>Next →</Link>:null}
   </nav>
   <ReservePreviewClient key={section+position} section={section} title={String(notes?.passageTitle??'')} prompt={String(item.prompt)} passage={item.passage?String(item.passage):''} choices={item.choices as Record<'A'|'B'|'C'|'D',string>} difficulty={String(item.difficulty)} number={position} ordinal={passageOrdinal} passageNumber={passageNumber} total={max}/>
  </main>;
