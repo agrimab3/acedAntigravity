@@ -2,12 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { getProviders, signOut, useSession } from "next-auth/react";
 import FirstTimeWalkthrough, { type WalkthroughTargetKey } from "@/app/dashboard/first-time-walkthrough";
 import MockTestCard from "@/components/MockTestCard";
 import NightSky from "@/components/NightSky";
 import MockTestNavTab from "@/components/MockTestNavTab";
-import ThemeToggle from "@/components/ThemeToggle";
 import { getTopicByName } from "@/lib/act-taxonomy";
 import { getDisplayFirstName } from "@/lib/onboarding";
 import { useOnboardingState } from "@/lib/use-onboarding-state";
@@ -1208,9 +1208,9 @@ export default function Dashboard() {
             marginBottom: "1.5rem",
           }}
         >
-          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "26px", justifySelf: "start" }}>
+          <Link href="/" style={{ fontFamily: "DM Serif Display,serif", fontSize: "26px", justifySelf: "start", color: "#fff", textDecoration: "none" }} aria-label="Aced home">
             Aced<em style={{ color: "#1D9E75" }}>.</em>
-          </div>
+          </Link>
           <div
             style={{
               display: "flex",
@@ -1220,7 +1220,6 @@ export default function Dashboard() {
               justifySelf: "center",
             }}
           >
-            <ThemeToggle />
             <button
               style={{
                 background: "transparent",
