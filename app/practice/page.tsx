@@ -116,7 +116,8 @@ function PracticeContent() {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.replace("/");
+      const callbackUrl = `${window.location.pathname}${window.location.search}`;
+      router.replace(`/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
     }
   }, [router, status]);
 
