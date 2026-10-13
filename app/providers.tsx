@@ -10,7 +10,7 @@ export default function Providers({
 }>) {
   const pathname = usePathname();
   // Public pages must not start NextAuth background requests behind Caddy Basic Auth.
-  const isPublic = pathname === "/" || ["/how-it-works", "/sections", "/faq", "/about", "/join", "/terms", "/privacy", "/refunds", "/contact"].includes(pathname);
+  const isPublic = pathname === "/" || ["/signin", "/how-it-works", "/sections", "/faq", "/about", "/join", "/terms", "/privacy", "/refunds", "/contact"].includes(pathname);
   if (isPublic) return <>{children}</>;
   return <SessionProvider>{children}</SessionProvider>;
 }
