@@ -31,7 +31,6 @@ export default async function ReservePreviewPage({searchParams}:{searchParams:Pr
  const item=rows.rows[position-1];if(!item)notFound();
  const notes=parseNotes(item.review_notes);
  const passageNumber=section==='english'?Math.ceil(position/10):section==='reading'?Math.ceil(position/9):section==='science'?String(notes?.passageNumber??''):'';
- const passageOrdinal=section==='english'?(position-1)%10+1:section==='reading'?(position-1)%9+1:position;
  return <main style={{minHeight:'100vh',background:'#080f1b',color:'#eef1f5'}}>
   <div style={{padding:'16px 24px',borderBottom:'1px solid #26354a',display:'flex',gap:14,alignItems:'center',flexWrap:'wrap'}}>
    <strong>ACED · Admin-only Form A dry-run</strong>
@@ -46,6 +45,6 @@ export default async function ReservePreviewPage({searchParams}:{searchParams:Pr
    <span>{section.toUpperCase()} · {position} of {max} · Passage {passageNumber}</span>
    {navigation.next?<Link style={{color:'#9ad9ff'}} href={navigation.next}>Next →</Link>:null}
   </nav>
-  <ReservePreviewClient key={section+position} section={section} title={String(notes?.passageTitle??'')} prompt={String(item.prompt)} passage={item.passage?String(item.passage):''} choices={item.choices as Record<'A'|'B'|'C'|'D',string>} difficulty={String(item.difficulty)} number={position} ordinal={passageOrdinal} passageNumber={passageNumber} total={max}/>
+  <ReservePreviewClient key={section+position} section={section} title={String(notes?.passageTitle??'')} prompt={String(item.prompt)} passage={item.passage?String(item.passage):''} choices={item.choices as Record<'A'|'B'|'C'|'D',string>} difficulty={String(item.difficulty)} number={position} passageNumber={passageNumber} total={max}/>
  </main>;
 }

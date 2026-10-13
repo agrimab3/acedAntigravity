@@ -7,7 +7,7 @@ import QuestionContent from '@/components/question-content/QuestionContent';
 import styles from '@/app/mock-test/run/run.module.css';
 
 type Letter='A'|'B'|'C'|'D';
-export default function ReservePreviewClient({section,title,prompt,passage,choices,difficulty,number,ordinal,passageNumber,total}:{section:string;title:string;prompt:string;passage:string;choices:Record<Letter,string>;difficulty:string;number:number;ordinal:number;passageNumber:string|number;total:number}){
+export default function ReservePreviewClient({section,title,prompt,passage,choices,difficulty,number,passageNumber,total}:{section:string;title:string;prompt:string;passage:string;choices:Record<Letter,string>;difficulty:string;number:number;passageNumber:string|number;total:number}){
  const [selected,setSelected]=useState<Letter|null>(null);
  return <div className={styles.contentFrame}>
  <div className={styles.mainArea+' '+styles.longPassageLayout}>

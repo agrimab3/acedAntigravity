@@ -1742,10 +1742,6 @@ function PracticeTestRunContent() {
           padding: "1.5rem",
         }}
       >
-        <link
-          href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap"
-          rel="stylesheet"
-        />
         <div style={{ maxWidth: "940px", margin: "0 auto" }}>
           <nav
             style={{
@@ -2149,10 +2145,6 @@ function PracticeTestRunContent() {
           padding: "1.5rem",
         }}
       >
-        <link
-          href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap"
-          rel="stylesheet"
-        />
         <div style={{ maxWidth: "1180px", margin: "0 auto" }}>
           <nav
             style={{
@@ -2506,10 +2498,6 @@ function PracticeTestRunContent() {
     >
       <RunnerVisualStyles />
       <RunnerStarField prefersReducedMotion={prefersReducedMotion} />
-      <link
-        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap"
-        rel="stylesheet"
-      />
       <div
         className={
           calculatorLayoutStyles.shiftHost +

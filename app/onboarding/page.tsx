@@ -260,10 +260,6 @@ export default function OnboardingPage() {
         overflow: "hidden",
       }}
     >
-      <link
-        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;700&display=swap"
-        rel="stylesheet"
-      />
 
       <style>{`
         @keyframes onboardingStarFloatA {

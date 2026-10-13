@@ -210,10 +210,6 @@ export default function PracticeTestHistoryDetailPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: REVIEW_GALAXY_BACKGROUND, color: "#fff", fontFamily: "DM Sans,sans-serif", position: "relative" }}>
-      <link
-        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap"
-        rel="stylesheet"
-      />
       {historyFeedback ? (
         <div
           style={{

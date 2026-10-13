@@ -1179,10 +1179,6 @@ export default function Dashboard() {
         overflowX: "hidden",
       }}
     >
-      <link
-        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap"
-        rel="stylesheet"
-      />
       <style>{`
         @keyframes scoreOrbit {
           to { transform: translate(-50%, -50%) rotate(360deg); }

@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // A local, untracked Claude worktree is not part of this application.
+    ".claude/**",
   ]),
 ]);
 

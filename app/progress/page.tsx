@@ -254,10 +254,6 @@ export default function ProgressPage() {
         position: "relative",
       }}
     >
-      <link
-        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap"
-        rel="stylesheet"
-      />
       <NightSky />
       {historyFeedback ? (
         <div

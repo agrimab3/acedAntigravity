@@ -597,8 +597,6 @@ function PracticeContent() {
 
   return (
     <div style={{ position: 'relative', background: 'linear-gradient(180deg,#0d1b2a 0%,#060d1e 60%,#020408 100%)', minHeight: '100vh', color: '#fff', fontFamily: 'DM Sans,sans-serif', padding: '1.5rem', overflow: 'hidden' }}>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
-
       <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
 
       <div style={{ position: 'relative', zIndex: 1, maxWidth: '1180px', margin: '0 auto' }}>

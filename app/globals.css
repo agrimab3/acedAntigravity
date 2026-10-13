@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
 :root {
-  --font-dm-serif: var(--font-playfair);
   --background: #070B14;
   --foreground: #EEF1F5;
   --sky-base: #070B14;
@@ -39,6 +38,16 @@ h4,
 h5,
 h6 {
   font-family: var(--font-dm-serif), serif;
+}
+
+/* Legacy inline styles keep their original visual fonts while the App Router
+   owns the font loading through next/font instead of page-level <link> tags. */
+[style*="DM Sans"] {
+  font-family: var(--font-dm-sans), sans-serif !important;
+}
+
+[style*="DM Serif Display"] {
+  font-family: var(--font-dm-serif), serif !important;
 }
 
 .policyPage {
