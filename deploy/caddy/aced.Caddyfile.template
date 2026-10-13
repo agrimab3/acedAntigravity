@@ -1,5 +1,6 @@
 aceditprep.com {
-  @public path / /terms /privacy /refunds /contact /favicon.ico /icon.svg /apple-icon.png
+  @public path / /how-it-works /sections /faq /about /join /terms /privacy /refunds /contact /favicon.ico /icon.svg /apple-icon.png
+  @publicForms path /api/waitlist-signups /api/join-requests
   @publicStatic path /_next/static/* /fonts/* /images/*
   @webhook path /api/stripe/webhook*
 
@@ -8,6 +9,10 @@ aceditprep.com {
   }
 
   handle @publicStatic {
+    reverse_proxy 127.0.0.1:3005
+  }
+
+  handle @publicForms {
     reverse_proxy 127.0.0.1:3005
   }
 
