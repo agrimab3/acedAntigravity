@@ -1,5 +1,5 @@
 aceditprep.com {
-  @public path / /signin /how-it-works /sections /faq /about /join /terms /privacy /refunds /contact /favicon.ico /icon.svg /apple-icon.png
+  @public path / /signin /legal /how-it-works /sections /faq /about /join /terms /privacy /refunds /contact /favicon.ico /icon.svg /apple-icon.png
   @publicForms path /api/waitlist-signups /api/join-requests
   @publicStatic path /_next/static/* /fonts/* /images/* /starmap.jpg /const-english.jpg /const-math.jpg /const-reading.jpg /const-science.jpg
   @webhook path /api/stripe/webhook*
