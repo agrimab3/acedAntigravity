@@ -48,6 +48,8 @@ export const users = pgTable("users", {
   onboardingCompletedAt: timestamp("onboarding_completed_at", { withTimezone: true }),
   walkthroughCompletedAt: timestamp("walkthrough_completed_at", { withTimezone: true }),
   agreedTermsAt: timestamp("agreed_terms_at", { withTimezone: true }),
+  agreedTermsVersion: text("agreed_terms_version"),
+  ageConfirmedAt: timestamp("age_confirmed_at", { withTimezone: true }),
   emailOptIn: boolean("email_opt_in").default(false).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
@@ -889,4 +891,13 @@ export const joinRequests = pgTable("join_requests", {
   roles: text("roles").array().notNull(),
   note: text("note"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const accountDeletionRequests = pgTable("account_deletion_requests", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  status: text("status").$type<"requested" | "reviewing" | "completed">().default("requested").notNull(),
+  requestedAt: timestamp("requested_at", { withTimezone: true }).defaultNow().notNull(),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  completedAt: timestamp("completed_at", { withTimezone: true }),
 });

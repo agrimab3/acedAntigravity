@@ -15,7 +15,7 @@ import {
 } from "@/lib/act-score";
 import { summarizePracticeTestPacing } from "@/lib/practice-test-score";
 import { ACT_TAXONOMY } from "@/lib/act-taxonomy";
-import { getAuthSession } from "@/lib/auth";
+import { getEligibleAccountSession } from "@/lib/account-consent";
 import { getDb } from "@/lib/db";
 
 function clamp(value: number, min: number, max: number) {
@@ -110,14 +110,14 @@ function blendSectionWithPracticeTest<T extends {
 }
 
 export async function GET() {
-  const session = await getAuthSession();
+  const session = await getEligibleAccountSession();
   const db = getDb();
 
-  if (!session?.user?.id || !db) {
+  if (!session?.userId || !db) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
-  const userId = session.user.id;
+  const userId = session.userId;
   const [userProfile] = await db
     .select({
       previousActScore: users.previousActScore,

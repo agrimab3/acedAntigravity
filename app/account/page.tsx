@@ -1,0 +1,12 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+export default function AccountPage() {
+  const [emailOptIn, setEmailOptIn] = useState(false); const [deletionStatus, setDeletionStatus] = useState<string | null>(null); const [notice, setNotice] = useState("");
+  useEffect(()=>{void Promise.all([fetch("/api/account/preferences").then(r=>r.ok?r.json():null),fetch("/api/account/deletion-request").then(r=>r.ok?r.json():null)]).then(([preferences,deletion])=>{if(preferences)setEmailOptIn(Boolean(preferences.emailOptIn));if(deletion?.request)setDeletionStatus(deletion.request.status);});},[]);
+  const savePreference=async(next:boolean)=>{const response=await fetch("/api/account/preferences",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({emailOptIn:next})});if(response.ok){setEmailOptIn(next);setNotice("Email preference saved.");}else setNotice("We couldn’t save that preference.");};
+  const requestDeletion=async()=>{if(!window.confirm("Request account deletion review? Your account will not be deleted automatically."))return;const response=await fetch("/api/account/deletion-request",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({confirm:true})});const data=await response.json().catch(()=>null);if(response.ok){setDeletionStatus(data.status??data.request?.status??"requested");setNotice("Your deletion request has been recorded for review.");}else setNotice("We couldn’t submit your request.");};
+  return <main style={{maxWidth:680,margin:"0 auto",padding:"48px 24px"}}><Link href="/dashboard">← dashboard</Link><h1>Account & privacy</h1><section><h2>Email preferences</h2><label><input type="checkbox" checked={emailOptIn} onChange={event=>void savePreference(event.target.checked)}/> Email me optional Aced updates and mock test dates.</label><p>Transactional messages about a mock-test purchase or account are not marketing emails.</p></section><section><h2>Account deletion</h2>{deletionStatus ? <p>Your request is currently: <strong>{deletionStatus}</strong>. We have not deleted your account automatically.</p> : <><p>You can request a review of account deletion. This does not immediately delete your account, study history, payment records, or backups.</p><button type="button" onClick={()=>void requestDeletion()}>Request account deletion</button></>}<p>Or contact <a href="mailto:support@aceditprep.com">support@aceditprep.com</a>.</p></section>{notice&&<p role="status">{notice}</p>}</main>;
+}

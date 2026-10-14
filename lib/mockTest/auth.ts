@@ -1,4 +1,4 @@
-import { getAuthSession } from "@/lib/auth";
+import { getEligibleAccountSession } from "@/lib/account-consent";
 import { sanitizeInternalCallbackUrl } from "@/lib/safe-callback";
 import { getMockTestAuthMode } from "@/lib/mockTest/mode";
 
@@ -9,15 +9,15 @@ export function sanitizeMockTestReturnTo(value: string | null | undefined) {
 }
 
 export async function getMockTestUser() {
-  const session = await getAuthSession();
-  if (!session?.user?.id || !session.user.email) {
+  const session = await getEligibleAccountSession();
+  if (!session?.userId || !session.email) {
     return null;
   }
 
   return {
-    id: session.user.id,
-    email: session.user.email,
-    name: session.user.name ?? null,
+    id: session.userId,
+    email: session.email,
+    name: null as string | null,
   };
 }
 

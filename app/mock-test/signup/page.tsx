@@ -134,7 +134,7 @@ export default async function MockTestSignupPage({ searchParams }: SignupPagePro
     ? {
         email: userSession.email,
         name: userSession.name,
-        initial: (userSession.name?.trim()[0] ?? userSession.email[0] ?? "A").toUpperCase(),
+        initial: ((typeof userSession.name === "string" ? userSession.name.trim()[0] : undefined) ?? userSession.email[0] ?? "A").toUpperCase(),
       }
     : null;
 

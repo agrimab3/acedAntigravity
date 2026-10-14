@@ -58,8 +58,10 @@ export function useOnboardingState(
         clearTimeout(timeoutId);
 
         if (!res.ok) {
-          if (res.status === 401 && redirectIfIncomplete) {
-            router.replace("/");
+          if (res.status === 403 && redirectIfIncomplete) {
+            router.replace(`/signin/complete?next=${encodeURIComponent(window.location.pathname)}`);
+          } else if (res.status === 401 && redirectIfIncomplete) {
+            router.replace("/signin");
           }
           return;
         }

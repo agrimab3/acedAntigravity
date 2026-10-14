@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { users } from "@/db/schema";
-import { getAuthSession } from "@/lib/auth";
+import { accountConsentRequiredResponse, getEligibleAccountSession } from "@/lib/account-consent";
 import { getDb } from "@/lib/db";
 import {
   ACT_TEST_DATES_SOURCE_URL,
@@ -30,11 +30,12 @@ const walkthroughPayloadSchema = z.object({
 });
 
 export async function GET() {
-  const session = await getAuthSession();
+  const session = await getEligibleAccountSession();
   const db = getDb();
 
-  if (!session?.user?.id || !session.user.email || !db) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  if (!session?.userId || !session.email || !db) {
+    if (!db) return NextResponse.json({ error: "Unavailable." }, { status: 503 });
+    return accountConsentRequiredResponse();
   }
 
   const [user] = await db
@@ -50,7 +51,7 @@ export async function GET() {
       walkthroughCompletedAt: users.walkthroughCompletedAt,
     })
     .from(users)
-    .where(eq(users.id, session.user.id))
+    .where(eq(users.id, session.userId))
     .limit(1);
 
   if (!user) {
@@ -71,11 +72,12 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const session = await getAuthSession();
+  const session = await getEligibleAccountSession();
   const db = getDb();
 
-  if (!session?.user?.id || !db) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  if (!session?.userId || !db) {
+    if (!db) return NextResponse.json({ error: "Unavailable." }, { status: 503 });
+    return accountConsentRequiredResponse();
   }
 
   const body = await request.json().catch(() => null);
@@ -111,17 +113,18 @@ export async function POST(request: Request) {
       onboardingCompletedAt: now,
       updatedAt: now,
     })
-    .where(eq(users.id, session.user.id));
+    .where(eq(users.id, session.userId));
 
   return NextResponse.json({ ok: true });
 }
 
 export async function PATCH(request: Request) {
-  const session = await getAuthSession();
+  const session = await getEligibleAccountSession();
   const db = getDb();
 
-  if (!session?.user?.id || !db) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  if (!session?.userId || !db) {
+    if (!db) return NextResponse.json({ error: "Unavailable." }, { status: 503 });
+    return accountConsentRequiredResponse();
   }
 
   const body = await request.json().catch(() => null);
@@ -135,7 +138,7 @@ export async function PATCH(request: Request) {
   await db
     .update(users)
     .set({ walkthroughCompletedAt: now, updatedAt: now })
-    .where(eq(users.id, session.user.id));
+    .where(eq(users.id, session.userId));
 
   return NextResponse.json({ ok: true, walkthroughCompletedAt: now.toISOString() });
 }

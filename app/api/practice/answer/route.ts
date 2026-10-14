@@ -17,7 +17,7 @@ import {
   normalizeDifficultyBand,
 } from "@/lib/adaptive";
 import { isTopicInPracticeScope, type SectionKey } from "@/lib/act-taxonomy";
-import { getAuthSession } from "@/lib/auth";
+import { getEligibleAccountSession } from "@/lib/account-consent";
 import { getDb } from "@/lib/db";
 import { getEffectivePracticeCorrectness } from "@/lib/tutor-guard";
 
@@ -35,8 +35,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid answer payload." }, { status: 400 });
   }
 
-  const session = await getAuthSession();
-  const userId = session?.user?.id;
+  const session = await getEligibleAccountSession();
+  const userId = session?.userId;
   const db = getDb();
 
   if (!userId || !db) {

@@ -21,7 +21,7 @@ import {
   getPracticeScopeTopics,
   type SectionKey,
 } from "@/lib/act-taxonomy";
-import { getAuthSession } from "@/lib/auth";
+import { accountConsentRequiredResponse, getEligibleAccountSession } from "@/lib/account-consent";
 import { getDb } from "@/lib/db";
 import { hydrateQuestionSetContext, validateQuestionSetLink } from "@/lib/question-sets";
 import { normalizeQuestionRow, type NormalizedQuestionRow } from "@/lib/question-utils";
@@ -87,7 +87,7 @@ export async function GET(request: Request) {
 
   const { section, topic, difficulty, limit } = parsed.data;
   const db = getDb();
-  const session = await getAuthSession();
+  const session = await getEligibleAccountSession();
 
   if (!db) {
     console.error("[questions-api] Database unavailable while loading practice questions", {
@@ -99,7 +99,8 @@ export async function GET(request: Request) {
       { status: 503 }
     );
   }
-  const userId = session?.user?.id || null;
+  if (!session?.userId) return accountConsentRequiredResponse();
+  const userId = session.userId;
   let targetDifficulty = "easy";
   let adaptiveFeedback = buildAdaptiveFeedback({
     previousDifficulty: "easy",

@@ -218,6 +218,13 @@
       "when": 1791930000000,
       "tag": "0030_signin_consent",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1792016400000,
+      "tag": "0031_account_privacy_foundation",
+      "breakpoints": true
     }
   ]
 }

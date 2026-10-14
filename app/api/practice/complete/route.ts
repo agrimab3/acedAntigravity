@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { practiceAnswers, practiceSessions } from "@/db/schema";
-import { getAuthSession } from "@/lib/auth";
+import { getEligibleAccountSession } from "@/lib/account-consent";
 import { getDb } from "@/lib/db";
 
 const completeSchema = z.object({
@@ -18,8 +18,8 @@ export async function POST(request: Request) {
   }
 
   const db = getDb();
-  const session = await getAuthSession();
-  const userId = session?.user?.id;
+  const session = await getEligibleAccountSession();
+  const userId = session?.userId;
 
   if (!db || !userId || !parsed.data.sessionId) {
     return NextResponse.json({ persisted: false });

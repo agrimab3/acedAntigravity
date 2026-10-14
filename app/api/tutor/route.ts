@@ -12,7 +12,7 @@ import {
   type ChoiceMap,
 } from "@/db/schema";
 import { getTopicByName, isTopicInPracticeScope, type SectionKey } from "@/lib/act-taxonomy";
-import { getAuthSession } from "@/lib/auth";
+import { accountConsentRequiredResponse, getEligibleAccountSession } from "@/lib/account-consent";
 import { getDb } from "@/lib/db";
 import { consumeRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import {
@@ -72,12 +72,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid tutor payload." }, { status: 400 });
   }
 
-  const session = await getAuthSession();
-  const userId = session?.user?.id;
+  const session = await getEligibleAccountSession();
+  const userId = session?.userId;
   const db = getDb();
 
   if (!userId || !db) {
-    return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+    if (!db) return NextResponse.json({ error: "Unavailable." }, { status: 503 });
+    return accountConsentRequiredResponse();
   }
 
   const tutorLimit = consumeRateLimit(`tutor:${userId}`, RATE_LIMITS.tutor);

@@ -6,7 +6,7 @@ import {
   practiceTestSessions,
   topicMastery,
 } from "@/db/schema";
-import { getAuthSession } from "@/lib/auth";
+import { getEligibleAccountSession } from "@/lib/account-consent";
 import { getDb } from "@/lib/db";
 import { getPracticeTestMode } from "@/lib/practice-test-engine";
 import { getPracticeStreaks } from "@/lib/practice-streak.mjs";
@@ -17,14 +17,14 @@ function average(values: number[]) {
 }
 
 export async function GET() {
-  const session = await getAuthSession();
+  const session = await getEligibleAccountSession();
   const db = getDb();
 
-  if (!session?.user?.id || !db) {
+  if (!session?.userId || !db) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
-  const userId = session.user.id;
+  const userId = session.userId;
 
   const [drillRows, testRows, masteryRows] = await Promise.all([
     db
