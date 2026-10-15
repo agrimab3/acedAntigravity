@@ -225,6 +225,13 @@
       "when": 1792016400000,
       "tag": "0031_account_privacy_foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1792032306300,
+      "tag": "0032_account_deletion_review_workflow",
+      "breakpoints": true
     }
   ]
 }

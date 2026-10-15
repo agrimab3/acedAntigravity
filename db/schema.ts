@@ -896,8 +896,14 @@ export const joinRequests = pgTable("join_requests", {
 export const accountDeletionRequests = pgTable("account_deletion_requests", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  status: text("status").$type<"requested" | "reviewing" | "completed">().default("requested").notNull(),
+  // `completed` is retained for historical compatibility only. The review workflow
+  // intentionally cannot set it: a separate, approved deletion process is required.
+  status: text("status").$type<"requested" | "reviewing" | "awaiting_clarification" | "blocked" | "completed">().default("requested").notNull(),
+  identityVerificationStatus: text("identity_verification_status").$type<"not_started" | "pending" | "verified">().default("not_started").notNull(),
+  identityVerifiedAt: timestamp("identity_verified_at", { withTimezone: true }),
+  internalNote: text("internal_note"),
   requestedAt: timestamp("requested_at", { withTimezone: true }).defaultNow().notNull(),
   reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
   completedAt: timestamp("completed_at", { withTimezone: true }),
+  lastStatusUpdatedAt: timestamp("last_status_updated_at", { withTimezone: true }),
 });
