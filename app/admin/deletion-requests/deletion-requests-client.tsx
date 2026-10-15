@@ -20,6 +20,17 @@ type DryRunInventory = {
   unresolvedRules: string[];
 };
 
+type ExecutionPlan = {
+  id: string;
+  status: string;
+  planVersion: string;
+  blockerKeys: string[];
+  preparedAt: string;
+  finalAuthorizedAt: string | null;
+  failureCode: string | null;
+  frozenPlan: DryRunInventory & { verificationChecklist: Array<{ key: string; category: string; required: boolean; label: string }> };
+};
+
 const statusLabels: Record<RequestRow["status"], string> = {
   requested: "Requested",
   reviewing: "Under review",
@@ -33,6 +44,8 @@ export default function DeletionRequestsClient({ initialRows }: { initialRows: R
   const [saving, setSaving] = useState<string | null>(null);
   const [loadingDryRun, setLoadingDryRun] = useState<string | null>(null);
   const [dryRuns, setDryRuns] = useState<Record<string, DryRunInventory>>({});
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [executionPlans, setExecutionPlans] = useState<Record<string, ExecutionPlan>>({});
   const [notice, setNotice] = useState("");
 
   async function save(row: RequestRow) {
@@ -75,6 +88,27 @@ export default function DeletionRequestsClient({ initialRows }: { initialRows: R
     setLoadingDryRun(null);
   }
 
+  async function loadExecutionPlan(requestId: string) {
+    setLoadingPlan(requestId); setNotice("");
+    const response = await fetch(`/api/admin/deletion-requests/${requestId}/execution-plan`);
+    const data = await response.json().catch(() => null);
+    if (!response.ok || !data?.execution) setNotice(data?.error ?? "No Phase 2 plan is available yet.");
+    else setExecutionPlans((current) => ({ ...current, [requestId]: data.execution }));
+    setLoadingPlan(null);
+  }
+
+  async function prepareExecutionPlan(requestId: string) {
+    setLoadingPlan(requestId); setNotice("");
+    const response = await fetch(`/api/admin/deletion-requests/${requestId}/execution-plan`, { method: "POST" });
+    const data = await response.json().catch(() => null);
+    if (!response.ok || !data?.execution) setNotice(data?.error ?? "Could not prepare the Phase 2 plan.");
+    else {
+      setExecutionPlans((current) => ({ ...current, [requestId]: data.execution }));
+      setNotice(data.created ? "Frozen Phase 2 plan created. It is non-destructive and may be blocked." : "Existing frozen Phase 2 plan loaded.");
+    }
+    setLoadingPlan(null);
+  }
+
   return <>
     <p>These start a review process only. Never mark a request complete here: there is no deletion action on this page.</p>
     {notice && <p role="status">{notice}</p>}
@@ -101,6 +135,20 @@ export default function DeletionRequestsClient({ initialRows }: { initialRows: R
             <table><thead><tr><th>Category</th><th>Records</th><th>Relationship</th><th>Notes</th></tr></thead><tbody>{dryRuns[row.id].items.map((item) => <tr key={item.key}><td>{item.label}<br /><small>{item.category}</small></td><td>{item.count ?? "Manual review"}</td><td>{item.relationship}</td><td>{item.note}</td></tr>)}</tbody></table>
             <h3>Unresolved rules</h3>
             <ul>{dryRuns[row.id].unresolvedRules.map((rule) => <li key={rule}>{rule}</li>)}</ul>
+          </section> : null}
+          {row.identityVerificationStatus === "verified" ? <section style={{ marginTop: 16, border: "1px solid #7c3aed", borderRadius: 8, padding: 12, background: "#faf5ff" }}>
+            <strong>PHASE 2 CONTROL PLANE — execution disabled</strong>
+            <p>Preparing a plan records aggregate counts, blockers, and a verification checklist only. It cannot delete, anonymize, purge, or contact providers.</p>
+            <button type="button" disabled={loadingPlan === row.id} onClick={() => void prepareExecutionPlan(row.id)}>{loadingPlan === row.id ? "Preparing…" : "Prepare frozen Phase 2 plan"}</button>{" "}
+            <button type="button" disabled={loadingPlan === row.id} onClick={() => void loadExecutionPlan(row.id)}>{loadingPlan === row.id ? "Loading…" : "View existing Phase 2 plan"}</button>
+            {executionPlans[row.id] ? <div style={{ marginTop: 12 }}>
+              <p><strong>Approval state:</strong> {executionPlans[row.id].status}. Final authorization: disabled. {executionPlans[row.id].failureCode ? `Reason: ${executionPlans[row.id].failureCode}.` : ""}</p>
+              <p><strong>Frozen:</strong> {new Date(executionPlans[row.id].preparedAt).toLocaleString()} · <strong>Plan:</strong> {executionPlans[row.id].planVersion}</p>
+              <h3>Blockers</h3><ul>{executionPlans[row.id].blockerKeys.map((key) => <li key={key}>{key}</li>)}</ul>
+              <h3>Planned actions</h3><table><thead><tr><th>Category</th><th>Records</th><th>Relationship</th></tr></thead><tbody>{executionPlans[row.id].frozenPlan.items.map((item) => <tr key={item.key}><td>{item.label}<br /><small>{item.category}</small></td><td>{item.count ?? "Manual review"}</td><td>{item.relationship}</td></tr>)}</tbody></table>
+              <h3>Verification checklist</h3><ul>{executionPlans[row.id].frozenPlan.verificationChecklist.map((item) => <li key={item.key}>{item.required ? "Required: " : ""}{item.label}</li>)}</ul>
+              <button type="button" disabled title="Final authorization and destructive execution are intentionally disabled.">Final authorization disabled</button>
+            </div> : null}
           </section> : null}
         </>}
       </article>)}

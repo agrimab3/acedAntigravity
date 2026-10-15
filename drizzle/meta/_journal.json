@@ -239,6 +239,13 @@
       "when": 1792035913238,
       "tag": "0033_legal_terms_acceptance_history",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1792104000000,
+      "tag": "0034_account_deletion_execution_control_plane",
+      "breakpoints": true
     }
   ]
 }

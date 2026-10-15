@@ -945,3 +945,65 @@ export const accountDeletionRequests = pgTable("account_deletion_requests", {
   completedAt: timestamp("completed_at", { withTimezone: true }),
   lastStatusUpdatedAt: timestamp("last_status_updated_at", { withTimezone: true }),
 });
+
+export type DeletionExecutionStatus =
+  | "prepared"
+  | "blocked"
+  | "awaiting_final_authorization"
+  | "final_authorized"
+  | "execution_disabled"
+  | "verified";
+
+/**
+ * Non-destructive control-plane record. It freezes aggregate inventory and
+ * approvals, but deliberately contains no deletion mechanism or student data.
+ */
+export const accountDeletionExecutions = pgTable(
+  "account_deletion_executions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    deletionRequestId: uuid("deletion_request_id")
+      .notNull()
+      .references(() => accountDeletionRequests.id, { onDelete: "restrict" }),
+    targetUserId: uuid("target_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    status: text("status").$type<DeletionExecutionStatus>().default("prepared").notNull(),
+    planVersion: text("plan_version").notNull(),
+    planDigest: text("plan_digest").notNull(),
+    frozenPlan: jsonb("frozen_plan").$type<Record<string, unknown>>().notNull(),
+    blockerKeys: text("blocker_keys").array().default([]).notNull(),
+    preparedByAdminEmail: text("prepared_by_admin_email").notNull(),
+    preparedAt: timestamp("prepared_at", { withTimezone: true }).defaultNow().notNull(),
+    finalAuthorizedByAdminEmail: text("final_authorized_by_admin_email"),
+    finalAuthorizedAt: timestamp("final_authorized_at", { withTimezone: true }),
+    failureCode: text("failure_code"),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("account_deletion_executions_request_idx").on(table.deletionRequestId),
+    index("account_deletion_executions_target_user_idx").on(table.targetUserId),
+    check(
+      "account_deletion_executions_status_ck",
+      sql`${table.status} in ('prepared','blocked','awaiting_final_authorization','final_authorized','execution_disabled','verified')`,
+    ),
+  ],
+);
+
+/** Append-only, non-sensitive lifecycle evidence for the future execution process. */
+export const accountDeletionExecutionEvents = pgTable(
+  "account_deletion_execution_events",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    executionId: uuid("execution_id")
+      .notNull()
+      .references(() => accountDeletionExecutions.id, { onDelete: "restrict" }),
+    eventType: text("event_type").notNull(),
+    actorAdminEmail: text("actor_admin_email").notNull(),
+    details: jsonb("details").$type<Record<string, unknown>>().default({}).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("account_deletion_execution_events_execution_created_idx").on(table.executionId, table.createdAt),
+  ],
+);
