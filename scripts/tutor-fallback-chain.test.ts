@@ -1,16 +1,21 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {runTutorFallbackChain,TUTOR_GEMINI_MODELS} from '../lib/tutor-fallback-chain.mjs';
+import {runTutorFallbackChain} from '../lib/tutor-fallback-chain.mjs';
 const options={systemInstruction:'hint only',prompt:'help'};
-for(let successes=0;successes<4;successes++)test('tutor uses Gemini fallback '+(successes+1),async()=>{
+test('student tutor requests use Groq only and preserve the intended payload',async()=>{
  const seen:string[]=[];
- const result=await runTutorFallbackChain(options,{gemini:async(model:string)=>{seen.push(model);if(seen.length<=successes)throw new Error('429');return 'A helpful hint';}});
- assert.equal(result.model,TUTOR_GEMINI_MODELS[successes]);assert.deepEqual(seen,TUTOR_GEMINI_MODELS.slice(0,successes+1));
+ const runners={gemini:async()=>{throw Error('Gemini must never be called')},groq:async(model:string,input:typeof options)=>{seen.push(model);assert.deepEqual(input,options);return 'Groq hint';}} as unknown as Parameters<typeof runTutorFallbackChain>[1];
+ const result=await runTutorFallbackChain(options,runners);
+ assert.equal(result.provider,'groq');assert.equal(result.text,'Groq hint');assert.equal(seen.length,1);
 });
-test('tutor tries Groq after all four Gemini failures',async()=>{
- const seen:string[]=[];const result=await runTutorFallbackChain(options,{gemini:async(model:string)=>{seen.push(model);throw Error('503')},groq:async()=> 'Groq hint'});
- assert.equal(result.provider,'groq');assert.deepEqual(seen,TUTOR_GEMINI_MODELS);
+test('Groq failure does not fall back to Gemini',async()=>{
+ let geminiCalled=false;
+ const runners={gemini:async()=>{geminiCalled=true;return 'unsafe';},groq:async()=>{throw Error('503')}} as unknown as Parameters<typeof runTutorFallbackChain>[1];
+ await assert.rejects(runTutorFallbackChain(options,runners),/providers unavailable/);
+ assert.equal(geminiCalled,false);
 });
-test('tutor fails gracefully when all providers fail',async()=>{
- await assert.rejects(runTutorFallbackChain(options,{gemini:async()=>{throw Error('429')},groq:async()=>{throw Error('503')}}),/providers unavailable/);
+test('Groq uses its model fallback without another provider',async()=>{
+ const seen:string[]=[];
+ const result=await runTutorFallbackChain(options,{groq:async(model:string)=>{seen.push(model);if(seen.length===1)throw Error('model unavailable');return 'Groq fallback hint';}});
+ assert.equal(result.provider,'groq');assert.equal(result.text,'Groq fallback hint');assert.equal(seen.length,2);
 });

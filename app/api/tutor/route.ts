@@ -406,9 +406,6 @@ export async function POST(req: Request) {
 
       if (firstGuard.blocked || firstRepeated || firstIncomplete) {
         console.error("[tutor-guard] Blocked pre-submission tutor reply", {
-          userId,
-          sessionId,
-          questionId,
           phase: decision.phase,
           hintLevel: decision.nextHintLevel,
           reason:
@@ -433,9 +430,6 @@ export async function POST(req: Request) {
 
         if (retryGuard.blocked || retryRepeated || retryIncomplete) {
           console.error("[tutor-guard] Blocked pre-submission tutor retry", {
-            userId,
-            sessionId,
-            questionId,
             phase: decision.phase,
             hintLevel: decision.nextHintLevel,
             reason:
@@ -482,9 +476,7 @@ export async function POST(req: Request) {
 
     if (looksIncompleteTutorReply(normalizedReply)) {
       console.error("[tutor-guard] Replaced incomplete post-submission tutor reply", {
-        userId,
-        sessionId,
-        questionId,
+        phase: decision.phase,
       });
       normalizedReply = fallbackReply;
     }
@@ -498,13 +490,10 @@ export async function POST(req: Request) {
       provider: activeProvider,
       model: activeModel,
     });
-  } catch (error) {
+  } catch {
     console.error("Tutor request failed", {
-      userId,
-      sessionId,
-      questionId,
       submitted,
-      error: error instanceof Error ? error.message : String(error),
+      provider: activeProvider ?? "groq",
     });
 
     await persistHint(TUTOR_UNAVAILABLE_MESSAGE);

@@ -1,9 +1,4 @@
-import { generateGeminiText, hasGeminiApiKey } from "@/lib/gemini";
 import { runTutorFallbackChain } from "./tutor-fallback-chain.mjs";
-import {
-  resolveGroqFallbackModel,
-  resolvePreferredGroqModel,
-} from "@/lib/groq-models";
 
 export const TUTOR_UNAVAILABLE_MESSAGE =
   "The tutor is taking a quick break, try again in a minute";
@@ -17,12 +12,12 @@ type TutorAiOptions = {
 
 type TutorAiResult = {
   text: string;
-  provider: "gemini" | "groq";
+  provider: "groq";
   model: string;
 };
 
 export function hasTutorAiProvider() {
-  return hasGeminiApiKey() || Boolean(process.env.GROQ_API_KEY);
+  return Boolean(process.env.GROQ_API_KEY);
 }
 
 async function generateGroqTutorText({
@@ -90,9 +85,6 @@ async function generateGroqTutorText({
 
 export async function generateTutorAiText(options: TutorAiOptions): Promise<TutorAiResult> {
   return runTutorFallbackChain(options, {
-    gemini: hasGeminiApiKey()
-      ? (model, input) => generateGeminiText({ ...input, model })
-      : undefined,
     groq: process.env.GROQ_API_KEY
       ? (model, input) => generateGroqTutorText({ options: input, model })
       : undefined,
