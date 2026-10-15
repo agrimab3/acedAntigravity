@@ -55,6 +55,44 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+/**
+ * Immutable consent evidence. Legacy rows are copied from the existing user
+ * fields by migration 0033 and are explicitly labelled as migrated evidence,
+ * rather than a newly collected affirmative acceptance.
+ */
+export const legalTermsAcceptanceHistory = pgTable(
+  "legal_terms_acceptance_history",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    termsVersion: text("terms_version").notNull(),
+    acceptedAt: timestamp("accepted_at", { withTimezone: true }),
+    evidenceSource: text("evidence_source")
+      .$type<"affirmative" | "legacy_migrated">()
+      .notNull(),
+    migratedAt: timestamp("migrated_at", { withTimezone: true }),
+    recordedAt: timestamp("recorded_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("legal_terms_acceptance_history_user_version_idx").on(
+      table.userId,
+      table.termsVersion,
+    ),
+    check(
+      "legal_terms_acceptance_history_source_ck",
+      sql`${table.evidenceSource} in ('affirmative', 'legacy_migrated')`,
+    ),
+    check(
+      "legal_terms_acceptance_history_affirmative_timestamp_ck",
+      sql`${table.evidenceSource} <> 'affirmative' or ${table.acceptedAt} is not null`,
+    ),
+  ],
+);
+
 export const userIdentities = pgTable(
   "user_identities",
   {

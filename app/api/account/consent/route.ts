@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { users, waitlistSignups } from "@/db/schema";
+import { legalTermsAcceptanceHistory, users, waitlistSignups } from "@/db/schema";
 import { CURRENT_TERMS_VERSION, getAccountConsentStatus } from "@/lib/account-consent";
 import { getDb } from "@/lib/db";
 
@@ -31,17 +31,32 @@ export async function POST(request: Request) {
   }
 
   const email = status.email.trim().toLowerCase();
+  const userId = status.userId;
   const now = new Date();
-  await db
-    .update(users)
-    .set({
-      agreedTermsAt: status.missingTermsAcceptance ? now : undefined,
-      agreedTermsVersion: CURRENT_TERMS_VERSION,
-      ageConfirmedAt: status.missingAgeConfirmation ? now : undefined,
-      emailOptIn: parsed.data.emailOptIn,
-      updatedAt: now,
-    })
-    .where(eq(users.id, status.userId));
+  await db.transaction(async (tx) => {
+    await tx
+      .insert(legalTermsAcceptanceHistory)
+      .values({
+        userId,
+        termsVersion: CURRENT_TERMS_VERSION,
+        acceptedAt: now,
+        evidenceSource: "affirmative",
+      })
+      // One evidence record per account and Terms version prevents repeat POSTs
+      // from creating misleading duplicate acceptances.
+      .onConflictDoNothing();
+
+    await tx
+      .update(users)
+      .set({
+        agreedTermsAt: status.missingTermsAcceptance ? now : undefined,
+        agreedTermsVersion: CURRENT_TERMS_VERSION,
+        ageConfirmedAt: status.missingAgeConfirmation ? now : undefined,
+        emailOptIn: parsed.data.emailOptIn,
+        updatedAt: now,
+      })
+      .where(eq(users.id, userId));
+  });
 
   if (parsed.data.emailOptIn) {
     await db.insert(waitlistSignups).values({ email }).onConflictDoNothing();

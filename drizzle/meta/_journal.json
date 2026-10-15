@@ -232,6 +232,13 @@
       "when": 1792032306300,
       "tag": "0032_account_deletion_review_workflow",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1792035913238,
+      "tag": "0033_legal_terms_acceptance_history",
+      "breakpoints": true
     }
   ]
 }
