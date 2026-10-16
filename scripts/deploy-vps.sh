@@ -12,8 +12,19 @@ LOG_DIR="${APP_ROOT}/logs"
 PM2_APP_NAME="aced-web"
 APP_PORT="3005"
 HEALTHCHECK_URL="http://127.0.0.1:${APP_PORT}/api/health"
-RELEASE_ID="$(date -u +%Y%m%dT%H%M%SZ)-${GITHUB_SHA:-manual}"
-RELEASE_ID="${RELEASE_ID:0:40}"
+EXPECTED_COMMIT="${GITHUB_SHA:-}"
+if [[ ! "${EXPECTED_COMMIT}" =~ ^[0-9a-fA-F]{7,40}$ ]]; then
+  echo "GITHUB_SHA must be the expected Git commit (7-40 hexadecimal characters)." >&2
+  exit 1
+fi
+EXPECTED_COMMIT="${EXPECTED_COMMIT,,}"
+SOURCE_COMMIT="${ACED_SOURCE_COMMIT:-$(git rev-parse --verify HEAD 2>/dev/null || true)}"
+SOURCE_COMMIT="${SOURCE_COMMIT,,}"
+if [[ ! "${SOURCE_COMMIT}" =~ ^[0-9a-f]{7,40}$ ]] || [[ "${SOURCE_COMMIT:0:${#EXPECTED_COMMIT}}" != "${EXPECTED_COMMIT}" ]]; then
+  echo "Release source does not match the expected Git commit." >&2
+  exit 1
+fi
+RELEASE_ID="$(date -u +%Y%m%dT%H%M%SZ)-${EXPECTED_COMMIT:0:12}"
 RELEASE_DIR="${RELEASES_DIR}/${RELEASE_ID}"
 
 install_cron_line() {
@@ -54,6 +65,7 @@ rsync -a --delete \
   --exclude ".git" --exclude ".github" --exclude "node_modules" --exclude ".next" \
   --exclude ".env" --exclude ".env.local" --exclude ".claude" --exclude "google Oauth" \
   ./ "${RELEASE_DIR}/"
+printf '%s\n' "${EXPECTED_COMMIT}" > "${RELEASE_DIR}/.aced-release-commit"
 
 cd "${RELEASE_DIR}"
 set -a
@@ -64,6 +76,7 @@ set +a
 npm ci --include=dev
 npm run build
 npm run db:migrate
+node scripts/verify-applied-drizzle-migrations.mjs
 node scripts/check-mocktest-production-release-state.mjs
 chmod +x scripts/run-mocktest-release-cron.sh scripts/backup-db.sh scripts/restore-backup.sh scripts/rollback-vps.sh scripts/run-content-factory-cron.sh
 
@@ -80,6 +93,16 @@ if [[ -n "${prior_target}" && -d "${prior_target}" ]]; then
 fi
 ln -sfn "${RELEASE_DIR}" "${APP_ROOT}/current.next"
 mv -Tf "${APP_ROOT}/current.next" "${CURRENT_DIR}"
+
+active_release="$(readlink -f "${CURRENT_DIR}" 2>/dev/null || true)"
+active_commit="$(cat "${RELEASE_DIR}/.aced-release-commit" 2>/dev/null || true)"
+if [[ "${active_release}" != "${RELEASE_DIR}" || "${active_commit}" != "${EXPECTED_COMMIT}" ]]; then
+  echo "Release activation verification failed; rolling back automatically." >&2
+  if [[ -L "${PREVIOUS_LINK}" ]]; then
+    bash "${RELEASE_DIR}/scripts/rollback-vps.sh" || true
+  fi
+  exit 1
+fi
 
 pm2 describe "${PM2_APP_NAME}" >/dev/null 2>&1 || pm2 start ecosystem.config.cjs --only "${PM2_APP_NAME}"
 pm2 restart "${PM2_APP_NAME}" --update-env
@@ -100,6 +123,19 @@ if [[ "${healthy}" != "true" ]]; then
     bash "${RELEASE_DIR}/scripts/rollback-vps.sh" || true
   fi
   pm2 logs "${PM2_APP_NAME}" --lines 100 --nostream || true
+  exit 1
+fi
+
+if [[ "$(readlink -f "${CURRENT_DIR}" 2>/dev/null || true)" != "${RELEASE_DIR}" ]]; then
+  echo "Active release changed before completion; rolling back automatically." >&2
+  if [[ -L "${PREVIOUS_LINK}" ]]; then
+    bash "${RELEASE_DIR}/scripts/rollback-vps.sh" || true
+  fi
+  exit 1
+fi
+
+if [[ "$(cat "${RELEASE_DIR}/.aced-release-commit" 2>/dev/null || true)" != "${EXPECTED_COMMIT}" ]]; then
+  echo "Active release commit verification failed." >&2
   exit 1
 fi
 

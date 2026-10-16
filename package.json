@@ -27,6 +27,7 @@
     "mocktest:dev-results": "node --experimental-strip-types --env-file=.env scripts/mocktest-dev-results.ts",
     "mocktest:seed-results": "node --experimental-strip-types --env-file=.env scripts/mocktest-seed-results.mjs",
     "test:mocktest-scoring": "node --test --experimental-strip-types scripts/mocktest-scoring.test.ts",
+    "test": "npm run test:all",
     "mocktest:admin-busy": "node --env-file=.env scripts/mocktest-admin-busy.mjs",
     "check:secrets": "node scripts/check-secrets.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
