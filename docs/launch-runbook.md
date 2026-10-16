@@ -32,6 +32,20 @@ Confirm backup completed and an offsite copy is accessible. Confirm Dec 5 Form A
 
 ## 4. Remove Caddy password — only after owner approval
 
+Before this step, update the public-route matchers in `/etc/caddy/Caddyfile` from `deploy/caddy/aced.Caddyfile.template`, while preserving the existing Basic Auth hash and default protected handler. This permits the public website, Google OAuth callback, mock-test flow, signed webhook, and health check without prompting for the temporary Caddy password. It does **not** make dashboard, practice, progress, or `/admin` public.
+
+Validate these boundaries before any decision to remove the remaining password gate:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' https://aceditprep.com/mock-test
+curl -s -o /dev/null -w '%{http_code}\n' https://aceditprep.com/api/auth/providers
+curl -s -o /dev/null -w '%{http_code}\n' https://aceditprep.com/api/health
+curl -s -o /dev/null -w '%{http_code}\n' https://aceditprep.com/dashboard
+curl -s -o /dev/null -w '%{http_code}\n' https://aceditprep.com/admin/deletion-requests
+```
+
+The first three requests should not receive a Caddy password challenge; dashboard and admin should remain protected until their application authorization succeeds.
+
 ```bash
 sudo cp /etc/caddy/Caddyfile /etc/caddy/Caddyfile.pre-launch-backup
 sudo nano /etc/caddy/Caddyfile

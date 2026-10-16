@@ -5,7 +5,7 @@ import { getMockTestPaymentMode, isUnsafeProductionMockTestMode, MOCK_TEST_SIGNU
 import { MOCK_TEST_SEAT_CAP } from "@/lib/mockTest/seat-policy";
 import { WAITLIST_INVITE_MS } from "@/lib/mockTest/waitlist-policy";
 import { getStripe } from "@/lib/mockTest/stripe";
-import { decideStripeCheckoutCompletion } from "@/lib/mockTest/stripe-policy";
+import { decideStripeCheckoutCompletion, resolveCheckoutOrigin } from "@/lib/mockTest/stripe-policy";
 import { reconcileWaitlistInvites } from "@/lib/mockTest/waitlist";
 
 export type MockTestCheckoutRegistration = { id: string; email?: string; origin?: string };
@@ -15,7 +15,11 @@ export async function createCheckout(registration: MockTestCheckoutRegistration)
   if (mode === "disabled" || isUnsafeProductionMockTestMode()) throw new Error(MOCK_TEST_SIGNUPS_SOON_MESSAGE);
   if (mode === "test") return { url: `/mock-test/dev/checkout?registrationId=${encodeURIComponent(registration.id)}` };
 
-  const origin = registration.origin || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const origin = resolveCheckoutOrigin({
+    configuredOrigin: process.env.NEXT_PUBLIC_SITE_URL,
+    requestOrigin: registration.origin,
+    nodeEnv: process.env.NODE_ENV,
+  });
   const stripe = getStripe();
   const db = getDb();
   if (!db) throw new Error("Database is not configured.");

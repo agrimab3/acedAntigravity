@@ -48,3 +48,19 @@ export function isExpectedMockCheckoutPayment(input: {
     input.currency === "usd"
   );
 }
+
+/** Production Checkout redirects must not depend on an inbound Host header. */
+export function resolveCheckoutOrigin(input: {
+  configuredOrigin?: string;
+  requestOrigin?: string;
+  nodeEnv?: string;
+}) {
+  const configuredOrigin = input.configuredOrigin?.replace(/\/$/, "");
+  if (input.nodeEnv === "production") {
+    if (configuredOrigin !== "https://aceditprep.com") {
+      throw new Error("Production Checkout requires NEXT_PUBLIC_SITE_URL=https://aceditprep.com.");
+    }
+    return configuredOrigin;
+  }
+  return input.requestOrigin || configuredOrigin || "http://localhost:3000";
+}

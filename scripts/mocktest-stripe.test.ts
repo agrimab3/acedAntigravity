@@ -5,6 +5,7 @@ import {
   decideStripeCheckoutCompletion,
   hasStripeWebhookSignature,
   isExpectedMockCheckoutPayment,
+  resolveCheckoutOrigin,
   shouldProcessStripeEventClaim,
   shouldReleaseCheckoutHoldOnExpiredEvent,
 } from "../lib/mockTest/stripe-policy.ts";
@@ -101,6 +102,25 @@ test("completed Checkout must be paid and exactly $2 USD", () => {
       currency: "usd",
     }),
     false
+  );
+});
+
+test("production Checkout uses the configured canonical origin, not the request origin", () => {
+  assert.equal(
+    resolveCheckoutOrigin({
+      configuredOrigin: "https://aceditprep.com/",
+      requestOrigin: "https://untrusted.example",
+      nodeEnv: "production",
+    }),
+    "https://aceditprep.com",
+  );
+  assert.throws(
+    () => resolveCheckoutOrigin({ configuredOrigin: "https://other.example", nodeEnv: "production" }),
+    /Production Checkout requires/,
+  );
+  assert.equal(
+    resolveCheckoutOrigin({ requestOrigin: "http://localhost:3000", nodeEnv: "development" }),
+    "http://localhost:3000",
   );
 });
 
