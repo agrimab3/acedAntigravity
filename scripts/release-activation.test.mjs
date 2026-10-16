@@ -26,3 +26,17 @@ test("release fails and rolls back if activation, commit, or health verification
   assert.match(deploy, /New release failed health check; rolling back automatically/);
   assert.match(deploy, /exit 1/);
 });
+
+test("release writes private, sanitized build-only diagnostics and never treats a failed build as success", () => {
+  assert.match(deploy, /BUILD_LOG_DIR="\$\{LOG_DIR\}\/release-builds"/);
+  assert.match(deploy, /chmod 700 "\$\{BUILD_LOG_DIR\}"/);
+  assert.match(deploy, /chmod 600 "\$\{BUILD_LOG\}"/);
+  assert.match(deploy, /redact_build_output/);
+  assert.match(deploy, /event=build_step_started/);
+  assert.match(deploy, /event=build_step_failed/);
+  assert.match(deploy, /failure_category=/);
+  assert.match(deploy, /abort_build_on_signal/);
+  assert.match(deploy, /run_logged_build_step dependencies npm ci --include=dev/);
+  assert.match(deploy, /run_logged_build_step next_build npm run build/);
+  assert.doesNotMatch(deploy, /npm run build\nnode scripts\/verify-applied/);
+});

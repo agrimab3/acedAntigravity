@@ -9,6 +9,7 @@ SHARED_DIR="${APP_ROOT}/shared"
 RUN_ENV_FILE="${SHARED_DIR}/.env"
 BACKUP_DIR="${APP_ROOT}/backups"
 LOG_DIR="${APP_ROOT}/logs"
+BUILD_LOG_DIR="${LOG_DIR}/release-builds"
 PM2_APP_NAME="aced-web"
 APP_PORT="3005"
 HEALTHCHECK_URL="http://127.0.0.1:${APP_PORT}/api/health"
@@ -26,6 +27,56 @@ if [[ ! "${SOURCE_COMMIT}" =~ ^[0-9a-f]{7,40}$ ]] || [[ "${SOURCE_COMMIT:0:${#EX
 fi
 RELEASE_ID="$(date -u +%Y%m%dT%H%M%SZ)-${EXPECTED_COMMIT:0:12}"
 RELEASE_DIR="${RELEASES_DIR}/${RELEASE_ID}"
+BUILD_LOG="${BUILD_LOG_DIR}/${RELEASE_ID}.log"
+
+redact_build_output() {
+  # Build output must never become an alternate source of environment secrets or PII.
+  # The raw temporary file is mode 600 and removed after this filter completes.
+  sed -E \
+    -e 's#(postgres(ql)?://)[^[:space:]]+#\1[REDACTED]#gi' \
+    -e 's#(sk_(live|test)_[[:alnum:]_]+|pk_(live|test)_[[:alnum:]_]+|whsec_[[:alnum:]_]+|AIza[[:alnum:]_-]+)#[REDACTED]#g' \
+    -e 's#([Bb]earer[[:space:]]+)[^[:space:]]+#\1[REDACTED]#g' \
+    -e 's#([[:alnum:]_.%+-]+@[[:alnum:].-]+\.[[:alpha:]]{2,})#[REDACTED_EMAIL]#g' \
+    -e 's#((AUTH|NEXTAUTH|STRIPE|RESEND|SENTRY|GEMINI|GROQ|OPENROUTER|CRON|DATABASE)_[A-Z0-9_]*[=:])[[:space:]]*[^[:space:],}]+#\1[REDACTED]#g'
+}
+
+write_build_log() {
+  printf '%s release=%s commit=%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "${RELEASE_ID}" "${EXPECTED_COMMIT}" "$*" >> "${BUILD_LOG}"
+}
+
+abort_build_on_signal() {
+  local signal="$1"
+  local status="$2"
+  write_build_log "event=build_interrupted signal=${signal} exit_status=${status} phase=${BUILD_PHASE:-unknown}"
+  exit "${status}"
+}
+
+run_logged_build_step() {
+  local step="$1"
+  shift
+  local raw_log started finished duration status
+  raw_log="$(mktemp "${BUILD_LOG_DIR}/.${RELEASE_ID}.${step}.XXXXXX")"
+  chmod 600 "${raw_log}"
+  started="$(date +%s)"
+  BUILD_PHASE="${step}"
+  write_build_log "event=build_step_started step=${step}"
+  set +e
+  "$@" > "${raw_log}" 2>&1
+  status=$?
+  set -e
+  finished="$(date +%s)"
+  duration=$((finished - started))
+  redact_build_output < "${raw_log}" >> "${BUILD_LOG}"
+  rm -f -- "${raw_log}"
+  if [[ "${status}" -ne 0 ]]; then
+    local category="command_failed"
+    if [[ "${status}" -eq 124 ]]; then category="timed_out"; fi
+    if [[ "${status}" -eq 137 || "${status}" -eq 143 ]]; then category="terminated"; fi
+    write_build_log "event=build_step_failed step=${step} exit_status=${status} duration_seconds=${duration} failure_category=${category}"
+    exit "${status}"
+  fi
+  write_build_log "event=build_step_succeeded step=${step} exit_status=0 duration_seconds=${duration}"
+}
 
 install_cron_line() {
   local marker="$1"
@@ -48,9 +99,17 @@ install_schedulers() {
   echo "Installed idempotent release, backup and Pacific-time content-factory crons."
 }
 
-mkdir -p "${RELEASES_DIR}" "${SHARED_DIR}" "${BACKUP_DIR}" "${LOG_DIR}"
+mkdir -p "${RELEASES_DIR}" "${SHARED_DIR}" "${BACKUP_DIR}" "${LOG_DIR}" "${BUILD_LOG_DIR}"
 chmod 700 "${SHARED_DIR}" "${BACKUP_DIR}"
 chmod 750 "${LOG_DIR}"
+chmod 700 "${BUILD_LOG_DIR}"
+touch "${BUILD_LOG}"
+chmod 600 "${BUILD_LOG}"
+BUILD_PHASE="initializing"
+write_build_log "event=build_started"
+trap 'abort_build_on_signal HUP 129' HUP
+trap 'abort_build_on_signal INT 130' INT
+trap 'abort_build_on_signal TERM 143' TERM
 if [[ ! -f "${RUN_ENV_FILE}" ]]; then
   echo "Missing production env file at ${RUN_ENV_FILE}" >&2
   exit 1
@@ -73,8 +132,9 @@ set -a
 source "${RUN_ENV_FILE}"
 set +a
 # Build tooling is in devDependencies; NODE_ENV=production must not omit it.
-npm ci --include=dev
-npm run build
+run_logged_build_step dependencies npm ci --include=dev
+run_logged_build_step next_build npm run build
+write_build_log "event=build_completed"
 npm run db:migrate
 node scripts/verify-applied-drizzle-migrations.mjs
 node scripts/check-mocktest-production-release-state.mjs
