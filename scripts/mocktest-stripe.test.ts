@@ -116,7 +116,16 @@ test("production Checkout uses the configured canonical origin, not the request 
   );
   assert.throws(
     () => resolveCheckoutOrigin({ configuredOrigin: "https://other.example", nodeEnv: "production" }),
-    /Production Checkout requires/,
+    /Checkout requires/,
+  );
+  assert.equal(
+    resolveCheckoutOrigin({
+      configuredOrigin: "https://staging.aceditprep.com/",
+      requestOrigin: "https://untrusted.example",
+      nodeEnv: "production",
+      deploymentEnvironment: "staging",
+    }),
+    "https://staging.aceditprep.com",
   );
   assert.equal(
     resolveCheckoutOrigin({ requestOrigin: "http://localhost:3000", nodeEnv: "development" }),

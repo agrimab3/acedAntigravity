@@ -1,22 +1,28 @@
 import { SUPPORT_EMAIL } from "../site-config.ts";
+import { isAcedStaging } from "../deployment-environment.ts";
 export const MOCK_EMAIL_FROM = process.env.EMAIL_FROM || "onboarding@resend.dev";
 export const MOCK_EMAIL_SUPPORT = process.env.MOCK_EMAIL_SUPPORT || process.env.EMAIL_SUPPORT || SUPPORT_EMAIL;
+const SINGLE_EMAIL_RE = /^[^\s,@]+@[^\s,@]+\.[^\s,@]+$/;
 
 export function resolveEmailDeliveryTarget(input: {
   realRecipient: string;
   subject: string;
   nodeEnv?: string;
   testRecipient?: string;
+  deploymentEnvironment?: string;
 }) {
-  if (input.nodeEnv === "production") {
+  if (input.nodeEnv === "production" && !isAcedStaging(input.deploymentEnvironment)) {
     return { to: input.realRecipient, subject: input.subject };
   }
   if (!input.testRecipient) {
     throw new Error("EMAIL_TEST_TO is required outside production.");
   }
+  if (!SINGLE_EMAIL_RE.test(input.testRecipient)) {
+    throw new Error("EMAIL_TEST_TO must be exactly one valid email address.");
+  }
   return {
     to: input.testRecipient,
-    subject: `[to: ${input.realRecipient}] ${input.subject}`,
+    subject: `[staging to: ${input.realRecipient}] ${input.subject}`,
   };
 }
 

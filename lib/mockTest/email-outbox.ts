@@ -25,6 +25,7 @@ import {
 } from "@/lib/mockTest/email-templates";
 import { WAITLIST_INVITE_MS } from "@/lib/mockTest/waitlist-policy";
 import { captureAcedError } from "@/lib/monitoring";
+import { isAcedStaging } from "@/lib/deployment-environment";
 
 const CLAIM_STALE_MS = 10 * 60_000;
 
@@ -49,7 +50,7 @@ export function getMockEmailHeaderSource(type: MockEmailType, nodeEnv = process.
 }
 
 export function getMockEmailSiteBaseUrl() {
-  if (process.env.NODE_ENV === "production") return "https://aceditprep.com";
+  if (process.env.NODE_ENV === "production" && !isAcedStaging()) return "https://aceditprep.com";
   return (process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000").replace(/\/$/, "");
 }
 
@@ -268,7 +269,7 @@ export async function processMockEmailOutbox(now = new Date()) {
   const db = getDb();
   if (!db) throw new Error("Database is not configured.");
   if (!process.env.RESEND_API_KEY) throw new Error("RESEND_API_KEY is not configured.");
-  if (process.env.NODE_ENV !== "production" && !process.env.EMAIL_TEST_TO) {
+  if ((process.env.NODE_ENV !== "production" || isAcedStaging()) && !process.env.EMAIL_TEST_TO) {
     throw new Error("EMAIL_TEST_TO is required outside production.");
   }
 
@@ -305,6 +306,7 @@ export async function processMockEmailOutbox(now = new Date()) {
       subject: String(row.subject),
       nodeEnv: process.env.NODE_ENV,
       testRecipient: process.env.EMAIL_TEST_TO,
+      deploymentEnvironment: process.env.ACED_DEPLOYMENT_ENV,
     });
     const storedAttachments = Array.isArray(row.attachments)
       ? (row.attachments as Array<{ filename: string; content: string; contentType?: string }>)

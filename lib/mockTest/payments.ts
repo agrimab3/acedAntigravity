@@ -19,6 +19,7 @@ export async function createCheckout(registration: MockTestCheckoutRegistration)
     configuredOrigin: process.env.NEXT_PUBLIC_SITE_URL,
     requestOrigin: registration.origin,
     nodeEnv: process.env.NODE_ENV,
+    deploymentEnvironment: process.env.ACED_DEPLOYMENT_ENV,
   });
   const stripe = getStripe();
   const db = getDb();

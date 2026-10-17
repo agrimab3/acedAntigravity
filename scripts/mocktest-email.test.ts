@@ -23,7 +23,7 @@ test("development email safety never targets the real recipient", () => {
     testRecipient: "owner@example.com",
   });
   assert.equal(result.to, "owner@example.com");
-  assert.equal(result.subject, "[to: student@example.com] You're in ✦");
+  assert.equal(result.subject, "[staging to: student@example.com] You're in ✦");
   assert.notEqual(result.to, "student@example.com");
 });
 
@@ -36,6 +36,25 @@ test("production email targets the intended recipient", () => {
   });
   assert.equal(result.to, "student@example.com");
   assert.equal(result.subject, "Your scores are in ✦");
+});
+
+test("staging email is forcibly redirected to its one configured owner recipient", () => {
+  const result = resolveEmailDeliveryTarget({
+    realRecipient: "student@example.com",
+    subject: "You're in ✦",
+    nodeEnv: "production",
+    deploymentEnvironment: "staging",
+    testRecipient: "owner@example.com",
+  });
+  assert.equal(result.to, "owner@example.com");
+  assert.match(result.subject, /^\[staging to: student@example\.com\]/);
+  assert.throws(() => resolveEmailDeliveryTarget({
+    realRecipient: "student@example.com",
+    subject: "You're in ✦",
+    nodeEnv: "production",
+    deploymentEnvironment: "staging",
+    testRecipient: "owner@example.com,second@example.com",
+  }), /exactly one valid email/);
 });
 
 test("same email cannot be sent twice and retries stop after five failures", () => {

@@ -1,0 +1,15 @@
+staging.aceditprep.com {
+  @providerCallbacks path /api/auth/* /api/stripe/webhook* /api/health
+  handle @providerCallbacks {
+    header X-Robots-Tag "noindex, nofollow, noarchive"
+    reverse_proxy 127.0.0.1:3006
+  }
+
+  handle {
+    basicauth {
+      aced HASH_FROM_CADDY
+    }
+    header X-Robots-Tag "noindex, nofollow, noarchive"
+    reverse_proxy 127.0.0.1:3006
+  }
+}

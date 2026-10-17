@@ -54,13 +54,21 @@ export function resolveCheckoutOrigin(input: {
   configuredOrigin?: string;
   requestOrigin?: string;
   nodeEnv?: string;
+  deploymentEnvironment?: string;
 }) {
   const configuredOrigin = input.configuredOrigin?.replace(/\/$/, "");
   if (input.nodeEnv === "production") {
-    if (configuredOrigin !== "https://aceditprep.com") {
-      throw new Error("Production Checkout requires NEXT_PUBLIC_SITE_URL=https://aceditprep.com.");
+    const environment = getAcedDeploymentEnvironment(input.deploymentEnvironment);
+    const allowedOrigin = environment === "staging" ? ACED_STAGING_ORIGIN : ACED_PRODUCTION_ORIGIN;
+    if (configuredOrigin !== allowedOrigin) {
+      throw new Error(`Checkout requires NEXT_PUBLIC_SITE_URL=${allowedOrigin}.`);
     }
     return configuredOrigin;
   }
   return input.requestOrigin || configuredOrigin || "http://localhost:3000";
 }
+import {
+  ACED_PRODUCTION_ORIGIN,
+  ACED_STAGING_ORIGIN,
+  getAcedDeploymentEnvironment,
+} from "../deployment-environment.ts";
