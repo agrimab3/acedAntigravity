@@ -7,7 +7,7 @@ import { getDb } from "@/lib/db";
 
 // The current public Terms are the document available at /legal?tab=terms.
 // This identifier intentionally does not claim a historical version for legacy acceptances.
-export const CURRENT_TERMS_VERSION = "legal-terms-2026-10-13";
+export const CURRENT_TERMS_VERSION = "legal-terms-2026-10-14";
 
 export type AccountConsentStatus = {
   authenticated: boolean;

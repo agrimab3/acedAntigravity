@@ -27,13 +27,13 @@ test("legacy consent evidence is preserved as migrated evidence, not a new accep
   assert.doesNotMatch(migration, /UPDATE\s+"users"|DELETE\s+FROM\s+"users"/i);
 });
 
-test("a revised Terms version creates distinct append-only evidence without activating it", () => {
+test("a revised Terms version creates distinct append-only evidence when activated", () => {
   const schema = read("db/schema.ts");
   const consent = read("lib/account-consent.ts");
   assert.match(schema, /termsVersion: text\("terms_version"\)/);
   assert.match(schema, /uniqueIndex\("legal_terms_acceptance_history_user_version_idx"\)/);
-  assert.match(consent, /legal-terms-2026-10-13/);
-  assert.doesNotMatch(consent, /legal-terms-2026-10-14/);
+  assert.match(consent, /legal-terms-2026-10-14/);
+  assert.doesNotMatch(consent, /UPDATE\s+legal_terms_acceptance_history|DELETE\s+FROM\s+legal_terms_acceptance_history/i);
 });
 
 test("history rows are database-enforced append-only evidence", () => {

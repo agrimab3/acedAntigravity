@@ -318,7 +318,8 @@ export default function SignupForm({
               />
               <span>
                 I understand this test is <strong>non-refundable</strong> and only open on{" "}
-                {NEXT_MOCK.testDateLabel}
+                {NEXT_MOCK.testDateLabel}. Read the <Link href="/legal?tab=refunds">Refund and Payment Policy</Link>{" "}
+                and <Link href="/legal?tab=mock-test-rules">Mock Test Rules</Link>.
               </span>
             </label>
 

@@ -1,7 +1,7 @@
 import { chromium } from 'playwright-core';
 const browser=await chromium.launch({headless:true,channel:process.env.CHROME_PATH ? undefined : "chrome",...(process.env.CHROME_PATH ? {executablePath:process.env.CHROME_PATH} : {})});
 const result={};const base=process.env.ACED_CHECK_BASE||'https://aceditprep.com';
-for(const route of ['/','/terms','/privacy','/refunds','/contact']){
+for(const route of ['/','/terms','/privacy','/refunds','/legal?tab=mock-test-rules','/legal?tab=accessibility','/mock-test-rules','/accessibility','/contact']){
  const context=await browser.newContext({serviceWorkers:'block'});const page=await context.newPage();const errors=[];const challenged=[];const failures=[];const protectedRequests=[];
  page.on('request',r=>{if(/\/(?:api\/auth\/(?:session|providers)|dashboard|practice|admin|mock-test)(?:[/?]|$)/.test(new URL(r.url()).pathname))protectedRequests.push({url:r.url(),type:r.resourceType()})});
  page.on('response',r=>{if(r.status()===401)errors.push({url:r.url(),type:r.request().resourceType(),status:401});});

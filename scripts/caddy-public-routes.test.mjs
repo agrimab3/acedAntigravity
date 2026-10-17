@@ -9,6 +9,8 @@ test("public auth, mock-test, and health routes bypass only the temporary Caddy 
   assert.match(caddy, /\/mock-test\/\*/);
   assert.match(caddy, /\/api\/mock-test\/\*/);
   assert.match(caddy, /\/api\/health/);
+  assert.match(caddy, /\/mock-test-rules/);
+  assert.match(caddy, /\/accessibility/);
   assert.match(caddy, /handle \{[\s\S]*basicauth[\s\S]*reverse_proxy/);
   assert.doesNotMatch(caddy, /@public path[^\n]*\/dashboard/);
   assert.doesNotMatch(caddy, /@public path[^\n]*\/admin/);
