@@ -26,6 +26,15 @@ test("legal navigation reaches all five documents from the footer and checkout",
   assert.match(signup, /legal\?tab=mock-test-rules/);
 });
 
+test("finalized numeric section headings render exactly once in navigation and document headings", () => {
+  for (const file of ["01-terms-of-service.md", "02-privacy-policy.md", "03-refund-and-payment-policy.md", "04-mock-test-rules.md", "05-accessibility-statement.md"]) {
+    assert.match(read(`docs/legal-drafts/${file}`), /^## 1\. /m);
+  }
+  assert.match(legalContent, /document\.sections\.map\(\(section\) => <a key=\{section\.heading\} href=/);
+  assert.match(legalContent, /<h3 id=\{slug\(section\.heading\)\}>\{section\.heading\}<\/h3>/);
+  assert.doesNotMatch(legalContent, /<i>\{index \+ 1\}/);
+});
+
 test("October 14 Terms are active without rewriting historical consent evidence", () => {
   assert.match(consent, /legal-terms-2026-10-14/);
   assert.match(read("scripts/legal-acceptance-history.test.mjs"), /append-only evidence/);
