@@ -7,6 +7,7 @@ CURRENT="${ROOT}/current"
 PREVIOUS="${ROOT}/previous"
 ENV_FILE="${ROOT}/shared/.env"
 APP="aced-staging"
+WORKER_APP="aced-staging-email-worker"
 PORT=3006
 EXPECTED="${GITHUB_SHA:-}"
 SOURCE="${ACED_SOURCE_COMMIT:-}"
@@ -21,7 +22,7 @@ set -a
 source "${ENV_FILE}"
 set +a
 node - <<'NODE'
-const required = ["AUTH_SECRET", "AUTH_GOOGLE_ID", "AUTH_GOOGLE_SECRET", "RESEND_API_KEY", "EMAIL_TEST_TO", "STAGING_TEST_EMAIL", "STRIPE_SECRET_KEY", "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", "STRIPE_WEBHOOK_SECRET"];
+const required = ["AUTH_SECRET", "AUTH_GOOGLE_ID", "AUTH_GOOGLE_SECRET", "RESEND_API_KEY", "EMAIL_TEST_TO", "STAGING_TEST_EMAIL", "STRIPE_SECRET_KEY", "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", "STRIPE_WEBHOOK_SECRET", "STAGING_EMAIL_WORKER_TOKEN"];
 if (process.env.ACED_DEPLOYMENT_ENV !== "staging" || process.env.NEXTAUTH_URL !== "https://staging.aceditprep.com" || process.env.NEXT_PUBLIC_SITE_URL !== "https://staging.aceditprep.com" || required.some((key) => !process.env[key])) process.exit(1);
 const url = new URL(process.env.DATABASE_URL || "");
 if (url.pathname !== "/aced_staging" || url.username !== "aced_staging" || !process.env.STRIPE_SECRET_KEY.startsWith("sk_test_") || !process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.startsWith("pk_test_") || !process.env.STRIPE_WEBHOOK_SECRET.startsWith("whsec_")) process.exit(1);
@@ -40,6 +41,7 @@ npm run build
 npm run db:migrate
 node scripts/verify-applied-drizzle-migrations.mjs
 chmod +x deploy/staging/start-staging.sh
+chmod +x deploy/staging/start-staging-email-worker.sh
 
 prior=""
 if [[ -L "${CURRENT}" ]]; then prior="$(readlink -f "${CURRENT}")"; fi
@@ -49,6 +51,7 @@ rollback() {
     ln -sfn "${prior}" "${ROOT}/current.rollback"
     mv -Tf "${ROOT}/current.rollback" "${CURRENT}"
     pm2 restart "${APP}" --update-env >/dev/null
+    pm2 restart "${WORKER_APP}" --update-env >/dev/null || true
   fi
 }
 activating=0
@@ -70,6 +73,9 @@ pm2 restart "${APP}" --update-env
 for _ in {1..30}; do curl --silent --fail "http://127.0.0.1:${PORT}/api/health" >/dev/null && break; sleep 2; done
 curl --silent --fail "http://127.0.0.1:${PORT}/api/health" >/dev/null || { rollback; exit 1; }
 test "$(readlink -f "${CURRENT}")" = "${RELEASE}" || { rollback; exit 1; }
+pm2 describe "${WORKER_APP}" >/dev/null 2>&1 || pm2 start deploy/staging/ecosystem.config.cjs --only "${WORKER_APP}"
+pm2 restart "${WORKER_APP}" --update-env
+pm2 describe "${WORKER_APP}" >/dev/null
 pm2 save >/dev/null
 activating=0
 echo "Staging release ${ID} activated."

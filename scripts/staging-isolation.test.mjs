@@ -8,6 +8,8 @@ const emailPolicy = readFileSync("lib/mockTest/email-policy.ts", "utf8");
 const reset = readFileSync("scripts/reset-staging-mock-test-fixture.mjs", "utf8");
 const stagingCheck = readFileSync("scripts/check-staging-config.mjs", "utf8");
 const caddy = readFileSync("deploy/staging/Caddyfile.template", "utf8");
+const worker = readFileSync("deploy/staging/start-staging-email-worker.sh", "utf8");
+const workerRoute = readFileSync("app/api/cron/mock-test-email/route.ts", "utf8");
 
 test("staging is explicit while production retains its sole canonical checkout origin", () => {
   assert.match(checkout, /ACED_PRODUCTION_ORIGIN/);
@@ -39,6 +41,15 @@ test("staging config and Caddy templates require isolated private operation", ()
   assert.match(caddy, /basicauth/);
   assert.match(caddy, /X-Robots-Tag "noindex, nofollow, noarchive"/);
   assert.match(caddy, /api\/stripe\/webhook/);
+});
+
+test("staging email delivery has a private worker and remains disabled unless explicitly enabled", () => {
+  assert.match(worker, /STAGING_EMAIL_DELIVERY_ENABLED:-false/);
+  assert.match(worker, /127\.0\.0\.1:3006\/api\/cron\/mock-test-email/);
+  assert.match(worker, /STAGING_EMAIL_WORKER_TOKEN/);
+  assert.match(workerRoute, /isAuthorizedStagingEmailWorker/);
+  assert.match(workerRoute, /isStagingEmailDeliveryEnabled/);
+  assert.match(workerRoute, /processMockEmailOutbox/);
 });
 
 test("staging gate requires present, valid, matching owner email values", () => {

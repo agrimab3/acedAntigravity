@@ -25,6 +25,8 @@ export const stagingChecks = (config) => [
   ["Stripe TEST secret", config.STRIPE_SECRET_KEY?.startsWith("sk_test_")],
   ["Stripe TEST public key", config.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith("pk_test_")],
   ["staging Stripe webhook secret", config.STRIPE_WEBHOOK_SECRET?.startsWith("whsec_")],
+  ["staging email worker token", Boolean(config.STAGING_EMAIL_WORKER_TOKEN)],
+  ["staging email delivery mode is explicit", ["true", "false"].includes(config.STAGING_EMAIL_DELIVERY_ENABLED)],
   ["Resend", Boolean(config.RESEND_API_KEY)],
   ["single owner email recipient", singleEmail(config.EMAIL_TEST_TO)],
   ["fixture owner matches email recipient", matchingStagingOwnerEmail(config.EMAIL_TEST_TO, config.STAGING_TEST_EMAIL)],
