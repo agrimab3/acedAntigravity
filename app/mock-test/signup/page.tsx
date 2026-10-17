@@ -7,7 +7,8 @@ import { DM_Sans, DM_Serif_Display } from "next/font/google";
 import NightSky from "@/components/NightSky";
 import { NEXT_MOCK } from "@/lib/mockTests";
 import TestModeBanner from "@/components/TestModeBanner";
-import { getMockTestUser, signInUrl, signOutUrl } from "@/lib/mockTest/auth";
+import { signInUrl, signOutUrl } from "@/lib/mockTest/auth";
+import { getAccountConsentStatus } from "@/lib/account-consent";
 import {
   getMockTestAuthMode,
   getMockTestPaymentMode,
@@ -45,7 +46,10 @@ type SignupPageProps = {
 };
 
 export default async function MockTestSignupPage({ searchParams }: SignupPageProps) {
-  const userSession = await getMockTestUser();
+  const accountConsent = await getAccountConsentStatus();
+  const userSession = accountConsent.complete && accountConsent.userId && accountConsent.email
+    ? { id: accountConsent.userId, email: accountConsent.email, name: null as string | null }
+    : null;
   const params = await searchParams;
   const authMode = getMockTestAuthMode();
   const paymentMode = getMockTestPaymentMode();
@@ -141,6 +145,13 @@ export default async function MockTestSignupPage({ searchParams }: SignupPagePro
   const returnTo = params.invite
     ? `/mock-test/signup?invite=${encodeURIComponent(params.invite)}`
     : "/mock-test/signup";
+  const authNotice = accountConsent.authenticated && !accountConsent.complete
+    ? {
+        message: "Google sign-in worked, but your account confirmations still need to be completed.",
+        href: `/signin/complete?next=${encodeURIComponent(returnTo)}`,
+        action: "Finish account setup →",
+      }
+    : null;
 
   return (
     <div className={`${styles.pageRoot} ${dmSerif.variable} ${dmSans.variable}`}>
@@ -209,6 +220,7 @@ export default async function MockTestSignupPage({ searchParams }: SignupPagePro
                 seatDisplay={seatDisplay}
                 inviteToken={validInvite ? params.invite : undefined}
                 invited={validInvite}
+                authNotice={authNotice}
               />
             </>
           )}

@@ -173,6 +173,20 @@
   font-weight: 600;
 }
 
+.accountSuccess {
+  display: inline-grid;
+  width: 18px;
+  height: 18px;
+  margin-left: 7px;
+  place-items: center;
+  border-radius: 50%;
+  background: #5DCAA5;
+  color: #072019;
+  font-size: 12px;
+  font-weight: 800;
+  vertical-align: 1px;
+}
+
 .accountEmail {
   margin-top: 3px;
   color: #8D97A6;
@@ -225,6 +239,10 @@
   color: #8D97A6;
   font-size: 13px;
   line-height: 1.45;
+}
+
+.authNotice a {
+  color: #7BE0C0;
 }
 
 .fieldGroup {
@@ -316,6 +334,15 @@
 
 .checkboxCard strong {
   color: #EEF1F5;
+}
+
+.checkoutHint {
+  min-height: 20px;
+  margin: -12px 0 0;
+  color: #B4BCC8;
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
 }
 
 .ticketPanel {

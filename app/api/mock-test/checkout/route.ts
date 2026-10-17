@@ -1,5 +1,6 @@
 import { and, eq, isNotNull } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { mockRegistrations, mockTestOpsEvents, mockTests } from "@/db/schema";
 import { getDb } from "@/lib/db";
 import { getMockTestUser } from "@/lib/mockTest/auth";
@@ -9,13 +10,14 @@ import { createSeatHold, MockTestSeatsFullError } from "@/lib/mockTest/seats";
 import { validateInviteForUser } from "@/lib/mockTest/waitlist";
 import { isMockSignupClosedForZone, NEXT_MOCK, TIME_ZONES } from "@/lib/mockTests";
 import { consumeRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
+import { hasRequiredNoRefundAcknowledgement } from "@/lib/mockTest/signup-policy";
 
-type CheckoutBody = {
-  timeZone?: string;
-  agreedNoRefund?: boolean;
-  marketingOptIn?: boolean;
-  inviteToken?: string;
-};
+const checkoutPayloadSchema = z.object({
+  timeZone: z.string(),
+  agreedNoRefund: z.literal(true),
+  marketingOptIn: z.boolean().optional().default(false),
+  inviteToken: z.string().optional(),
+}).strict();
 
 export async function POST(request: Request) {
   if (!isMockTestSignupEnabled()) {
@@ -36,19 +38,29 @@ export async function POST(request: Request) {
     );
   }
 
-  let body: CheckoutBody;
+  let rawBody: unknown;
   try {
-    body = (await request.json()) as CheckoutBody;
+    rawBody = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid checkout request." }, { status: 400 });
   }
 
-  if (!body.agreedNoRefund) {
+  const rawAcknowledgement =
+    rawBody && typeof rawBody === "object" && "agreedNoRefund" in rawBody
+      ? rawBody.agreedNoRefund
+      : undefined;
+  if (!hasRequiredNoRefundAcknowledgement(rawAcknowledgement)) {
     return NextResponse.json(
       { error: "You must agree to the non-refundable policy before checking out." },
       { status: 400 }
     );
   }
+
+  const parsed = checkoutPayloadSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid checkout request." }, { status: 400 });
+  }
+  const body = parsed.data;
 
   if (!body.timeZone || !TIME_ZONES.some((zone) => zone.value === body.timeZone)) {
     return NextResponse.json({ error: "Choose a valid time zone." }, { status: 400 });

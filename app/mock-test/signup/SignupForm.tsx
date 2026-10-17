@@ -14,6 +14,7 @@ import {
   getMockTimeZoneDisplay,
   isMockSignupClosedForZone,
 } from "@/lib/mockTests";
+import { getCheckoutBlocker } from "@/lib/mockTest/signup-policy";
 import styles from "./signup.module.css";
 
 type SignupUser = {
@@ -32,12 +33,11 @@ type SignupFormProps = {
   seatDisplay: StudentSeatDisplay;
   inviteToken?: string;
   invited?: boolean;
+  authNotice?: { message: string; href: string; action: string } | null;
 };
 
 type SavedSignupState = {
   timeZone?: string;
-  agreedNoRefund?: boolean;
-  marketingOptIn?: boolean;
 };
 
 const STORAGE_KEY = `aced-mock-signup-${NEXT_MOCK.mockTestSlug}`;
@@ -93,6 +93,7 @@ export default function SignupForm({
   seatDisplay,
   inviteToken,
   invited = false,
+  authNotice = null,
 }: SignupFormProps) {
   const [timeZone, setTimeZone] = useState(TIME_ZONES[0].value);
   const [agreedNoRefund, setAgreedNoRefund] = useState(false);
@@ -118,8 +119,9 @@ export default function SignupForm({
 
     const reveal = window.setTimeout(() => {
       setTimeZone(restoredZone);
-      setAgreedNoRefund(Boolean(saved?.agreedNoRefund));
-      setMarketingOptIn(Boolean(saved?.marketingOptIn));
+      // Legal and marketing choices deliberately begin unchecked on every visit.
+      setAgreedNoRefund(false);
+      setMarketingOptIn(false);
       setClosed(isMockSignupClosedForZone(restoredZone));
       setHydrated(true);
     }, 0);
@@ -132,12 +134,12 @@ export default function SignupForm({
     try {
       window.sessionStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ timeZone, agreedNoRefund, marketingOptIn })
+        JSON.stringify({ timeZone })
       );
     } catch {
       // The form still works when sessionStorage is unavailable.
     }
-  }, [timeZone, agreedNoRefund, marketingOptIn, hydrated]);
+  }, [timeZone, hydrated]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -148,13 +150,22 @@ export default function SignupForm({
   }, [timeZone, hydrated]);
 
   const zoneDisplay = useMemo(() => getMockTimeZoneDisplay(timeZone), [timeZone]);
-  const canContinue = Boolean(user && agreedNoRefund && !closed && !checkoutBusy);
+  const hasValidTimeZone = TIME_ZONES.some((zone) => zone.value === timeZone);
+  const checkoutBlocker = getCheckoutBlocker({
+    signedIn: Boolean(user),
+    agreedToRefundPolicy: agreedNoRefund,
+    hasValidTimeZone,
+    signupsClosed: closed,
+    seatsFull: seatDisplay.isFull && !invited,
+    checkoutBusy,
+  });
+  const canContinue = checkoutBlocker === null;
 
   const saveBeforeAuth = () => {
     try {
       window.sessionStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ timeZone, agreedNoRefund, marketingOptIn })
+        JSON.stringify({ timeZone })
       );
     } catch {
       // No-op when storage is unavailable.
@@ -251,7 +262,10 @@ export default function SignupForm({
                     {user.initial}
                   </div>
                   <div>
-                    <div className={styles.accountTitle}>{authMode === "test" ? "signed in · test student" : "signed in with Google"}</div>
+                    <div className={styles.accountTitle}>
+                      {authMode === "test" ? "Signed in · test student" : "Signed in with Google"}
+                      <span className={styles.accountSuccess} role="status">✓</span>
+                    </div>
                     <div className={styles.accountEmail}>{user.email}</div>
                   </div>
                 </div>
@@ -265,13 +279,22 @@ export default function SignupForm({
               </>
             ) : (
               <div className={styles.signInBlock}>
-                <button
-                  type="button"
-                  className={styles.googleButton}
-                  onClick={handleSignIn}
-                >
-                  {authMode === "test" ? "continue with Google · test" : "continue with Google"}
-                </button>
+                {authNotice ? (
+                  <p className={styles.authNotice} role="alert">
+                    {authNotice.message} <Link href={authNotice.href}>{authNotice.action}</Link>
+                  </p>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className={styles.googleButton}
+                      onClick={handleSignIn}
+                    >
+                      {authMode === "test" ? "continue with Google · test" : "continue with Google"}
+                    </button>
+                    <p className={styles.authNotice}>Sign in securely with Google to continue.</p>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -314,12 +337,13 @@ export default function SignupForm({
               <input
                 type="checkbox"
                 checked={agreedNoRefund}
+                required
                 onChange={(event) => setAgreedNoRefund(event.target.checked)}
               />
               <span>
-                I understand this test is <strong>non-refundable</strong> and only open on{" "}
-                {NEXT_MOCK.testDateLabel}. Read the <Link href="/legal?tab=refunds">Refund and Payment Policy</Link>{" "}
-                and <Link href="/legal?tab=mock-test-rules">Mock Test Rules</Link>.
+                I understand this test is <strong>generally non-refundable</strong>, subject to applicable law and the exceptions in the{" "}
+                <Link href="/legal?tab=refunds">Refund and Payment Policy</Link>, and is open on {NEXT_MOCK.testDateLabel}. Read the{" "}
+                <Link href="/legal?tab=mock-test-rules">Mock Test Rules</Link>.
               </span>
             </label>
 
@@ -333,9 +357,6 @@ export default function SignupForm({
             </label>
           </div>
 
-          <span id="mock-pay-hint" className={styles.srOnly}>
-            Sign in and tick the non-refund box to continue.
-          </span>
         </form>
 
         <aside className={styles.ticketPanel} aria-label="Your mock test ticket">
@@ -404,6 +425,10 @@ export default function SignupForm({
           >
             {checkoutBusy ? "opening checkout…" : "pay & save my seat ✦"}
           </button>
+
+          <p id="mock-pay-hint" className={styles.checkoutHint} role="status">
+            {checkoutBlocker ?? "Ready to open secure $2 test checkout."}
+          </p>
 
           <p className={styles.deviceNote}>Best on a laptop or desktop, like the real ACT. Phones work, but the passages are easier to read on a bigger screen.</p>
 
