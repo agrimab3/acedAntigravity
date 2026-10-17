@@ -3,7 +3,7 @@ aceditprep.com {
   # Keep the catch-all handle below protected by Caddy Basic Auth.
   @public path / /signin /legal /how-it-works /sections /faq /about /join /terms /privacy /refunds /mock-test-rules /accessibility /contact /favicon.ico /icon.svg /apple-icon.png /api/health /api/auth/* /mock-test /mock-test/* /api/mock-test/*
   @publicForms path /api/waitlist-signups /api/join-requests
-  @publicStatic path /_next/static/* /fonts/* /images/* /starmap.jpg /const-english.jpg /const-math.jpg /const-reading.jpg /const-science.jpg
+  @publicStatic path /_next/static/* /fonts/* /images/* /email/* /starmap.jpg /const-english.jpg /const-math.jpg /const-reading.jpg /const-science.jpg
   @webhook path /api/stripe/webhook*
 
   handle @public {

@@ -4,6 +4,7 @@ import { readFileSync, statSync } from "node:fs";
 import test from "node:test";
 import {
   getMockReminderAt,
+  makeMockTestGoogleCalendarUrl,
   resolveEmailDeliveryTarget,
   shouldRetryMockEmail,
 } from "../lib/mockTest/email-policy.ts";
@@ -89,6 +90,23 @@ test("Friday 5 PM reminder is correct in Pacific, Eastern, and Hawaii", () => {
   );
 });
 
+test("confirmation calendar link is a Google all-day event in the registered time zone", () => {
+  const url = new URL(makeMockTestGoogleCalendarUrl({
+    timeZone: "America/New_York",
+    mockTestUrl: "https://staging.aceditprep.com/mock-test",
+  }));
+  assert.equal(url.origin, "https://calendar.google.com");
+  assert.equal(url.pathname, "/calendar/render");
+  assert.equal(url.searchParams.get("action"), "TEMPLATE");
+  assert.equal(url.searchParams.get("text"), "ACED Mock Test");
+  assert.equal(url.searchParams.get("dates"), "20261205/20261206");
+  assert.equal(url.searchParams.get("ctz"), "America/New_York");
+  assert.equal(url.searchParams.get("location"), "https://staging.aceditprep.com/mock-test");
+  assert.match(url.searchParams.get("details") ?? "", /available all day/);
+  assert.match(url.searchParams.get("details") ?? "", /9 PM Eastern/);
+  assert.match(url.searchParams.get("details") ?? "", /Open the test: https:\/\/staging\.aceditprep\.com\/mock-test/);
+});
+
 test("all six follow-up email templates use the requested copy", () => {
   const messages = renderEveryMockEmailForTest({
     timeZone: "America/Los_Angeles",
@@ -107,7 +125,10 @@ test("all six follow-up email templates use the requested copy", () => {
   assert.match(confirmed.html, /One 10-minute break, right after Math\./);
   assert.match(confirmed.html, /A graphing calculator is built in for Math\./);
   assert.match(confirmed.html, /If your wifi drops, keep going\. Your answers save and sync\./);
-  assert.match(confirmed.html, />Add to calendar</);
+  assert.match(confirmed.html, />Add to Google Calendar</);
+  assert.match(confirmed.html, /Apple \/ Outlook \(.ics\)/);
+  assert.match(confirmed.html, /href="https:\/\/calendar\.google\.com\/calendar\/render\?action=TEMPLATE&amp;text=ACED\+Mock\+Test/);
+  assert.match(confirmed.html, /api\/mock-test\/calendar\?timeZone=America%2FLos_Angeles/);
   assert.match(confirmed.html, /Scores out Sun, Dec 6 at 2 PM PT/);
   assert.match(confirmed.html, /\$2 · non-refundable/);
 
@@ -168,7 +189,7 @@ test("all six follow-up email templates use the requested copy", () => {
 
   for (const message of messages) {
     assert.match(message.html, new RegExp(MOCK_EMAIL_HEADER_TOKEN));
-    assert.match(message.html, /width="600" height="200" alt="Aced"/);
+    assert.match(message.html, /width="600" height="200" alt="Aced Mock Test: your seat is saved"/);
     assert.match(message.html, /max-width:600px/);
     assert.match(message.html, /meta name="color-scheme" content="light dark"/);
     assert.match(message.html, /prefers-color-scheme: dark/);
@@ -188,7 +209,7 @@ test("all six follow-up email templates use the requested copy", () => {
   assert.match(confirmed.attachments[0]?.content ?? "", /TZID=America\/Los_Angeles/);
 });
 
-test("header delivery uses CID locally and absolute site URLs in production", () => {
+test("header delivery uses CID locally and public absolute site URLs in deployed environments", () => {
   const outbox = readFileSync(
     new URL("../lib/mockTest/email-outbox.ts", import.meta.url),
     "utf8"

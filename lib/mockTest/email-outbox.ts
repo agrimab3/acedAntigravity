@@ -7,6 +7,7 @@ import { mockEmailOutbox, mockWaitlist } from "@/db/schema";
 import { getDb } from "@/lib/db";
 import {
   getMockReminderAt,
+  makeMockTestGoogleCalendarUrl,
   MOCK_EMAIL_FROM,
   MOCK_EMAIL_MAX_ATTEMPTS,
   MOCK_EMAIL_SUPPORT,
@@ -117,8 +118,10 @@ export async function queueRegistrationConfirmedEmails(registrationId: string) {
   const recipientEmail = String(row.email);
   const mockTestId = String(row.mock_test_id);
   const paidAt = new Date(String(row.paid_at));
-  const mockTestUrl = `${getMockEmailSiteBaseUrl()}/mock-test`;
-  const calendarUrl = `${getMockEmailSiteBaseUrl()}/api/mock-test/calendar?timeZone=${encodeURIComponent(timeZone)}`;
+  const siteBaseUrl = getMockEmailSiteBaseUrl();
+  const mockTestUrl = `${siteBaseUrl}/mock-test`;
+  const calendarIcsUrl = `${siteBaseUrl}/api/mock-test/calendar?timeZone=${encodeURIComponent(timeZone)}`;
+  const googleCalendarUrl = makeMockTestGoogleCalendarUrl({ timeZone, mockTestUrl });
 
   await queueMockEmail({
     mockTestId,
@@ -126,7 +129,7 @@ export async function queueRegistrationConfirmedEmails(registrationId: string) {
     uniqueKey: `registration_confirmed:${registrationId}`,
     recipientEmail,
     scheduledAt: paidAt,
-    rendered: renderRegistrationConfirmed({ timeZone, calendarUrl }),
+    rendered: renderRegistrationConfirmed({ timeZone, googleCalendarUrl, calendarIcsUrl }),
   });
 
   const reminderAt = getMockReminderAt(timeZone);

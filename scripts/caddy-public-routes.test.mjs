@@ -8,6 +8,7 @@ test("public auth, mock-test, and health routes bypass only the temporary Caddy 
   assert.match(caddy, /\/api\/auth\/\*/);
   assert.match(caddy, /\/mock-test\/\*/);
   assert.match(caddy, /\/api\/mock-test\/\*/);
+  assert.match(caddy, /\/email\/\*/);
   assert.match(caddy, /\/api\/health/);
   assert.match(caddy, /\/mock-test-rules/);
   assert.match(caddy, /\/accessibility/);

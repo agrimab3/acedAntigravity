@@ -5,6 +5,14 @@ staging.aceditprep.com {
     reverse_proxy 127.0.0.1:3006
   }
 
+  # Email clients cannot present Basic Auth. Limit this exception to static
+  # email headers and the optional calendar-download link.
+  @emailAssets path /email/* /api/mock-test/calendar*
+  handle @emailAssets {
+    header X-Robots-Tag "noindex, nofollow, noarchive"
+    reverse_proxy 127.0.0.1:3006
+  }
+
   handle {
     basicauth {
       aced HASH_FROM_CADDY

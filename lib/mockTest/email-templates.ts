@@ -1,5 +1,6 @@
 import {
   getFriendlyMockTimeZoneName,
+  makeMockTestGoogleCalendarUrl,
   makeMockTestCalendarIcs,
 } from "./email-policy.ts";
 
@@ -79,10 +80,14 @@ function layout(input: {
   cardHtml?: string;
   afterCardHtml?: string;
   button?: { label: string; url: string; outlined?: boolean };
+  secondaryLink?: { label: string; url: string };
   smallLine?: string;
   footerFirst: string;
 }) {
   const button = input.button ? bulletproofButton(input.button) : "";
+  const secondaryLink = input.secondaryLink
+    ? `<p style="margin:14px 0 0;text-align:center;font-size:14px;line-height:20px"><a href="${escapeHtml(input.secondaryLink.url)}" style="color:#28785F;font-weight:700;text-decoration:underline">${escapeHtml(input.secondaryLink.label)}</a></p>`
+    : "";
   const smallLine = input.smallLine
     ? `<div class="aced-small" style="margin-top:14px;color:#8A93A3;font-size:13px;line-height:19px;text-align:center">${input.smallLine}</div>`
     : "";
@@ -109,11 +114,11 @@ function layout(input: {
 ${previewHtml(input.previewText)}
 <table class="aced-shell" role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background:#F3F5F8"><tr><td align="center" style="padding:0 0 24px">
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px;margin:0 auto;background:#FFFFFF">
-<tr><td bgcolor="#0F1838" style="background:#0F1838;line-height:0;font-size:0"><img src="${MOCK_EMAIL_HEADER_TOKEN}" width="600" height="200" alt="Aced" style="display:block;width:100%;max-width:600px;height:auto;border:0;outline:none;text-decoration:none;background:#0F1838"></td></tr>
+<tr><td bgcolor="#0F1838" style="background:#0F1838;line-height:0;font-size:0"><img src="${MOCK_EMAIL_HEADER_TOKEN}" width="600" height="200" alt="Aced Mock Test: your seat is saved" style="display:block;width:100%;max-width:600px;height:auto;border:0;outline:none;text-decoration:none;background:#0F1838"></td></tr>
 <tr><td class="aced-body" style="padding:28px 24px 26px;background:#FFFFFF">
 <h1 class="aced-headline" style="margin:0;color:#121826;font-size:28px;line-height:34px;font-weight:800;letter-spacing:-0.4px">${escapeHtml(input.headline.replace(/ ✦$/, ""))} <span style="color:${input.accent}">✦</span></h1>
 <p class="aced-copy" style="margin:10px 0 0;color:#4A5466;font-size:16px;line-height:24px">${escapeHtml(input.sentence)}</p>
-${input.beforeCardHtml ?? ""}${input.cardHtml ?? ""}${input.afterCardHtml ?? ""}${button}${smallLine}
+${input.beforeCardHtml ?? ""}${input.cardHtml ?? ""}${input.afterCardHtml ?? ""}${button}${secondaryLink}${smallLine}
 </td></tr>
 <tr><td class="aced-body" style="padding:0 24px 24px;background:#FFFFFF"><div style="border-top:1px solid #E3E6EB;padding-top:18px"><p class="aced-footer" style="margin:0;color:#9AA2B1;font-size:12px;line-height:18px;text-align:center">${escapeHtml(input.footerFirst)}<br>Questions? Just reply to this email.</p></div></td></tr>
 </table>
@@ -127,7 +132,8 @@ function baseText(input: { body: string; footerFirst: string }) {
 
 export function renderRegistrationConfirmed(input: {
   timeZone: string;
-  calendarUrl: string;
+  googleCalendarUrl: string;
+  calendarIcsUrl: string;
 }): RenderedMockEmail {
   const zone = getFriendlyMockTimeZoneName(input.timeZone);
   const card = `<div class="aced-card" style="margin-top:22px;padding:18px;border:1px solid #B8E8D7;border-radius:16px;background:#F2FBF7"><div style="color:#28785F;font-size:12px;line-height:16px;font-weight:800;letter-spacing:1.2px">SATURDAY</div><div class="aced-card-main" style="margin-top:4px;color:#121826;font-size:24px;line-height:30px;font-weight:800">December 5</div><div class="aced-card-copy" style="margin-top:8px;color:#4A5466;font-size:14px;line-height:21px">Open all day in your time zone (${escapeHtml(zone)})<br>Start any time, as long as it's by 9 PM</div></div>`;
@@ -147,13 +153,14 @@ export function renderRegistrationConfirmed(input: {
       sentence: "Your seat for the ACED Mock Test is saved. Here's everything you need for test day.",
       cardHtml: card,
       afterCardHtml: howItWorks,
-      button: { label: "Add to calendar", url: input.calendarUrl },
+      button: { label: "Add to Google Calendar", url: input.googleCalendarUrl },
+      secondaryLink: { label: "Apple / Outlook (.ics)", url: input.calendarIcsUrl },
       smallLine: `Scores out Sun, Dec 6 at 2 PM PT<br>$2 · non-refundable`,
       footerFirst: "You signed up for the ACED Mock Test on Aced.",
       previewText: "Your ACED Mock Test seat is saved for Saturday, December 5.",
     }),
     text: baseText({
-      body: `You're in ✦\n\nYour seat for the ACED Mock Test is saved. Here's everything you need for test day.\n\nSATURDAY\nDecember 5\nOpen all day in your time zone (${zone})\nStart any time, as long as it's by 9 PM\n\nHOW IT WORKS\n● All 4 sections in one sitting: English, Math, Reading, Science. About 3 hours.\n● One 10-minute break, right after Math.\n● A graphing calculator is built in for Math.\n● If your wifi drops, keep going. Your answers save and sync.\n\nAdd to calendar: ${input.calendarUrl}\n\nScores out Sun, Dec 6 at 2 PM PT\n$2 · non-refundable`,
+      body: `You're in ✦\n\nYour seat for the ACED Mock Test is saved. Here's everything you need for test day.\n\nSATURDAY\nDecember 5\nOpen all day in your time zone (${zone})\nStart any time, as long as it's by 9 PM\n\nHOW IT WORKS\n● All 4 sections in one sitting: English, Math, Reading, Science. About 3 hours.\n● One 10-minute break, right after Math.\n● A graphing calculator is built in for Math.\n● If your wifi drops, keep going. Your answers save and sync.\n\nAdd to Google Calendar: ${input.googleCalendarUrl}\nApple / Outlook (.ics): ${input.calendarIcsUrl}\n\nScores out Sun, Dec 6 at 2 PM PT\n$2 · non-refundable`,
       footerFirst: "You signed up for the ACED Mock Test on Aced.",
     }),
     attachments: [{
@@ -320,7 +327,11 @@ export function renderEveryMockEmailForTest(input: { timeZone: string; baseUrl: 
   return [
     renderRegistrationConfirmed({
       timeZone: input.timeZone,
-      calendarUrl: `${input.baseUrl}/api/mock-test/calendar?timeZone=${encodeURIComponent(input.timeZone)}`,
+      googleCalendarUrl: makeMockTestGoogleCalendarUrl({
+        timeZone: input.timeZone,
+        mockTestUrl: `${input.baseUrl}/mock-test`,
+      }),
+      calendarIcsUrl: `${input.baseUrl}/api/mock-test/calendar?timeZone=${encodeURIComponent(input.timeZone)}`,
     }),
     renderTomorrowReminder({ mockTestUrl: `${input.baseUrl}/mock-test` }),
     renderWaitlistInvite({

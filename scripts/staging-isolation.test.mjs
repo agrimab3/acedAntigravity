@@ -39,6 +39,7 @@ test("staging config and Caddy templates require isolated private operation", ()
   assert.match(stagingCheck, /single owner email recipient/);
   assert.match(caddy, /staging\.aceditprep\.com/);
   assert.match(caddy, /basicauth/);
+  assert.match(caddy, /@emailAssets path \/email\/\* \/api\/mock-test\/calendar\*/);
   assert.match(caddy, /X-Robots-Tag "noindex, nofollow, noarchive"/);
   assert.match(caddy, /api\/stripe\/webhook/);
 });

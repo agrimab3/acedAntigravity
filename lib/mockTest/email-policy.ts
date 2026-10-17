@@ -140,6 +140,33 @@ export function makeMockTestCalendarIcs(timeZone: string) {
   ].join("\r\n");
 }
 
+/**
+ * Google Calendar renders date-only ranges as all-day events. That matches a
+ * test which opens all day, while ctz and the details retain the student's
+ * registered time zone and 9 PM local start deadline.
+ */
+export function makeMockTestGoogleCalendarUrl(input: {
+  timeZone: string;
+  mockTestUrl: string;
+}) {
+  const origin = new URL(input.mockTestUrl).origin;
+  const zone = getFriendlyMockTimeZoneName(input.timeZone);
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: "ACED Mock Test",
+    dates: "20261205/20261206",
+    details: [
+      `The ACED Mock Test is available all day on Saturday, December 5, 2026, in your registered time zone (${zone}).`,
+      `Start any time, but begin by 9 PM ${zone}.`,
+      "Complete English, Math, Reading, and Science in one sitting (about 3 hours, with one 10-minute break after Math).",
+      `Open the test: ${origin}/mock-test`,
+    ].join("\n\n"),
+    location: `${origin}/mock-test`,
+    ctz: input.timeZone,
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
 export const MOCK_EMAIL_MAX_ATTEMPTS = 5;
 
 export function shouldRetryMockEmail(attempts: number, sentAt: Date | null) {
