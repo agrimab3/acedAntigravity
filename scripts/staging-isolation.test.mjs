@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { matchingStagingOwnerEmail } from "./check-staging-config.mjs";
 
 const checkout = readFileSync("lib/mockTest/stripe-policy.ts", "utf8");
 const emailPolicy = readFileSync("lib/mockTest/email-policy.ts", "utf8");
@@ -38,4 +39,12 @@ test("staging config and Caddy templates require isolated private operation", ()
   assert.match(caddy, /basicauth/);
   assert.match(caddy, /X-Robots-Tag "noindex, nofollow, noarchive"/);
   assert.match(caddy, /api\/stripe\/webhook/);
+});
+
+test("staging gate requires present, valid, matching owner email values", () => {
+  assert.equal(matchingStagingOwnerEmail(undefined, undefined), false);
+  assert.equal(matchingStagingOwnerEmail("", ""), false);
+  assert.equal(matchingStagingOwnerEmail("owner@example.com", "other@example.com"), false);
+  assert.equal(matchingStagingOwnerEmail("owner@example.com", "owner@example.com"), true);
+  assert.equal(matchingStagingOwnerEmail("owner@example.com, second@example.com", "owner@example.com, second@example.com"), false);
 });
