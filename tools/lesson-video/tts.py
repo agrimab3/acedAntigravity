@@ -14,19 +14,23 @@ PRONUNCIATION = json.loads((ROOT / "pronunciation.json").read_text())
 
 
 def apply_pronunciation(text: str) -> str:
-    # Handle prose ("ACT") and script-friendly dotted forms ("A.C.T.").
-    # Commas give Kokoro an unambiguous spoken-letter pause.
-    text = re.sub(r"(?<![A-Za-z])A\.?\s*C\.?\s*T\.?(?![A-Za-z])", "A, C, T", text, flags=re.IGNORECASE)
-    text = re.sub(r"(?<![A-Za-z])A\.?\s*I\.?(?![A-Za-z])", "A, I", text, flags=re.IGNORECASE)
-    # Longest first prevents a future short phrase from overriding a longer one.
-    for phrase, spoken in sorted(PRONUNCIATION.items(), key=lambda item: len(item[0]), reverse=True):
-        text = re.sub(r"\b" + re.escape(phrase) + r"\b", spoken, text, flags=re.IGNORECASE)
-    return text
+    # Legacy scripts may contain dotted initialisms. The narration passed to Kokoro
+    # is plain text; pronunciation is controlled by its lexicon below.
+    return re.sub(r"(?<![A-Za-z])A\.\s*C\.\s*T\.?(?![A-Za-z])", "ACT", text, flags=re.IGNORECASE)
+
+
+def apply_phoneme_overrides(pipeline: KPipeline) -> None:
+    # Misaki/Kokoro phoneme notation corresponding to the IPA documented in
+    # pronunciation.json. Exact-case entries take priority for capitalized brands
+    # and initialisms.
+    for word, value in PRONUNCIATION.items():
+        pipeline.g2p.lexicon.golds[word] = value["kokoro"]
 
 
 def synthesize(text: str, voice: str, output: Path, pipeline: KPipeline | None = None) -> None:
     spoken = apply_pronunciation(text)
     pipeline = pipeline or KPipeline(lang_code="a")
+    apply_phoneme_overrides(pipeline)
     chunks = []
     for _, _, audio in pipeline(spoken, voice=voice):
         chunks.append(np.asarray(audio, dtype=np.float32))
@@ -55,6 +59,7 @@ def main() -> None:
     if args.manifest:
         jobs = json.loads(Path(args.manifest).read_text())
         pipeline = KPipeline(lang_code="a")
+        apply_phoneme_overrides(pipeline)
         for job in jobs:
             synthesize(job["text"], job["voice"], Path(job["output"]), pipeline)
         return

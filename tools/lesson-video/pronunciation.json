@@ -1,5 +1,5 @@
 {
-  "Aced": "AYST",
-  "ACT": "A, C, T",
-  "AI": "A, I"
+  "Aced": { "ipa": "ˈeɪst", "kokoro": "ˈAst" },
+  "AI": { "ipa": "ˌeɪ ˈaɪ", "kokoro": "ˌA ˈI" },
+  "ACT": { "ipa": "ˌeɪ siː ˈtiː", "kokoro": "ˌA sˈi tˈi" }
 }
