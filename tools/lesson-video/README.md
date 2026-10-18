@@ -9,7 +9,7 @@ Local-only 1080p lesson rendering with Kokoro TTS, Playwright (Google Chrome), a
 npm run lesson:samples
 ```
 
-The three generated voice samples are `tools/lesson-video/output/voice-samples/af_heart.wav`, `af_bella.wav`, and `af_nicole.wav`. Set `LESSON_VOICE=af_bella` (or another listed voice) when rendering after choosing Astra's voice.
+Astra uses `af_heart`; Cosmo uses `bm_fable`. Generate the locally cached Cosmo comparison clips with `npm run lesson:samples`. The renderer applies the pronunciation map before every Kokoro request: Aced is spoken “AYST,” and ACT/AI are spoken as individual letters.
 
 ## Script syntax
 
