@@ -32,6 +32,8 @@
     "check:secrets": "node scripts/check-secrets.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
     "test:all": "node scripts/run-all-tests.mjs",
+    "lesson": "node tools/lesson-video/render.mjs",
+    "lesson:samples": "node tools/lesson-video/make-voice-samples.mjs",
     "mocktest:prepare-dec5": "node --experimental-strip-types --env-file=.env scripts/prepare-dec5-form.mjs",
     "mocktest:review-dec5": "node --experimental-strip-types --env-file=.env scripts/write-dec5-form-review.mjs"
   },
