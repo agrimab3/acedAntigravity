@@ -17,7 +17,7 @@ export function astronautSvg(id, color, cheek = "#F0997B") {
   <ellipse cx="80" cy="64" rx="15" ry="7" fill="#fff" opacity=".18" transform="rotate(-25 80 64)"/>
   <ellipse id="${id}EL" cx="83" cy="86" rx="6" ry="7" fill="#F4F8FF"/><ellipse id="${id}ER" cx="117" cy="86" rx="6" ry="7" fill="#F4F8FF"/>
   <circle cx="72" cy="100" r="5" fill="${cheek}" opacity=".45"/><circle cx="128" cy="100" r="5" fill="${cheek}" opacity=".45"/>
-  <ellipse id="${id}M" cx="100" cy="106" rx="8" ry="2" fill="#FF9EA8"/>
+  <ellipse id="${id}M" cx="100" cy="106" rx="8" ry="2" fill="#FF9EA8"><animate attributeName="ry" values="2;4.8;2;3.4;2" dur=".42s" repeatCount="indefinite"/></ellipse>
   </g></svg>`;
 }
 
