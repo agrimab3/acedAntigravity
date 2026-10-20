@@ -1,5 +1,5 @@
 {
-  "lesson": "Lesson 1 · The ACT in 20 minutes",
+  "lesson": "Lesson 1 · The ACT Crash Course",
   "rules": [
     "Show ONLY the text written in each scene. Never add filler text, quotes, slogans or labels that are not in this file.",
     "Each scene appears when its 'say' line starts and stays until the next scene.",
@@ -11,9 +11,9 @@
       "id": "intro",
       "type": "title",
       "kicker": "Live lesson 1",
-      "title": "The ACT in 20 minutes",
-      "subtitle": "+ 3 quick wins",
-      "say": "Hey everyone! I'm Astra, the AI tutor here at Aced. Welcome to our very first live lesson! Tonight we're covering the ACT in twenty minutes: how the test works, how it's scored, and three quick wins you can use right away. Drop your questions in the chat anytime. And when a practice question pops up, type your answer in the chat before I reveal it. Let's see who gets it first! Ready? Let's light up some stars."
+      "title": "The ACT Crash Course",
+      "subtitle": "+ 3 quick wins & insider tips",
+      "say": "Hey everyone! I'm Astra, the AI tutor here at Aced. Welcome to our very first live lesson! Tonight is your ACT crash course: how the test works, how it's scored, and three quick wins, plus some insider tips you can use right away. Drop your questions in the chat anytime. And when a practice question pops up, type your answer in the chat before I reveal it. Let's see who gets it first! Ready? Let's light up some stars."
     },
     {
       "id": "p1-intro",
@@ -114,7 +114,7 @@
       "type": "chatQuestion",
       "kicker": "Quick check",
       "question": "30 seconds left, 5 questions to go. What do you do?",
-      "chatSeconds": 20,
+      "chatSeconds": 10,
       "answer": "Fill in an answer for every one.",
       "explain": "A guess has a 1 in 4 chance. A blank has zero.",
       "say": "Quick check! In the chat: if you have thirty seconds left and five questions to go, what should you do?",
@@ -191,7 +191,7 @@
         2,
         3
       ],
-      "chatSeconds": 20,
+      "chatSeconds": 10,
       "explain": "Semicolons and colons need a full sentence before them.",
       "say": "Your turn! In the chat. Which is correct?",
       "sayAfter": "The answer is B! 'Afterward' is an intro word, so it gets a comma. And remember, semicolons and colons need a full sentence before them. 'Afterward' isn't a full sentence, so C and D are out."
@@ -213,10 +213,48 @@
         2,
         3
       ],
-      "chatSeconds": 20,
+      "chatSeconds": 10,
       "explain": "Lift out \"Running every morning\" → \"helps me focus.\" Not a sentence, so no comma.",
       "say": "Here's a tricky one. Use the lift-out test. Which is correct?",
       "sayAfter": "It's B! Watch what happens when you lift out 'Running every morning.' You're left with 'helps me focus.' That's not a full sentence. 'Running every morning' isn't an intro phrase here. It's the subject. So no comma. The lift-out test tells you when to use a comma, and when not to."
+    },
+    {
+      "id": "e-tip1",
+      "type": "bigText",
+      "kicker": "Insider tip · English",
+      "big": "Two answers mean the same? Both are wrong.",
+      "caption": "Period vs. semicolon between two full sentences = same thing. Cross out both.",
+      "say": "Here's an insider tip. If two answer choices mean exactly the same thing, neither one can be right, because the ACT only has one correct answer. For example, a period and a semicolon both work between two full sentences. So if one choice uses a period and another uses a semicolon in the same spot, they're equal. Cross them both out."
+    },
+    {
+      "id": "e-tip2",
+      "type": "bigText",
+      "kicker": "Insider tip · English",
+      "big": "Check OMIT first.",
+      "caption": "Shorter and clearer usually wins on ACT English.",
+      "say": "Next tip. The ACT loves short, clear writing. If one of the choices says 'DELETE the underlined portion' or 'OMIT,' check it first. If the sentence still makes sense and doesn't lose anything important, that's usually the answer. And when two choices are both grammatically correct, the shorter one usually wins."
+    },
+    {
+      "id": "e-q3",
+      "type": "question",
+      "kicker": "Your turn · English",
+      "stem": "She returned back to the classroom. Which is best?",
+      "choices": [
+        "returned back to",
+        "returned to",
+        "returned backward to",
+        "came and returned to"
+      ],
+      "answer": 1,
+      "crossOut": [
+        0,
+        2,
+        3
+      ],
+      "chatSeconds": 10,
+      "explain": "\"Returned\" already means \"went back.\" Shortest correct answer wins.",
+      "say": "Let's try it. She returned back to the classroom. Which choice is best? Chat it in!",
+      "sayAfter": "It's B, returned to! 'Returned' already means 'went back,' so 'back' is extra. The shortest correct answer wins."
     },
     {
       "id": "w2-rule",
@@ -238,7 +276,7 @@
         "15"
       ],
       "answer": 1,
-      "chatSeconds": 20,
+      "chatSeconds": 10,
       "work": "3(5) + 5 = 15 + 5 = 20 ✓",
       "sticky": "Start with a middle choice ↕",
       "say": "Try this one in the chat. If three x plus five equals twenty, what is x?",
@@ -256,10 +294,43 @@
         "18"
       ],
       "answer": 2,
-      "chatSeconds": 20,
+      "chatSeconds": 10,
       "work": "Try B: 2(7) − 7 = 7 → too small ↑   Try C: 2(9) − 7 = 11 ✓",
       "say": "Let's practice starting in the middle. Two x minus seven equals eleven. What is x? Try plugging in, and put your answer in the chat.",
       "sayAfter": "It's C, nine! Start with B, seven. Two times seven is fourteen, minus seven is seven. That's too small, so go bigger. Try C, nine. Two times nine is eighteen, minus seven is eleven. That's it! Two tries, done."
+    },
+    {
+      "id": "m-q3",
+      "type": "question",
+      "kicker": "Trap check · Math",
+      "stem": "If 2x = 10, what is x + 3?",
+      "choices": [
+        "5",
+        "8",
+        "10",
+        "13"
+      ],
+      "answer": 1,
+      "crossOut": [
+        0
+      ],
+      "chatSeconds": 10,
+      "work": "x = 5 → x + 3 = 8 ✓   (5 is the trap!)",
+      "sticky": "Read the last line twice.",
+      "say": "Here's a trap the ACT loves. If two x equals ten, what is x plus three? Careful! Chat your answer.",
+      "sayAfter": "It's B, eight! Two x equals ten, so x is five. But they asked for x plus three, which is eight. Five is sitting right there as choice A to catch people who stop too early. So always read the last line of the question twice before you pick."
+    },
+    {
+      "id": "m-tip1",
+      "type": "steps",
+      "kicker": "Insider tip · Math",
+      "title": "Letters in the answers? Pick your own numbers.",
+      "steps": [
+        "Pick an easy number, like n = 2",
+        "Plug it into the question and each choice",
+        "Keep the choice that matches"
+      ],
+      "say": "Another math secret. When the answer choices have letters in them, like n or x, you can pick your own number. Say a question says n is an even number. Just pick n equals two, plug it in everywhere, and see which choice works. Use easy numbers like two or ten. Avoid zero and one, because they can make several choices look right."
     },
     {
       "id": "w3-rule",
@@ -310,11 +381,31 @@
         2,
         3
       ],
-      "chatSeconds": 20,
+      "chatSeconds": 10,
       "proof": "her hands shook",
       "explain": "A is contradicted · C is too extreme · D is never said.",
       "say": "Your turn! Read this short passage. Which choice is best supported by the passage? Remember, if you can't point to it, don't pick it.",
       "sayAfter": "It's B! Point to the proof: 'her hands shook.' That shows she was nervous. A is wrong, because she practiced for weeks. C says 'always,' which is too extreme. And D is never mentioned at all. That's the trap answer that sounds nice but has no proof."
+    },
+    {
+      "id": "r-tip1",
+      "type": "bigText",
+      "kicker": "Insider tip · Reading",
+      "big": "Start with your favorite passage.",
+      "caption": "You can do the passages in any order.",
+      "say": "Insider tip for Reading. You don't have to go in order. You can do the four passages in any order you want. Take a quick look at all of them, and start with the one that looks easiest or most interesting to you. You'll warm up faster and save time. Just make sure you mark your answers in the right spots."
+    },
+    {
+      "id": "r-tip2",
+      "type": "steps",
+      "kicker": "Insider tip · Reading",
+      "title": "Paired passages: one at a time",
+      "steps": [
+        "Read Passage A → answer its questions",
+        "Read Passage B → answer its questions",
+        "Then answer the questions about both"
+      ],
+      "say": "Remember the paired passage, where you compare two short passages? Don't read both at once. Read Passage A, and answer only the questions about A. Then read Passage B, and answer the questions about B. Save the questions about both passages for last. By then, you'll know both really well."
     },
     {
       "id": "sci-rule",
@@ -356,10 +447,38 @@
         "12 cm"
       ],
       "answer": 1,
-      "chatSeconds": 20,
+      "chatSeconds": 10,
       "work": "10 hours is between 8 and 12 → growth is between 6 and 9 cm → 7.5 cm ✓",
       "say": "Look at this table. It shows how much a plant grows with different hours of light each day. Based on the table, about how much would a plant grow with ten hours of light? Answer in the chat!",
       "sayAfter": "It's B, seven and a half centimeters! Ten hours is right between eight and twelve. So the growth should be right between six and nine. That's seven and a half. No science facts needed. Just the table."
+    },
+    {
+      "id": "s-tip1",
+      "type": "bigText",
+      "kicker": "Insider tip · Science",
+      "big": "Go to the questions first.",
+      "caption": "Skip the long intro. Find the chart each question points to.",
+      "say": "Science tip number one. Don't spend a long time reading the intro paragraph. Go to the questions first. Most of them tell you exactly where to look, like Figure one or Table two. Go straight there and find the answer."
+    },
+    {
+      "id": "s-tip2",
+      "type": "list",
+      "kicker": "Insider tip · Science",
+      "title": "Before you answer, check:",
+      "items": [
+        "The axis labels",
+        "The units (cm vs. mm, seconds vs. minutes)",
+        "The key or legend"
+      ],
+      "say": "Tip number two. Before you answer any chart question, check three things: the labels on the axes, the units, and the key. A lot of trap answers use the right number with the wrong units."
+    },
+    {
+      "id": "s-tip3",
+      "type": "bigText",
+      "kicker": "Insider tip · Science",
+      "big": "Two scientists disagree?",
+      "caption": "Write each scientist's main idea in 3–4 words.",
+      "say": "And tip number three. One Science passage is usually about scientists or students who disagree. As you read each viewpoint, write their main idea in three or four words in the margin. Like 'Scientist one: heat causes it.' Then the questions get way easier, because you're not rereading everything."
     },
     {
       "id": "bonus-q",
@@ -378,10 +497,23 @@
         1,
         3
       ],
-      "chatSeconds": 20,
+      "chatSeconds": 10,
       "explain": "Never leave a blank, and don't let one question steal your time.",
       "say": "Last question of the night, and it puts everything together. You have two minutes left and four English questions to go. What's your best move?",
       "sayAfter": "It's C! Answer the quick ones first, then guess on the rest. Never leave a blank, and don't let one hard question steal time from the easy ones. Nice work, everyone!"
+    },
+    {
+      "id": "t-tip",
+      "type": "steps",
+      "kicker": "Pacing strategy",
+      "title": "Use two passes",
+      "steps": [
+        "Pass 1: answer every question you're sure about",
+        "Mark anything that takes too long and keep moving",
+        "Pass 2: go back to the marked ones with the time left"
+      ],
+      "sticky": "Halfway through the time? Aim to be halfway through the questions.",
+      "say": "One last strategy, and it's a big one: use two passes. On your first pass, answer every question you feel good about, and mark any question that's taking too long. Keep moving. Then, on your second pass, go back to the marked ones with the time you have left. And here's a checkpoint: when half the time is gone, try to be about halfway through the questions. That way, the easy points are always locked in first."
     },
     {
       "id": "recap",
