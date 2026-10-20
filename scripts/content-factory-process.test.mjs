@@ -3,6 +3,14 @@ import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { FACTORY_JOB_TIMEOUT_MS, FACTORY_BATCH_TIMEOUT_MS, describeFactoryProcessError } from '../lib/content-factory-process.mjs';
+import { parseContentFactoryArgs } from '../lib/content-factory-args.mjs';
+
+test('manual factory flag is recognized without an equals value', () => {
+  assert.deepEqual(parseContentFactoryArgs(['--manual', '--limit=3']), {
+    manual: true,
+    limit: '3',
+  });
+});
 
 test('timeout keeps its cause before long progress output and redacts credentials', async () => {
   let error;

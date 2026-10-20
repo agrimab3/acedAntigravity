@@ -37,7 +37,15 @@ export default function MockTestCard({
   const full = Boolean(seatStatus.isFull);
   const href = full ? "/mock-test/waitlist" : "/mock-test/signup";
   const [hidden, setHidden] = useState(false);
-  useEffect(() => { try { setHidden(localStorage.getItem("aced:mock-test:hidden") === "hidden"); } catch {} }, []);
+  useEffect(() => {
+    const readDismissal = () => {
+      try {
+        setHidden(localStorage.getItem("aced:mock-test:hidden") === "hidden");
+      } catch {}
+    };
+    const timer = window.setTimeout(readDismissal, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
   if (hidden) return <button className={styles.restore} type="button" onClick={() => { try { localStorage.removeItem("aced:mock-test:hidden"); } catch {} setHidden(false); }}>✦ Mock test</button>;
 
   return (

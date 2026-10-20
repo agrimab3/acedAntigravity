@@ -14,12 +14,16 @@ function calendarUrl(title: string, start: Date, zoomUrl: string) {
   return `https://calendar.google.com/calendar/render?${params}`;
 }
 
+function hasLessonEnded(start: Date) {
+  return start.getTime() + 60 * 60 * 1000 < Date.now();
+}
+
 export default function LiveLessonCard() {
   const title = process.env.LIVE_LESSON_TITLE?.trim();
   const rawStart = process.env.LIVE_LESSON_START?.trim();
   const zoomUrl = process.env.LIVE_LESSON_URL?.trim();
   const start = rawStart ? new Date(rawStart) : null;
-  if (!title || !zoomUrl || !start || Number.isNaN(start.getTime()) || start.getTime() + 60 * 60 * 1000 < Date.now()) return null;
+  if (!title || !zoomUrl || !start || Number.isNaN(start.getTime()) || hasLessonEnded(start)) return null;
   try { if (!/^https:\/\//.test(zoomUrl)) return null; } catch { return null; }
   const date = new Intl.DateTimeFormat("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "America/Los_Angeles" }).format(start);
   const time = new Intl.DateTimeFormat("en-US", { hour: "numeric", timeZone: "America/Los_Angeles" }).format(start).replace(" ", " ");

@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // A local, untracked Claude worktree is not part of this application.
     ".claude/**",
+    // Local Python tooling for lesson-video rendering is never application source.
+    "tools/lesson-video/.venv/**",
   ]),
 ]);
 
