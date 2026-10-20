@@ -36,9 +36,12 @@ export default function MockTestCard({
 
   const full = Boolean(seatStatus.isFull);
   const href = full ? "/mock-test/waitlist" : "/mock-test/signup";
+  const [hidden, setHidden] = useState(false);
+  useEffect(() => { try { setHidden(localStorage.getItem("aced:mock-test:hidden") === "hidden"); } catch {} }, []);
+  if (hidden) return <button className={styles.restore} type="button" onClick={() => { try { localStorage.removeItem("aced:mock-test:hidden"); } catch {} setHidden(false); }}>✦ Mock test</button>;
 
   return (
-    <section className={styles.card} aria-label="ACED Mock Test">
+    <div className={styles.shell}><section className={styles.card} aria-label="ACED Mock Test">
       <div className={styles.glow} aria-hidden="true" />
       <div className={styles.copy}>
         <div className={styles.eyebrow}>ACED Mock Test</div>
@@ -52,6 +55,6 @@ export default function MockTestCard({
       <Link href={href} prefetch={false} className={styles.cta}>
         {full ? "join waitlist" : "sign up"}
       </Link>
-    </section>
+    </section><button className={styles.hide} type="button" aria-label="Hide" onClick={() => { try { localStorage.setItem("aced:mock-test:hidden", "hidden"); } catch {} setHidden(true); }}>×</button></div>
   );
 }

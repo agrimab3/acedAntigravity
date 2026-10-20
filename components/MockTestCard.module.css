@@ -12,6 +12,10 @@
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
   color: #eef1f5;
 }
+.shell { position: relative; }
+.hide, .restore { border: 0; cursor: pointer; font: 700 16px/1 "DM Sans", sans-serif; }
+.hide { position: absolute; z-index: 3; right: 8px; top: 8px; width: 32px; height: 32px; border-radius: 50%; color: rgba(255,255,255,.75); background: rgba(255,255,255,.1); }
+.restore { align-self: end; border: 1px solid rgba(93,202,165,.35); border-radius: 999px; padding: 9px 13px; color: #bff6e5; background: rgba(9,22,37,.94); white-space: nowrap; }
 
 .glow {
   position: absolute;

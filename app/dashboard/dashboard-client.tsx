@@ -1980,6 +1980,7 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
       />
       <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
         .dashboard-quick-tiles{position:fixed;right:22px;bottom:18px;z-index:30;display:flex;gap:12px;align-items:stretch}
+        .dashboard-tile-shell{position:relative}.dashboard-tile-hide{position:absolute;z-index:4;right:8px;top:8px;width:32px;height:32px;border:0;border-radius:50%;cursor:pointer;background:rgba(255,255,255,.1);color:rgba(255,255,255,.76);font:700 18px/1 DM Sans}.dashboard-restore-pill{align-self:end;border:1px solid rgba(93,202,165,.35);border-radius:999px;padding:9px 13px;cursor:pointer;color:#bff6e5;background:rgba(9,22,37,.94);font:700 13px DM Sans;white-space:nowrap}
         @media(max-width:760px){.dashboard-quick-tiles{position:relative;right:auto;bottom:auto;flex-direction:column;align-items:center;margin:22px 0 92px}.dashboard-live-tile{width:min(340px,calc(100vw - 48px)) !important}.dashboard-quick-tiles+*{margin-top:20px}}
       `}</style>
     </div>
