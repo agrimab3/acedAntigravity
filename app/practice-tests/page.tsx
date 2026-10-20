@@ -392,7 +392,7 @@ export default function PracticeTestsPage() {
           </div>
         </nav>
 
-        <div style={{ marginBottom: "2rem", maxWidth: "760px" }}>
+        <div data-tour-target="practice-tests" style={{ marginBottom: "2rem", maxWidth: "760px" }}>
           <h1
             style={{
               fontFamily: "DM Serif Display,serif",

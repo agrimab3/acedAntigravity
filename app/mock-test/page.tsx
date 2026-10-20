@@ -18,6 +18,7 @@ import {
   formatDuration,
 } from "@/lib/mockTests";
 import styles from "./mock-test.module.css";
+import StudentTour from "@/components/StudentTour";
 
 const dmSerif = DM_Serif_Display({
   subsets: ["latin"],
@@ -107,7 +108,7 @@ export default async function MockTestPage() {
         {/* ==================================================================
             2. Hero (centered)
             ================================================================== */}
-        <section className={styles.heroSection}>
+        <section data-tour-target="mock-test-page" className={styles.heroSection}>
           <div className={styles.heroBadge}>
             <span className={styles.twinkleDot} />
             <span>
@@ -381,6 +382,7 @@ export default async function MockTestPage() {
         </section>
 
       </div>
+      <StudentTour />
     </div>
   );
 }

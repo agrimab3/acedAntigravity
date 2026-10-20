@@ -372,7 +372,7 @@ export default function ProgressPage() {
           </div>
         </nav>
 
-        <div style={{ marginBottom: "1.8rem", maxWidth: "760px" }}>
+        <div data-tour-target="progress" style={{ marginBottom: "1.8rem", maxWidth: "760px" }}>
           <h1
             style={{
               fontFamily: "DM Serif Display,serif",

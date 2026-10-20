@@ -46,10 +46,10 @@ export default function MockTestCard({
     const timer = window.setTimeout(readDismissal, 0);
     return () => window.clearTimeout(timer);
   }, []);
-  if (hidden) return <button className={styles.restore} type="button" onClick={() => { try { localStorage.removeItem("aced:mock-test:hidden"); } catch {} setHidden(false); }}>✦ Mock test</button>;
+  if (hidden) return <button data-tour-target="mock-test-tile" className={styles.restore} type="button" onClick={() => { try { localStorage.removeItem("aced:mock-test:hidden"); } catch {} setHidden(false); }}>✦ Mock test</button>;
 
   return (
-    <div className={styles.shell}><section className={styles.card} aria-label="ACED Mock Test">
+    <div data-tour-target="mock-test-tile" className={styles.shell}><section className={styles.card} aria-label="ACED Mock Test">
       <div className={styles.glow} aria-hidden="true" />
       <div className={styles.copy}>
         <div className={styles.eyebrow}>ACED Mock Test</div>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getProviders, signOut, useSession } from "next-auth/react";
 import FirstTimeWalkthrough, { type WalkthroughTargetKey } from "@/app/dashboard/first-time-walkthrough";
+import { startStudentTour } from "@/components/StudentTour";
 import MockTestCard from "@/components/MockTestCard";
 import NightSky from "@/components/NightSky";
 import MockTestNavTab from "@/components/MockTestNavTab";
@@ -434,7 +435,6 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
   const progressButtonRef = useRef<HTMLButtonElement>(null);
   const filtersRef = useRef<HTMLDivElement>(null);
   const universeRef = useRef<HTMLDivElement>(null);
-  const walkthroughInitRef = useRef(false);
   const scoreCountUpStartedAtRef = useRef<number | null>(null);
   const scoreCountUpCompleteRef = useRef(false);
   const stateRef = useRef({
@@ -1057,38 +1057,15 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
     walkthroughFilterPreview,
   ]);
 
-  useEffect(() => {
-    if (status !== "authenticated" || onboardingLoading || !onboardingData?.isComplete) {
-      return;
-    }
-
-    if (walkthroughInitRef.current) {
-      return;
-    }
-
-    walkthroughInitRef.current = true;
-
-    if (
-      onboardingData.profile.walkthroughCompletedAt ||
-      (typeof window !== "undefined" && window.localStorage.getItem("aced.walkthrough.completed") === "1")
-    ) {
-      return;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      setWalkthroughOpen(true);
-    }, 420);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [onboardingData, onboardingLoading, status]);
+  // The cross-page StudentTour owns first-run detection and persistence now.
+  // Keep the legacy canvas preview state dormant until this dashboard renderer is simplified.
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: "/" });
   };
 
   const handleReplayWalkthrough = () => {
-    window.localStorage.removeItem("aced.walkthrough.completed");
-    setWalkthroughOpen(true);
+    startStudentTour();
   };
 
   const handleResetOnboarding = async () => {
@@ -1354,6 +1331,7 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
               {session?.user?.email}
             </span>
             <Link href="/account" style={{ fontSize: "13px", color: "rgba(255,255,255,0.78)" }}>account</Link>
+            <button type="button" onClick={startStudentTour} style={{ background: "transparent", border: 0, padding: 0, color: "rgba(255,255,255,0.62)", cursor: "pointer", fontSize: "12px" }}>Take the tour</button>
             {process.env.NODE_ENV === "development" && devBackToLoginAvailable && (
               <>
                 <div style={{ display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
@@ -1492,7 +1470,7 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
             : "your universe is waiting - click any bright star"}
         </p>
 
-        <div ref={filtersRef} style={{ display: "flex", gap: "6px", marginBottom: "0", flexWrap: "wrap" }}>
+        <div ref={filtersRef} data-tour-target="section-filters" style={{ display: "flex", gap: "6px", marginBottom: "0", flexWrap: "wrap" }}>
           {(["all", "english", "math", "reading", "science"] as const).map((section) => (
             <button
               key={section}
@@ -1562,6 +1540,7 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
 
         <div
           ref={universeRef}
+          data-tour-target="universe"
           style={{
             position: "relative",
             zIndex: 3,
@@ -1580,6 +1559,7 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
           }}
         />
         <canvas ref={canvasRef} style={{ width: "100%", display: "block", border: "none", outline: "none", position: "relative", zIndex: 0 }} />
+        <span data-tour-target="bright-star" aria-hidden="true" style={{ position: "absolute", left: "10.8%", top: "9.8%", width: 28, height: 28, borderRadius: "50%", pointerEvents: "none", zIndex: 2 }} />
         <div
           className="score-orbit"
           aria-hidden="true"
@@ -1901,7 +1881,7 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
         <MockTestCard dynamicSeats />
       </div>
       <FirstTimeWalkthrough
-        open={walkthroughOpen}
+        open={false}
         saving={savingWalkthrough}
         onClose={() => void handleCloseWalkthrough()}
         firstName={firstName}
