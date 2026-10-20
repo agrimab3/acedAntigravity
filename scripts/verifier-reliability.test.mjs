@@ -5,6 +5,8 @@ import test from "node:test";
 const source = await readFile(new URL("../generate-questions.mjs", import.meta.url), "utf8");
 const verifierStart = source.indexOf("async function verifyGeneratedQuestionCorrectness");
 const verifier = source.slice(verifierStart, source.indexOf("function hasVerifierHardFailure", verifierStart));
+const blindPromptStart = source.indexOf("function buildBlindCorrectnessVerificationPrompt");
+const blindPrompt = source.slice(blindPromptStart, source.indexOf("async function fetchProviderResponse", blindPromptStart));
 
 test("Groq strict-schema transport rejection retries once in JSON-object mode", () => {
   assert.match(source, /allowSchemaTransportFallback = true/);
@@ -13,11 +15,26 @@ test("Groq strict-schema transport rejection retries once in JSON-object mode", 
   assert.match(source, /allowSchemaTransportFallback: false/);
 });
 
-test("JSON-object Groq fallback still requires the complete verifier schema locally", () => {
+test("blind verifier requires only a chosen answer and concise reason locally", () => {
   assert.match(verifier, /correctnessVerifierSchema\.parse\(parsedPayload\)/);
-  assert.match(source, /note: z\.string\(\)/);
+  assert.match(source, /chosen_answer: z\.enum\(ANSWER_CHOICES\)/);
+  assert.match(source, /reason: z\.string\(\)\.min\(1\)\.max\(500\)/);
   const verifierSchema = verifier.slice(verifier.indexOf("const schema ="), verifier.indexOf("const prompt ="));
-  assert.match(verifierSchema, /"note"/);
+  assert.match(verifierSchema, /chosen_answer:/);
+  assert.match(verifierSchema, /reason:/);
+});
+
+test("blind verifier never receives the answer key or explanation", () => {
+  assert.match(blindPrompt, /answer key and explanation are intentionally withheld/i);
+  const itemPayload = blindPrompt.slice(blindPrompt.indexOf("Item:"));
+  assert.doesNotMatch(itemPayload, /correct_answer/);
+  assert.doesNotMatch(itemPayload, /explanation/);
+});
+
+test("key disagreement has an explicit rejecting disposition", () => {
+  assert.match(source, /verifierResult\.chosen_answer !== normalizedQuestion\.correctAnswer/);
+  assert.match(source, /disposition: "key_mismatch"/);
+  assert.match(source, /counters\.reviewRejected \+= 1/);
 });
 
 test("Gemini verifier routing retains configured fallback providers", () => {

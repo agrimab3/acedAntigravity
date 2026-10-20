@@ -348,15 +348,8 @@ const reviewedQuestionSchema = z.object({
 });
 
 const correctnessVerifierSchema = z.object({
-  correctness_verified: z.enum(["yes", "no", "unclear"]),
-  unique_correct_answer: z.enum(["yes", "no", "unclear"]),
-  answer_key_verified: z.enum(["yes", "no", "unclear"]),
-  explanation_verified: z.enum(["yes", "no", "unclear"]),
-  choices_distinct: z.enum(["yes", "no", "unclear"]),
-  evidence_supported: z.enum(["yes", "no", "unclear"]),
-  recommended_disposition: z.enum(["keep", "revise", "reject"]),
-  main_issues: z.array(z.string().min(1)).max(6),
-  note: z.string(),
+  chosen_answer: z.enum(ANSWER_CHOICES),
+  reason: z.string().min(1).max(500),
 });
 
 const client = new Client({
@@ -1781,52 +1774,21 @@ ${JSON.stringify([
 `.trim();
 }
 
-function buildCorrectnessVerificationPrompt(topic, question) {
+function buildBlindCorrectnessVerificationPrompt(topic, question) {
   return `
-Verify only the objective correctness of this ACT-style item.
+Independently solve this ACT-style item. You are a blind answer checker.
 
 Requested section: ${topic.section_key}
 Requested topic: ${topic.name}
 
 Return one JSON object with exactly these fields:
-- correctness_verified
-- unique_correct_answer
-- answer_key_verified
-- explanation_verified
-- choices_distinct
-- evidence_supported
-- recommended_disposition
-- main_issues
-- note
+- chosen_answer: one of A, B, C, D
+- reason: one concise sentence explaining why that choice is best from the supplied material
 
-Allowed values:
-- correctness_verified: yes, no, unclear
-- unique_correct_answer: yes, no, unclear
-- answer_key_verified: yes, no, unclear
-- explanation_verified: yes, no, unclear
-- choices_distinct: yes, no, unclear
-- evidence_supported: yes, no, unclear
-- recommended_disposition: keep, revise, reject
-
-Verification order:
-1. Independently solve the item from the supplied passage or stimulus where practical.
-2. Determine whether exactly one answer is defensibly correct.
-3. Check whether the keyed answer matches that independently supported answer.
-4. Check whether the explanation matches the data and the keyed answer.
-5. Check whether any distractor is equivalent to the correct answer.
-6. Check whether the wording overstates what the evidence supports.
-
-Disposition rules:
-- no valid answer -> reject
-- more than one valid answer -> reject
-- keyed answer wrong -> reject or revise
-- explanation contradicts the evidence -> reject or revise
-- wording that overstates the evidence -> revise
-- if the evidence is insufficient to verify correctness confidently -> revise
-- For Geometry, treat the literal object stated in the stem as binding: a point beyond a segment endpoint cannot be an intersection point of that finite segment. Reject or revise when the solution requires an unstated extension, ray, line, parallel/perpendicular, collinearity, angle, or circle-tangency/intersection assumption.
-
-For Reading and Science, use only the supplied shared passage or stimulus as evidence.
-Do not assess style, originality, or broad publishability here.
+Rules:
+- Use only the supplied passage or stimulus as evidence for Reading and Science.
+- Do not assess style, difficulty, publication quality, or anything outside choosing the best answer.
+- The answer key and explanation are intentionally withheld. Do not infer that either exists.
 
 Item:
 ${JSON.stringify({
@@ -1836,8 +1798,6 @@ ${JSON.stringify({
   passage: question.passage,
   question_text: question.question_text,
   choices: question.choices,
-  correct_answer: question.correct_answer,
-  explanation: question.explanation,
 })}
 `.trim();
 }
@@ -2942,54 +2902,23 @@ async function verifyGeneratedQuestionCorrectness(
   const schema = {
     type: "object",
     properties: {
-      correctness_verified: {
+      chosen_answer: {
         type: "string",
-        enum: ["yes", "no", "unclear"],
+        enum: ANSWER_CHOICES,
       },
-      unique_correct_answer: {
+      reason: {
         type: "string",
-        enum: ["yes", "no", "unclear"],
+        minLength: 1,
+        maxLength: 500,
       },
-      answer_key_verified: {
-        type: "string",
-        enum: ["yes", "no", "unclear"],
-      },
-      explanation_verified: {
-        type: "string",
-        enum: ["yes", "no", "unclear"],
-      },
-      choices_distinct: {
-        type: "string",
-        enum: ["yes", "no", "unclear"],
-      },
-      evidence_supported: {
-        type: "string",
-        enum: ["yes", "no", "unclear"],
-      },
-      recommended_disposition: {
-        type: "string",
-        enum: ["keep", "revise", "reject"],
-      },
-      main_issues: {
-        type: "array",
-        items: { type: "string" },
-      },
-      note: { type: "string" },
     },
     required: [
-      "correctness_verified",
-      "unique_correct_answer",
-      "answer_key_verified",
-      "explanation_verified",
-      "choices_distinct",
-      "evidence_supported",
-      "recommended_disposition",
-      "main_issues",
-      "note",
+      "chosen_answer",
+      "reason",
     ],
     additionalProperties: false,
   };
-  const prompt = buildCorrectnessVerificationPrompt(topic, question);
+  const prompt = buildBlindCorrectnessVerificationPrompt(topic, question);
   const verifierProviderOrder = verifierProviderOverride
     ? [verifierProviderOverride]
     : buildVerifierProviderOrder(generationSourceProvider, provider);
@@ -3008,7 +2937,7 @@ async function verifyGeneratedQuestionCorrectness(
   try {
     operationResult = await executeReviewOperation({
       runState: runProviderState,
-      operation: `verify:${topic.section_key}/${topic.slug}`,
+      operation: `blind-verify:${topic.section_key}/${topic.slug}`,
       primary,
       fallback,
       fallbacks,
@@ -3411,13 +3340,7 @@ function hasHardPrimaryCorrectnessFailure(reviewerResult) {
 
 function hasVerifierHardFailure(verifierResult) {
   return (
-    verifierResult.correctness_verified === "no" ||
-    verifierResult.unique_correct_answer === "no" ||
-    verifierResult.answer_key_verified === "no" ||
-    verifierResult.explanation_verified === "no" ||
-    verifierResult.choices_distinct === "no" ||
-    verifierResult.evidence_supported === "no" ||
-    verifierResult.recommended_disposition !== "keep"
+    !verifierResult?.chosen_answer
   );
 }
 
@@ -3427,15 +3350,7 @@ function buildShadowReview(normalizedQuestion, reviewerResult, verifierResult) {
     reviewerResult.verdict === "keep" &&
     reviewerResult.suggested_difficulty === null &&
     !hasHardPrimaryCorrectnessFailure(reviewerResult);
-  const verifierAgrees =
-    verifierResult &&
-    verifierResult.recommended_disposition === "keep" &&
-    verifierResult.correctness_verified === "yes" &&
-    verifierResult.unique_correct_answer === "yes" &&
-    verifierResult.answer_key_verified === "yes" &&
-    verifierResult.explanation_verified === "yes" &&
-    verifierResult.choices_distinct === "yes" &&
-    verifierResult.evidence_supported === "yes";
+  const verifierAgrees = verifierResult?.chosen_answer === normalizedQuestion.correctAnswer;
   const autoPublishEligible =
     deterministic.autoPublishEligible &&
     primaryKeep &&
@@ -3500,19 +3415,14 @@ function buildReviewNotes({
       ? {
           provider: verifierResult.provider ?? null,
           model: verifierResult.model ?? null,
-          correctnessVerified: verifierResult.correctness_verified,
-          uniqueCorrectAnswer: verifierResult.unique_correct_answer,
-          answerKeyVerified: verifierResult.answer_key_verified,
-          explanationVerified: verifierResult.explanation_verified,
-          choicesDistinct: verifierResult.choices_distinct,
-          evidenceSupported: verifierResult.evidence_supported,
-          recommendedDisposition: verifierResult.recommended_disposition,
+          chosenAnswer: verifierResult.chosen_answer,
+          reason: verifierResult.reason,
         }
       : null,
   };
 
   if (verifierResult) {
-    lines.push(`Correctness verifier: ${verifierResult.note}`);
+    lines.push(`Blind correctness verifier chose ${verifierResult.chosen_answer}: ${verifierResult.reason}`);
   }
 
   lines.push(`[shadow-review] ${JSON.stringify(shadowPayload)}`);
@@ -3723,6 +3633,7 @@ async function runReviewPipelineForQuestion({
     );
     verifierResult = verificationOperation.verifierResult;
     if (process.env.CONTENT_FACTORY_GEMINI_API_KEY) console.log(`Factory review audit: candidate=${auditCandidateId} stage=verifier model=${verificationOperation.model}`);
+    if (process.env.CONTENT_FACTORY_GEMINI_API_KEY) console.log(`Factory blind check: candidate=${auditCandidateId} key=${normalizedQuestion.correctAnswer} chosen=${verifierResult.chosen_answer} model=${verificationOperation.model}`);
   } catch (error) {
     if (error instanceof ProviderRunStoppedError) {
       if (comparisonMode) {
@@ -3780,14 +3691,30 @@ async function runReviewPipelineForQuestion({
     return { approved: false, counters, normalizedQuestion, reviewerResult, disposition: "rejected_verifier_error" };
   }
 
+  if (verifierResult.chosen_answer !== normalizedQuestion.correctAnswer) {
+    counters.skipped += 1;
+    counters.reviewRejected += 1;
+    console.warn(
+      `Skipping ${contextLabel} after blind correctness verification: key_mismatch (key=${normalizedQuestion.correctAnswer}, chosen=${verifierResult.chosen_answer})`
+    );
+    return {
+      approved: false,
+      counters,
+      normalizedQuestion,
+      reviewerResult,
+      verifierResult,
+      disposition: "key_mismatch",
+    };
+  }
+
   if (hasVerifierHardFailure(verifierResult)) {
     incrementReviewCounters(counters, verifierResult, "verifier");
     console.warn(
-      `Skipping ${contextLabel} after correctness verification: ${verifierResult.recommended_disposition} (${formatDifficultyDebugLabel({
+      `Skipping ${contextLabel} after blind correctness verification: invalid_response (${formatDifficultyDebugLabel({
         requestedDifficulty,
         generatedDifficulty: normalizedQuestion.difficulty,
         reviewerResult,
-      })} · action=reject${verifierResult.main_issues.length > 0 ? ` · ${verifierResult.main_issues.join(", ")}` : ""})`
+      })} · action=reject)`
     );
     return { approved: false, counters, normalizedQuestion, reviewerResult, verifierResult, disposition: "reject" };
   }

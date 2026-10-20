@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createFactoryReviewRunner, FACTORY_REVIEW_MODELS, factoryReviewAuditLines } from '../lib/content-factory-review.mjs';
+import { createFactoryReviewRunner, FACTORY_REVIEW_MODELS, FACTORY_BLIND_VERIFIER_MODELS, factoryReviewAuditLines } from '../lib/content-factory-review.mjs';
 import { ProviderRequestError, ProviderRunStoppedError, createProviderRunState } from '../lib/content-generation-resilience.mjs';
 const quota = () => new ProviderRequestError('quota', { statusCode: 429, classification: { kind: 'hard-quota' } });
 
@@ -46,6 +46,17 @@ test('temporary 429 also advances immediately without retries or waits', async (
   assert.deepEqual(calls,FACTORY_REVIEW_MODELS.slice(0,2));
 });
 
+test('blind verification starts with Pro and falls back to the established review chain on 429', async () => {
+  const attempted=[];
+  const result=await createFactoryReviewRunner()({operation:'blind-verify:test',perform:async({model})=>{
+    attempted.push(model);
+    if(model===FACTORY_BLIND_VERIFIER_MODELS[0]) throw quota();
+    return { verifierResult:{ chosen_answer:'A' } };
+  }});
+  assert.deepEqual(attempted, FACTORY_BLIND_VERIFIER_MODELS.slice(0,2));
+  assert.equal(result.model, FACTORY_REVIEW_MODELS[0]);
+});
+
 test('all model quotas stop safely and do not approve a draft', async () => {
   let calls=0;
   await assert.rejects(createFactoryReviewRunner()({operation:'verify:test',perform:async()=>{
@@ -64,5 +75,6 @@ test('auth, schema and transport errors do not become quota fallbacks', async ()
 
 test('forwarded draft audit logs contain only IDs, stages and models', () => {
   const line='Factory review audit: candidate=1234-abcd stage=primary model=gemini-3-flash-preview';
-  assert.deepEqual(factoryReviewAuditLines([line, 'secret provider response', line+' key=secret'].join('\n')), [line]);
+  const blind='Factory blind check: candidate=1234-abcd key=A chosen=B model=gemini-3.1-pro-preview';
+  assert.deepEqual(factoryReviewAuditLines([line, blind, 'secret provider response', line+' key=secret'].join('\n')), [line, blind]);
 });
