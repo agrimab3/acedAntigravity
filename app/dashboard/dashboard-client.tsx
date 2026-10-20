@@ -1558,8 +1558,6 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
           ))}
         </div>
 
-        {liveLessonCard}
-        <MockTestCard dynamicSeats />
       </div>
 
         <div
@@ -1898,12 +1896,16 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
           </div>
         )}
       </div>
+      <div className="dashboard-quick-tiles">
+        {liveLessonCard}
+        <MockTestCard dynamicSeats />
+      </div>
       <div
         style={{
           position: "fixed",
-          left: "50%",
+          left: "18px",
           bottom: "16px",
-          transform: "translateX(-50%)",
+          transform: "none",
           zIndex: 50,
           display: "flex",
           gap: "8px",
@@ -1976,7 +1978,10 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
         progressRef={progressButtonRef}
         onStepChange={setWalkthroughStep}
       />
-      <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}`}</style>
+      <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+        .dashboard-quick-tiles{position:fixed;right:22px;bottom:18px;z-index:30;display:flex;gap:12px;align-items:stretch}
+        @media(max-width:760px){.dashboard-quick-tiles{position:relative;right:auto;bottom:auto;flex-direction:column;align-items:center;margin:22px 0 92px}.dashboard-live-tile{width:min(340px,calc(100vw - 48px)) !important}.dashboard-quick-tiles+*{margin-top:20px}}
+      `}</style>
     </div>
   );
 }

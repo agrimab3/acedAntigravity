@@ -23,15 +23,14 @@ export default function LiveLessonCard() {
   try { if (!/^https:\/\//.test(zoomUrl)) return null; } catch { return null; }
   const date = new Intl.DateTimeFormat("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "America/Los_Angeles" }).format(start);
   const time = new Intl.DateTimeFormat("en-US", { hour: "numeric", timeZone: "America/Los_Angeles" }).format(start).replace(" ", " ");
-  return <section aria-label="Live lesson" style={{ position: "relative", overflow: "hidden", maxWidth: 990, margin: "32px auto 20px", padding: "28px 190px 28px 32px", borderRadius: 28, border: "1px solid rgba(93,202,165,.5)", background: "linear-gradient(110deg,rgba(14,42,52,.96),rgba(12,27,47,.96))", boxShadow: "0 0 48px rgba(93,202,165,.12)" }}>
-    <div style={{ color: "#5DCAA5", fontSize: 12, fontWeight: 800, letterSpacing: ".12em" }}>✦ LIVE LESSON · FREE FOR ACED STUDENTS</div>
-    <h2 style={{ fontFamily: "Playfair Display,serif", fontSize: "clamp(28px,4vw,42px)", lineHeight: 1.08, margin: "12px 0", color: "#fff" }}>{title}</h2>
-    <p style={{ color: "rgba(255,255,255,.76)", margin: "0 0 18px", fontSize: 16 }}>{date} · {time} PT · with Astra, our AI tutor</p>
-    <div style={{ display: "flex", alignItems: "center", gap: 18, flexWrap: "wrap" }}>
-      <a href={zoomUrl} target="_blank" rel="noreferrer" style={{ background: "#5DCAA5", color: "#062018", padding: "12px 18px", borderRadius: 999, fontWeight: 800, textDecoration: "none" }}>Join on Zoom</a>
-      <a href={calendarUrl(title, start, zoomUrl)} target="_blank" rel="noreferrer" style={{ color: "#aeeedb", fontWeight: 700 }}>Add to Google Calendar</a>
+  return <section aria-label="Live lesson" className="dashboard-live-tile" style={{ position: "relative", overflow: "hidden", width: 340, height: 174, padding: "18px 64px 16px 20px", borderRadius: 20, border: "1px solid rgba(93,202,165,.38)", background: "linear-gradient(135deg,rgba(13,32,43,.96),rgba(10,17,31,.98))", boxShadow: "0 14px 35px rgba(0,0,0,.25)", color: "#fff" }}>
+    <div style={{ color: "#5DCAA5", fontSize: 11, fontWeight: 800, letterSpacing: ".1em", whiteSpace: "nowrap" }}>✦ LIVE · {date.toUpperCase()} {time} PT</div>
+    <h2 title={title} style={{ fontFamily: "Playfair Display,serif", fontSize: 20, lineHeight: 1.15, margin: "9px 0 6px", color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title.replace(" + 3 Quick Wins", "")}</h2>
+    <p style={{ color: "rgba(255,255,255,.65)", margin: "0 0 13px", fontSize: 13, whiteSpace: "nowrap" }}>with Astra, our AI tutor</p>
+    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <a href={zoomUrl} target="_blank" rel="noreferrer" style={{ background: "#5DCAA5", color: "#062018", padding: "8px 13px", borderRadius: 999, fontSize: 12, fontWeight: 800, textDecoration: "none" }}>Join</a>
+      <a href={calendarUrl(title, start, zoomUrl)} target="_blank" rel="noreferrer" style={{ color: "#aeeedb", fontSize: 12, fontWeight: 700, whiteSpace: "nowrap" }}>Add to calendar</a>
     </div>
-    <p style={{ margin: "18px 0 0", color: "rgba(255,255,255,.55)", fontSize: 13 }}>Cameras and mics stay off. Answer questions in the chat!</p>
-    <div aria-hidden="true" style={{ position: "absolute", right: 18, bottom: -62, width: 170, filter: "drop-shadow(0 8px 15px rgba(0,0,0,.35))" }}><AstraIcon /></div>
+    <div aria-hidden="true" style={{ position: "absolute", right: 12, top: 12, width: 48, filter: "drop-shadow(0 5px 8px rgba(0,0,0,.35))" }}><AstraIcon /></div>
   </section>;
 }

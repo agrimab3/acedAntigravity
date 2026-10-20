@@ -43,7 +43,6 @@ export default function MockTestCard({
       <div className={styles.copy}>
         <div className={styles.eyebrow}>ACED Mock Test</div>
         <h2>{NEXT_MOCK.testDateShort.replace(",", "")}</h2>
-        <p>Full timed ACT-style practice under real section timing.</p>
         <div className={styles.meta}>
           <span className={styles.price}>$2</span>
           <span>·</span>
