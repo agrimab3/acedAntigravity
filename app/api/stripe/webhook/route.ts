@@ -1,11 +1,12 @@
 import { eq, sql } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { mockStripeEvents, mockTestOpsEvents } from "@/db/schema";
 import { getDb } from "@/lib/db";
 import { getStripe } from "@/lib/mockTest/stripe";
 import { captureAcedError } from "@/lib/monitoring";
 import {
+  processMockEmailOutbox,
   queuePaymentRefundedEmail,
   queueRegistrationConfirmedEmails,
 } from "@/lib/mockTest/email-outbox";
@@ -94,8 +95,10 @@ export async function POST(request: Request) {
           mockTestId: result.mockTestId,
         });
         await queuePaymentRefundedEmail(id);
+        sendQueuedEmailsSoon();
       } else if (result.status === "paid") {
         await queueRegistrationConfirmedEmails(id);
+        sendQueuedEmailsSoon();
       }
     } else if (event.type === "checkout.session.expired") {
       const session = event.data.object as Stripe.Checkout.Session;
@@ -124,4 +127,17 @@ export async function POST(request: Request) {
     console.error("[mock-test stripe] webhook failed", { eventId: event.id, eventType: event.type, error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json({ error: "Webhook processing failed." }, { status: 500 });
   }
+}
+
+// Send the just-queued email right after the webhook responds instead of
+// waiting for the 5-minute cron. The outbox locks rows, so this is safe to run
+// alongside the cron, and the cron still retries anything that fails here.
+function sendQueuedEmailsSoon() {
+  after(async () => {
+    try {
+      await processMockEmailOutbox(new Date());
+    } catch (error) {
+      captureAcedError(error, "stripe-webhook");
+    }
+  });
 }
