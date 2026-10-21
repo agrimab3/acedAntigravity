@@ -27,11 +27,21 @@ test("student tour matches the designed spotlight, delayed tooltip, welcome, and
   assert.match(tour, /data-tour-nav/);
 });
 
-test("student tour persists completion server-side and supports Escape and replay", () => {
+test("student tour persists completion server-side and supports Escape without a replay control", () => {
   assert.match(tour, /method: "PATCH"/);
   assert.match(tour, /walkthroughCompleted: true/);
   assert.match(tour, /event\.key === "Escape"/);
-  assert.match(tour, /aced:tour:start/);
+  assert.doesNotMatch(tour, /aced:tour:start|startStudentTour/);
   assert.match(onboardingApi, /walkthroughCompletedAt: now/);
-  assert.match(dashboard, /Take the tour/);
+  assert.doesNotMatch(dashboard, /Take the tour|replay walkthrough/);
+  assert.match(dashboard, /<circle data-tour-target="bright-star"/);
+});
+
+test("dismissed lesson and mock tiles remain available during the automatic tour", () => {
+  const liveTile = readFileSync("components/DismissibleLiveLessonTile.tsx", "utf8");
+  const mockTile = readFileSync("components/MockTestCard.tsx", "utf8");
+  assert.match(liveTile, /hidden && !touring/);
+  assert.match(mockTile, /hidden && !touring/);
+  assert.match(liveTile, /useTourActive/);
+  assert.match(mockTile, /useTourActive/);
 });

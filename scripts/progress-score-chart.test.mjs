@@ -27,6 +27,9 @@ test("score chart has real-data filters, latest labels, hover detail, and an exp
   assert.match(chart, /testCount >= 2/);
   assert.match(chart, /Take 2 practice tests to see your score trend ✦/);
   assert.match(chart, /Sample score trend preview/);
+  assert.match(chart, /minHeight: 220/);
+  assert.match(chart, /zIndex: 1, display: "flex"/);
+  assert.match(chart, /<g opacity="\.3">/);
   assert.match(chart, /onMouseEnter/);
   assert.match(chart, /smoothPath/);
   for (const color of ["#5DCAA5", "#AFA9EC", "#EF9F27", "#F0997B"]) assert.match(chart, new RegExp(color));

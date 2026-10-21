@@ -80,7 +80,7 @@ export default function ProgressScoreChart({ points, testCount }: { points: Scor
         })}
       </div>
     </div>
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative", minHeight: 220 }}>
       <svg viewBox={`0 0 ${view.width} ${view.height}`} role="img" aria-label={showingRealTrend ? "Section score estimates over time" : "Sample score trend preview"} style={{ display: "block", width: "100%", height: "auto", overflow: "visible" }}>
         {[1, 12, 24, 36].map((score) => {
           const y = view.top + ((36 - score) / 35) * plotHeight;
@@ -100,7 +100,7 @@ export default function ProgressScoreChart({ points, testCount }: { points: Scor
         }) : null}
       </svg>
       {hovered ? <div role="status" style={{ position: "absolute", left: `min(calc(${(hovered.x / view.width) * 100}% + 12px), calc(100% - 128px))`, top: `max(8px, calc(${(hovered.y / view.height) * 100}% - 48px))`, borderRadius: 10, padding: "8px 10px", background: "#101D2D", border: "1px solid rgba(255,255,255,.14)", color: "#fff", fontSize: 12, boxShadow: "0 10px 25px rgba(0,0,0,.36)", pointerEvents: "none" }}><strong>{hovered.score}/36</strong><br /><span style={{ color: "rgba(255,255,255,.66)" }}>{dateLabel(hovered.completedAt)}</span></div> : null}
-      {!showingRealTrend ? <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, textAlign: "center", padding: "20px" }}><div style={{ borderRadius: 14, padding: "12px 16px", background: "rgba(8,19,32,.85)", border: "1px solid rgba(93,202,165,.2)", color: "rgba(255,255,255,.88)", fontSize: "14px" }}>Take 2 practice tests to see your score trend ✦</div><Link href="/practice-tests" style={{ borderRadius: 999, background: "#5DCAA5", color: "#072019", padding: "10px 18px", fontWeight: 700, fontSize: 14, textDecoration: "none" }}>practice tests →</Link></div> : null}
+      {!showingRealTrend ? <div style={{ position: "absolute", inset: 0, zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, textAlign: "center", padding: "20px" }}><div style={{ borderRadius: 14, padding: "12px 16px", background: "rgba(8,19,32,.94)", border: "1px solid rgba(93,202,165,.2)", color: "rgba(255,255,255,.88)", fontSize: "14px" }}>Take 2 practice tests to see your score trend ✦</div><Link href="/practice-tests" style={{ borderRadius: 999, background: "#5DCAA5", color: "#072019", padding: "10px 18px", fontWeight: 700, fontSize: 14, textDecoration: "none" }}>practice tests →</Link></div> : null}
     </div>
   </section>;
 }

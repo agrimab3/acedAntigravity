@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getProviders, signOut, useSession } from "next-auth/react";
 import FirstTimeWalkthrough, { type WalkthroughTargetKey } from "@/app/dashboard/first-time-walkthrough";
-import { startStudentTour } from "@/components/StudentTour";
 import MockTestCard from "@/components/MockTestCard";
 import NightSky from "@/components/NightSky";
 import LiveLessonsNavTab from "@/components/LiveLessonsNavTab";
@@ -220,9 +219,10 @@ function pointToCanvas(sec: Section, point: Point) {
 // Where the tour spotlights a clickable star: the first English star with a topic.
 const TOUR_STAR = (() => {
   const sec = SECS[0];
-  const point = sec.points.find((item) => item.topicIndex !== undefined) ?? sec.points[0];
+  const pi = sec.points.findIndex((item) => item.topicIndex !== undefined);
+  const point = sec.points[pi >= 0 ? pi : 0];
   const p = pointToCanvas(sec, point);
-  return { x: p.x / W, y: p.y / H };
+  return { si: 0, pi: pi >= 0 ? pi : 0, x: p.x / W, y: p.y / H };
 })();
 
 function getPointTopic(sec: Section, pointIndex: number) {
@@ -1073,10 +1073,6 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
     await signOut({ callbackUrl: "/" });
   };
 
-  const handleReplayWalkthrough = () => {
-    startStudentTour();
-  };
-
   const handleResetOnboarding = async () => {
     const response = await fetch("/api/onboarding/reset", { method: "POST" });
 
@@ -1344,13 +1340,6 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
               {session?.user?.email}
             </span>
             <Link href="/account" style={{ fontSize: "13px", color: "rgba(255,255,255,0.78)" }}>account</Link>
-            <button
-              type="button"
-              onClick={handleReplayWalkthrough}
-              style={{ background: "transparent", border: 0, color: "rgba(255,255,255,0.78)", padding: 0, fontSize: "13px", cursor: "pointer", fontFamily: "inherit" }}
-            >
-              Take the tour
-            </button>
             {process.env.NODE_ENV === "development" && devBackToLoginAvailable && (
               <>
                 <div style={{ display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
@@ -1426,19 +1415,6 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
                   }}
                 >
                   reset onboarding
-                </button>
-                <button
-                  onClick={handleReplayWalkthrough}
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    color: "rgba(255,255,255,0.68)",
-                    padding: "4px 2px",
-                    fontSize: "11px",
-                    cursor: "pointer",
-                  }}
-                >
-                  replay walkthrough
                 </button>
                 <button
                   onClick={handleSignOut}
@@ -1578,7 +1554,11 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
           }}
         />
         <canvas ref={canvasRef} style={{ width: "100%", display: "block", border: "none", outline: "none", position: "relative", zIndex: 0 }} />
-        <span data-tour-target="bright-star" data-tour-shape="circle" aria-hidden="true" style={{ position: "absolute", left: `${TOUR_STAR.x * 100}%`, top: `calc(44px + (100% - 44px) * ${TOUR_STAR.y})`, transform: "translate(-50%, -50%)", width: 28, height: 28, borderRadius: "50%", pointerEvents: "none", zIndex: 2 }} />
+        <svg aria-label="Practice star" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ position: "absolute", inset: 0, zIndex: 2, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}>
+          <circle data-tour-target="bright-star" data-tour-shape="circle" cx={TOUR_STAR.x * W} cy={TOUR_STAR.y * H} r="11" fill="transparent" stroke="transparent" style={{ pointerEvents: "all", cursor: "pointer" }} onClick={() => setSelected({ si: TOUR_STAR.si, pi: TOUR_STAR.pi })}>
+            <title>Practice this star</title>
+          </circle>
+        </svg>
         <div
           className="score-orbit"
           aria-hidden="true"
