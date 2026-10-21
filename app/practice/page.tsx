@@ -8,6 +8,8 @@ import { useSession } from "next-auth/react";
 import { getTopicByName, type SectionKey } from "@/lib/act-taxonomy";
 import { useOnboardingState } from "@/lib/use-onboarding-state";
 import QuestionContent from "@/components/question-content/QuestionContent";
+import AcedCalculator from "@/components/calculator/AcedCalculator";
+import calculatorLayoutStyles from "@/components/calculator/practice-layout.module.css";
 import {
   formatDifficultyBand,
   normalizeDifficultyBand,
@@ -103,6 +105,8 @@ function PracticeContent() {
   const [aiLoading, setAiLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
+  const [showCalculator, setShowCalculator] = useState(false);
+  const calculatorButtonRef = useRef<HTMLButtonElement | null>(null);
   const [sessionFinalized, setSessionFinalized] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [questionStartedAtMs, setQuestionStartedAtMs] = useState<number>(Date.now());
@@ -599,13 +603,21 @@ function PracticeContent() {
   return (
     <div style={{ position: 'relative', background: 'linear-gradient(180deg,#0d1b2a 0%,#060d1e 60%,#020408 100%)', minHeight: '100vh', color: '#fff', fontFamily: 'DM Sans,sans-serif', padding: '1.5rem', overflow: 'hidden' }}>
       <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
+      {section === 'math' && (
+        <AcedCalculator id="practice-drill-calculator" isOpen={showCalculator} onClose={() => setShowCalculator(false)} storageKey={`aced-calculator:drill:${topic || 'math'}`} returnFocusRef={calculatorButtonRef} variant="practice" />
+      )}
 
-      <div style={{ position: 'relative', zIndex: 1, maxWidth: '1180px', margin: '0 auto' }}>
+      <div className={section === 'math' ? calculatorLayoutStyles.shiftHost + (showCalculator ? ' ' + calculatorLayoutStyles.shiftHostOpen : '') : undefined} style={{ position: 'relative', zIndex: 1, maxWidth: '1180px', margin: '0 auto' }}>
 
         {/* nav */}
         <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
           <div style={{ fontFamily: 'DM Serif Display,serif', fontSize: '18px' }}>Aced<em style={{ color: '#1D9E75' }}>.</em></div>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            {section === 'math' && (
+              <button ref={calculatorButtonRef} type="button" onClick={() => setShowCalculator((open) => !open)} aria-expanded={showCalculator} aria-controls="practice-drill-calculator" style={{ minHeight: '36px', padding: '6px 14px', display: 'inline-flex', alignItems: 'center', gap: '6px', borderRadius: '999px', border: '1px solid #3B3870', background: '#16152B', color: '#CFCBF5', cursor: 'pointer', fontWeight: 700, fontSize: '12px' }}>
+                <span aria-hidden="true">▦</span>{showCalculator ? 'hide calculator' : 'calculator'}
+              </button>
+            )}
             <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', fontVariantNumeric: 'tabular-nums' }}>{formatTime(elapsedSeconds)}</span>
             <button onClick={() => { void finalizeSession(); setDone(true); }} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', background: 'transparent', border: '0.5px solid rgba(255,255,255,0.12)', padding: '5px 12px', borderRadius: '20px', fontFamily: 'DM Sans,sans-serif' }}>end session</button>
           </div>
