@@ -10,6 +10,7 @@ export default function MockTestNavTab() {
   return (
     <button
       type="button"
+      data-tour-nav="mock-test"
       onClick={() => router.push("/mock-test")}
       style={{
         background: "transparent",

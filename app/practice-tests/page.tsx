@@ -275,6 +275,7 @@ export default function PracticeTestsPage() {
             }}
           >
             <button
+              data-tour-nav="universe"
               onClick={() => router.push("/dashboard")}
               style={{
                 background: "transparent",
@@ -307,6 +308,7 @@ export default function PracticeTestsPage() {
               <span style={{ position: "relative", zIndex: 1 }}>your universe</span>
             </button>
             <button
+              data-tour-nav="practice-tests"
               style={{
                 background: "transparent",
                 border: "none",
@@ -338,6 +340,7 @@ export default function PracticeTestsPage() {
               <span style={{ position: "relative", zIndex: 1 }}>practice tests</span>
             </button>
             <button
+              data-tour-nav="progress"
               onClick={() => router.push("/progress")}
               style={{
                 background: "transparent",

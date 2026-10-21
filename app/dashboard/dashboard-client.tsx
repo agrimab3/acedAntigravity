@@ -1198,6 +1198,7 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
             }}
           >
             <button
+              data-tour-nav="universe"
               style={{
                 background: "transparent",
                 border: "none",
@@ -1229,6 +1230,7 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
               <span style={{ position: "relative", zIndex: 1 }}>your universe</span>
             </button>
             <button
+              data-tour-nav="practice-tests"
               ref={practiceTestsButtonRef}
               onClick={() => router.push("/practice-tests")}
               style={{
@@ -1277,6 +1279,7 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
               <span style={{ position: "relative", zIndex: 1 }}>practice tests</span>
             </button>
             <button
+              data-tour-nav="progress"
               ref={progressButtonRef}
               onClick={() => router.push("/progress")}
               style={{

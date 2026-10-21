@@ -313,6 +313,7 @@ export default function ProgressPage() {
             ].map((item) => (
               <button
                 key={item.label}
+                data-tour-nav={item.label === "your universe" ? "universe" : item.label === "practice tests" ? "practice-tests" : "progress"}
                 onClick={item.onClick}
                 style={{
                   background: "transparent",
