@@ -36,7 +36,7 @@ Our Privacy Policy explains how personal information is collected, used, disclos
 We cannot guarantee uninterrupted or error-free service. We may revise these Terms and will provide notice where required. Material revisions may require fresh affirmative acceptance; earlier acceptance will not be treated as acceptance of new Terms.
 
 ## 11. Disclaimers and Liability
-To the extent permitted by law, Aced is provided on an "as is" and "as available" basis without guarantees of uninterrupted operation or educational results. Nothing limits rights or liabilities that cannot lawfully be excluded. **[LEGAL REVIEW: Finalize liability, dispute-resolution, governing-law, and minor-user terms.]**
+To the extent permitted by law, Aced is provided on an "as is" and "as available" basis without guarantees of uninterrupted operation or educational results. Nothing limits rights or liabilities that cannot lawfully be excluded.
 
 ## 12. Account Closure and Deletion
 You may request deletion in Account & Privacy or through support@aceditprep.com. A request begins an identity-verified review, not immediate deletion. Certain information may remain for legitimate legal, payment, security, or compliance reasons.
