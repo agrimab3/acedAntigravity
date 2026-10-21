@@ -20,6 +20,7 @@ import {
   renderTomorrowReminder,
   renderWaitlistInvite,
   renderWaitlistJoined,
+  renderWelcome,
   MOCK_EMAIL_HEADER_TOKEN,
   type MockEmailType,
   type RenderedMockEmail,
@@ -37,6 +38,7 @@ const MOCK_EMAIL_HEADER_FILES: Record<MockEmailType, string> = {
   waitlist_joined: "header-waitlist.gif",
   payment_refunded: "header-refund.gif",
   scores_released: "header-scores.gif",
+  welcome: "header-in.gif",
 };
 
 export function getMockEmailHeaderFilename(type: MockEmailType) {
@@ -387,4 +389,27 @@ export async function getFailedMockEmailCount(mockTestId: string) {
       and attempts >= ${MOCK_EMAIL_MAX_ATTEMPTS}
   `);
   return Number((result.rows[0] as { count?: unknown } | undefined)?.count ?? 0);
+}
+
+// Welcome email for a new account. It rides the same outbox (retries, staging
+// guards) and is keyed per user, so it is only ever sent once.
+export async function queueWelcomeEmail(userId: string) {
+  const db = getDb();
+  if (!db) throw new Error("Database is not configured.");
+  const result = await db.execute(sql`
+    select u.email, coalesce(u.preferred_name, u.name) as name,
+           (select id from mock_tests order by created_at desc limit 1) as mock_test_id
+    from users u where u.id = ${userId} limit 1
+  `);
+  const row = result.rows[0] as { email?: string | null; name?: string | null; mock_test_id?: string | null } | undefined;
+  if (!row?.email || !row.mock_test_id) return { queued: false };
+  const base = getMockEmailSiteBaseUrl();
+  return queueMockEmail({
+    mockTestId: row.mock_test_id,
+    sourceKey: userId,
+    uniqueKey: `welcome:${userId}`,
+    recipientEmail: row.email,
+    scheduledAt: new Date(),
+    rendered: renderWelcome({ name: row.name ?? null, dashboardUrl: `${base}/dashboard`, lessonsUrl: `${base}/lessons` }),
+  });
 }

@@ -1,9 +1,11 @@
 import { eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { z } from "zod";
 import { users } from "@/db/schema";
 import { accountConsentRequiredResponse, getEligibleAccountSession } from "@/lib/account-consent";
 import { getDb } from "@/lib/db";
+import { processMockEmailOutbox, queueWelcomeEmail } from "@/lib/mockTest/email-outbox";
+import { captureAcedError } from "@/lib/monitoring";
 import {
   ACT_TEST_DATES_SOURCE_URL,
   isOnboardingComplete,
@@ -101,6 +103,12 @@ export async function POST(request: Request) {
   }
 
   const now = new Date();
+  const [before] = await db
+    .select({ onboardingCompletedAt: users.onboardingCompletedAt })
+    .from(users)
+    .where(eq(users.id, session.userId))
+    .limit(1);
+  const isFirstCompletion = !before?.onboardingCompletedAt;
 
   await db
     .update(users)
@@ -114,6 +122,18 @@ export async function POST(request: Request) {
       updatedAt: now,
     })
     .where(eq(users.id, session.userId));
+
+  if (isFirstCompletion) {
+    const userId = session.userId;
+    after(async () => {
+      try {
+        await queueWelcomeEmail(userId);
+        await processMockEmailOutbox(new Date());
+      } catch (error) {
+        captureAcedError(error, "email-outbox");
+      }
+    });
+  }
 
   return NextResponse.json({ ok: true });
 }

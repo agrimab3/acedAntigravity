@@ -10,7 +10,8 @@ export type MockEmailType =
   | "waitlist_invite"
   | "waitlist_joined"
   | "payment_refunded"
-  | "scores_released";
+  | "scores_released"
+  | "welcome";
 
 export type RenderedMockEmail = {
   type: MockEmailType;
@@ -343,4 +344,37 @@ export function renderEveryMockEmailForTest(input: { timeZone: string; baseUrl: 
     renderPaymentRefunded({ practiceUrl: `${input.baseUrl}/dashboard` }),
     renderScoresReleased({ resultsUrl: `${input.baseUrl}/mock-test/results` }),
   ];
+}
+
+export function renderWelcome(input: { name: string | null; dashboardUrl: string; lessonsUrl: string }): RenderedMockEmail {
+  const first = input.name?.trim().split(/\s+/)[0];
+  const headline = first ? `Welcome to Aced, ${escapeHtml(first)} ✦` : "Welcome to Aced ✦";
+  const steps = [
+    { color: TEAL, text: "Open your star map and try a short set on any star." },
+    { color: VIOLET, text: "Join Astra's free live lesson, Sundays at 5 PM PT." },
+    { color: AMBER, text: "Every question you practice makes a star brighter." },
+  ];
+  const card = `<div class="aced-card" style="margin-top:22px;padding:18px;border:1px solid #CDEBDF;border-radius:16px;background:#F3FBF7"><div style="color:#12876A;font-size:12px;line-height:16px;font-weight:800;letter-spacing:1.2px">WHERE TO START</div>${bulletList(steps, true)}</div>`;
+  const textHeadline = first ? `Welcome to Aced, ${first} ✦` : "Welcome to Aced ✦";
+  return {
+    type: "welcome",
+    subject: "Welcome to Aced ✦",
+    previewText: "Your star map is ready.",
+    html: layout({
+      headline,
+      accent: TEAL,
+      sentence: "Your star map is ready. Every star is one ACT skill, and it gets brighter as you practice.",
+      cardHtml: card,
+      button: { label: "Open your star map", url: input.dashboardUrl },
+      secondaryLink: { label: "See this week's live lesson", url: input.lessonsUrl },
+      smallLine: "Questions? Just reply to this email.",
+      footerFirst: "You're getting this because you created an Aced account.",
+      previewText: "Your star map is ready.",
+    }),
+    text: baseText({
+      body: `${textHeadline}\n\nYour star map is ready. Every star is one ACT skill, and it gets brighter as you practice.\n\nWHERE TO START\n${steps.map((step) => `● ${step.text}`).join("\n")}\n\nOpen your star map: ${input.dashboardUrl}\nFree live lessons: ${input.lessonsUrl}`,
+      footerFirst: "You're getting this because you created an Aced account.",
+    }),
+    attachments: [],
+  };
 }

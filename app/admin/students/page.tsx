@@ -7,7 +7,7 @@ export const metadata = { title: "Students · ACED Admin", robots: { index: fals
 
 type Row = {
   email: string | null; name: string | null; grade_level: string | null; act_test_date: string | null;
-  created_at: Date | string; finished_setup: boolean; drills: number; tests: number; questions: number;
+  created_at: Date | string; finished_setup: boolean; email_opt_in: boolean; drills: number; tests: number; questions: number;
   seconds: number; last_active: Date | string | null;
 };
 
@@ -29,7 +29,7 @@ async function loadStudents() {
   if (!db) throw new Error("Database unavailable.");
   const result = await db.execute(sql`
     select u.email, coalesce(u.preferred_name, u.name) as name, u.grade_level, u.act_test_date, u.created_at,
-           (u.onboarding_completed_at is not null) as finished_setup,
+           (u.onboarding_completed_at is not null) as finished_setup, u.email_opt_in,
            coalesce(d.drills, 0)::int as drills, coalesce(t.tests, 0)::int as tests,
            (coalesce(d.q, 0) + coalesce(t.q, 0))::int as questions,
            (coalesce(d.secs, 0) + coalesce(t.secs, 0))::int as seconds,
@@ -53,19 +53,20 @@ export default async function StudentsAdminPage() {
   const activeWeek = rows.filter((r) => r.last_active && new Date(r.last_active).getTime() >= weekAgo).length;
   const practicedEver = rows.filter((r) => r.questions > 0).length;
   const totalQuestions = rows.reduce((sum, r) => sum + Number(r.questions), 0);
-  const tiles = [["Students", rows.length], ["Joined today", joinedToday], ["Joined this week", joinedWeek], ["Practiced this week", activeWeek], ["Ever practiced", practicedEver], ["Questions answered", totalQuestions]] as const;
+  const optedIn = rows.filter((r) => r.email_opt_in).length;
+  const tiles = [["Students", rows.length], ["Joined today", joinedToday], ["Joined this week", joinedWeek], ["Practiced this week", activeWeek], ["Ever practiced", practicedEver], ["Questions answered", totalQuestions], ["Opted into emails", optedIn]] as const;
   const cell: React.CSSProperties = { padding: "10px 12px", borderTop: "1px solid rgba(127,127,127,.25)", fontSize: 14, whiteSpace: "nowrap" };
 
   return <main className="policyPage"><article className="policyCard" style={{ maxWidth: 1240 }}>
     <p className="policyEyebrow">Aced admin</p>
     <h1>Students</h1>
-    <p style={{ marginTop: 0, color: "#6b7280" }}>Everyone who has signed in, newest first. Times are Pacific. Refresh to update.</p>
+    <p style={{ marginTop: 0, color: "#6b7280" }}>Everyone who has signed in, newest first. Times are Pacific. Homepage email-list signups are on /admin/signups.</p>
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 12, margin: "18px 0 26px" }}>
       {tiles.map(([label, value]) => <div key={label} style={{ border: "1px solid rgba(127,127,127,.28)", borderRadius: 16, padding: "14px 16px", background: "rgba(127,127,127,.08)", color: "inherit" }}><div style={{ fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", opacity: .7, fontWeight: 700 }}>{label}</div><div style={{ fontSize: 30, fontWeight: 700, marginTop: 4, color: "inherit" }}>{value}</div></div>)}
     </div>
     <div style={{ overflowX: "auto" }}>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead><tr>{["Name", "Email", "Grade", "Test date", "Joined", "Setup", "Last practice", "Drills", "Tests", "Questions", "Time"].map((h) => <th key={h} style={{ ...cell, borderTop: 0, textAlign: "left", fontSize: 12, textTransform: "uppercase", letterSpacing: ".08em", color: "#6b7280" }}>{h}</th>)}</tr></thead>
+        <thead><tr>{["Name", "Email", "Grade", "Test date", "Joined", "Setup", "Emails", "Last practice", "Drills", "Tests", "Questions", "Time"].map((h) => <th key={h} style={{ ...cell, borderTop: 0, textAlign: "left", fontSize: 12, textTransform: "uppercase", letterSpacing: ".08em", color: "#6b7280" }}>{h}</th>)}</tr></thead>
         <tbody>{rows.map((r, i) => <tr key={`${r.email}-${i}`}>
           <td style={cell}>{r.name ?? "—"}</td>
           <td style={cell}>{r.email ?? "—"}</td>
@@ -73,6 +74,7 @@ export default async function StudentsAdminPage() {
           <td style={cell}>{r.act_test_date ?? "—"}</td>
           <td style={cell}>{when(r.created_at)}</td>
           <td style={cell}>{r.finished_setup ? "✓" : "—"}</td>
+          <td style={cell}>{r.email_opt_in ? "✓ yes" : "—"}</td>
           <td style={{ ...cell, opacity: r.last_active ? 1 : .5 }}>{ago(r.last_active, now)}</td>
           <td style={cell}>{r.drills}</td>
           <td style={cell}>{r.tests}</td>
