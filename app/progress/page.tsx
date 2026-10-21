@@ -6,6 +6,7 @@ import { signOut, useSession } from "next-auth/react";
 import { useOnboardingState } from "@/lib/use-onboarding-state";
 import MockTestNavTab from "@/components/MockTestNavTab";
 import NightSky from "@/components/NightSky";
+import ProgressScoreChart from "@/components/ProgressScoreChart";
 
 const SECTION_ACCENTS: Record<string, string> = {
   english: "#5DCAA5",
@@ -52,6 +53,7 @@ export default function ProgressPage() {
       testRunsCompleted: number;
       questionsAnswered: number;
       totalMinutes: number;
+      averageAccuracyPct: number;
       averageDrillAccuracyPct: number;
       averageTestAccuracyPct: number;
       litStars: number;
@@ -83,6 +85,17 @@ export default function ProgressPage() {
       estimatedScore: number | null;
       durationSeconds: number;
       completedAt: string | null;
+    }>;
+    scoreTrend: Array<{
+      sessionId: string;
+      sectionKey: string;
+      score: number;
+      completedAt: string;
+    }>;
+    weakestSkills: Array<{
+      sectionKey: string;
+      topicName: string;
+      masteryPct: number;
     }>;
   } | null>(null);
   const [openTestMenuId, setOpenTestMenuId] = useState<string | null>(null);
@@ -388,7 +401,7 @@ export default function ProgressPage() {
             <em style={{ color: "#1D9E75" }}>saved in the stars</em>
           </h1>
           <p style={{ fontSize: "15px", lineHeight: 1.75, color: "rgba(255,255,255,0.56)" }}>
-            Every drill, timed test, and mastery update is already being stored. This tab turns that saved work into a cleaner progress view.
+            Watch your scores climb, one star at a time.
           </p>
         </div>
 
@@ -397,12 +410,8 @@ export default function ProgressPage() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "12px", marginBottom: "1.4rem" }}>
               {[
                 { value: progress.streaks.current, label: "current streak (days)" },
-                { value: progress.streaks.best, label: "best streak (days)" },
-                { value: progress.totals.drillsCompleted, label: "drills" },
-                { value: progress.totals.testRunsCompleted, label: "test runs" },
-                { value: progress.totals.questionsAnswered, label: "questions" },
-                { value: `${progress.totals.averageDrillAccuracyPct}%`, label: "drill accuracy" },
-                { value: `${progress.totals.averageTestAccuracyPct}%`, label: "test accuracy" },
+                { value: progress.totals.questionsAnswered, label: "questions practiced" },
+                { value: `${progress.totals.averageAccuracyPct}%`, label: "accuracy" },
                 { value: `${progress.totals.strongStars}/${progress.totals.litStars}`, label: "strong stars" },
               ].map((item) => (
                 <div key={item.label} style={{ borderRadius: "16px", background: "rgba(255,255,255,0.04)", padding: "1rem" }}>
@@ -414,37 +423,27 @@ export default function ProgressPage() {
               ))}
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.05fr) minmax(340px, 0.95fr)", gap: "18px", alignItems: "start" }}>
+            <div style={{ marginBottom: "18px" }}>
+              <ProgressScoreChart points={progress.scoreTrend} testCount={progress.totals.testRunsCompleted} />
+              {progress.totals.testRunsCompleted < 2 ? (
+                <button type="button" onClick={() => router.push("/practice-tests")} style={{ display: "block", margin: "-56px auto 18px", position: "relative", zIndex: 2, border: 0, borderRadius: 999, background: "#5DCAA5", color: "#072019", padding: "10px 16px", fontWeight: 700, cursor: "pointer" }}>
+                  practice tests →
+                </button>
+              ) : null}
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))", gap: "18px", alignItems: "start" }}>
               <div style={{ display: "grid", gap: "16px" }}>
                 <section style={{ borderRadius: "18px", background: "rgba(255,255,255,0.035)", border: "0.5px solid rgba(255,255,255,0.08)", padding: "1.1rem" }}>
-                  <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.68)", marginBottom: "10px" }}>section progress</div>
+                  <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.68)", marginBottom: "10px" }}>skills to work on</div>
                   <div style={{ display: "grid", gap: "10px" }}>
-                    {progress.sectionProgress.map((section) => (
-                      <div
-                        key={section.sectionKey}
-                        style={{
-                          borderRadius: "14px",
-                          background: "rgba(255,255,255,0.03)",
-                          border: `0.5px solid ${(SECTION_ACCENTS[section.sectionKey] ?? "#fff")}22`,
-                          padding: "0.95rem 1rem",
-                        }}
-                      >
-                        <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", marginBottom: "6px" }}>
-                          <div style={{ fontFamily: "DM Serif Display,serif", fontSize: "22px", color: SECTION_ACCENTS[section.sectionKey] ?? "#fff", textTransform: "capitalize" }}>
-                            {section.sectionKey}
-                          </div>
-                          <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.68)" }}>
-                            {section.completedDrills} drills
-                          </div>
-                        </div>
-                        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.54)", lineHeight: 1.7 }}>
-                          {section.averageAccuracyPct}% average accuracy · {section.totalQuestions} questions practiced ·{" "}
-                          {section.lastPracticedAt
-                            ? new Date(section.lastPracticedAt).toLocaleDateString([], { month: "short", day: "numeric" })
-                            : "not yet practiced"}
-                        </div>
-                      </div>
-                    ))}
+                    {progress.weakestSkills.length === 0 ? <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)", lineHeight: 1.7 }}>Practice a star and its progress will appear here.</div> : progress.weakestSkills.map((skill) => {
+                      const color = SECTION_ACCENTS[skill.sectionKey] ?? "#fff";
+                      return <button key={`${skill.sectionKey}-${skill.topicName}`} type="button" onClick={() => router.push(`/practice?section=${skill.sectionKey}&topic=${encodeURIComponent(skill.topicName)}`)} style={{ textAlign: "left", borderRadius: "12px", background: "rgba(255,255,255,0.03)", border: `0.5px solid ${color}22`, padding: "10px 12px", color: "#fff", cursor: "pointer" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", marginBottom: "7px", fontSize: "13px" }}><span>{skill.topicName}</span><span style={{ color }}>{skill.masteryPct}%</span></div>
+                        <div style={{ height: "7px", borderRadius: 999, background: "rgba(255,255,255,.09)", overflow: "hidden" }}><div style={{ width: `${skill.masteryPct}%`, height: "100%", borderRadius: 999, background: color }} /></div>
+                      </button>;
+                    })}
                   </div>
                 </section>
 

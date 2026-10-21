@@ -1,8 +1,9 @@
-import { and, desc, eq, isNotNull } from "drizzle-orm";
+import { and, asc, desc, eq, gt, isNotNull } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import {
   actTopics,
   practiceSessions,
+  practiceTestSections,
   practiceTestSessions,
   topicMastery,
 } from "@/db/schema";
@@ -26,7 +27,7 @@ export async function GET() {
 
   const userId = session.userId;
 
-  const [drillRows, testRows, masteryRows] = await Promise.all([
+  const [drillRows, testRows, masteryRows, scoreTrendRows, weakestSkillRows] = await Promise.all([
     db
       .select({
         id: practiceSessions.id,
@@ -71,6 +72,41 @@ export async function GET() {
       })
       .from(topicMastery)
       .where(eq(topicMastery.userId, userId)),
+    db
+      .select({
+        sessionId: practiceTestSessions.id,
+        sectionKey: practiceTestSections.sectionKey,
+        estimatedScore: practiceTestSections.estimatedScore,
+        completedAt: practiceTestSessions.completedAt,
+      })
+      .from(practiceTestSections)
+      .innerJoin(practiceTestSessions, eq(practiceTestSections.sessionId, practiceTestSessions.id))
+      .where(
+        and(
+          eq(practiceTestSessions.userId, userId),
+          eq(practiceTestSessions.status, "completed"),
+          isNotNull(practiceTestSessions.completedAt),
+          isNotNull(practiceTestSections.estimatedScore)
+        )
+      )
+      .orderBy(asc(practiceTestSessions.completedAt), asc(practiceTestSections.sectionOrder)),
+    db
+      .select({
+        sectionKey: actTopics.sectionKey,
+        topicName: actTopics.name,
+        masteryPct: topicMastery.masteryPct,
+      })
+      .from(topicMastery)
+      .innerJoin(actTopics, eq(topicMastery.topicId, actTopics.id))
+      .where(
+        and(
+          eq(topicMastery.userId, userId),
+          eq(actTopics.isActive, true),
+          gt(topicMastery.attemptCount, 0)
+        )
+      )
+      .orderBy(asc(topicMastery.masteryPct), desc(topicMastery.attemptCount))
+      .limit(5),
   ]);
 
   const sectionProgress = Array.from(
@@ -126,12 +162,31 @@ export async function GET() {
             testRows.reduce((sum, row) => sum + row.durationSeconds, 0)) /
             60
         ) || 0,
+      averageAccuracyPct: average([
+        ...drillRows.map((row) => row.accuracyPct),
+        ...testRows.map((row) => row.accuracyPct),
+      ]),
       averageDrillAccuracyPct: average(drillRows.map((row) => row.accuracyPct)),
       averageTestAccuracyPct: average(testRows.map((row) => row.accuracyPct)),
       litStars: masteryRows.filter((row) => row.attemptCount > 0).length,
       strongStars: masteryRows.filter((row) => row.masteryPct >= 75).length,
     },
     sectionProgress,
+    scoreTrend: scoreTrendRows.flatMap((row) =>
+      row.estimatedScore && row.completedAt
+        ? [{
+            sessionId: row.sessionId,
+            sectionKey: row.sectionKey,
+            score: row.estimatedScore,
+            completedAt: row.completedAt.toISOString(),
+          }]
+        : []
+    ),
+    weakestSkills: weakestSkillRows.map((row) => ({
+      sectionKey: row.sectionKey,
+      topicName: row.topicName,
+      masteryPct: row.masteryPct,
+    })),
     recentDrills: drillRows.slice(0, 10).map((row) => ({
       sessionId: row.id,
       sectionKey: row.sectionKey,
