@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { setTourActiveFlag } from "@/components/useTourActive";
 
 type TourStop = {
   id: string;
@@ -55,6 +56,10 @@ function prefersReducedMotion() {
 
 function rectFor(element: HTMLElement): SpotlightRect {
   const rect = element.getBoundingClientRect();
+  if (element.dataset.tourShape === "circle") {
+    const size = Math.max(rect.width, rect.height) + 28;
+    return { top: rect.top + rect.height / 2 - size / 2, left: rect.left + rect.width / 2 - size / 2, width: size, height: size, radius: 999 };
+  }
   const padding = 10;
   return {
     top: Math.max(8, rect.top - padding),
@@ -105,6 +110,11 @@ export default function StudentTour() {
   const targetTimer = useRef<number | null>(null);
   const stop = STUDENT_TOUR_STOPS[index];
   const phone = typeof window !== "undefined" && window.matchMedia("(max-width: 720px)").matches;
+
+  useEffect(() => {
+    setTourActiveFlag(active);
+    return () => setTourActiveFlag(false);
+  }, [active]);
 
   const clearTimers = useCallback(() => {
     if (transitionTimer.current) window.clearTimeout(transitionTimer.current);
@@ -310,7 +320,7 @@ export default function StudentTour() {
         </div>
       </section>
     ) : null}
-    {(showWelcome || showFinish) ? <section role="dialog" aria-modal="true" aria-label={showFinish ? "Tour complete" : "Welcome to Aced"} className="student-tour-modal" style={{ position: "fixed", zIndex: 2, pointerEvents: "auto", width: "min(460px, calc(100vw - 32px))", boxSizing: "border-box", left: "50%", top: "50%", transform: "translate(-50%,-50%)", borderRadius: 18, padding: "36px 40px", textAlign: "center", background: "#0F1B2C", border: "1px solid #2A3B52", boxShadow: "0 30px 70px rgba(0,0,0,.66)", color: "#EEF1F5" }}><AstraMark /><h2 style={{ fontFamily: "var(--font-playfair), Playfair Display, serif", fontSize: 30, lineHeight: 1.12, margin: "14px 0 0" }}>{showFinish ? "You’re all set! ✦" : "Welcome to Aced!"}</h2><p style={{ color: "#B4BCC8", margin: "10px 0 0", lineHeight: 1.5, fontSize: 16 }}>{showFinish ? "Click any bright star to start practicing. You can replay this tour anytime from your account menu." : "I’m Astra, your AI tutor. Want a quick 1-minute tour of your new universe?"}</p><div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 26 }}>{showWelcome ? <button type="button" onClick={() => void complete()} disabled={saving} style={{ border: "1px solid #2A3B52", borderRadius: 999, background: "transparent", color: "#B4BCC8", padding: "12px 20px", cursor: "pointer" }}>Maybe later</button> : null}<button type="button" onClick={() => showFinish ? void complete() : goTo(0)} disabled={saving} style={{ border: 0, borderRadius: 999, background: "#5DCAA5", color: "#072019", padding: "12px 26px", fontWeight: 700, cursor: "pointer" }}>{showFinish ? "Start practicing" : "Show me around"}</button></div></section> : null}
+    {(showWelcome || showFinish) ? <section role="dialog" aria-modal="true" aria-label={showFinish ? "Tour complete" : "Welcome to Aced"} className="student-tour-modal" style={{ position: "fixed", zIndex: 2, pointerEvents: "auto", width: "min(460px, calc(100vw - 32px))", boxSizing: "border-box", left: "50%", top: "50%", transform: "translate(-50%,-50%)", borderRadius: 18, padding: "36px 40px", textAlign: "center", background: "#0F1B2C", border: "1px solid #2A3B52", boxShadow: "0 30px 70px rgba(0,0,0,.66)", color: "#EEF1F5" }}><AstraMark /><h2 style={{ fontFamily: "var(--font-playfair), Playfair Display, serif", fontSize: 30, lineHeight: 1.12, margin: "14px 0 0" }}>{showFinish ? "You’re all set! ✦" : "Welcome to Aced!"}</h2><p style={{ color: "#B4BCC8", margin: "10px 0 0", lineHeight: 1.5, fontSize: 16 }}>{showFinish ? "Click any bright star to start practicing." : "I’m Astra, your AI tutor. Want a quick 1-minute tour of your new universe?"}</p><div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 26 }}>{showWelcome ? <button type="button" onClick={() => void complete()} disabled={saving} style={{ border: "1px solid #2A3B52", borderRadius: 999, background: "transparent", color: "#B4BCC8", padding: "12px 20px", cursor: "pointer" }}>Maybe later</button> : null}<button type="button" onClick={() => showFinish ? void complete() : goTo(0)} disabled={saving} style={{ border: 0, borderRadius: 999, background: "#5DCAA5", color: "#072019", padding: "12px 26px", fontWeight: 700, cursor: "pointer" }}>{showFinish ? "Start practicing" : "Show me around"}</button></div></section> : null}
   </div>;
 }
 

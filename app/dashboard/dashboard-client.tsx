@@ -216,6 +216,14 @@ function pointToCanvas(sec: Section, point: Point) {
   };
 }
 
+// Where the tour spotlights a clickable star: the first English star with a topic.
+const TOUR_STAR = (() => {
+  const sec = SECS[0];
+  const point = sec.points.find((item) => item.topicIndex !== undefined) ?? sec.points[0];
+  const p = pointToCanvas(sec, point);
+  return { x: p.x / W, y: p.y / H };
+})();
+
 function getPointTopic(sec: Section, pointIndex: number) {
   const topicIndex = sec.points[pointIndex]?.topicIndex;
   if (topicIndex === undefined) return null;
@@ -1334,7 +1342,6 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
               {session?.user?.email}
             </span>
             <Link href="/account" style={{ fontSize: "13px", color: "rgba(255,255,255,0.78)" }}>account</Link>
-            <button type="button" onClick={startStudentTour} style={{ background: "transparent", border: 0, padding: 0, color: "rgba(255,255,255,0.62)", cursor: "pointer", fontSize: "12px" }}>Take the tour</button>
             {process.env.NODE_ENV === "development" && devBackToLoginAvailable && (
               <>
                 <div style={{ display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
@@ -1562,7 +1569,7 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
           }}
         />
         <canvas ref={canvasRef} style={{ width: "100%", display: "block", border: "none", outline: "none", position: "relative", zIndex: 0 }} />
-        <span data-tour-target="bright-star" aria-hidden="true" style={{ position: "absolute", left: "10.8%", top: "9.8%", width: 28, height: 28, borderRadius: "50%", pointerEvents: "none", zIndex: 2 }} />
+        <span data-tour-target="bright-star" data-tour-shape="circle" aria-hidden="true" style={{ position: "absolute", left: `${TOUR_STAR.x * 100}%`, top: `calc(44px + (100% - 44px) * ${TOUR_STAR.y})`, transform: "translate(-50%, -50%)", width: 28, height: 28, borderRadius: "50%", pointerEvents: "none", zIndex: 2 }} />
         <div
           className="score-orbit"
           aria-hidden="true"

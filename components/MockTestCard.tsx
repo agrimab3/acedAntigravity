@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { NEXT_MOCK } from "@/lib/mockTests";
 import styles from "./MockTestCard.module.css";
+import { useTourActive } from "@/components/useTourActive";
 
 type PublicSeatStatus = {
   isFull?: boolean;
@@ -37,6 +38,7 @@ export default function MockTestCard({
   const full = Boolean(seatStatus.isFull);
   const href = full ? "/mock-test/waitlist" : "/mock-test/signup";
   const [hidden, setHidden] = useState(false);
+  const touring = useTourActive();
   useEffect(() => {
     const readDismissal = () => {
       try {
@@ -46,7 +48,7 @@ export default function MockTestCard({
     const timer = window.setTimeout(readDismissal, 0);
     return () => window.clearTimeout(timer);
   }, []);
-  if (hidden) return <button data-tour-target="mock-test-tile" className={styles.restore} type="button" onClick={() => { try { localStorage.removeItem("aced:mock-test:hidden"); } catch {} setHidden(false); }}>✦ Mock test</button>;
+  if (hidden && !touring) return <button data-tour-target="mock-test-tile" className={styles.restore} type="button" onClick={() => { try { localStorage.removeItem("aced:mock-test:hidden"); } catch {} setHidden(false); }}>✦ Mock test</button>;
 
   return (
     <div data-tour-target="mock-test-tile" className={styles.shell}><section className={styles.card} aria-label="ACED Mock Test">
