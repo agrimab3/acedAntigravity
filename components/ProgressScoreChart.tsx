@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 import { useMemo, useState } from "react";
 
@@ -91,15 +92,15 @@ export default function ProgressScoreChart({ points, testCount }: { points: Scor
             <circle cx={point.x} cy={point.y} r={pointIndex === section.points.length - 1 ? 7 : 4.5} fill={section.color} stroke="#0B1624" strokeWidth="3" style={{ cursor: "pointer" }} onMouseEnter={() => setHovered(point)} onMouseLeave={() => setHovered(null)} onFocus={() => setHovered(point)} onBlur={() => setHovered(null)} tabIndex={0} aria-label={`${section.label}: ${point.score} on ${dateLabel(point.completedAt)}`} />
             {pointIndex === section.points.length - 1 ? <text x={point.x + 12} y={point.y + 4} fill={section.color} fontSize="14" fontWeight="700">{point.score}</text> : null}
           </g>)}
-        </g> : null) : <g opacity=".42"><path d={sampleLine} fill="none" stroke="#5DCAA5" strokeWidth="3.5" strokeLinecap="round" strokeDasharray="7 9"/><circle cx="948" cy="86" r="7" fill="#5DCAA5" /></g>}
+        </g> : null) : <g opacity=".3"><path d={sampleLine} fill="none" stroke="#5DCAA5" strokeWidth="3.5" strokeLinecap="round" strokeDasharray="7 9"/><circle cx="948" cy="86" r="7" fill="#5DCAA5" /></g>}
         {showingRealTrend ? xLabels.map((date, index) => {
           const first = new Date(xLabels[0]).getTime(); const last = new Date(xLabels[xLabels.length - 1]).getTime();
           const x = view.left + (last === first ? plotWidth / 2 : ((new Date(date).getTime() - first) / (last - first)) * plotWidth);
           return <text key={date} x={x} y={view.height - 18} textAnchor="middle" fill="rgba(255,255,255,.45)" fontSize="12">{dateLabel(date)}</text>;
-        }) : <text x={view.width / 2} y={view.height - 18} textAnchor="middle" fill="rgba(255,255,255,.38)" fontSize="12">your score trend will appear here</text>}
+        }) : null}
       </svg>
       {hovered ? <div role="status" style={{ position: "absolute", left: `min(calc(${(hovered.x / view.width) * 100}% + 12px), calc(100% - 128px))`, top: `max(8px, calc(${(hovered.y / view.height) * 100}% - 48px))`, borderRadius: 10, padding: "8px 10px", background: "#101D2D", border: "1px solid rgba(255,255,255,.14)", color: "#fff", fontSize: 12, boxShadow: "0 10px 25px rgba(0,0,0,.36)", pointerEvents: "none" }}><strong>{hovered.score}/36</strong><br /><span style={{ color: "rgba(255,255,255,.66)" }}>{dateLabel(hovered.completedAt)}</span></div> : null}
-      {!showingRealTrend ? <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", textAlign: "center", padding: "20px" }}><div style={{ borderRadius: 14, padding: "12px 16px", background: "rgba(8,19,32,.78)", border: "1px solid rgba(93,202,165,.2)", color: "rgba(255,255,255,.85)", fontSize: "14px" }}>Take 2 practice tests to see your score trend ✦</div></div> : null}
+      {!showingRealTrend ? <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, textAlign: "center", padding: "20px" }}><div style={{ borderRadius: 14, padding: "12px 16px", background: "rgba(8,19,32,.85)", border: "1px solid rgba(93,202,165,.2)", color: "rgba(255,255,255,.88)", fontSize: "14px" }}>Take 2 practice tests to see your score trend ✦</div><Link href="/practice-tests" style={{ borderRadius: 999, background: "#5DCAA5", color: "#072019", padding: "10px 18px", fontWeight: 700, fontSize: 14, textDecoration: "none" }}>practice tests →</Link></div> : null}
     </div>
   </section>;
 }

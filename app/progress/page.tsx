@@ -425,11 +425,6 @@ export default function ProgressPage() {
 
             <div style={{ marginBottom: "18px" }}>
               <ProgressScoreChart points={progress.scoreTrend} testCount={progress.totals.testRunsCompleted} />
-              {progress.totals.testRunsCompleted < 2 ? (
-                <button type="button" onClick={() => router.push("/practice-tests")} style={{ display: "block", margin: "-56px auto 18px", position: "relative", zIndex: 2, border: 0, borderRadius: 999, background: "#5DCAA5", color: "#072019", padding: "10px 16px", fontWeight: 700, cursor: "pointer" }}>
-                  practice tests →
-                </button>
-              ) : null}
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))", gap: "18px", alignItems: "start" }}>
