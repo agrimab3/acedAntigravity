@@ -662,6 +662,8 @@ export const questionGenerationAudits = pgTable(
     verifierResult: jsonb("verifier_result"),
     providerAttempts: jsonb("provider_attempts"),
     parserSchemaErrors: jsonb("parser_schema_errors"),
+    rawModelOutputPreview: text("raw_model_output_preview"),
+    failedCheck: text("failed_check"),
     finalDisposition: text("final_disposition").notNull(),
     finalReason: text("final_reason"),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),

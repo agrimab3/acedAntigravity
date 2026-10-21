@@ -36,6 +36,10 @@ import {
 import { generatedTopicMatchesRequested } from "./lib/generation-topic-validation.mjs";
 import { reviewQuestionQuality } from "./lib/question-utils.ts";
 import { createFactoryReviewRunner } from "./lib/content-factory-review.mjs";
+import {
+  parseStructuredOutputWithOneRetry,
+  previewRawModelOutput,
+} from "./lib/content-factory-structured-output.mjs";
 const runFactoryReview = createFactoryReviewRunner();
 const executeFactoryGeminiOperation = (options) => process.env.CONTENT_FACTORY_GEMINI_API_KEY
   ? runFactoryReview(options)
@@ -82,6 +86,9 @@ Output rules:
 - Exactly 1 answer must be correct.
 - The explanation must match the keyed answer exactly.
 - Do not mention internal reasoning.
+- Every English item must put the exact tested words in one and only one literal
+  [underline]target text[/underline] span inside its passage. Do not use Markdown,
+  HTML, underscores, or any other underline syntax.
 
 Before finalizing each item, silently verify:
 - It matches the requested section and topic exactly.
@@ -407,6 +414,7 @@ async function createCandidateAudit({
 }) {
   const candidateId = randomUUID();
   const fields = safeCandidateAuditFields(candidate);
+  const rawModelOutputPreview = previewRawModelOutput(candidate?._rawModelOutput);
 
   await client.query(
     `
@@ -414,10 +422,10 @@ async function createCandidateAudit({
         run_id, candidate_id, section_key, topic_id, topic_name,
         requested_difficulty, generated_difficulty, passage, prompt, choices,
         correct_answer, explanation, generation_provider, generation_model,
-        generation_attempt, provider_attempts, final_disposition
+        generation_attempt, provider_attempts, raw_model_output_preview, final_disposition
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb,
-        $11, $12, $13, $14, $15, $16::jsonb, 'pending'
+        $11, $12, $13, $14, $15, $16::jsonb, $17, 'pending'
       )
     `,
     [
@@ -437,6 +445,7 @@ async function createCandidateAudit({
       candidateModel,
       generationAttempt,
       JSON.stringify(runProviderState.events),
+      rawModelOutputPreview || null,
     ]
   );
 
@@ -444,6 +453,9 @@ async function createCandidateAudit({
 }
 
 async function updateCandidateAudit(candidateId, updates = {}) {
+  if (updates.finalReason !== undefined && updates.failedCheck === undefined) {
+    updates = { ...updates, failedCheck: updates.finalReason };
+  }
   const entries = Object.entries(updates).filter(([, value]) => value !== undefined);
   if (!candidateId || entries.length === 0) {
     return;
@@ -484,6 +496,8 @@ async function updateCandidateAudit(candidateId, updates = {}) {
       verifierResult: "verifier_result",
       providerAttempts: "provider_attempts",
       parserSchemaErrors: "parser_schema_errors",
+      rawModelOutputPreview: "raw_model_output_preview",
+      failedCheck: "failed_check",
       finalDisposition: "final_disposition",
       finalReason: "final_reason",
     }[key];
@@ -520,6 +534,8 @@ async function recordGenerationFailureAudit({ topic, requestedDifficulty, error 
   await updateCandidateAudit(auditCandidateId, {
     providerAttempts: runProviderState.events,
     parserSchemaErrors: [message],
+    rawModelOutputPreview: error?.rawOutputPreview ?? null,
+    failedCheck: error?.failedCheck ?? message,
     finalDisposition: "provider_schema_failure",
     finalReason: message,
   });
@@ -1279,6 +1295,27 @@ Easy Math quality requirements:
 `.trim();
 }
 
+function buildEnglishUnderlineContract(sectionKey) {
+  if (sectionKey !== "english") return "";
+  return `
+English underline contract (required for every English item):
+- Put exactly one tested span in the passage using this literal syntax: [underline]words being tested[/underline]
+- Do not use Markdown (__words__), HTML (<u>words</u>), asterisks, brackets without the matching close tag, or more than one underline span.
+- The question must ask for the best revision of the underlined portion, and all four choices must revise that exact span.
+
+Complete format example only. Write a different, original item:
+{
+  "section": "english",
+  "topic": "Punctuation",
+  "difficulty": "easy",
+  "passage": "The volunteers packed lunches [underline]and delivered them before noon[/underline] to the shelter.",
+  "question_text": "Which choice provides the most effective revision of the underlined portion?",
+  "choices": {"A": "and delivered them before noon", "B": ", and delivered them before noon", "C": "; and delivered them before noon", "D": ": and delivered them before noon"},
+  "correct_answer": "A",
+  "explanation": "The two verbs share the same subject, so no punctuation is needed before the compound predicate."
+}`.trim();
+}
+
 function buildPrompt({ sectionKey, topicName, slug, requestedDifficulty, requestedCount }) {
   return `
 Generate ${requestedCount} original ACT-style multiple-choice questions.
@@ -1348,6 +1385,8 @@ Difficulty calibration rules:
 ${buildDifficultyCalibrationInstructions(sectionKey)}
 
 ${buildEasyMathGenerationInstructions(sectionKey, requestedDifficulty)}
+
+${buildEnglishUnderlineContract(sectionKey)}
 
 Section-specific rules:
 ${getSectionSpecificInstructions(sectionKey)}
@@ -1469,8 +1508,8 @@ ${getTopicSpecificInstructions(sectionKey, slug)}
 }
 
 function buildQuestionBatchSchema(sectionKey, requestedDifficulty, requestedCount) {
-  const passageSchema = sectionKey === "reading" || sectionKey === "science"
-    ? { type: "string" }
+  const passageSchema = sectionKey === "english" || sectionKey === "reading" || sectionKey === "science"
+    ? { type: "string", minLength: 1 }
     : { type: ["string", "null"] };
 
   return {
@@ -1850,7 +1889,7 @@ async function fetchProviderResponse(provider, url, options) {
 
 async function requestGeminiJson({ model, systemPrompt, userPrompt, schema, temperature = 0.35 }) {
   if (process.env.CONTENT_FACTORY_GEMINI_API_KEY) {
-    const allowed = new Set(['gemini-3.1-flash-lite-preview','gemini-2.5-flash','gemini-3-flash-preview','gemini-2.5-flash-lite']);
+    const allowed = new Set(['gemini-3.1-flash-lite-preview','gemini-2.5-flash','gemini-3-flash-preview','gemini-2.5-flash-lite','gemini-3.1-pro-preview']);
     if (!allowed.has(model)) throw new Error(`Content factory model is not on free-tier allowlist: ${model}`);
     await new Promise(resolve => setTimeout(resolve, Math.max(5000,Number(process.env.CONTENT_FACTORY_REQUEST_SPACING_MS)||5000)));
   }
@@ -2278,29 +2317,109 @@ async function generateBatchForDifficulty(
     defaultRetryDelayMs: primary.provider === "groq" ? 20000 : 35000,
     wait: sleep,
     perform: async (candidate) => {
-      const text = await requestStructuredJson({
-        provider: candidate.provider,
-        model: candidate.model,
-        systemPrompt: GENERATION_SYSTEM_PROMPT,
-        userPrompt: prompt,
-        schema,
-        temperature: 0.7,
-      });
-      const parsedPayload = normalizeGeneratedPayload(parseModelJson(text));
-
-      return {
-        questions: buildGeneratedBatchSchema({
+      const structured = await parseStructuredOutputWithOneRetry({
+        label: `Writer response for ${topic.section_key}/${topic.slug}/${requestedDifficulty}`,
+        request: () => requestStructuredJson({
+          provider: candidate.provider,
+          model: candidate.model,
+          systemPrompt: GENERATION_SYSTEM_PROMPT,
+          userPrompt: prompt,
+          schema,
+          temperature: 0.7,
+        }),
+        parse: (text) => buildGeneratedBatchSchema({
           requestedCount,
           requestedDifficulty,
-        }).parse(parsedPayload).questions,
+        }).parse(normalizeGeneratedPayload(parseModelJson(text))),
+      });
+
+      return {
+        questions: structured.value.questions,
+        rawModelOutput: structured.rawOutput,
       };
     },
   });
 
   return {
-    questions: operationResult.questions,
+    questions: operationResult.questions.map((question) => ({
+      ...question,
+      _rawModelOutput: operationResult.rawModelOutput,
+    })),
     provider: operationResult.provider,
     model: operationResult.model,
+  };
+}
+
+async function repairEnglishUnderlineFormat(
+  topic,
+  question,
+  failedCheck,
+  provider = generationProvider,
+  model = generationModel
+) {
+  const requestedDifficulty = question.difficulty;
+  const schema = buildQuestionBatchSchema("english", requestedDifficulty, 1);
+  const prompt = `
+Repair only the English underline FORMAT failure below. Return one complete replacement item in a JSON object with a "questions" array containing exactly one item.
+
+Exact failed check:
+${failedCheck}
+
+Requirements:
+- Preserve the same requested topic and difficulty, and keep four A–D choices, one correct answer, and an explanation.
+- The passage must contain exactly one literal [underline]target text[/underline] span.
+- The question_text must ask for the best revision of the underlined portion.
+- Do not use Markdown, HTML, or any other underline syntax.
+- This is a format repair, not a quality waiver. The replacement must still meet every writer quality rule.
+
+Candidate to repair:
+${JSON.stringify({
+  section: question.section,
+  topic: question.topic,
+  difficulty: question.difficulty,
+  passage: question.passage,
+  question_text: question.question_text,
+  choices: question.choices,
+  correct_answer: question.correct_answer,
+  explanation: question.explanation,
+})}`.trim();
+  const { primary, fallback, fallbacks } = buildOperationCandidates("generation", provider, model);
+  const operationResult = await executeFactoryGeminiOperation({
+    runState: runProviderState,
+    operation: `generation:${topic.section_key}/${topic.slug}/english-underline-repair/${requestedDifficulty}`,
+    primary,
+    fallback,
+    fallbacks,
+    maxRetries: 1,
+    defaultRetryDelayMs: primary.provider === "groq" ? 20000 : 35000,
+    wait: sleep,
+    perform: async (candidate) => {
+      const structured = await parseStructuredOutputWithOneRetry({
+        label: `English underline repair for ${topic.section_key}/${topic.slug}`,
+        request: () => requestStructuredJson({
+          provider: candidate.provider,
+          model: candidate.model,
+          systemPrompt: GENERATION_SYSTEM_PROMPT,
+          userPrompt: prompt,
+          schema,
+          temperature: 0.35,
+        }),
+        parse: (text) => buildGeneratedBatchSchema({
+          requestedCount: 1,
+          requestedDifficulty,
+        }).parse(normalizeGeneratedPayload(parseModelJson(text))),
+      });
+      return { question: structured.value.questions[0], rawModelOutput: structured.rawOutput };
+    },
+  });
+
+  return {
+    question: {
+      ...operationResult.question,
+      _generationProvider: operationResult.provider,
+      _generationModel: operationResult.model,
+      _rawModelOutput: operationResult.rawModelOutput,
+    },
   };
 }
 
@@ -2332,29 +2451,33 @@ async function generateQuestionSet(
     defaultRetryDelayMs: primary.provider === "groq" ? 20000 : 35000,
     wait: sleep,
     perform: async (candidate) => {
-      const text = await requestStructuredJson({
-        provider: candidate.provider,
-        model: candidate.model,
-        systemPrompt: GENERATION_SYSTEM_PROMPT,
-        userPrompt: prompt,
-        schema,
-        temperature: 0.7,
-      });
-      const parsedPayload = normalizeGeneratedSetPayload(parseModelJson(text));
-
-      return {
-        generatedSet: buildGeneratedSetSchema({
+      const structured = await parseStructuredOutputWithOneRetry({
+        label: `Writer response for ${topic.section_key}/${topic.slug}/set`,
+        request: () => requestStructuredJson({
+          provider: candidate.provider,
+          model: candidate.model,
+          systemPrompt: GENERATION_SYSTEM_PROMPT,
+          userPrompt: prompt,
+          schema,
+          temperature: 0.7,
+        }),
+        parse: (text) => buildGeneratedSetSchema({
           sectionKey: topic.section_key,
           requestedDifficultyCounts,
           minQuestionCount: requestedQuestionCount,
           maxQuestionCount: requestedQuestionCount,
-        }).parse(parsedPayload),
+        }).parse(normalizeGeneratedSetPayload(parseModelJson(text))),
+      });
+
+      return {
+        generatedSet: structured.value,
+        rawModelOutput: structured.rawOutput,
       };
     },
   });
 
   return {
-    generatedSet: operationResult.generatedSet,
+    generatedSet: { ...operationResult.generatedSet, _rawModelOutput: operationResult.rawModelOutput },
     provider: operationResult.provider,
     model: operationResult.model,
   };
@@ -2578,24 +2701,28 @@ async function generateReplacementSetChild(
     defaultRetryDelayMs: primary.provider === "groq" ? 20000 : 35000,
     wait: sleep,
     perform: async (candidate) => {
-      const text = await requestStructuredJson({
-        provider: candidate.provider,
-        model: candidate.model,
-        systemPrompt: GENERATION_SYSTEM_PROMPT,
-        userPrompt: prompt,
-        schema,
-        temperature: 0.7,
+      const structured = await parseStructuredOutputWithOneRetry({
+        label: `Writer response for ${topic.section_key}/${topic.slug}/replacement/${requestedDifficulty}`,
+        request: () => requestStructuredJson({
+          provider: candidate.provider,
+          model: candidate.model,
+          systemPrompt: GENERATION_SYSTEM_PROMPT,
+          userPrompt: prompt,
+          schema,
+          temperature: 0.7,
+        }),
+        parse: (text) => parser.parse(parseModelJson(text)),
       });
-      const parsedPayload = parseModelJson(text);
 
       return {
-        question: parser.parse(parsedPayload),
+        question: structured.value,
+        rawModelOutput: structured.rawOutput,
       };
     },
   });
 
   return {
-    question: operationResult.question,
+    question: { ...operationResult.question, _rawModelOutput: operationResult.rawModelOutput },
     provider: operationResult.provider,
     model: operationResult.model,
   };
@@ -2632,28 +2759,32 @@ async function reviseSetChildForDifficulty(
     defaultRetryDelayMs: primary.provider === "groq" ? 20000 : 35000,
     wait: sleep,
     perform: async (candidate) => {
-      const text = await requestStructuredJson({
-        provider: candidate.provider,
-        model: candidate.model,
-        systemPrompt: GENERATION_SYSTEM_PROMPT,
-        userPrompt: prompt,
-        schema: responseJsonSchema,
-        temperature: 0.65,
-      });
-      const parsedPayload = parseModelJson(text);
-
-      return {
-        question: toCanonicalSetChildCandidate(responseSchema.parse(parsedPayload), {
+      const structured = await parseStructuredOutputWithOneRetry({
+        label: `Writer response for ${topic.section_key}/${topic.slug}/revise/${requestedDifficulty}`,
+        request: () => requestStructuredJson({
+          provider: candidate.provider,
+          model: candidate.model,
+          systemPrompt: GENERATION_SYSTEM_PROMPT,
+          userPrompt: prompt,
+          schema: responseJsonSchema,
+          temperature: 0.65,
+        }),
+        parse: (text) => toCanonicalSetChildCandidate(responseSchema.parse(parseModelJson(text)), {
           topic,
           originalChild: child,
           requestedDifficulty,
         }),
+      });
+
+      return {
+        question: structured.value,
+        rawModelOutput: structured.rawOutput,
       };
     },
   });
 
   return {
-    question: operationResult.question,
+    question: { ...operationResult.question, _rawModelOutput: operationResult.rawModelOutput },
     provider: operationResult.provider,
     model: operationResult.model,
   };
@@ -2897,18 +3028,22 @@ async function reviewGeneratedQuestion(
     defaultRetryDelayMs: primary.provider === "groq" ? 12000 : 20000,
     wait: sleep,
     perform: async (candidate) => {
-      const text = await requestStructuredJson({
-        provider: candidate.provider,
-        model: candidate.model,
-        systemPrompt: REVIEW_SYSTEM_PROMPT,
-        userPrompt: prompt,
-        schema,
-        temperature: 0.2,
+      const structured = await parseStructuredOutputWithOneRetry({
+        label: `Primary reviewer response for ${topic.section_key}/${topic.slug}`,
+        request: () => requestStructuredJson({
+          provider: candidate.provider,
+          model: candidate.model,
+          systemPrompt: REVIEW_SYSTEM_PROMPT,
+          userPrompt: prompt,
+          schema,
+          temperature: 0.2,
+        }),
+        parse: (text) => reviewedQuestionSchema.parse(parseModelJson(text)),
       });
-      const parsedPayload = parseModelJson(text);
 
       return {
-        reviewerResult: reviewedQuestionSchema.parse(parsedPayload),
+        reviewerResult: structured.value,
+        rawModelOutput: structured.rawOutput,
       };
     },
   });
@@ -2917,6 +3052,7 @@ async function reviewGeneratedQuestion(
     reviewerResult: { ...operationResult.reviewerResult, provider: operationResult.provider, model: operationResult.model },
     provider: operationResult.provider,
     model: operationResult.model,
+    rawModelOutput: operationResult.rawModelOutput,
   };
 }
 
@@ -2998,18 +3134,22 @@ async function verifyGeneratedQuestionCorrectness(
         }
       },
       perform: async (candidate) => {
-        const text = await requestStructuredJson({
-          provider: candidate.provider,
-          model: candidate.model,
-          systemPrompt: REVIEW_SYSTEM_PROMPT,
-          userPrompt: prompt,
-          schema,
-          temperature: 0.1,
+        const structured = await parseStructuredOutputWithOneRetry({
+          label: `Blind verifier response for ${topic.section_key}/${topic.slug}`,
+          request: () => requestStructuredJson({
+            provider: candidate.provider,
+            model: candidate.model,
+            systemPrompt: REVIEW_SYSTEM_PROMPT,
+            userPrompt: prompt,
+            schema,
+            temperature: 0.1,
+          }),
+          parse: (text) => correctnessVerifierSchema.parse(parseModelJson(text)),
         });
-        const parsedPayload = parseModelJson(text);
 
         return {
-          verifierResult: correctnessVerifierSchema.parse(parsedPayload),
+          verifierResult: structured.value,
+          rawModelOutput: structured.rawOutput,
         };
       },
     });
@@ -3032,7 +3172,30 @@ async function verifyGeneratedQuestionCorrectness(
     verifierResult: { ...operationResult.verifierResult, provider: operationResult.provider, model: operationResult.model },
     provider: operationResult.provider,
     model: operationResult.model,
+    rawModelOutput: operationResult.rawModelOutput,
   };
+}
+
+function getEnglishUnderlineFormatFailure(question) {
+  const passage = typeof question?.passage === "string" ? question.passage : "";
+  const questionText = typeof question?.question_text === "string" ? question.question_text : "";
+  const openingTags = passage.match(/\[underline\]/gi) ?? [];
+  const closingTags = passage.match(/\[\/underline\]/gi) ?? [];
+  const exactSpan = passage.match(/\[underline\]([^\[\]]+?)\[\/underline\]/i);
+
+  if (openingTags.length !== 1 || closingTags.length !== 1 || !exactSpan || !exactSpan[1].trim()) {
+    return "English format error: passage must contain exactly one nonempty [underline]target text[/underline] span; do not use Markdown or HTML underline syntax.";
+  }
+
+  if (!/underlin/i.test(questionText)) {
+    return "English format error: question_text must explicitly ask for the best revision of the underlined portion.";
+  }
+
+  return null;
+}
+
+function isEnglishUnderlineFormatFailure(error) {
+  return error instanceof Error && error.message.startsWith("English format error:");
 }
 
 function sanitizeQuestion(sectionKey, topic, question, sourceMetadata = {}) {
@@ -3089,6 +3252,11 @@ function sanitizeQuestion(sectionKey, topic, question, sourceMetadata = {}) {
     throw new Error("English question missing passage/setup.");
   }
 
+  if (sectionKey === "english") {
+    const underlineFailure = getEnglishUnderlineFormatFailure(question);
+    if (underlineFailure) throw new Error(underlineFailure);
+  }
+
   const combinedText = `${passage || ""} ${prompt} ${explanation}`.toLowerCase();
   const explicitApproximationPrompt = /\b(closest|nearest|approximately|approximate|about|round)\b/i.test(
     prompt
@@ -3124,14 +3292,6 @@ function sanitizeQuestion(sectionKey, topic, question, sourceMetadata = {}) {
     )
   ) {
     throw new Error("English question reads like a terminology quiz instead of ACT revision.");
-  }
-
-  if (
-    sectionKey === "english" &&
-    /underlin/.test(combinedText) &&
-    !/\[underline\].*?\[\/underline\]|__(.*?)__|<u>.*?<\/u>/i.test(passage || "")
-  ) {
-    throw new Error("English question refers to underlined text without markup.");
   }
 
   if (
@@ -3488,6 +3648,19 @@ function buildQuestionReviewPayload(question) {
   };
 }
 
+function describeReviewPipelineFailure(result) {
+  if (result.disposition === "key_mismatch" && result.verifierResult) {
+    return `Blind verifier key mismatch: stored key ${result.normalizedQuestion.correctAnswer}, verifier chose ${result.verifierResult.chosen_answer}.`;
+  }
+  if (result.reviewerResult?.main_issues?.length) {
+    return `Primary reviewer ${result.reviewerResult.verdict}: ${result.reviewerResult.main_issues.join("; ")}`;
+  }
+  if (result.reviewerResult?.editorial_note) {
+    return `Primary reviewer ${result.reviewerResult.verdict}: ${result.reviewerResult.editorial_note}`;
+  }
+  return `Review pipeline disposition: ${result.disposition ?? "rejected_review"}.`;
+}
+
 async function runReviewPipelineForQuestion({
   topic,
   normalizedQuestion,
@@ -3498,13 +3671,16 @@ async function runReviewPipelineForQuestion({
 }) {
   const counters = createReviewCounters();
   let reviewerResult;
+  let reviewerRawModelOutput = null;
   let verifierResult = null;
+  let verifierRawModelOutput = null;
   let disposition = "reject";
   let reviewProviderUsed = null;
 
   try {
     const reviewOperation = await reviewGeneratedQuestion(topic, buildQuestionReviewPayload(normalizedQuestion));
     reviewerResult = reviewOperation.reviewerResult;
+    reviewerRawModelOutput = reviewOperation.rawModelOutput;
     reviewProviderUsed = reviewOperation.provider;
     if (process.env.CONTENT_FACTORY_GEMINI_API_KEY) console.log(`Factory review audit: candidate=${auditCandidateId} stage=primary model=${reviewOperation.model}`);
   } catch (error) {
@@ -3515,6 +3691,8 @@ async function runReviewPipelineForQuestion({
       await updateCandidateAudit(auditCandidateId, {
         providerAttempts: runProviderState.events,
         parserSchemaErrors: [message],
+        rawModelOutputPreview: error?.rawOutputPreview ?? null,
+        failedCheck: error?.failedCheck ?? message,
         finalDisposition: "rejected_reviewer_error",
         finalReason: message,
       });
@@ -3528,6 +3706,8 @@ async function runReviewPipelineForQuestion({
     await updateCandidateAudit(auditCandidateId, {
       providerAttempts: runProviderState.events,
       parserSchemaErrors: [error instanceof Error ? error.message : "unknown reviewer error"],
+      rawModelOutputPreview: error?.rawOutputPreview ?? null,
+      failedCheck: error?.failedCheck ?? (error instanceof Error ? error.message : "unknown reviewer error"),
       finalDisposition: "rejected_reviewer_error",
       finalReason: error instanceof Error ? error.message : "unknown reviewer error",
     });
@@ -3551,6 +3731,7 @@ async function runReviewPipelineForQuestion({
   await updateCandidateAudit(auditCandidateId, {
     primaryReviewerResult: reviewerResult,
     providerAttempts: runProviderState.events,
+    rawModelOutputPreview: previewRawModelOutput(reviewerRawModelOutput) || null,
   });
 
   if (disposition === "revise") {
@@ -3660,6 +3841,7 @@ async function runReviewPipelineForQuestion({
       normalizedQuestion.generationProvider ?? reviewProviderUsed
     );
     verifierResult = verificationOperation.verifierResult;
+    verifierRawModelOutput = verificationOperation.rawModelOutput;
     if (process.env.CONTENT_FACTORY_GEMINI_API_KEY) console.log(`Factory review audit: candidate=${auditCandidateId} stage=verifier model=${verificationOperation.model}`);
     if (process.env.CONTENT_FACTORY_GEMINI_API_KEY) console.log(`Factory blind check: candidate=${auditCandidateId} key=${normalizedQuestion.correctAnswer} chosen=${verifierResult.chosen_answer} model=${verificationOperation.model}`);
   } catch (error) {
@@ -3682,6 +3864,8 @@ async function runReviewPipelineForQuestion({
         primaryReviewerResult: reviewerResult,
         providerAttempts: runProviderState.events,
         parserSchemaErrors: [message],
+        rawModelOutputPreview: error?.rawOutputPreview ?? null,
+        failedCheck: error?.failedCheck ?? message,
         finalDisposition: "rejected_verifier_error",
         finalReason: message,
       });
@@ -3696,6 +3880,8 @@ async function runReviewPipelineForQuestion({
         primaryReviewerResult: reviewerResult,
         providerAttempts: runProviderState.events,
         parserSchemaErrors: [error instanceof Error ? error.message : "unknown verifier error"],
+        rawModelOutputPreview: error?.rawOutputPreview ?? null,
+        failedCheck: error?.failedCheck ?? (error instanceof Error ? error.message : "unknown verifier error"),
         finalDisposition: "unverified_comparison",
         finalReason: "Verifier unavailable in opt-in comparison mode.",
       });
@@ -3708,6 +3894,8 @@ async function runReviewPipelineForQuestion({
       primaryReviewerResult: reviewerResult,
       providerAttempts: runProviderState.events,
       parserSchemaErrors: [error instanceof Error ? error.message : "unknown verifier error"],
+      rawModelOutputPreview: error?.rawOutputPreview ?? null,
+      failedCheck: error?.failedCheck ?? (error instanceof Error ? error.message : "unknown verifier error"),
       finalDisposition: "rejected_verifier_error",
       finalReason: error instanceof Error ? error.message : "unknown verifier error",
     });
@@ -3722,6 +3910,11 @@ async function runReviewPipelineForQuestion({
   if (verifierResult.chosen_answer !== normalizedQuestion.correctAnswer) {
     counters.skipped += 1;
     counters.reviewRejected += 1;
+    await updateCandidateAudit(auditCandidateId, {
+      verifierResult,
+      rawModelOutputPreview: previewRawModelOutput(verifierRawModelOutput) || null,
+      failedCheck: `Blind verifier key mismatch: stored key ${normalizedQuestion.correctAnswer}, verifier chose ${verifierResult.chosen_answer}.`,
+    });
     console.warn(
       `Skipping ${contextLabel} after blind correctness verification: key_mismatch (key=${normalizedQuestion.correctAnswer}, chosen=${verifierResult.chosen_answer})`
     );
@@ -3798,25 +3991,64 @@ async function insertQuestions(topic, generatedQuestions) {
   let reviewErrors = 0;
 
   for (const generatedQuestion of generatedQuestions) {
+    let candidateQuestion = generatedQuestion;
     const auditCandidateId = await createCandidateAudit({
       topic,
-      requestedDifficulty: generatedQuestion.difficulty,
-      candidate: generatedQuestion,
-      generationProvider: generatedQuestion._generationProvider,
-      generationModel: generatedQuestion._generationModel,
+      requestedDifficulty: candidateQuestion.difficulty,
+      candidate: candidateQuestion,
+      generationProvider: candidateQuestion._generationProvider,
+      generationModel: candidateQuestion._generationModel,
     });
     let normalizedQuestion;
 
     try {
-      normalizedQuestion = sanitizeQuestion(topic.section_key, topic, generatedQuestion, {
-        generationProvider: generatedQuestion._generationProvider,
-        generationModel: generatedQuestion._generationModel,
+      normalizedQuestion = sanitizeQuestion(topic.section_key, topic, candidateQuestion, {
+        generationProvider: candidateQuestion._generationProvider,
+        generationModel: candidateQuestion._generationModel,
       });
     } catch (error) {
+      if (topic.section_key === "english" && isEnglishUnderlineFormatFailure(error)) {
+        const formatFailure = error.message;
+        try {
+          const repaired = await repairEnglishUnderlineFormat(topic, candidateQuestion, formatFailure);
+          candidateQuestion = repaired.question;
+          const repairedFields = safeCandidateAuditFields(candidateQuestion);
+          await updateCandidateAudit(auditCandidateId, {
+            generatedDifficulty: repairedFields.generatedDifficulty,
+            passage: repairedFields.passage,
+            prompt: repairedFields.prompt,
+            choices: repairedFields.choices,
+            correctAnswer: repairedFields.correctAnswer,
+            explanation: repairedFields.explanation,
+            rawModelOutputPreview: previewRawModelOutput(candidateQuestion._rawModelOutput) || null,
+            parserSchemaErrors: [formatFailure],
+            failedCheck: formatFailure,
+            providerAttempts: runProviderState.events,
+          });
+          normalizedQuestion = sanitizeQuestion(topic.section_key, topic, candidateQuestion, {
+            generationProvider: candidateQuestion._generationProvider,
+            generationModel: candidateQuestion._generationModel,
+          });
+        } catch (repairError) {
+          skipped += 1;
+          const message = repairError instanceof Error ? repairError.message : "unknown English format repair error";
+          await updateCandidateAudit(auditCandidateId, {
+            providerAttempts: runProviderState.events,
+            parserSchemaErrors: [formatFailure, message],
+            rawModelOutputPreview: repairError?.rawOutputPreview || previewRawModelOutput(candidateQuestion._rawModelOutput) || null,
+            failedCheck: repairError?.failedCheck ?? message,
+            finalDisposition: "rejected_english_format",
+            finalReason: message,
+          });
+          console.warn(`Skipping invalid ${topic.section_key}/${topic.slug} question after one underline-format repair: ${message}`);
+          continue;
+        }
+      } else {
       skipped += 1;
       await updateCandidateAudit(auditCandidateId, {
         providerAttempts: runProviderState.events,
         parserSchemaErrors: [error instanceof Error ? error.message : "unknown validation error"],
+        failedCheck: error instanceof Error ? error.message : "unknown validation error",
         finalDisposition: "rejected_deterministic",
         finalReason: error instanceof Error ? error.message : "unknown validation error",
       });
@@ -3826,6 +4058,7 @@ async function insertQuestions(topic, generatedQuestions) {
         }`
       );
       continue;
+      }
     }
 
     if (knownFingerprints.has(normalizedQuestion.fingerprint)) {
@@ -3887,7 +4120,7 @@ async function insertQuestions(topic, generatedQuestions) {
         verifierResult: reviewedQuestion.verifierResult ?? null,
         providerAttempts: runProviderState.events,
         finalDisposition: reviewedQuestion.disposition ?? "rejected_review",
-        finalReason: "Candidate did not pass the review pipeline.",
+        finalReason: describeReviewPipelineFailure(reviewedQuestion),
       });
       continue;
     }
@@ -4001,7 +4234,7 @@ async function insertQuestionSets(topic, generatedSets) {
             const auditCandidateId = await createCandidateAudit({
               topic,
               requestedDifficulty: rawChild.difficulty ?? "unknown",
-              candidate: { ...rawChild, passage: generatedSet.content ?? null },
+              candidate: { ...rawChild, passage: generatedSet.content ?? null, _rawModelOutput: generatedSet._rawModelOutput },
               generationProvider: generatedSet._generationProvider,
               generationModel: generatedSet._generationModel,
             });
@@ -4029,7 +4262,7 @@ async function insertQuestionSets(topic, generatedSets) {
       const auditCandidateId = await createCandidateAudit({
         topic,
         requestedDifficulty: rawChild.difficulty,
-        candidate: { ...rawChild, passage: normalizedSet.content },
+        candidate: { ...rawChild, passage: normalizedSet.content, _rawModelOutput: generatedSet._rawModelOutput },
         generationProvider: generatedSet._generationProvider,
         generationModel: generatedSet._generationModel,
       });
@@ -4134,7 +4367,7 @@ async function insertQuestionSets(topic, generatedSets) {
             verifierResult: reviewedChild.verifierResult ?? null,
             providerAttempts: runProviderState.events,
             finalDisposition: reviewedChild.disposition ?? "rejected_review",
-            finalReason: "Shared-set child did not pass the review pipeline.",
+            finalReason: describeReviewPipelineFailure(reviewedChild),
           });
         }
       } catch (error) {
@@ -4178,7 +4411,7 @@ async function insertQuestionSets(topic, generatedSets) {
         const replacementAuditId = await createCandidateAudit({
           topic,
           requestedDifficulty: missingDifficulty,
-          candidate: { passage: normalizedSet.content },
+          candidate: { passage: normalizedSet.content, _rawModelOutput: generatedSet._rawModelOutput },
           generationAttempt: attempt,
         });
         try {
@@ -4285,7 +4518,7 @@ async function insertQuestionSets(topic, generatedSets) {
               verifierResult: reviewedReplacement.verifierResult ?? null,
               providerAttempts: runProviderState.events,
               finalDisposition: reviewedReplacement.disposition ?? "rejected_review",
-              finalReason: "Replacement did not pass the review pipeline.",
+              finalReason: describeReviewPipelineFailure(reviewedReplacement),
             });
             continue;
           }

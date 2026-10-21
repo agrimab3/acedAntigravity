@@ -1344,6 +1344,13 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
               {session?.user?.email}
             </span>
             <Link href="/account" style={{ fontSize: "13px", color: "rgba(255,255,255,0.78)" }}>account</Link>
+            <button
+              type="button"
+              onClick={handleReplayWalkthrough}
+              style={{ background: "transparent", border: 0, color: "rgba(255,255,255,0.78)", padding: 0, fontSize: "13px", cursor: "pointer", fontFamily: "inherit" }}
+            >
+              Take the tour
+            </button>
             {process.env.NODE_ENV === "development" && devBackToLoginAvailable && (
               <>
                 <div style={{ display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>

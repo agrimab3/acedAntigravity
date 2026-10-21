@@ -3,10 +3,13 @@ import pg from 'pg';
 import { factoryReviewAuditLines } from '../lib/content-factory-review.mjs';
 import { describeFactoryProcessError, redactFactoryError } from '../lib/content-factory-process.mjs';
 import { parseContentFactoryArgs } from '../lib/content-factory-args.mjs';
-import { buildPacedFactoryBatches, FACTORY_NIGHTLY_TARGET } from '../lib/content-factory-schedule.mjs';
+import { buildManualFactoryTestPlan, buildPacedFactoryBatches, FACTORY_NIGHTLY_TARGET } from '../lib/content-factory-schedule.mjs';
 
 const arg = parseContentFactoryArgs(process.argv.slice(2));
-const limit = Math.min(FACTORY_NIGHTLY_TARGET, Math.max(1, Number(arg.limit || FACTORY_NIGHTLY_TARGET)));
+const manualTestPlan = arg['section-plan'] ? buildManualFactoryTestPlan(arg['section-plan']) : null;
+const limit = manualTestPlan
+  ? manualTestPlan.reduce((sum, batch) => sum + batch.requested, 0)
+  : Math.min(FACTORY_NIGHTLY_TARGET, Math.max(1, Number(arg.limit || FACTORY_NIGHTLY_TARGET)));
 if (!Number.isInteger(limit)) throw Error('Invalid limit');
 const pacificHour = Number(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', hour: '2-digit', hourCycle: 'h23' }).format(new Date()));
 if (!arg.manual && pacificHour !== 1) {
@@ -62,14 +65,14 @@ try {
         OLLAMA_GENERATION_MODEL: '', OLLAMA_REVIEW_MODEL: '', OLLAMA_MODEL: '', OLLAMA_API_BASE_URL: '', OLLAMA_BASE_URL: '',
       };
       const safeError = (value) => redactFactoryError(value, key).slice(0, 1400);
-      const batches = buildPacedFactoryBatches(limit);
+      const batches = manualTestPlan ?? buildPacedFactoryBatches(limit);
 
       for (const [index, batch] of batches.entries()) {
         let remaining = batch.requested;
         let attempts = 0;
         while (remaining > 0 && attempts < 2) {
           attempts += 1;
-          console.log(`Factory batch ${index + 1}/${batches.length}: ${batch.sectionKey}, ${remaining} target(s), attempt ${attempts}.`);
+          console.log(`Factory batch ${index + 1}/${batches.length}: ${batch.label ?? batch.sectionKey}, ${remaining} target(s), attempt ${attempts}.`);
           const child = spawnSync('node', [
             'scripts/content-generate-next.mjs', '--scope=practice', `--section=${batch.sectionKey}`,
             `--limit=${remaining}`, '--provider=gemini', '--model=gemini-3-flash-preview',
@@ -113,7 +116,7 @@ try {
     process.exitCode = 1;
   } finally {
     await db.query('update content_factory_runs set finished_at=now(),status=$2,inserted=$3,rejected=$4,skipped=$5,quota_paused=$6,note=$7 where id=$1', [runId, result.status, result.inserted, result.rejected, result.skipped, result.quota_paused, result.note]);
-    console.log(JSON.stringify({ generationModel: 'gemini-3-flash-preview', reviewModel: 'gemini-2.5-flash', status: result.status, requested: limit, inserted: result.inserted, rejected: result.rejected, skipped: result.skipped, quota_paused: result.quota_paused, note: result.note }));
+    console.log(JSON.stringify({ runId, generationModel: 'gemini-3-flash-preview', reviewModel: 'gemini-2.5-flash', status: result.status, requested: limit, manualTestPlan, inserted: result.inserted, rejected: result.rejected, skipped: result.skipped, quota_paused: result.quota_paused, note: result.note }));
   }
 } finally {
   await db.end();

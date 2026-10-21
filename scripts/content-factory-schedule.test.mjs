@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { allocateSectionTargets, buildPacedFactoryBatches, FACTORY_BATCH_SIZE, FACTORY_NIGHTLY_TARGET } from '../lib/content-factory-schedule.mjs';
+import { allocateSectionTargets, buildManualFactoryTestPlan, buildPacedFactoryBatches, FACTORY_BATCH_SIZE, FACTORY_NIGHTLY_TARGET } from '../lib/content-factory-schedule.mjs';
 
 test('nightly target is balanced 30/30/20/20 and paced in batches of five', () => {
   assert.deepEqual(allocateSectionTargets(FACTORY_NIGHTLY_TARGET), {
@@ -15,4 +15,13 @@ test('an eight-item manual run allocates two candidates per section', () => {
   assert.deepEqual(allocateSectionTargets(8), {
     english: 2, math: 2, reading: 2, science: 2,
   });
+});
+
+test('the fair manual test plan requests three English, three Math, and one viable shared set per passage section', () => {
+  assert.deepEqual(buildManualFactoryTestPlan('english:3,math:3,reading-set:1,science-set:1'), [
+    { sectionKey: 'english', requested: 3, label: 'English candidates' },
+    { sectionKey: 'math', requested: 3, label: 'Math candidates' },
+    { sectionKey: 'reading', requested: 3, setCount: 1, label: 'Reading shared sets' },
+    { sectionKey: 'science', requested: 3, setCount: 1, label: 'Science shared sets' },
+  ]);
 });

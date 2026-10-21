@@ -16,7 +16,8 @@ test("Groq strict-schema transport rejection retries once in JSON-object mode", 
 });
 
 test("blind verifier requires only a chosen answer and concise reason locally", () => {
-  assert.match(verifier, /correctnessVerifierSchema\.parse\(parsedPayload\)/);
+  assert.match(verifier, /parseStructuredOutputWithOneRetry/);
+  assert.match(verifier, /correctnessVerifierSchema\.parse\(parseModelJson\(text\)\)/);
   assert.match(source, /chosen_answer: z\.enum\(ANSWER_CHOICES\)/);
   assert.match(source, /reason: z\.string\(\)\.min\(1\)\.max\(500\)/);
   const verifierSchema = verifier.slice(verifier.indexOf("const schema ="), verifier.indexOf("const prompt ="));
