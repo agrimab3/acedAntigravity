@@ -18,7 +18,7 @@ Mock-test purchases are generally non-refundable because they reserve limited sc
 If payment succeeds but Aced cannot provide a seat because capacity is exhausted, the current system is designed to initiate an automatic refund and queue a notification email. Stripe and the payment institution determine when refunded funds appear.
 
 ## 5. Incorrect Charges and Service Problems
-For duplicate or incorrect charges, missing paid access, cancellation by Aced, or other problems, contact support@aceditprep.com. We will investigate and provide legally required remedies or other appropriate resolutions. There is currently no general self-service refund button. Exceptions may require authorized action in Stripe Dashboard. **[REQUIRED: Approve and test manual refund/support procedures.]**
+For duplicate or incorrect charges, missing paid access, cancellation by Aced, or other problems, contact support@aceditprep.com. We will investigate and provide legally required remedies or other appropriate resolutions. There is currently no general self-service refund button. Exceptions may require authorized action in Stripe Dashboard.
 
 ## 6. Missed Tests
 Missing the exam, starting too late, or voluntarily declining to participate does not ordinarily entitle a student to an automatic refund. This does not waive mandatory consumer rights or remedies for Aced's failure to provide the purchased service.
@@ -33,5 +33,4 @@ Students retain applicable payment dispute rights. Policy updates will not retro
 Aced  
 Website: https://aceditprep.com  
 Email: support@aceditprep.com  
-
-**[REQUIRED BEFORE PUBLICATION: Confirm legal operator, tax handling, consumer-rights wording, and live-payment readiness.]**
+Operator: Agrima Bhutani, an individual. Aced is not currently a registered business entity.

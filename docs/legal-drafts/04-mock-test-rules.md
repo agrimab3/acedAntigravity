@@ -38,7 +38,7 @@ Aced's built-in calculator is available in the Math section only. The interface 
 Results for the December 5 mock test are scheduled for **Sunday, December 6, 2026 at 2:00 PM Pacific Time**. Results and explanations are not immediately revealed during the test. Mock scores are unofficial and do not guarantee performance on an official ACT.
 
 ## 9. Accessibility
-Aced has some accessibility-oriented interface features, but has not verified full conformance or established a formal extended-time accommodation workflow. Students needing support should contact support@aceditprep.com before purchasing or starting. Aced will explain available options and review requests as required by law. **[REVIEW: Accessibility and accommodations procedure before paid launch.]**
+Aced has some accessibility-oriented interface features, but has not verified full conformance or established a formal extended-time accommodation workflow. Students who need extended time or other support should email support@aceditprep.com before December 5. We will arrange extra time and explain other available options.
 
 ## 10. Technical Problems, Changes, and Cancellation
 Report issues to support@aceditprep.com without sending passwords or card information. Material changes, cancellations, and failures to provide paid access will be handled under the Refund and Payment Policy and applicable law.

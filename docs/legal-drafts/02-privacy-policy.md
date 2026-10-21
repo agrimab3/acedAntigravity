@@ -32,19 +32,19 @@ We use information to maintain accounts, provide and personalize educational ser
 **Google Gemini:** Gemini is used separately for educational question generation and review. The deployed interactive tutor does not send student-specific tutor requests to Gemini, including as a fallback. Gemini's free-tier terms may allow submitted educational content to be used for product improvement or human review. Aced does not intentionally use student tutor messages or learning histories in that content-generation workflow.
 
 ## 5. Service Providers
-Aced uses Google for sign-in, Groq for tutoring, Gemini for educational content generation, Stripe for payments when enabled, Resend for transactional emails, Sentry for error monitoring, and infrastructure providers for hosting, databases, and backups. Providers process information under applicable terms and controls. Aced does not sell student personal information to advertisers. **[VERIFY: Provider inventory and any newly added analytics or advertising tools.]**
+Aced uses Google for sign-in, Groq for tutoring, Google Gemini for educational content generation, Stripe for payments, Resend for email (including delivery, open, and click information), Sentry for error monitoring, Amazon Web Services for hosting, databases, and encrypted backups, and Zoom for live lessons. Providers process information under their own terms and controls. Aced does not use advertising or third-party analytics trackers and does not sell student personal information.
 
 ## 6. Cookies and Browser Storage
-Aced uses authentication cookies and browser storage for preferences, mock-test session continuity, temporary answer recovery, and interface settings. Clearing browser storage may affect preferences or recovery. **[VERIFY: Current cookie and local-storage inventory before publication.]**
+Aced uses authentication cookies and browser storage for preferences, mock-test session continuity, temporary answer recovery, and interface settings. Specifically, Aced uses: a sign-in session cookie; your light/dark theme choice; whether you hid a dashboard card; your place in the first-time tour; and temporary backups of mock-test answers so they survive a refresh. Aced does not use advertising cookies. Clearing browser storage may affect preferences or recovery.
 
 ## 7. Retention
-We retain data as reasonably needed to provide services, maintain security, manage transactions, and comply with law. Active account and identifiable learning data generally remain while needed for the account, subject to valid deletion requests. Minimal payment, refund, security, and consent records may be retained for legitimate obligations, subject to applicable limits. Backup copies may persist until established rotation removes them. Not all retention rules are automatically enforced today. **[REQUIRED: Approve record-specific limits, verify backup retention, and establish a tested deletion-execution process.]**
+We retain data as reasonably needed to provide services, maintain security, manage transactions, and comply with law. Active account and identifiable learning data generally remain while needed for the account, subject to valid deletion requests. Minimal payment, refund, security, and consent records may be retained for legitimate obligations, subject to applicable limits. Backup copies may persist until established rotation removes them. Account data is kept until the account is deleted. Database backups are encrypted and automatically deleted after 30 days.
 
 ## 8. Deletion and Privacy Requests
-Request deletion through Account & Privacy or support@aceditprep.com. We aim to acknowledge requests within **seven calendar days**. This is not a guarantee that deletion will be completed in seven days. Requests begin a review that may include ownership verification and assessment of legal, payment, or security retention exceptions. Requests do not instantly erase data. Provider-held data and backups may follow separate retention processes. **[REQUIRED: Verify Aced can execute valid deletion requests before publishing operational commitments.]**
+Request deletion through Account & Privacy or support@aceditprep.com. We aim to acknowledge requests within **seven calendar days**. This is not a guarantee that deletion will be completed in seven days. Requests begin a review that may include ownership verification and assessment of legal, payment, or security retention exceptions. Requests do not instantly erase data. Provider-held data and backups may follow separate retention processes. Approved deletions are completed by hand, and we will email you when yours is done.
 
 ## 9. De-identified Information
-Where permitted by law, Aced may retain genuinely de-identified or aggregated educational information to improve the service. Removing a name alone does not necessarily de-identify a record. **[VERIFY: Technical standards and actual de-identification practices.]**
+Where permitted by law, Aced may retain genuinely de-identified or aggregated educational information to improve the service. To de-identify information, we remove names, email addresses, and account identifiers and keep only answer-level or aggregated statistics that are not reasonably linkable to you. Removing a name alone does not necessarily de-identify a record.
 
 ## 10. Privacy Rights
 Depending on applicable law, you may request access, correction, or deletion of information and learn about our processing practices. Contact support@aceditprep.com. We may verify identity before acting. Email preferences do not prevent necessary transactional communications.
@@ -62,5 +62,4 @@ We may update this Policy and will provide notice where required by law.
 Aced  
 Website: https://aceditprep.com  
 Email: support@aceditprep.com  
-
-**[REQUIRED BEFORE PUBLICATION: Confirm operator identity and any legally required contact/address details.]**
+Operator: Agrima Bhutani, an individual. Aced is not currently a registered business entity.

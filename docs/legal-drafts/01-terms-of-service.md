@@ -45,6 +45,4 @@ You may request deletion in Account & Privacy or through support@aceditprep.com.
 Aced  
 Website: https://aceditprep.com  
 Email: support@aceditprep.com  
-Operator: Independently operated  
-
-**[REQUIRED BEFORE PUBLICATION: Confirm the legally responsible operator's name and any legally required mailing or business contact details. The public-facing name "Agrima B" is not a substitute where legal identification is required.]**
+Operator: Agrima Bhutani, an individual. Aced is not currently a registered business entity.
