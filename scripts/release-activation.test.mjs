@@ -45,4 +45,6 @@ test("release writes private, sanitized build-only diagnostics and never treats 
 test("production Next server is reachable only through the local reverse proxy", () => {
   assert.match(ecosystem, /HOSTNAME:\s*"127\.0\.0\.1"/);
   assert.match(ecosystem, /--hostname 127\.0\.0\.1 --port 3005/);
+  assert.match(deploy, /pm2 reload ecosystem\.config\.cjs --only/);
+  assert.doesNotMatch(deploy, /pm2 restart "\$\{PM2_APP_NAME\}" --update-env/);
 });

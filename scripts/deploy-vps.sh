@@ -164,8 +164,13 @@ if [[ "${active_release}" != "${RELEASE_DIR}" || "${active_commit}" != "${EXPECT
   exit 1
 fi
 
-pm2 describe "${PM2_APP_NAME}" >/dev/null 2>&1 || pm2 start ecosystem.config.cjs --only "${PM2_APP_NAME}"
-pm2 restart "${PM2_APP_NAME}" --update-env
+# Reload the ecosystem file, not merely the existing process.  A plain
+# `pm2 restart` preserves old argv, which could retain a prior public bind.
+if pm2 describe "${PM2_APP_NAME}" >/dev/null 2>&1; then
+  pm2 reload ecosystem.config.cjs --only "${PM2_APP_NAME}" --update-env
+else
+  pm2 start ecosystem.config.cjs --only "${PM2_APP_NAME}" --update-env
+fi
 
 healthy=false
 for attempt in {1..30}; do
