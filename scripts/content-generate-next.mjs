@@ -28,6 +28,7 @@ const args = Object.fromEntries(
 const scope = (args.scope || "mock_reserve").trim().toLowerCase();
 const limit = Math.min(40, Math.max(1, Number(args.limit || 6)));
 const requestedSection = args.section?.trim().toLowerCase() || null;
+const requestedRunId = args["run-id"]?.trim() || null;
 const dryRun = args["dry-run"] === "1" || args["dry-run"] === "true";
 const provider = args.provider?.trim() || process.env.CONTENT_GENERATION_PROVIDER?.trim() || "gemini";
 const model = args.model?.trim();
@@ -38,6 +39,10 @@ if (!["practice", "mock_reserve"].includes(scope)) {
 
 if (requestedSection && !["english", "math", "reading", "science"].includes(requestedSection)) {
   throw new Error("--section must be english, math, reading, or science.");
+}
+
+if (requestedRunId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(requestedRunId)) {
+  throw new Error("--run-id must be a UUID.");
 }
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -207,6 +212,7 @@ try {
     ];
     if (provider) childArgs.push(`--provider=${provider}`);
     if (model) childArgs.push(`--model=${model}`);
+    if (requestedRunId) childArgs.push(`--run-id=${requestedRunId}`);
     if (process.env.CONTENT_FACTORY_GEMINI_API_KEY) { childArgs.push("--model=gemini-3.1-flash-lite-preview", "--review-model=gemini-2.5-flash"); }
 
     console.log(`\nGenerating ${job.sectionKey}/${job.topicSlug}...`);

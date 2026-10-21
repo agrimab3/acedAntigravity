@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { allocateSectionTargets, buildManualFactoryTestPlan, buildPacedFactoryBatches, FACTORY_BATCH_SIZE, FACTORY_NIGHTLY_TARGET } from '../lib/content-factory-schedule.mjs';
 
 test('nightly target is balanced 30/30/20/20 and paced in batches of five', () => {
@@ -24,4 +25,12 @@ test('the fair manual test plan requests three English, three Math, and one viab
     { sectionKey: 'reading', requested: 3, setCount: 1, label: 'Reading shared sets' },
     { sectionKey: 'science', requested: 3, setCount: 1, label: 'Science shared sets' },
   ]);
+});
+
+test('nightly runner passes its run ID through the generator boundary', () => {
+  const nightly = readFileSync('scripts/content-nightly.mjs', 'utf8');
+  const generator = readFileSync('scripts/content-generate-next.mjs', 'utf8');
+  assert.match(nightly, /`--run-id=\$\{runId\}`/);
+  assert.match(generator, /const requestedRunId = args\["run-id"\]/);
+  assert.match(generator, /childArgs\.push\(`--run-id=\$\{requestedRunId\}`\)/);
 });

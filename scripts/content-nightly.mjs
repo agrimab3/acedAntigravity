@@ -75,7 +75,7 @@ try {
           console.log(`Factory batch ${index + 1}/${batches.length}: ${batch.label ?? batch.sectionKey}, ${remaining} target(s), attempt ${attempts}.`);
           const child = spawnSync('node', [
             'scripts/content-generate-next.mjs', '--scope=practice', `--section=${batch.sectionKey}`,
-            `--limit=${remaining}`, '--provider=gemini', '--model=gemini-3-flash-preview',
+            `--limit=${remaining}`, `--run-id=${runId}`, '--provider=gemini', '--model=gemini-3-flash-preview',
           ], { cwd: process.cwd(), env, encoding: 'utf8', timeout: 15 * 60 * 1000, maxBuffer: 10 * 1024 * 1024 });
           const output = child.stdout || '';
           const stderr = child.stderr || '';
