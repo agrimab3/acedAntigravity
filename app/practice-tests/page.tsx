@@ -8,6 +8,7 @@ import {
   PRACTICE_TEST_MODES,
   SECTION_TESTS,
 } from "@/lib/practice-tests";
+import LiveLessonsNavTab from "@/components/LiveLessonsNavTab";
 import MockTestNavTab from "@/components/MockTestNavTab";
 import NightSky from "@/components/NightSky";
 import { useOnboardingState } from "@/lib/use-onboarding-state";
@@ -372,6 +373,7 @@ export default function PracticeTestsPage() {
               />
               <span style={{ position: "relative", zIndex: 1 }}>progress</span>
             </button>
+            <LiveLessonsNavTab />
             <MockTestNavTab />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", justifySelf: "end" }}>

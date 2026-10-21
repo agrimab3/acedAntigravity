@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useOnboardingState } from "@/lib/use-onboarding-state";
+import LiveLessonsNavTab from "@/components/LiveLessonsNavTab";
 import MockTestNavTab from "@/components/MockTestNavTab";
 import QuestionContent from "@/components/question-content/QuestionContent";
 
@@ -287,6 +288,7 @@ export default function PracticeTestHistoryDetailPage() {
                 <span style={{ position: "relative", zIndex: 1 }}>{item.label}</span>
               </button>
             ))}
+            <LiveLessonsNavTab />
             <MockTestNavTab />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", justifySelf: "end" }}>

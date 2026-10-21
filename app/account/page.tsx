@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
+import LiveLessonsNavTab from "@/components/LiveLessonsNavTab";
 import MockTestNavTab from "@/components/MockTestNavTab";
 import NightSky from "@/components/NightSky";
 
@@ -116,6 +117,7 @@ export default function AccountPage() {
         <Link href="/dashboard" style={{ color: "rgba(255,255,255,.78)", textDecoration: "none", fontSize: 17 }}>your universe</Link>
         <Link href="/practice-tests" style={{ color: "rgba(255,255,255,.78)", textDecoration: "none", fontSize: 17 }}>practice tests</Link>
         <Link href="/progress" style={{ color: "rgba(255,255,255,.78)", textDecoration: "none", fontSize: 17 }}>progress</Link>
+        <LiveLessonsNavTab />
         <MockTestNavTab />
       </nav>
 

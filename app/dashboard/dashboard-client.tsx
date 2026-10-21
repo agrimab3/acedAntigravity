@@ -8,6 +8,7 @@ import FirstTimeWalkthrough, { type WalkthroughTargetKey } from "@/app/dashboard
 import { startStudentTour } from "@/components/StudentTour";
 import MockTestCard from "@/components/MockTestCard";
 import NightSky from "@/components/NightSky";
+import LiveLessonsNavTab from "@/components/LiveLessonsNavTab";
 import MockTestNavTab from "@/components/MockTestNavTab";
 import { getTopicByName } from "@/lib/act-taxonomy";
 import { getDisplayFirstName } from "@/lib/onboarding";
@@ -1335,6 +1336,7 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
               />
               <span style={{ position: "relative", zIndex: 1 }}>progress</span>
             </button>
+            <LiveLessonsNavTab />
             <MockTestNavTab />
           </div>
           <div style={{ display: "flex", gap: "1rem", alignItems: "center", justifySelf: "end" }}>

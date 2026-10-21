@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useOnboardingState } from "@/lib/use-onboarding-state";
+import LiveLessonsNavTab from "@/components/LiveLessonsNavTab";
 import MockTestNavTab from "@/components/MockTestNavTab";
 import NightSky from "@/components/NightSky";
 import ProgressScoreChart from "@/components/ProgressScoreChart";
@@ -363,6 +364,7 @@ export default function ProgressPage() {
                 <span style={{ position: "relative", zIndex: 1 }}>{item.label}</span>
               </button>
             ))}
+            <LiveLessonsNavTab />
             <MockTestNavTab />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", justifySelf: "end" }}>
