@@ -19,7 +19,7 @@ Aced is intended for people aged 13 and older. We request an affirmation of age 
 
 **Payments:** When paid checkout is enabled, Stripe processes payments. Aced may retain Checkout Session, PaymentIntent, refund, and registration identifiers and status. Aced does not directly receive full card numbers or card security codes through its current Stripe Checkout integration.
 
-**Communications:** Support, feedback, waitlist and join submissions, account-deletion requests, and transactional email outbox records.
+**Communications:** Support, feedback, waitlist and join submissions, account-deletion requests, and transactional email outbox records. Our email provider tells us whether an email we send was delivered, opened, or clicked, using a tracking pixel and redirected links. We use this only to make sure our emails reach students and are useful.
 
 **Technical:** Servers and service providers may process IP addresses, device/browser details, request times, security events, and error information.
 
