@@ -34,3 +34,10 @@ test('nightly runner passes its run ID through the generator boundary', () => {
   assert.match(generator, /const requestedRunId = args\["run-id"\]/);
   assert.match(generator, /childArgs\.push\(`--run-id=\$\{requestedRunId\}`\)/);
 });
+
+test('nightly runner fails visibly when a child writes no audit rows', () => {
+  const nightly = readFileSync('scripts/content-nightly.mjs', 'utf8');
+  assert.match(nightly, /Factory audit write failed/);
+  assert.match(nightly, /result\.status = 'error'/);
+  assert.match(nightly, /auditCountAfter <= auditCountBefore/);
+});

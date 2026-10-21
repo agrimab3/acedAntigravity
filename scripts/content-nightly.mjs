@@ -72,6 +72,10 @@ try {
         let attempts = 0;
         while (remaining > 0 && attempts < 2) {
           attempts += 1;
+          const auditCountBefore = Number((await db.query(
+            'select count(*)::int as count from question_generation_audits where run_id=$1',
+            [runId]
+          )).rows[0]?.count ?? 0);
           console.log(`Factory batch ${index + 1}/${batches.length}: ${batch.label ?? batch.sectionKey}, ${remaining} target(s), attempt ${attempts}.`);
           const child = spawnSync('node', [
             'scripts/content-generate-next.mjs', '--scope=practice', `--section=${batch.sectionKey}`,
@@ -81,6 +85,16 @@ try {
           const stderr = child.stderr || '';
           for (const line of factoryReviewAuditLines(output)) console.log(line);
           const summary = parseGeneratorSummary(output);
+          const auditCountAfter = Number((await db.query(
+            'select count(*)::int as count from question_generation_audits where run_id=$1',
+            [runId]
+          )).rows[0]?.count ?? 0);
+          if (!summary) {
+            throw new Error(`Factory child produced no parseable summary for ${batch.sectionKey}; audit rows written: ${auditCountAfter - auditCountBefore}.`);
+          }
+          if (auditCountAfter <= auditCountBefore) {
+            throw new Error(`Factory audit write failed for ${batch.sectionKey}: child completed without creating an audit row.`);
+          }
           const insertedBefore = result.inserted;
           addSummary(result, summary, safeError);
           remaining = Math.max(0, remaining - (result.inserted - insertedBefore));
@@ -110,7 +124,7 @@ try {
       result.status = result.quota_paused > 0 ? 'quota_paused' : 'completed';
     }
   } catch (error) {
-    result.status = 'failed';
+    result.status = 'error';
     result.note = redactFactoryError(error.message, key);
     console.log('Factory failed:', result.note);
     process.exitCode = 1;
