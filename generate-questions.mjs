@@ -37,7 +37,7 @@ import { generatedTopicMatchesRequested } from "./lib/generation-topic-validatio
 import { reviewQuestionQuality } from "./lib/question-utils.ts";
 import { createFactoryReviewRunner } from "./lib/content-factory-review.mjs";
 const runFactoryReview = createFactoryReviewRunner();
-const executeReviewOperation = (options) => process.env.CONTENT_FACTORY_GEMINI_API_KEY
+const executeFactoryGeminiOperation = (options) => process.env.CONTENT_FACTORY_GEMINI_API_KEY
   ? runFactoryReview(options)
   : executeProviderOperation(options);
 
@@ -78,6 +78,7 @@ Output rules:
 - Use plain text only.
 - No LaTeX.
 - Exactly 4 answer choices: A, B, C, D.
+- This four-choice A–D format applies to every section, including Math.
 - Exactly 1 answer must be correct.
 - The explanation must match the keyed answer exactly.
 - Do not mention internal reasoning.
@@ -104,6 +105,19 @@ Do not output any item that:
 - has answer choices that differ in obvious plausibility, tone, or length
 - uses "closest" or approximation logic without explicitly asking for it
 - would likely be flagged by a human editor as too easy, too generic, too short, too direct, or too sloppy
+
+Writer workflow for every item, in this order:
+1. Solve the item yourself and fix the one correct A–D answer before writing choices or an explanation.
+2. Write the explanation from that solved work, so its result and answer letter agree exactly.
+3. Build the three wrong choices from distinct, realistic student mistakes; never use random, throwaway, equivalent, or obviously absurd distractors.
+4. Re-check all four choices, the key, and the explanation together before returning JSON.
+
+Do not submit items with the failure patterns our reviewers reject: a missing or wrong keyed answer; fewer or more than exactly four A–D choices; an explanation that describes a different result; equivalent or multiple defensible answers; weak or implausible distractors; a worksheet-like or too-easy prompt; an unsupported passage claim; topic drift; unsignaled approximation; or a difficulty label based only on lengthy arithmetic.
+
+Original design examples (use as design patterns only; do not copy their wording, values, or structures):
+- Math: after solving a constrained comparison, make three distractors traceable to reversing a relationship, missing a stated limit, or mixing units, then verify the keyed value is listed exactly.
+- Reading: write a passage whose evidence supports one cautious inference, then make distractors reflect a too-broad claim, a detail from a different paragraph, and an unsupported causal claim.
+- Science: use a shared experiment with a clear control and variable, then ask for the conclusion directly supported by the stated results rather than outside scientific trivia.
 
 Difficulty standard:
 - Easy: a direct but credible ACT-level interpretation, generally requiring one clear reasoning step. Distractors must reflect plausible misreads, not childish errors.
@@ -290,7 +304,7 @@ const generatedQuestionSchema = z.object({
     B: z.string().min(1),
     C: z.string().min(1),
     D: z.string().min(1),
-  }),
+  }).strict(),
   correct_answer: z.enum(ANSWER_CHOICES),
   explanation: z.string().min(30),
 });
@@ -305,7 +319,7 @@ const generatedSetQuestionSchema = z.object({
     B: z.string().min(1),
     C: z.string().min(1),
     D: z.string().min(1),
-  }),
+  }).strict(),
   correct_answer: z.enum(ANSWER_CHOICES),
   explanation: z.string().min(30),
 });
@@ -1312,6 +1326,19 @@ Global quality rules:
 - Do not create explanations that mention a different answer letter than the keyed correct answer.
 - Do not create any item whose explanation says the correct answer is missing from the choices, that the options contain a mistake, or that the closest choice should be used instead.
 
+Required authoring order for each item:
+1. Solve the question first and determine the correct A–D answer before drafting the choices.
+2. Write the explanation from that exact solution.
+3. Create three wrong choices from distinct, realistic student errors.
+4. Independently re-check that exactly one choice is correct and that the key and explanation name the same result.
+
+Do not submit: a wrong/missing key; any choice count other than exactly four A–D choices; a key/explanation mismatch; equivalent or multiple defensible choices; weak, absurd, or random distractors; a generic worksheet drill; a passage that gives away the answer; topic drift; unsignaled approximation; or a medium/hard label based only on long arithmetic.
+
+Original design examples only (do not reuse their wording, values, or setup):
+- Math: a constrained comparison can use distractors for a reversed relationship, a missed limit, and a unit mix-up.
+- Reading: one cautious inference can compete with a too-broad claim, an out-of-context detail, and an unsupported cause.
+- Science: a stated experiment can distinguish its measured result from an unsupported outside-knowledge claim.
+
 Batch diversity rules:
 - Vary the tested subskill within the topic.
 - Vary passage style, stem wording, distractor logic, and answer placement.
@@ -1728,6 +1755,7 @@ Allowed values:
 
 Rules:
 - Be strict.
+- Every section, including Math, uses exactly four answer choices: A, B, C, D. Reject an item with any other answer-choice count or labels.
 - Follow this order exactly: independently solve, determine the correct answer, inspect each choice, confirm exactly one defensible answer, confirm the keyed answer, confirm the explanation, confirm no equivalent distractor, confirm the wording does not overstate the evidence, confirm section/topic fit, then decide verdict.
 - Reject items that are weak even if technically answerable.
 - Reject items that feel like worksheet drills rather than ACT items.
@@ -2240,7 +2268,7 @@ async function generateBatchForDifficulty(
     requestedCount,
   });
   const { primary, fallback, fallbacks } = buildOperationCandidates("generation", provider, model);
-  const operationResult = await executeProviderOperation({
+  const operationResult = await executeFactoryGeminiOperation({
     runState: runProviderState,
     operation: `generation:${topic.section_key}/${topic.slug}/${requestedDifficulty}`,
     primary,
@@ -2294,7 +2322,7 @@ async function generateQuestionSet(
     0
   );
   const { primary, fallback, fallbacks } = buildOperationCandidates("generation", provider, model);
-  const operationResult = await executeProviderOperation({
+  const operationResult = await executeFactoryGeminiOperation({
     runState: runProviderState,
     operation: `generation:${topic.section_key}/${topic.slug}/set`,
     primary,
@@ -2540,7 +2568,7 @@ async function generateReplacementSetChild(
     existingPrompts,
   });
   const { primary, fallback, fallbacks } = buildOperationCandidates("generation", provider, model);
-  const operationResult = await executeProviderOperation({
+  const operationResult = await executeFactoryGeminiOperation({
     runState: runProviderState,
     operation: `generation:${topic.section_key}/${topic.slug}/replacement/${requestedDifficulty}`,
     primary,
@@ -2594,7 +2622,7 @@ async function reviseSetChildForDifficulty(
     reviewerResult,
   });
   const { primary, fallback, fallbacks } = buildOperationCandidates("generation", provider, model);
-  const operationResult = await executeProviderOperation({
+  const operationResult = await executeFactoryGeminiOperation({
     runState: runProviderState,
     operation: `generation:${topic.section_key}/${topic.slug}/revise/${requestedDifficulty}`,
     primary,
@@ -2859,7 +2887,7 @@ async function reviewGeneratedQuestion(
   };
   const prompt = buildReviewPrompt(topic, question);
   const { primary, fallback, fallbacks } = buildOperationCandidates("review", provider, model);
-  const operationResult = await executeReviewOperation({
+  const operationResult = await executeFactoryGeminiOperation({
     runState: runProviderState,
     operation: `review:${topic.section_key}/${topic.slug}`,
     primary,
@@ -2935,7 +2963,7 @@ async function verifyGeneratedQuestionCorrectness(
   let operationResult;
 
   try {
-    operationResult = await executeReviewOperation({
+    operationResult = await executeFactoryGeminiOperation({
       runState: runProviderState,
       operation: `blind-verify:${topic.section_key}/${topic.slug}`,
       primary,

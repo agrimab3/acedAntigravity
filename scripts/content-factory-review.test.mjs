@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createFactoryReviewRunner, FACTORY_REVIEW_MODELS, FACTORY_BLIND_VERIFIER_MODELS, factoryReviewAuditLines } from '../lib/content-factory-review.mjs';
+import { createFactoryReviewRunner, FACTORY_GENERATION_MODELS, FACTORY_REVIEW_MODELS, FACTORY_BLIND_VERIFIER_MODELS, factoryReviewAuditLines } from '../lib/content-factory-review.mjs';
 import { ProviderRequestError, ProviderRunStoppedError, createProviderRunState } from '../lib/content-generation-resilience.mjs';
 const quota = () => new ProviderRequestError('quota', { statusCode: 429, classification: { kind: 'hard-quota' } });
 
@@ -55,6 +55,17 @@ test('blind verification starts with Pro and falls back to the established revie
   }});
   assert.deepEqual(attempted, FACTORY_BLIND_VERIFIER_MODELS.slice(0,2));
   assert.equal(result.model, FACTORY_REVIEW_MODELS[0]);
+});
+
+test('writer starts with stronger Flash and falls back to the prior Gemini writer chain on 429', async () => {
+  const attempted=[];
+  const result=await createFactoryReviewRunner()({operation:'generation:test',perform:async({model})=>{
+    attempted.push(model);
+    if(model===FACTORY_GENERATION_MODELS[0]) throw quota();
+    return { questions:[] };
+  }});
+  assert.deepEqual(attempted, FACTORY_GENERATION_MODELS.slice(0,2));
+  assert.equal(result.model, FACTORY_GENERATION_MODELS[1]);
 });
 
 test('all model quotas stop safely and do not approve a draft', async () => {

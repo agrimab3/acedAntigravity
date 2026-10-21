@@ -15,9 +15,9 @@ test("interactive tutor has no Gemini transport or Gemini fallback", () => {
 test("Gemini content factory remains isolated from tutor routing", () => {
   const factory = readFileSync("scripts/content-nightly.mjs", "utf8");
 
-  assert.match(factory, /QUESTION_GENERATION_PROVIDER:'gemini'/);
-  assert.match(factory, /QUESTION_REVIEW_PROVIDER:'gemini'/);
-  assert.match(factory, /GROQ_API_KEY:''/);
+  assert.match(factory, /QUESTION_GENERATION_PROVIDER:\s*'gemini'/);
+  assert.match(factory, /QUESTION_REVIEW_PROVIDER:\s*'gemini'/);
+  assert.match(factory, /GROQ_API_KEY:\s*''/);
 });
 
 test("tutor logs do not include student, session, question, prompt, or reply fields", () => {

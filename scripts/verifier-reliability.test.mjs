@@ -31,6 +31,13 @@ test("blind verifier never receives the answer key or explanation", () => {
   assert.doesNotMatch(itemPayload, /explanation/);
 });
 
+test("every generated and reviewed section, including Math, is constrained to four A–D choices", () => {
+  assert.match(source, /This four-choice A–D format applies to every section, including Math\./);
+  assert.match(source, /Every section, including Math, uses exactly four answer choices: A, B, C, D\./);
+  assert.match(source, /choices must be an object with exactly four keys: A, B, C, D/);
+  assert.match(source, /D: z\.string\(\)\.min\(1\),\n  \}\)\.strict\(\)/);
+});
+
 test("key disagreement has an explicit rejecting disposition", () => {
   assert.match(source, /verifierResult\.chosen_answer !== normalizedQuestion\.correctAnswer/);
   assert.match(source, /disposition: "key_mismatch"/);

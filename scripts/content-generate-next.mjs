@@ -26,13 +26,18 @@ const args = Object.fromEntries(
 );
 
 const scope = (args.scope || "mock_reserve").trim().toLowerCase();
-const limit = Math.min(24, Math.max(1, Number(args.limit || 6)));
+const limit = Math.min(40, Math.max(1, Number(args.limit || 6)));
+const requestedSection = args.section?.trim().toLowerCase() || null;
 const dryRun = args["dry-run"] === "1" || args["dry-run"] === "true";
 const provider = args.provider?.trim() || process.env.CONTENT_GENERATION_PROVIDER?.trim() || "gemini";
 const model = args.model?.trim();
 
 if (!["practice", "mock_reserve"].includes(scope)) {
   throw new Error("--scope must be practice or mock_reserve.");
+}
+
+if (requestedSection && !["english", "math", "reading", "science"].includes(requestedSection)) {
+  throw new Error("--section must be english, math, reading, or science.");
 }
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -76,7 +81,7 @@ try {
     `, [scope]),
   ]);
 
-  const topics = topicsResult.rows;
+  const topics = topicsResult.rows.filter((topic) => !requestedSection || topic.section_key === requestedSection);
   const topicCountBySection = new Map();
   for (const topic of topics) {
     topicCountBySection.set(
