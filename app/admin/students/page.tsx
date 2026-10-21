@@ -54,14 +54,14 @@ export default async function StudentsAdminPage() {
   const practicedEver = rows.filter((r) => r.questions > 0).length;
   const totalQuestions = rows.reduce((sum, r) => sum + Number(r.questions), 0);
   const tiles = [["Students", rows.length], ["Joined today", joinedToday], ["Joined this week", joinedWeek], ["Practiced this week", activeWeek], ["Ever practiced", practicedEver], ["Questions answered", totalQuestions]] as const;
-  const cell: React.CSSProperties = { padding: "10px 12px", borderTop: "1px solid #e6e3da", fontSize: 14, whiteSpace: "nowrap" };
+  const cell: React.CSSProperties = { padding: "10px 12px", borderTop: "1px solid rgba(127,127,127,.25)", fontSize: 14, whiteSpace: "nowrap" };
 
   return <main className="policyPage"><article className="policyCard" style={{ maxWidth: 1240 }}>
     <p className="policyEyebrow">Aced admin</p>
     <h1>Students</h1>
     <p style={{ marginTop: 0, color: "#6b7280" }}>Everyone who has signed in, newest first. Times are Pacific. Refresh to update.</p>
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 12, margin: "18px 0 26px" }}>
-      {tiles.map(([label, value]) => <div key={label} style={{ border: "1px solid #e6e3da", borderRadius: 16, padding: "14px 16px", background: "#fbfaf7" }}><div style={{ fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: "#6b7280", fontWeight: 700 }}>{label}</div><div style={{ fontSize: 30, fontWeight: 700, marginTop: 4 }}>{value}</div></div>)}
+      {tiles.map(([label, value]) => <div key={label} style={{ border: "1px solid rgba(127,127,127,.28)", borderRadius: 16, padding: "14px 16px", background: "rgba(127,127,127,.08)", color: "inherit" }}><div style={{ fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", opacity: .7, fontWeight: 700 }}>{label}</div><div style={{ fontSize: 30, fontWeight: 700, marginTop: 4, color: "inherit" }}>{value}</div></div>)}
     </div>
     <div style={{ overflowX: "auto" }}>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -73,7 +73,7 @@ export default async function StudentsAdminPage() {
           <td style={cell}>{r.act_test_date ?? "—"}</td>
           <td style={cell}>{when(r.created_at)}</td>
           <td style={cell}>{r.finished_setup ? "✓" : "—"}</td>
-          <td style={{ ...cell, color: r.last_active ? "#111827" : "#9ca3af" }}>{ago(r.last_active, now)}</td>
+          <td style={{ ...cell, opacity: r.last_active ? 1 : .5 }}>{ago(r.last_active, now)}</td>
           <td style={cell}>{r.drills}</td>
           <td style={cell}>{r.tests}</td>
           <td style={cell}>{r.questions}</td>
