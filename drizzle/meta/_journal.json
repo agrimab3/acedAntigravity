@@ -246,6 +246,13 @@
       "when": 1792104000000,
       "tag": "0034_account_deletion_execution_control_plane",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1792540800000,
+      "tag": "0035_content_factory_format_audit",
+      "breakpoints": true
     }
   ]
 }
