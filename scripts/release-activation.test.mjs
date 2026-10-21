@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 
 const deploy = readFileSync("scripts/deploy-vps.sh", "utf8");
 const migrationVerification = readFileSync("scripts/verify-applied-drizzle-migrations.mjs", "utf8");
+const ecosystem = readFileSync("ecosystem.config.cjs", "utf8");
 
 test("release requires a verified expected source commit before activation", () => {
   assert.match(deploy, /GITHUB_SHA must be the expected Git commit/);
@@ -39,4 +40,9 @@ test("release writes private, sanitized build-only diagnostics and never treats 
   assert.match(deploy, /run_logged_build_step dependencies npm ci --include=dev/);
   assert.match(deploy, /run_logged_build_step next_build npm run build/);
   assert.doesNotMatch(deploy, /npm run build\nnode scripts\/verify-applied/);
+});
+
+test("production Next server is reachable only through the local reverse proxy", () => {
+  assert.match(ecosystem, /HOSTNAME:\s*"127\.0\.0\.1"/);
+  assert.match(ecosystem, /--hostname 127\.0\.0\.1 --port 3005/);
 });
