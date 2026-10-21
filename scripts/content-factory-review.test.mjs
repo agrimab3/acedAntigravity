@@ -68,6 +68,19 @@ test('writer starts with stronger Flash and falls back to the prior Gemini write
   assert.equal(result.model, FACTORY_GENERATION_MODELS[1]);
 });
 
+test('writer also falls back when Gemini reports temporary high demand without a 429', async () => {
+  const attempted=[];
+  const result=await createFactoryReviewRunner()({operation:'generation:test',perform:async({model})=>{
+    attempted.push(model);
+    if(model===FACTORY_GENERATION_MODELS[0]) {
+      throw new ProviderRequestError('high demand', { statusCode: 503, classification: { kind: 'temporary-rate-limit' } });
+    }
+    return { questions:[] };
+  }});
+  assert.deepEqual(attempted, FACTORY_GENERATION_MODELS.slice(0,2));
+  assert.equal(result.model, FACTORY_GENERATION_MODELS[1]);
+});
+
 test('all model quotas stop safely and do not approve a draft', async () => {
   let calls=0;
   await assert.rejects(createFactoryReviewRunner()({operation:'verify:test',perform:async()=>{
