@@ -35,7 +35,7 @@ export default function LiveLessonCard() {
       <a href={zoomUrl} target="_blank" rel="noreferrer" style={{ background: "#5DCAA5", color: "#062018", padding: "8px 13px", borderRadius: 999, fontSize: 12, fontWeight: 800, textDecoration: "none" }}>Join</a>
       <a href={calendarUrl(title, start, zoomUrl)} target="_blank" rel="noreferrer" style={{ color: "#aeeedb", fontSize: 12, fontWeight: 700, whiteSpace: "nowrap" }}>Add to calendar</a>
     </div>
-    <div aria-hidden="true" style={{ position: "absolute", right: 12, top: 12, width: 48, filter: "drop-shadow(0 5px 8px rgba(0,0,0,.35))" }}><AstraIcon /></div>
+    <div aria-hidden="true" style={{ position: "absolute", right: 16, bottom: 14, width: 44, filter: "drop-shadow(0 5px 8px rgba(0,0,0,.35))" }}><AstraIcon /></div>
   </section></DismissibleLiveLessonTile>;
 }
 import DismissibleLiveLessonTile from "./DismissibleLiveLessonTile";
