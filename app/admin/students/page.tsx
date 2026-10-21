@@ -1,11 +1,13 @@
 import { sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { requireMockTestAdminPage } from "@/lib/admin/mockTestAdmin";
+import SendWelcomeButton from "./send-welcome-button";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Students · ACED Admin", robots: { index: false, follow: false } };
 
 type Row = {
+  id: string; welcome_sent_at: Date | string | null;
   email: string | null; name: string | null; grade_level: string | null; act_test_date: string | null;
   created_at: Date | string; finished_setup: boolean; email_opt_in: boolean; drills: number; tests: number; questions: number;
   seconds: number; last_active: Date | string | null;
@@ -28,12 +30,13 @@ async function loadStudents() {
   const db = getDb();
   if (!db) throw new Error("Database unavailable.");
   const result = await db.execute(sql`
-    select u.email, coalesce(u.preferred_name, u.name) as name, u.grade_level, u.act_test_date, u.created_at,
+    select u.id, u.email, coalesce(u.preferred_name, u.name) as name, u.grade_level, u.act_test_date, u.created_at,
            (u.onboarding_completed_at is not null) as finished_setup, u.email_opt_in,
            coalesce(d.drills, 0)::int as drills, coalesce(t.tests, 0)::int as tests,
            (coalesce(d.q, 0) + coalesce(t.q, 0))::int as questions,
            (coalesce(d.secs, 0) + coalesce(t.secs, 0))::int as seconds,
-           greatest(d.last, t.last) as last_active
+           greatest(d.last, t.last) as last_active,
+           (select o.sent_at from mock_email_outbox o where o.unique_key = 'welcome:' || u.id::text limit 1) as welcome_sent_at
     from users u
     left join (select user_id, count(*) drills, sum(question_count) q, sum(duration_seconds) secs, max(completed_at) last
                from practice_sessions where completed_at is not null group by user_id) d on d.user_id = u.id
@@ -66,8 +69,8 @@ export default async function StudentsAdminPage() {
     </div>
     <div style={{ overflowX: "auto" }}>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead><tr>{["Name", "Email", "Grade", "Test date", "Joined", "Setup", "Emails", "Last practice", "Drills", "Tests", "Questions", "Time"].map((h) => <th key={h} style={{ ...cell, borderTop: 0, textAlign: "left", fontSize: 12, textTransform: "uppercase", letterSpacing: ".08em", color: "#6b7280" }}>{h}</th>)}</tr></thead>
-        <tbody>{rows.map((r, i) => <tr key={`${r.email}-${i}`}>
+        <thead><tr>{["Name", "Email", "Grade", "Test date", "Joined", "Setup", "Emails", "Last practice", "Drills", "Tests", "Questions", "Time", "Welcome"].map((h) => <th key={h} style={{ ...cell, borderTop: 0, textAlign: "left", fontSize: 12, textTransform: "uppercase", letterSpacing: ".08em", color: "#6b7280" }}>{h}</th>)}</tr></thead>
+        <tbody>{rows.map((r, i) => <tr key={r.id ?? i}>
           <td style={cell}>{r.name ?? "—"}</td>
           <td style={cell}>{r.email ?? "—"}</td>
           <td style={cell}>{r.grade_level ?? "—"}</td>
@@ -80,6 +83,7 @@ export default async function StudentsAdminPage() {
           <td style={cell}>{r.tests}</td>
           <td style={cell}>{r.questions}</td>
           <td style={cell}>{minutes(Number(r.seconds))}</td>
+          <td style={cell}>{r.welcome_sent_at ? `✓ ${when(r.welcome_sent_at)}` : r.finished_setup ? <SendWelcomeButton userId={r.id} /> : "—"}</td>
         </tr>)}</tbody>
       </table>
     </div>
