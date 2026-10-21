@@ -10,6 +10,7 @@ export default function LiveLessonsNavTab() {
   return (
     <button
       type="button"
+      data-tour-nav="live-lessons"
       onClick={() => router.push("/lessons")}
       aria-current={active ? "page" : undefined}
       style={{

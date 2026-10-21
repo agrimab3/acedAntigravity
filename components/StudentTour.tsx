@@ -23,6 +23,7 @@ export const STUDENT_TOUR_STOPS: TourStop[] = [
   { id: "mock-tile", path: "/dashboard", selector: 'section[aria-label="ACED Mock Test"]', title: "The Aced Mock Test", body: "A full, timed practice test on Sat, Dec 5. Seats are limited." },
   { id: "practice-tests", path: "/practice-tests", selector: '[data-tour-target="practice-tests"]', navSelector: '[data-tour-nav="practice-tests"]', title: "Practice tests", body: "Timed sets for each section, just like test day. Your recent scores show up below." },
   { id: "progress", path: "/progress", selector: '[data-tour-target="progress"]', navSelector: '[data-tour-nav="progress"]', title: "Your progress", body: "See your scores and exactly which skills need work, so you never study blind." },
+  { id: "live-lessons", path: "/lessons", selector: '[data-tour-target="live-lessons-page"]', navSelector: '[data-tour-nav="live-lessons"]', title: "Astra's live lessons", body: "Join Astra live every Sunday at 5 PM PT, see what's coming up, and catch replays here." },
   { id: "mock-test", path: "/mock-test", selector: '[data-tour-target="mock-test-page"]', navSelector: '[data-tour-nav="mock-test"]', title: "Mock test details", body: "Sign up and see everything about test day right here." },
 ];
 

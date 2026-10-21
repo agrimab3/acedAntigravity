@@ -54,7 +54,7 @@ export default async function LessonsPage() {
       <Link href="/dashboard" style={{ fontFamily: serif, fontWeight: 700, fontSize: 28, color: "#fff", textDecoration: "none" }}>Aced<span style={{ color: "#5DCAA5" }}>.</span></Link>
       <nav className="ll-nav" style={{ display: "flex", gap: 26, alignItems: "center", flexWrap: "wrap" }}>
         <Link href="/dashboard">your universe</Link><Link href="/practice-tests">practice tests</Link><Link href="/progress">progress</Link>
-        <span style={{ color: "#fff", fontWeight: 700, fontSize: 15 }}>live lessons</span><Link href="/mock-test">mock test</Link>
+        <span data-tour-nav="live-lessons" style={{ color: "#fff", fontWeight: 700, fontSize: 15 }}>live lessons</span><Link href="/mock-test" data-tour-nav="mock-test">mock test</Link>
       </nav>
     </header>
 
@@ -72,7 +72,7 @@ export default async function LessonsPage() {
       </div>
     </section>
 
-    <section style={{ position: "relative", maxWidth: 1180, margin: "0 auto", padding: "44px 24px 0" }}>
+    <section data-tour-target="live-lessons-page" style={{ position: "relative", maxWidth: 1180, margin: "0 auto", padding: "44px 24px 0" }}>
       {next ? <div style={{ ...card, padding: "30px 32px", display: "flex", flexWrap: "wrap", gap: "24px 40px", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(110deg,rgba(16,38,31,.8),rgba(26,24,48,.8))", borderColor: "#2A4A55" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 8, minWidth: 260, flex: "1 1 320px" }}>
           <span style={{ fontSize: 13, letterSpacing: ".14em", color: "#8EE0C4", fontWeight: 700 }}>{isLiveNow ? "● HAPPENING NOW" : "NEXT LIVE LESSON"}</span>
