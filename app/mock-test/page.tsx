@@ -218,7 +218,6 @@ export default async function MockTestPage() {
             </h2>
           </div>
 
-          <p style={{color:"#AFA9EC",fontSize:14,marginBottom:24}}>A built-in calculator is included. You can also use your own ACT-approved calculator.</p>
           <div className={styles.howGrid}>
             <article className={styles.howCard}>
               <div className={styles.howCardDate}>SATURDAY · DEC 5</div>
