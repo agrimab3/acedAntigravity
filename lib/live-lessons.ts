@@ -21,7 +21,7 @@ export const SECTION_COLORS: Record<UpcomingLesson["section"], string> = {
 
 export function getNextLiveLesson() {
   const title = process.env.LIVE_LESSON_TITLE?.trim();
-  const rawStart = process.env.LIVE_LESSON_START?.trim();
+  const rawStart = "2026-11-01T17:00:00-08:00"; // set in code so a stale server setting can never win
   const zoomUrl = process.env.LIVE_LESSON_URL?.trim();
   const start = rawStart ? new Date(rawStart) : null;
   if (!title || !zoomUrl || !start || Number.isNaN(start.getTime())) return null;
