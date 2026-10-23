@@ -121,3 +121,28 @@ h6 {
 .sectionScoringBar { display:flex; justify-content:center; gap:18px; flex-wrap:wrap; padding:16px 22px; border:1px solid var(--bd2); border-radius:16px; background:var(--surf); color:var(--ink2); font-size:14px; }
 .sectionScoringBar span + span { border-left:1px solid var(--bd2); padding-left:18px; }
 @media(max-width:700px){.sectionScoringBar{align-items:flex-start;flex-direction:column;gap:8px}.sectionScoringBar span + span{border-left:0;border-top:1px solid var(--bd2);padding:8px 0 0;width:100%}}
+
+/* Phones: student top menu stays on one line and swipes sideways */
+@media (max-width: 760px) {
+  *:has(> * > [data-tour-nav]) {
+    grid-template-columns: 1fr auto !important;
+    row-gap: 0.6rem !important;
+  }
+  *:has(> [data-tour-nav]) {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    justify-self: stretch !important;
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden;
+    width: 100%;
+    min-width: 0;
+    gap: 1.3rem !important;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  *:has(> [data-tour-nav])::-webkit-scrollbar { display: none; }
+  *:has(> [data-tour-nav]) > * { flex-shrink: 0; white-space: nowrap; }
+}
