@@ -202,6 +202,10 @@ export default async function MockTestFinishedPage({
             </div>
           </section>
 
+          <div style={{ maxWidth: 880, margin: "24px auto 0", padding: "0 14px" }}>
+            <FeedbackForm source="mock_test" contextId={session.id} />
+          </div>
+
           <section className={styles.submittedCard}>
             <div className={styles.cardLabel}>WHAT YOU SUBMITTED</div>
             <div className={styles.sectionGrid}>
@@ -228,7 +232,6 @@ export default async function MockTestFinishedPage({
             </p>
           </section>
 
-          <FeedbackForm source="mock_test" contextId={session.id} />
 
           <section className={styles.unlockSection}>
             <h2>
