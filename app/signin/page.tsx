@@ -2,8 +2,8 @@
 
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import NightSky from "@/components/NightSky";
 import styles from "./signin.module.css";
 
@@ -13,6 +13,8 @@ function SignInCard() {
   const searchParams = useSearchParams();
   const next = safeNext(searchParams.get("callbackUrl"));
   const [error, setError] = useState("");
+  const router = useRouter();
+  useEffect(() => { fetch("/api/auth/session", { credentials: "same-origin" }).then(r => r.ok ? r.json() : null).then(d => { if (d?.user) router.replace(searchParams.get("callbackUrl") ? next : "/dashboard"); }).catch(() => {}); }, [router, searchParams, next]);
   const continueWithGoogle = () => {
     setError("");
     const callbackUrl = `/signin/complete?next=${encodeURIComponent(next)}`;
