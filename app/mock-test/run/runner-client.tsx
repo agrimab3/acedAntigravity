@@ -1255,13 +1255,12 @@ export default function MockTestRunner({
           <section className={styles.lobbyCard}>
             <div className={styles.eyebrow}>ACED MOCK TEST · {NEXT_MOCK.testDateShort}</div>
             <h1>ready when you are.</h1>
-            <p>
-              Your section timer is controlled by the server and keeps running through
-              refreshes or Wi-Fi drops. Submitted sections are locked.
-            </p>
-            <p className={styles.lobbyRule}>
-              A built-in calculator is included. You can also use your own ACT-approved calculator.
-            </p>
+            <p>Four timed sections, with a 10-minute break after Math. Each section ends when its timer runs out.</p>
+            <ul style={{ listStyle: "none", padding: 0, margin: "6px 0 26px", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 10 }}>
+              {["⏱ timer keeps running if you refresh", "▦ calculator in Math", "▭ best on a laptop"].map((item) => (
+                <li key={item} style={{ fontSize: 14, padding: "8px 14px", borderRadius: 999, border: "1px solid rgba(255,255,255,.14)", background: "rgba(255,255,255,.04)", color: "rgba(255,255,255,.75)" }}>{item}</li>
+              ))}
+            </ul>
             <button
               className={styles.primaryAction}
               disabled={!canStart || busy}
@@ -1269,7 +1268,6 @@ export default function MockTestRunner({
             >
               {busy ? "starting…" : canStart ? "start English →" : "test not open yet"}
             </button>
-            <p className={styles.deviceNote}>Best on a laptop or desktop, like the real ACT. Phones work, but the passages are easier to read on a bigger screen.</p>
             <div className={styles.accountLine}>{email}</div>
             {error ? <div className={styles.error}>{error}</div> : null}
           </section>
@@ -1819,13 +1817,6 @@ export default function MockTestRunner({
       <footer className={styles.bottomBar}>
         <div className={styles.bottomInner}>
           <div className={styles.bottomLeftActions}>
-            <button
-              type="button"
-              className={styles.outlineButton}
-              onClick={() => setEndConfirmOpen(true)}
-            >
-              end section
-            </button>
             {allowDevReset ? (
               <a
                 href="/admin/mock-test?slug=DEV-ADMIN-BUSY"
@@ -1928,16 +1919,6 @@ export default function MockTestRunner({
             </div>
 
             <div className={styles.dialogFooter}>
-              <button
-                type="button"
-                className={styles.outlineButton}
-                onClick={() => {
-                  setReviewOpen(false);
-                  setEndConfirmOpen(true);
-                }}
-              >
-                end section
-              </button>
               <button type="button" className={styles.nextButton} onClick={closeReview}>
                 keep working
               </button>
