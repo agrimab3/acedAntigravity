@@ -193,12 +193,19 @@ export default function StudentTour() {
     transitionTimer.current = window.setTimeout(() => router.push("/dashboard"), prefersReducedMotion() ? 0 : MOTION_MS);
   }, [clearTimers, pathname, router]);
 
+  // Re-check whenever the page changes until we know the tour state. A brand-new
+  // student lands on /onboarding first and is sent to /dashboard without a full
+  // page reload, so checking only once on mount would miss them.
+  const tourChecked = useRef(false);
   useEffect(() => {
+    if (tourChecked.current || active) return;
+    if (pathname !== "/dashboard" && !readSessionState()) return;
     let mounted = true;
     void fetch("/api/onboarding", { cache: "no-store" })
       .then((response) => response.ok ? response.json() : null)
       .then((data) => {
         if (!mounted || !data?.isComplete) return;
+        tourChecked.current = true;
         setLoaded(true);
         const resumed = readSessionState();
         if (resumed) {
@@ -213,7 +220,7 @@ export default function StudentTour() {
       })
       .catch(() => setLoaded(true));
     return () => { mounted = false; };
-  }, []);
+  }, [pathname, active]);
 
   useEffect(() => () => clearTimers(), [clearTimers]);
 
