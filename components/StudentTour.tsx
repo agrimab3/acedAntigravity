@@ -22,7 +22,7 @@ export const STUDENT_TOUR_STOPS: TourStop[] = [
   { id: "live-lesson", path: "/dashboard", selector: 'section[data-tour-target="live-lesson"]', title: "Live lessons with Astra", body: "Join Astra, our AI tutor, live every Sunday at 5 PM PT. Free for Aced students.", optional: true },
   { id: "mock-tile", path: "/dashboard", selector: 'section[aria-label="ACED Mock Test"]', title: "The Aced Mock Test", body: "A full, timed practice test on Sat, Dec 5. Seats are limited." },
   { id: "practice-tests", path: "/practice-tests", selector: '[data-tour-target="practice-tests"]', navSelector: '[data-tour-nav="practice-tests"]', title: "Practice tests", body: "Timed sets for each section, just like test day. Your recent scores show up below." },
-  { id: "progress", path: "/progress", selector: '[data-tour-target="progress"]', navSelector: '[data-tour-nav="progress"]', title: "Your progress", body: "See your scores and exactly which skills need work, so you never study blind." },
+  { id: "progress", path: "/progress", selector: '[data-tour-target="progress"]', navSelector: '[data-tour-nav="progress"]', title: "Your progress", body: "Watch your scores climb and see which stars to brighten next." },
   { id: "live-lessons", path: "/lessons", selector: '[data-tour-target="live-lessons-page"]', navSelector: '[data-tour-nav="live-lessons"]', title: "Astra's live lessons", body: "Join Astra live every Sunday at 5 PM PT, see what's coming up, and catch replays here." },
   { id: "mock-test", path: "/mock-test", selector: '[data-tour-target="mock-test-page"]', navSelector: '[data-tour-nav="mock-test"]', title: "Mock test details", body: "Sign up and see everything about test day right here." },
 ];
@@ -197,6 +197,16 @@ export default function StudentTour() {
   // student lands on /onboarding first and is sent to /dashboard without a full
   // page reload, so checking only once on mount would miss them.
   const tourChecked = useRef(false);
+
+  // Let pages react to the current stop (the star glows, the filters animate).
+  useEffect(() => {
+    const id = active && stage === "target" && stop ? stop.id : "";
+    try {
+      if (id) document.documentElement.dataset.acedTourStop = id;
+      else delete document.documentElement.dataset.acedTourStop;
+      window.dispatchEvent(new CustomEvent("aced:tour-stop", { detail: id }));
+    } catch {}
+  }, [active, stage, stop]);
   useEffect(() => {
     if (tourChecked.current || active) return;
     if (pathname !== "/dashboard" && !readSessionState()) return;
@@ -290,7 +300,7 @@ export default function StudentTour() {
   return <div aria-live="polite" style={{ position: "fixed", inset: 0, zIndex: 1000, pointerEvents: "none", fontFamily: "var(--font-dm-sans), DM Sans, sans-serif" }}>
     <style>{`.student-tour-spotlight{transition:left .6s cubic-bezier(.65,0,.35,1),top .6s cubic-bezier(.65,0,.35,1),width .6s cubic-bezier(.65,0,.35,1),height .6s cubic-bezier(.65,0,.35,1),border-radius .6s,box-shadow .5s}.student-tour-tip{transition:opacity .3s ease,transform .3s ease}.student-tour-modal{transition:opacity .35s ease,transform .35s ease}.student-tour-page-fade{animation:student-tour-page-fade .4s ease both}@keyframes student-tour-page-fade{0%{opacity:0}50%{opacity:.25}100%{opacity:0}}@media (prefers-reduced-motion:reduce){.student-tour-spotlight,.student-tour-tip,.student-tour-modal,.student-tour-page-fade{transition:none!important;animation:none!important}}`}</style>
     {stage === "traveling" ? <div aria-hidden="true" className="student-tour-page-fade" style={{ position: "fixed", inset: 0, background: "#070B14", pointerEvents: "none" }} /> : null}
-    {dim ? <><div style={{ position: "fixed", top: 0, left: 0, right: 0, height: dim.top, background: "rgba(3,7,14,.74)", pointerEvents: "auto" }} /><div style={{ position: "fixed", top: dim.top, left: 0, width: dim.left, height: spotlight?.height, background: "rgba(3,7,14,.74)", pointerEvents: "auto" }} /><div style={{ position: "fixed", top: dim.top, left: window.innerWidth - dim.right, right: 0, height: spotlight?.height, background: "rgba(3,7,14,.74)", pointerEvents: "auto" }} /><div style={{ position: "fixed", top: window.innerHeight - dim.bottom, left: 0, right: 0, bottom: 0, background: "rgba(3,7,14,.74)", pointerEvents: "auto" }} /><div aria-hidden="true" className="student-tour-spotlight" style={{ position: "fixed", top: spotlight?.top, left: spotlight?.left, width: spotlight?.width, height: spotlight?.height, borderRadius: spotlight?.radius, border: "2px solid #5DCAA5", boxShadow: "0 0 0 1px rgba(238,241,245,.34),0 0 30px 4px rgba(93,202,165,.34)", pointerEvents: "none" }} /></> : <div style={{ position: "fixed", inset: 0, background: "rgba(3,7,14,.68)", pointerEvents: "auto" }} />}
+    {dim ? <><div style={{ position: "fixed", top: 0, left: 0, right: 0, height: dim.top, background: "rgba(3,7,14,.74)", pointerEvents: "auto" }} /><div style={{ position: "fixed", top: dim.top, left: 0, width: dim.left, height: spotlight?.height, background: "rgba(3,7,14,.74)", pointerEvents: "auto" }} /><div style={{ position: "fixed", top: dim.top, left: window.innerWidth - dim.right, right: 0, height: spotlight?.height, background: "rgba(3,7,14,.74)", pointerEvents: "auto" }} /><div style={{ position: "fixed", top: window.innerHeight - dim.bottom, left: 0, right: 0, bottom: 0, background: "rgba(3,7,14,.74)", pointerEvents: "auto" }} /><div aria-hidden="true" className="student-tour-spotlight" style={{ position: "fixed", top: spotlight?.top, left: spotlight?.left, width: spotlight?.width, height: spotlight?.height, borderRadius: spotlight?.radius, border: target?.dataset.tourShape === "circle" ? "0" : "2px solid #5DCAA5", boxShadow: target?.dataset.tourShape === "circle" ? "none" : "0 0 0 1px rgba(238,241,245,.34),0 0 30px 4px rgba(93,202,165,.34)", pointerEvents: "none" }} /></> : <div style={{ position: "fixed", inset: 0, background: "rgba(3,7,14,.68)", pointerEvents: "auto" }} />}
     {showTip && position ? (
       <section role="dialog" aria-modal="true" aria-label={`Tour step ${index + 1}`} className="student-tour-tip" style={{ position: "fixed", zIndex: 2, pointerEvents: "auto", width: phone ? "auto" : position.width, left: phone ? 16 : position.left, right: phone ? 16 : undefined, top: phone ? undefined : position.top, bottom: phone ? 16 : undefined, borderRadius: 18, padding: "20px 22px", background: "#0F1B2C", border: "1px solid #2A3B52", boxShadow: "0 20px 50px rgba(0,0,0,.6)", color: "#EEF1F5" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

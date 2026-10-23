@@ -430,6 +430,25 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
     redirectIfIncomplete: "/onboarding",
   });
   const [activeSec, setActiveSec] = useState<SectionKey | "all">("all");
+
+  // During the tour's "filters" stop, flip through the sections so students see what the filter does.
+  useEffect(() => {
+    let timer: number | null = null;
+    const order: Array<SectionKey | "all"> = ["english", "math", "reading", "science", "all"];
+    const onStop = (event: Event) => {
+      const id = (event as CustomEvent<string>).detail;
+      if (timer) { window.clearInterval(timer); timer = null; }
+      if (id === "filters") {
+        let i = 0;
+        setActiveSec(order[0]);
+        timer = window.setInterval(() => { i = (i + 1) % order.length; setActiveSec(order[i]); }, 1300);
+      } else {
+        setActiveSec("all");
+      }
+    };
+    window.addEventListener("aced:tour-stop", onStop);
+    return () => { window.removeEventListener("aced:tour-stop", onStop); if (timer) window.clearInterval(timer); };
+  }, []);
   const [selected, setSelected] = useState<Hit>(null);
   const [dashboardSummary, setDashboardSummary] = useState<DashboardSummary | null>(null);
   const [hoverTooltip, setHoverTooltip] = useState<{
@@ -1554,7 +1573,9 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
           }}
         />
         <canvas ref={canvasRef} style={{ width: "100%", display: "block", border: "none", outline: "none", position: "relative", zIndex: 0 }} />
-        <svg aria-label="Practice star" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ position: "absolute", inset: 0, zIndex: 2, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}>
+        <svg aria-label="Practice star" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ position: "absolute", left: 0, right: 0, top: 44, zIndex: 2, width: "100%", height: "calc(100% - 44px)", overflow: "visible", pointerEvents: "none" }}>
+          <defs><radialGradient id="tourStarGlow"><stop offset="0" stopColor="#fff" stopOpacity="1" /><stop offset=".35" stopColor="#8EE0C4" stopOpacity=".9" /><stop offset="1" stopColor="#5DCAA5" stopOpacity="0" /></radialGradient></defs>
+          <circle className="tour-star-glow" cx={TOUR_STAR.x * W} cy={TOUR_STAR.y * H} r="34" fill="url(#tourStarGlow)" />
           <circle data-tour-target="bright-star" data-tour-shape="circle" cx={TOUR_STAR.x * W} cy={TOUR_STAR.y * H} r="11" fill="transparent" stroke="transparent" style={{ pointerEvents: "all", cursor: "pointer" }} onClick={() => setSelected({ si: TOUR_STAR.si, pi: TOUR_STAR.pi })}>
             <title>Practice this star</title>
           </circle>
@@ -1892,7 +1913,7 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
       />
       <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
         .dashboard-quick-tiles{position:fixed;right:22px;bottom:18px;z-index:30;display:flex;gap:12px;align-items:stretch}
-        .dashboard-tile-shell{position:relative}.dashboard-tile-hide{position:absolute;z-index:4;right:8px;top:8px;width:32px;height:32px;border:0;border-radius:50%;cursor:pointer;background:rgba(255,255,255,.1);color:rgba(255,255,255,.76);font:700 18px/1 DM Sans}.dashboard-restore-pill{align-self:end;border:1px solid rgba(93,202,165,.35);border-radius:999px;padding:9px 13px;cursor:pointer;color:#bff6e5;background:rgba(9,22,37,.94);font:700 13px DM Sans;white-space:nowrap}
+        .tour-star-glow{opacity:0;transform-box:fill-box;transform-origin:center;transition:opacity .4s}[data-aced-tour-stop="bright-star"] .tour-star-glow{opacity:1;animation:tourStarPulse 1.6s ease-in-out infinite}@keyframes tourStarPulse{0%,100%{transform:scale(.85)}50%{transform:scale(1.25)}}@media (prefers-reduced-motion: reduce){[data-aced-tour-stop="bright-star"] .tour-star-glow{animation:none}}.dashboard-tile-shell{position:relative}.dashboard-tile-hide{position:absolute;z-index:4;right:8px;top:8px;width:32px;height:32px;border:0;border-radius:50%;cursor:pointer;background:rgba(255,255,255,.1);color:rgba(255,255,255,.76);font:700 18px/1 DM Sans}.dashboard-restore-pill{align-self:end;border:1px solid rgba(93,202,165,.35);border-radius:999px;padding:9px 13px;cursor:pointer;color:#bff6e5;background:rgba(9,22,37,.94);font:700 13px DM Sans;white-space:nowrap}
         @media(max-width:760px){.dashboard-quick-tiles{position:relative;right:auto;bottom:auto;flex-direction:column;align-items:center;margin:22px 0 92px}.dashboard-live-tile{width:min(340px,calc(100vw - 48px)) !important}.dashboard-quick-tiles+*{margin-top:20px}}
       `}</style>
     </div>
