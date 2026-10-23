@@ -28,7 +28,8 @@ type ReleasedPayload = {
   scoringLabel: string;
   scoringNote: string;
   composite: number;
-  percentile: number;
+  percentile: number | null;
+  dryRun?: boolean;
   sectionScores: Record<SectionKey, number>;
   sectionStats: Record<SectionKey, { correct: number; total: number }>;
   topicBreakdown: Array<{
@@ -824,14 +825,14 @@ export default function ResultsClient({
 
         {released ? (
           <div className={styles.postHeroContent}>
-            <article className={styles.percentileCard}>
+            {!released.dryRun ? <article className={styles.percentileCard}>
               {showRank ? (
                 <>
                   <h2>
                     You scored higher than{" "}
                     <strong>
                       <CountUp
-                        value={released.percentile}
+                        value={released.percentile ?? 0}
                         active={phaseAtLeast(phase, "rank")}
                         instant={instantFinal}
                         duration={500}
@@ -914,7 +915,7 @@ export default function ResultsClient({
                   <p>Scores stay private while the cohort is still small.</p>
                 </div>
               )}
-            </article>
+            </article> : null}
 
             <div className={styles.sectionCardsRow}>
               {SECTION_ORDER.map((key, index) => {

@@ -26,6 +26,7 @@ type Section = {
 
 type Student = {
   registrationId: string;
+  isAdminDryRun: boolean;
   email: string;
   timeZone: string;
   paymentStatus: "yes" | "test" | "no" | "refunded";
@@ -137,6 +138,7 @@ type Overview = {
   };
   alerts: Alert[];
   students: Student[];
+  adminDryRuns: Student[];
 };
 
 const STATUS_OPTIONS = [
@@ -663,6 +665,22 @@ export default function MockTestLiveConsole({
           </div>
         ) : null}
       </section>
+
+      {overview.adminDryRuns.length ? (
+        <section className={styles.studentsPanel} aria-label="Admin dry runs">
+          <div className={styles.studentsHeader}>
+            <div>
+              <div className={styles.label}>ADMIN DRY RUN · EXCLUDED FROM SEATS, STUDENT LISTS, AND PERCENTILES</div>
+              <h2>{overview.adminDryRuns.length} active</h2>
+            </div>
+          </div>
+          {overview.adminDryRuns.map((dryRun) => (
+            <div key={dryRun.registrationId} className={styles.emptyTable}>
+              <b>Form A rehearsal</b> · {dryRun.status} · {dryRun.currentTotal == null ? "not started" : `${dryRun.answeredCurrent}/${dryRun.currentTotal} answered`} · {duration(dryRun.timeLeftSeconds)} left
+            </div>
+          ))}
+        </section>
+      ) : null}
 
       <section className={styles.studentsPanel} aria-labelledby="students-title">
         <div className={styles.studentsHeader}>

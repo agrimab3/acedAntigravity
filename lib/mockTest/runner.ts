@@ -274,6 +274,7 @@ export async function getPaidMockRegistration(userId: string) {
       mockTestId: mockRegistrations.mockTestId,
       timeZone: mockRegistrations.timeZone,
       paidAt: mockRegistrations.paidAt,
+      isAdminDryRun: mockRegistrations.isAdminDryRun,
       startOverrideUntil: mockRegistrations.startOverrideUntil,
       startedAt: mockRegistrations.startedAt,
       finishedAt: mockRegistrations.finishedAt,
@@ -290,7 +291,7 @@ export async function getPaidMockRegistration(userId: string) {
       and(
         eq(mockTests.slug, NEXT_MOCK.mockTestSlug),
         eq(mockRegistrations.userId, userId),
-        isNotNull(mockRegistrations.paidAt)
+        sql`(${mockRegistrations.paidAt} is not null or ${mockRegistrations.isAdminDryRun} = true)`
       )
     )
     .limit(1);

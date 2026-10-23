@@ -48,6 +48,7 @@ export async function reconcileWaitlistInvites(mockTestId: string, now = new Dat
           select count(*)::int
           from mock_registrations
           where mock_test_id=${mockTestId}
+            and is_admin_dry_run=false
             and (
               paid_at is not null
               or (hold_expires_at is not null and hold_expires_at > ${now})

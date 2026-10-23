@@ -42,6 +42,7 @@ export async function getSeatStatus(mockTestId: string): Promise<SeatStatus> {
         SELECT COUNT(*)::int
         FROM mock_registrations mr
         WHERE mr.mock_test_id = ${mockTestId}
+          AND mr.is_admin_dry_run = false
           AND (
             mr.paid_at IS NOT NULL
             OR (mr.hold_expires_at IS NOT NULL AND mr.hold_expires_at > NOW())
@@ -120,6 +121,7 @@ export async function createSeatHold(input: CreateSeatHoldInput) {
             SELECT COUNT(*)::int
             FROM mock_registrations
             WHERE mock_test_id = ${input.mockTestId}
+              AND is_admin_dry_run = false
               AND (
                 paid_at IS NOT NULL
                 OR (hold_expires_at IS NOT NULL AND hold_expires_at > ${now})

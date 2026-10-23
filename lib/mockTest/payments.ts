@@ -99,7 +99,7 @@ export async function completeStripeRegistration(registrationId: string, payment
     const activeHold = Boolean(before.hold_expires_at && new Date(before.hold_expires_at).getTime() > now.getTime());
     await tx.execute(sql`select id from mock_tests where id=${before.mock_test_id} for update`);
     const cutoff = new Date(now.getTime() - WAITLIST_INVITE_MS);
-    const occupied = await tx.execute(sql`select ((select count(*)::int from mock_registrations where mock_test_id=${before.mock_test_id} and id<>${registrationId} and (paid_at is not null or (hold_expires_at is not null and hold_expires_at>${now}))) + (select count(*)::int from mock_waitlist where mock_test_id=${before.mock_test_id} and invited_at is not null and invite_used_at is null and invited_at>${cutoff})) as occupied`);
+    const occupied = await tx.execute(sql`select ((select count(*)::int from mock_registrations where mock_test_id=${before.mock_test_id} and id<>${registrationId} and is_admin_dry_run=false and (paid_at is not null or (hold_expires_at is not null and hold_expires_at>${now}))) + (select count(*)::int from mock_waitlist where mock_test_id=${before.mock_test_id} and invited_at is not null and invite_used_at is null and invited_at>${cutoff})) as occupied`);
     const completionDecision = decideStripeCheckoutCompletion({
       alreadyPaid: Boolean(before.paid_at),
       alreadyRefunded: Boolean(before.refunded_at),

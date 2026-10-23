@@ -150,6 +150,7 @@ export async function releaseMockTest({
        inner join users u on u.id=mr.user_id
        inner join mock_test_forms mf on mf.id=mts.form_id
        where mr.mock_test_id=$1
+         and mr.is_admin_dry_run=false
          and ($2::boolean = true or mf.version <> 'DEV')
        order by mts.started_at, mts.id
        for update of mts, mr`,

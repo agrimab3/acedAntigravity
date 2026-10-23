@@ -37,6 +37,7 @@ export type MockAdminSection = {
 
 export type MockAdminStudent = {
   registrationId: string;
+  isAdminDryRun: boolean;
   email: string;
   timeZone: string;
   paymentStatus: "yes" | "test" | "no" | "refunded";
@@ -193,6 +194,7 @@ export async function getMockTestLiveOverview(slug: string) {
   const studentsResult = await db.execute(sql`
     select
       mr.id as registration_id,
+      mr.is_admin_dry_run,
       u.email,
       mr.time_zone,
       mr.paid_at,
@@ -501,6 +503,7 @@ export async function getMockTestLiveOverview(slug: string) {
 
     students.push({
       registrationId,
+      isAdminDryRun: Boolean(raw.is_admin_dry_run),
       email,
       timeZone: String(raw.time_zone),
       paymentStatus,
@@ -616,6 +619,9 @@ export async function getMockTestLiveOverview(slug: string) {
     });
   }
 
+  const adminDryRuns = students.filter((student) => student.isAdminDryRun);
+  const realStudents = students.filter((student) => !student.isAdminDryRun);
+
   const rightNow = {
     notStarted: 0,
     english: 0,
@@ -626,7 +632,7 @@ export async function getMockTestLiveOverview(slug: string) {
     finished: 0,
   };
 
-  for (const student of students.filter((item) => item.paidAt)) {
+  for (const student of realStudents.filter((item) => item.paidAt)) {
     if (student.status === "not started") rightNow.notStarted += 1;
     else if (student.status === "finished") rightNow.finished += 1;
     else if (student.status === "break") rightNow.break += 1;
@@ -671,10 +677,11 @@ export async function getMockTestLiveOverview(slug: string) {
           : ("not released" as const),
       releasedAt: iso(test.released_at),
       scored: students.filter(
-        (student) => student.scores?.composite != null
+        (student) => !student.isAdminDryRun && student.scores?.composite != null
       ).length,
     },
     alerts,
-    students,
+    students: realStudents,
+    adminDryRuns,
   };
 }

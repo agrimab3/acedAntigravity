@@ -189,6 +189,7 @@ export const mockRegistrations = pgTable(
     paidAt: timestamp("paid_at", { withTimezone: true }),
     holdExpiresAt: timestamp("hold_expires_at", { withTimezone: true }),
     startOverrideUntil: timestamp("start_override_until", { withTimezone: true }),
+    isAdminDryRun: boolean("is_admin_dry_run").default(false).notNull(),
     startedAt: timestamp("started_at", { withTimezone: true }),
     finishedAt: timestamp("finished_at", { withTimezone: true }),
     englishScore: integer("english_score"),

@@ -54,6 +54,7 @@ export async function GET(request: Request) {
     .where(
       and(
         eq(mockRegistrations.mockTestId, registration.mockTestId),
+        sql`${mockRegistrations.isAdminDryRun} = false`,
         isNotNull(mockRegistrations.finishedAt)
       )
     );
@@ -77,7 +78,18 @@ export async function GET(request: Request) {
     ? new Date(releaseAt.getTime() + 1000)
     : getMockTestServerNow();
 
+  const dryRunResultsReady = Boolean(
+    registration.isAdminDryRun &&
+      registration.finishedAt &&
+      registration.englishScore !== null &&
+      registration.mathScore !== null &&
+      registration.readingScore !== null &&
+      registration.scienceScore !== null &&
+      registration.composite !== null
+  );
+
   if (
+    !dryRunResultsReady &&
     !shouldRevealMockResults({
       status: mockTest.status,
       now,
@@ -115,7 +127,7 @@ export async function GET(request: Request) {
     registration.readingScore === null ||
     registration.scienceScore === null ||
     registration.composite === null ||
-    registration.percentile === null
+    (!registration.isAdminDryRun && registration.percentile === null)
   ) {
     return NextResponse.json(
       { error: "Released mock result is incomplete." },
@@ -210,7 +222,8 @@ export async function GET(request: Request) {
     scoringLabel: "ACED estimated ACT score",
     scoringNote: "Estimated scores, not official ACT scores.",
     composite: registration.composite,
-    percentile: registration.percentile,
+    percentile: registration.isAdminDryRun ? null : registration.percentile,
+    dryRun: registration.isAdminDryRun,
     sectionScores: {
       english: registration.englishScore,
       math: registration.mathScore,
