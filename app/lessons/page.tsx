@@ -121,7 +121,7 @@ export default async function LessonsPage() {
       <div style={{ ...card, marginTop: 16, padding: "34px 30px", textAlign: "center", color: "#B4BCC8" }}>
         <div style={{ fontSize: 28, color: "#5DCAA5" }}>✦</div>
         <div style={{ fontSize: 17, marginTop: 6 }}>Replays will show up here after each lesson.</div>
-        <div style={{ fontSize: 14, color: "#8D97A6", marginTop: 4 }}>The first one airs Sunday, Oct 25.</div>
+        <div style={{ fontSize: 14, color: "#8D97A6", marginTop: 4 }}>The first one airs Sunday, Nov 1.</div>
       </div>
     </section>
   </main>;

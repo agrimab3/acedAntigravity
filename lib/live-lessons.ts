@@ -4,11 +4,10 @@
 export type UpcomingLesson = { date: string; section: "English" | "Math" | "Reading" | "Science" | "Special"; title: string };
 
 export const UPCOMING_LESSONS: UpcomingLesson[] = [
-  { date: "2026-11-01", section: "English", title: "Comma rules the ACT loves" },
-  { date: "2026-11-08", section: "Math", title: "Solving linear equations" },
-  { date: "2026-11-15", section: "Reading", title: "Main idea + inference" },
-  { date: "2026-11-22", section: "Science", title: "Reading graphs without the passage" },
-  { date: "2026-11-29", section: "Math", title: "Geometry shortcuts" },
+  { date: "2026-11-08", section: "English", title: "Comma rules the ACT loves" },
+  { date: "2026-11-15", section: "Math", title: "Solving linear equations" },
+  { date: "2026-11-22", section: "Reading", title: "Main idea + inference" },
+  { date: "2026-11-29", section: "Science", title: "Reading graphs without the passage" },
   { date: "2026-12-06", section: "Special", title: "Mock test debrief" },
 ];
 

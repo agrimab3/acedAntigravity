@@ -4,7 +4,8 @@
     "Show ONLY the text written in each scene. Never add filler text, quotes, slogans or labels that are not in this file.",
     "Each scene appears when its 'say' line starts and stays until the next scene.",
     "Nothing may overlap. Every item must be fully visible inside the board.",
-    "Sticky notes only appear when a scene has a 'sticky' field."
+    "Sticky notes only appear when a scene has a 'sticky' field.",
+    "Cosmo lines: 'cosmoBefore' is spoken by Cosmo before the scene's 'say'; 'cosmoAfter' is spoken by Cosmo after the scene's last Astra line ('sayAfter' if present, else 'say'). Only the speaking character shows in the slot."
   ],
   "scenes": [
     {
@@ -13,14 +14,15 @@
       "kicker": "Live lesson 1",
       "title": "The ACT Crash Course",
       "subtitle": "+ 3 quick wins & insider tips",
-      "say": "Hey everyone! I'm Astra, the AI tutor here at Aced. Welcome to our very first live lesson! Tonight is your ACT crash course: how the test works, how it's scored, and three quick wins, plus some insider tips you can use right away. Drop your questions in the chat anytime. And when a practice question pops up, type your answer in the chat before I reveal it. Let's see who gets it first! Ready? Let's light up some stars."
+      "say": "Hey everyone! I'm Astra, the AI tutor here at Aced. Welcome to our very first live lesson! Tonight is your ACT crash course: how the test works, how it's scored, and three quick wins, plus some insider tips you can use right away. Drop your questions in the chat anytime. And when a practice question pops up, type your answer in the chat before I reveal it. Let's see who gets it first! Ready? Let's light up some stars.",
+      "cosmoAfter": "Hi everyone! I'm Cosmo. I'm taking the ACT this year too, so I'll be asking the questions you're probably thinking."
     },
     {
       "id": "p1-intro",
       "type": "section",
       "kicker": "Part 1",
       "title": "What's on the test",
-      "say": "Let's start with the big picture. The ACT has three main sections, plus one optional one."
+      "say": "Thanks, Cosmo! Let's start with the big picture. The ACT has three main sections, plus one optional one."
     },
     {
       "id": "p1-cards",
@@ -69,14 +71,15 @@
       "kicker": "Part 1 · What's on the test",
       "big": "A  B  C  D",
       "caption": "4 answer choices. Every question.",
-      "say": "Every multiple choice question has four answer choices. Not five. Four. That's going to matter in a minute."
+      "say": "Every multiple choice question has four answer choices. Not five. Four. That's going to matter in a minute.",
+      "cosmoAfter": "Wait, why does it matter that there are only four choices?"
     },
     {
       "id": "p2-intro",
       "type": "section",
       "kicker": "Part 2",
       "title": "How it's scored",
-      "say": "Now, scoring. Each section gets a score from one to thirty-six."
+      "say": "Good question, Cosmo. It matters because of how scoring works. Each section gets a score from one to thirty-six."
     },
     {
       "id": "p2-formula",
@@ -136,7 +139,8 @@
           "color": "#6C63C9"
         }
       ],
-      "say": "Let's talk timing, because running out of time is the number one way students lose points. In English, you get about forty-two seconds per question. That's fast, but most English questions are quick. In Math, Reading, and Science, you get about one minute per question."
+      "say": "Let's talk timing, because running out of time is the number one way students lose points. In English, you get about forty-two seconds per question. That's fast, but most English questions are quick. In Math, Reading, and Science, you get about one minute per question.",
+      "cosmoAfter": "Forty-two seconds? That feels really fast."
     },
     {
       "id": "p3-rule",
@@ -145,7 +149,7 @@
       "big": "Stuck over 90 seconds?",
       "caption": "Guess · mark it · move on.",
       "sticky": "One hard question shouldn't steal time from three easy ones.",
-      "say": "Here's my pacing trick. If a question is taking you more than about a minute and a half, mark it, make your best guess, and move on. Come back at the end if you have time. Never let one hard question steal time from three easy ones."
+      "say": "It does, so you need a plan. Here's my pacing trick. If a question is taking you more than about a minute and a half, mark it, make your best guess, and move on. Come back at the end if you have time. Never let one hard question steal time from three easy ones."
     },
     {
       "id": "w1-rule",
@@ -173,7 +177,8 @@
       ],
       "fadePart": 0,
       "check": "\"We got pizza.\" ✓ full sentence → use the comma",
-      "say": "Here's the test. Lift the intro phrase out. If what's left is still a full sentence, use the comma. 'We got pizza.' Still a full sentence. So the comma goes in."
+      "say": "Here's the test. Lift the intro phrase out. If what's left is still a full sentence, use the comma. 'We got pizza.' Still a full sentence. So the comma goes in.",
+      "cosmoAfter": "Oh, so the lift-out test tells you when the comma goes in."
     },
     {
       "id": "w1-q",
@@ -193,7 +198,7 @@
       ],
       "chatSeconds": 10,
       "explain": "Semicolons and colons need a full sentence before them.",
-      "say": "Your turn! In the chat. Which is correct?",
+      "say": "Exactly, Cosmo. Your turn! In the chat. Which is correct?",
       "sayAfter": "The answer is B! 'Afterward' is an intro word, so it gets a comma. And remember, semicolons and colons need a full sentence before them. 'Afterward' isn't a full sentence, so C and D are out."
     },
     {
@@ -318,7 +323,8 @@
       "work": "x = 5 → x + 3 = 8 ✓   (5 is the trap!)",
       "sticky": "Read the last line twice.",
       "say": "Here's a trap the ACT loves. If two x equals ten, what is x plus three? Careful! Chat your answer.",
-      "sayAfter": "It's B, eight! Two x equals ten, so x is five. But they asked for x plus three, which is eight. Five is sitting right there as choice A to catch people who stop too early. So always read the last line of the question twice before you pick."
+      "sayAfter": "It's B, eight! Two x equals ten, so x is five. But they asked for x plus three, which is eight. Five is sitting right there as choice A to catch people who stop too early. So always read the last line of the question twice before you pick.",
+      "cosmoAfter": "Okay, I definitely would have picked five."
     },
     {
       "id": "m-tip1",
@@ -330,7 +336,7 @@
         "Plug it into the question and each choice",
         "Keep the choice that matches"
       ],
-      "say": "Another math secret. When the answer choices have letters in them, like n or x, you can pick your own number. Say a question says n is an even number. Just pick n equals two, plug it in everywhere, and see which choice works. Use easy numbers like two or ten. Avoid zero and one, because they can make several choices look right."
+      "say": "You're not alone, Cosmo. That's why we practice! Another math secret. When the answer choices have letters in them, like n or x, you can pick your own number. Say a question says n is an even number. Just pick n equals two, plug it in everywhere, and see which choice works. Use easy numbers like two or ten. Avoid zero and one, because they can make several choices look right."
     },
     {
       "id": "w3-rule",
@@ -413,7 +419,8 @@
       "kicker": "Bonus · Science",
       "big": "Read the chart, not your memory.",
       "caption": "Most Science answers are right there in the data.",
-      "say": "Bonus round! Science time. Remember, Science on the ACT is mostly about reading data. You don't need to memorize facts. Most answers are sitting right there in the chart or table. Just find the pattern."
+      "say": "Bonus round! And don't worry, Cosmo. Remember, Science on the ACT is mostly about reading data. You don't need to memorize facts. Most answers are sitting right there in the chart or table. Just find the pattern.",
+      "cosmoBefore": "Science is the section I'm most nervous about."
     },
     {
       "id": "sci-q",
@@ -538,7 +545,8 @@
         "Aced Mock Test · Sat, Dec 5",
         "Next week: commas"
       ],
-      "say": "That's it for tonight! Quick recap: know your timing, use the comma test, and never leave a question blank, because there's no penalty for guessing. Head to your star map on Aced to see where you stand. And if you want to try the real thing, the Aced Mock Test is Saturday, December fifth. Next week, we're tackling commas. See you next Sunday!"
+      "say": "That's it for tonight! Quick recap: know your timing, use the comma test, and never leave a question blank, because there's no penalty for guessing. Head to your star map on Aced to see where you stand. And if you want to try the real thing, the Aced Mock Test is Saturday, December fifth. Next week, we're tackling commas. See you next Sunday!",
+      "cosmoAfter": "Thanks, Astra! See you all next Sunday!"
     }
   ]
 }
