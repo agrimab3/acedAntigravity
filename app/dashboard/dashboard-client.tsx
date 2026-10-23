@@ -1355,9 +1355,6 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
             <MockTestNavTab />
           </div>
           <div style={{ display: "flex", gap: "1rem", alignItems: "center", justifySelf: "end" }}>
-            <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.68)" }}>
-              {session?.user?.email}
-            </span>
             <Link href="/account" style={{ fontSize: "13px", color: "rgba(255,255,255,0.78)" }}>account</Link>
             {process.env.NODE_ENV === "development" && devBackToLoginAvailable && (
               <>

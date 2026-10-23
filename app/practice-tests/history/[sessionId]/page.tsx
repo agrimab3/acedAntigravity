@@ -35,7 +35,7 @@ function formatHistoryTimestamp(value: string | null) {
 export default function PracticeTestHistoryDetailPage() {
   const router = useRouter();
   const params = useParams<{ sessionId: string }>();
-  const { status, data: session } = useSession();
+  const { status } = useSession();
   const { loading: onboardingLoading } = useOnboardingState(status, {
     redirectIfIncomplete: "/onboarding",
   });
@@ -292,9 +292,6 @@ export default function PracticeTestHistoryDetailPage() {
             <MockTestNavTab />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", justifySelf: "end" }}>
-            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.28)" }}>
-              {session?.user?.email}
-            </span>
             <button
               onClick={() => void signOut({ callbackUrl: "/" })}
               style={{

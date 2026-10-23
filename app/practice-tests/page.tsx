@@ -48,7 +48,7 @@ function topModeAccent(modeKey: string) {
 
 export default function PracticeTestsPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const { loading: onboardingLoading } = useOnboardingState(status, {
     redirectIfIncomplete: "/onboarding",
   });
@@ -377,9 +377,6 @@ export default function PracticeTestsPage() {
             <MockTestNavTab />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", justifySelf: "end" }}>
-            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.68)" }}>
-              {session?.user?.email}
-            </span>
             <button
               onClick={() => void signOut({ callbackUrl: "/" })}
               style={{
