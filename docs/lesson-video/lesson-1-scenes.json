@@ -5,7 +5,8 @@
     "Each scene appears when its 'say' line starts and stays until the next scene.",
     "Nothing may overlap. Every item must be fully visible inside the board.",
     "Sticky notes only appear when a scene has a 'sticky' field.",
-    "Cosmo lines: 'cosmoBefore' is spoken by Cosmo before the scene's 'say'; 'cosmoAfter' is spoken by Cosmo after the scene's last Astra line ('sayAfter' if present, else 'say'). Only the speaking character shows in the slot."
+    "Cosmo lines: 'cosmoBefore' is spoken by Cosmo before the scene's 'say'; 'cosmoAfter' is spoken by Cosmo after the scene's last Astra line ('sayAfter' if present, else 'say'). Only the speaking character shows in the slot.",
+    "Every scene's board content (question, choices, table, passage, cards, steps) must be fully visible on screen for the whole time that scene's lines are spoken, including during the chat countdown and after the reveal."
   ],
   "scenes": [
     {
@@ -14,15 +15,15 @@
       "kicker": "Live lesson 1",
       "title": "The ACT Crash Course",
       "subtitle": "+ 3 quick wins & insider tips",
-      "say": "Hey everyone! I'm Astra, the AI tutor here at Aced. Welcome to our very first live lesson! Tonight is your ACT crash course: how the test works, how it's scored, and three quick wins, plus some insider tips you can use right away. Drop your questions in the chat anytime. And when a practice question pops up, type your answer in the chat before I reveal it. Let's see who gets it first! Ready? Let's light up some stars.",
-      "cosmoAfter": "Hi everyone! I'm Cosmo. I'm taking the ACT this year too, so I'll be asking the questions you're probably thinking."
+      "say": "Hey everyone! I'm Astra, the AI tutor here at Aced. Welcome to our first live lesson! Tonight is your ACT crash course: how the test works, how it's scored, and three quick wins you can use right away. When a practice question pops up, type your answer in the Zoom chat before I reveal it. And drop any questions in the chat too. We'll answer them after the lesson. Let's get started.",
+      "cosmoAfter": "Hi, I'm Cosmo! I'm studying for the ACT too, so I'll ask the questions you're probably thinking."
     },
     {
       "id": "p1-intro",
       "type": "section",
       "kicker": "Part 1",
       "title": "What's on the test",
-      "say": "Thanks, Cosmo! Let's start with the big picture. The ACT has three main sections, plus one optional one."
+      "say": "Thanks, Cosmo! Let's start with the big picture. The ACT has three main sections: English, Math, and Reading. Science and Writing are optional."
     },
     {
       "id": "p1-cards",
@@ -58,12 +59,12 @@
           "color": "#D0674A",
           "stat": "40 questions",
           "time": "40 min",
-          "note": "optional · charts & experiments",
+          "note": "optional · graphs & experiments",
           "badge": "optional",
           "revealOn": "And then there's Science."
         }
       ],
-      "say": "First, English. Fifty questions in thirty-five minutes. You'll read short passages and fix grammar, punctuation, and how ideas flow. Second, Math. Forty-five questions in fifty minutes. Algebra, functions, geometry, and some statistics. And yes, you can use a calculator. Third, Reading. Thirty-six questions in forty minutes. Four passages, and one of them is actually two short passages you compare. And then there's Science. Forty questions in forty minutes. Here's the thing most people don't know: Science is now optional. It's not about memorizing facts. It's about reading charts, tables, and experiments."
+      "say": "First, English. Fifty questions in thirty-five minutes. You'll edit short passages for grammar, punctuation, and how ideas flow. Second, Math. Forty-five questions in fifty minutes. Algebra, functions, geometry, and statistics. And yes, you can use an approved calculator. Third, Reading. Thirty-six questions in forty minutes. You'll answer questions about details, main ideas, and what the author means. Some questions compare two short passages. And then there's Science. Forty questions in forty minutes. It's optional, and it's mostly about reading graphs, tables, and experiments. There's also an optional essay, called Writing."
     },
     {
       "id": "p1-abcd",
@@ -71,15 +72,15 @@
       "kicker": "Part 1 · What's on the test",
       "big": "A  B  C  D",
       "caption": "4 answer choices. Every question.",
-      "say": "Every multiple choice question has four answer choices. Not five. Four. That's going to matter in a minute.",
-      "cosmoAfter": "Wait, why does it matter that there are only four choices?"
+      "say": "One more thing. Every multiple choice question now has four answer choices, including Math. Keep that in mind. It matters for scoring."
     },
     {
       "id": "p2-intro",
       "type": "section",
       "kicker": "Part 2",
       "title": "How it's scored",
-      "say": "Good question, Cosmo. It matters because of how scoring works. Each section gets a score from one to thirty-six."
+      "say": "Now, scoring. Each section gets a score from one to thirty-six.",
+      "cosmoAfter": "Wait, so does Science count toward my main score?"
     },
     {
       "id": "p2-formula",
@@ -87,11 +88,11 @@
       "kicker": "Part 2 · How it's scored",
       "lines": [
         "English + Math + Reading",
-        "÷ 3",
+        "÷ 3, rounded",
         "= your composite"
       ],
       "side": "Science = its own separate score",
-      "say": "Your composite score, the big number colleges look at, is the average of three sections: English, Math, and Reading. Science gets its own separate score."
+      "say": "Good question. No. Your composite score, the big number colleges look at, is the average of English, Math, and Reading, rounded to the nearest whole number. If you take Science, you get a separate Science score."
     },
     {
       "id": "p2-example",
@@ -102,15 +103,15 @@
         "75 ÷ 3 = 25 ✦"
       ],
       "highlight": "25",
-      "say": "So if you get a twenty-four in English, a twenty-six in Math, and a twenty-five in Reading, add them up, that's seventy-five, divide by three, and your composite is twenty-five."
+      "say": "So if you get a twenty-four in English, a twenty-six in Math, and a twenty-five in Reading, that adds up to seventy-five. Divide by three, and your composite is twenty-five."
     },
     {
       "id": "p2-blank",
       "type": "bigText",
       "kicker": "Part 2 · The #1 rule",
       "big": "Never leave a blank.",
-      "caption": "Wrong answer = blank answer = 0 points. Guessing is free.",
-      "say": "And here's the most important rule on the whole test. There is no penalty for guessing. A wrong answer and a blank answer count exactly the same. So never, ever leave a question blank. If you're out of time, pick a letter and fill in the rest."
+      "caption": "Wrong answer = blank answer = 0 points.",
+      "say": "Here's the most important rule on the whole test. There's no penalty for wrong answers. A wrong answer and a blank answer both earn zero. So never leave a question blank. If you're stuck, cross out the choices you know are wrong, pick your best answer, and move on."
     },
     {
       "id": "p2-chat",
@@ -119,9 +120,9 @@
       "question": "30 seconds left, 5 questions to go. What do you do?",
       "chatSeconds": 10,
       "answer": "Fill in an answer for every one.",
-      "explain": "A guess has a 1 in 4 chance. A blank has zero.",
-      "say": "Quick check! In the chat: if you have thirty seconds left and five questions to go, what should you do?",
-      "sayAfter": "Fill in an answer for every single one. Even a random guess gives you a one in four chance. A blank gives you zero."
+      "explain": "Answer what you can quickly. Never leave a blank.",
+      "say": "Quick check! In the chat: you have thirty seconds left and five questions you haven't answered. What should you do?",
+      "sayAfter": "Make sure all five have an answer before time runs out. If one looks quick, solve it. But don't leave any blank. With four choices, even a guess has a chance. A blank has none."
     },
     {
       "id": "p3-pacing",
@@ -134,22 +135,27 @@
           "color": "#1E9C78"
         },
         {
-          "label": "Math · Reading · Science",
-          "value": "≈ 1 min / question",
+          "label": "Math · Reading",
+          "value": "≈ 67 sec / question",
           "color": "#6C63C9"
+        },
+        {
+          "label": "Science",
+          "value": "≈ 60 sec / question",
+          "color": "#D0674A"
         }
       ],
-      "say": "Let's talk timing, because running out of time is the number one way students lose points. In English, you get about forty-two seconds per question. That's fast, but most English questions are quick. In Math, Reading, and Science, you get about one minute per question.",
-      "cosmoAfter": "Forty-two seconds? That feels really fast."
+      "say": "Let's talk timing, because running out of time costs students a lot of points. In English, you get about forty-two seconds per question. In Math and Reading, about sixty-seven seconds. And in Science, about one minute. Those are averages. Some questions take ten seconds. Others take longer.",
+      "cosmoAfter": "Forty-two seconds? What if I'm still stuck after a minute?"
     },
     {
       "id": "p3-rule",
       "type": "bigText",
       "kicker": "Part 3 · Pacing",
-      "big": "Stuck over 90 seconds?",
-      "caption": "Guess · mark it · move on.",
+      "big": "Stuck with no next step?",
+      "caption": "Best guess · mark it · move on.",
       "sticky": "One hard question shouldn't steal time from three easy ones.",
-      "say": "It does, so you need a plan. Here's my pacing trick. If a question is taking you more than about a minute and a half, mark it, make your best guess, and move on. Come back at the end if you have time. Never let one hard question steal time from three easy ones."
+      "say": "Then ask yourself one thing: am I making progress? If you're close, a little more time is worth it. But if you're staring at it with no next step, make your best guess, mark it, and move on. Come back at the end if there's time. One hard question shouldn't steal time from three easy ones."
     },
     {
       "id": "w1-rule",
@@ -163,7 +169,7 @@
       ],
       "highlightPart": 0,
       "commaPart": 1,
-      "say": "Okay, quick win number one. This is for English. When a sentence starts with an intro phrase, like 'After the game,' you put a comma right after that phrase."
+      "say": "Okay, quick win number one. This one's for English. When a sentence starts with an intro phrase, like 'After the game,' you usually put a comma right after it."
     },
     {
       "id": "w1-test",
@@ -176,9 +182,9 @@
         "we got pizza."
       ],
       "fadePart": 0,
-      "check": "\"We got pizza.\" ✓ full sentence → use the comma",
-      "say": "Here's the test. Lift the intro phrase out. If what's left is still a full sentence, use the comma. 'We got pizza.' Still a full sentence. So the comma goes in.",
-      "cosmoAfter": "Oh, so the lift-out test tells you when the comma goes in."
+      "check": "\"We got pizza.\" ✓ full sentence → comma after the intro phrase",
+      "say": "Here's a quick check. Lift the intro phrase out. If what's left is a full sentence, like 'We got pizza,' the intro phrase is separate from the main sentence, so it gets a comma.",
+      "cosmoAfter": "So does every word at the start of a sentence get a comma?"
     },
     {
       "id": "w1-q",
@@ -198,8 +204,8 @@
       ],
       "chatSeconds": 10,
       "explain": "Semicolons and colons need a full sentence before them.",
-      "say": "Exactly, Cosmo. Your turn! In the chat. Which is correct?",
-      "sayAfter": "The answer is B! 'Afterward' is an intro word, so it gets a comma. And remember, semicolons and colons need a full sentence before them. 'Afterward' isn't a full sentence, so C and D are out."
+      "say": "Not always. Let's test it. Your turn! In the chat: which is correct?",
+      "sayAfter": "It's B! 'Afterward' is an intro word, so a comma separates it from the main sentence. And semicolons and colons need a full sentence before them. 'Afterward' isn't a full sentence, so C and D are out."
     },
     {
       "id": "w1-q2",
@@ -219,25 +225,25 @@
         3
       ],
       "chatSeconds": 10,
-      "explain": "Lift out \"Running every morning\" → \"helps me focus.\" Not a sentence, so no comma.",
-      "say": "Here's a tricky one. Use the lift-out test. Which is correct?",
-      "sayAfter": "It's B! Watch what happens when you lift out 'Running every morning.' You're left with 'helps me focus.' That's not a full sentence. 'Running every morning' isn't an intro phrase here. It's the subject. So no comma. The lift-out test tells you when to use a comma, and when not to."
+      "explain": "\"Running every morning\" is the subject. No comma between a subject and its verb.",
+      "say": "Now watch for a comma that doesn't belong. Which is correct?",
+      "sayAfter": "It's B! Lift out 'Running every morning,' and you're left with 'helps me focus.' That's not a full sentence. Here, 'Running every morning' isn't an intro phrase. It's the subject. And we don't put a comma between a subject and its verb."
     },
     {
       "id": "e-tip1",
       "type": "bigText",
       "kicker": "Insider tip · English",
-      "big": "Two answers mean the same? Both are wrong.",
-      "caption": "Period vs. semicolon between two full sentences = same thing. Cross out both.",
-      "say": "Here's an insider tip. If two answer choices mean exactly the same thing, neither one can be right, because the ACT only has one correct answer. For example, a period and a semicolon both work between two full sentences. So if one choice uses a period and another uses a semicolon in the same spot, they're equal. Cross them both out."
+      "big": "Fancy isn't always right.",
+      "caption": "A period and a semicolon can both join two full sentences. Check structure and meaning.",
+      "say": "Here's a tip. Fancy punctuation isn't automatically right. A period and a semicolon can both join two full sentences. So don't pick an answer because it looks more advanced. Check the sentence structure and the meaning."
     },
     {
       "id": "e-tip2",
       "type": "bigText",
       "kicker": "Insider tip · English",
-      "big": "Check OMIT first.",
-      "caption": "Shorter and clearer usually wins on ACT English.",
-      "say": "Next tip. The ACT loves short, clear writing. If one of the choices says 'DELETE the underlined portion' or 'OMIT,' check it first. If the sentence still makes sense and doesn't lose anything important, that's usually the answer. And when two choices are both grammatically correct, the shorter one usually wins."
+      "big": "Extra words? Cut them.",
+      "caption": "If cutting keeps the meaning, it's often the best answer.",
+      "say": "Next, wordiness. The ACT likes writing that's clear and doesn't repeat itself. If a choice cuts words, ask: does the sentence keep its meaning and stay clear? If yes, that's often the best answer."
     },
     {
       "id": "e-q3",
@@ -257,17 +263,17 @@
         3
       ],
       "chatSeconds": 10,
-      "explain": "\"Returned\" already means \"went back.\" Shortest correct answer wins.",
+      "explain": "\"Returned\" already means \"went back.\" Clear and no repeats.",
       "say": "Let's try it. She returned back to the classroom. Which choice is best? Chat it in!",
-      "sayAfter": "It's B, returned to! 'Returned' already means 'went back,' so 'back' is extra. The shortest correct answer wins."
+      "sayAfter": "It's B, 'returned to.' 'Returned' already means 'went back,' so 'back' repeats the same idea. We're not picking it just because it's shorter. We're picking it because it's clearer and means the same thing."
     },
     {
       "id": "w2-rule",
       "type": "bigText",
       "kicker": "Quick win #2 · Math",
       "big": "Stuck? Plug in the choices.",
-      "caption": "The answer is always right there.",
-      "say": "Quick win number two. This one's for Math, and it's a lifesaver. On the ACT, the answer is always right there in the choices. So if you get stuck setting up an equation, just try the answer choices in the problem and see which one works."
+      "caption": "Test the answer choices in the problem.",
+      "say": "Quick win number two is for Math. If you get stuck setting up an equation, try working backward. Plug the answer choices into the problem and see which one works."
     },
     {
       "id": "w2-q",
@@ -283,9 +289,8 @@
       "answer": 1,
       "chatSeconds": 10,
       "work": "3(5) + 5 = 15 + 5 = 20 ✓",
-      "sticky": "Start with a middle choice ↕",
       "say": "Try this one in the chat. If three x plus five equals twenty, what is x?",
-      "sayAfter": "It's B, five! You could solve it: subtract five to get three x equals fifteen, then divide by three. Or plug in: three times five is fifteen, plus five is twenty. It works. Pro tip: start with a middle answer choice. If it's too big, you know to go smaller. If it's too small, go bigger. You'll often find the answer in two tries."
+      "sayAfter": "It's B, five! You can solve it: subtract five to get three x equals fifteen, then divide by three. Or plug in: three times five is fifteen, plus five is twenty. Both ways work."
     },
     {
       "id": "w2-q2",
@@ -301,8 +306,10 @@
       "answer": 2,
       "chatSeconds": 10,
       "work": "Try B: 2(7) − 7 = 7 → too small ↑   Try C: 2(9) − 7 = 11 ✓",
-      "say": "Let's practice starting in the middle. Two x minus seven equals eleven. What is x? Try plugging in, and put your answer in the chat.",
-      "sayAfter": "It's C, nine! Start with B, seven. Two times seven is fourteen, minus seven is seven. That's too small, so go bigger. Try C, nine. Two times nine is eighteen, minus seven is eleven. That's it! Two tries, done."
+      "say": "Now let's plug in. Two x minus seven equals eleven. What is x? Try the choices, and put your answer in the chat.",
+      "sayAfter": "It's C, nine! When the choices go from small to big, starting in the middle can save time. Try B, seven. Two times seven is fourteen, minus seven is seven. Too small, and since this gets bigger as x gets bigger, go bigger. Try C, nine. Two times nine is eighteen, minus seven is eleven. That's it!",
+      "sticky": "Ordered choices? Start in the middle ↕",
+      "cosmoAfter": "So I don't always have to solve the equation first?"
     },
     {
       "id": "m-q3",
@@ -322,29 +329,29 @@
       "chatSeconds": 10,
       "work": "x = 5 → x + 3 = 8 ✓   (5 is the trap!)",
       "sticky": "Read the last line twice.",
-      "say": "Here's a trap the ACT loves. If two x equals ten, what is x plus three? Careful! Chat your answer.",
-      "sayAfter": "It's B, eight! Two x equals ten, so x is five. But they asked for x plus three, which is eight. Five is sitting right there as choice A to catch people who stop too early. So always read the last line of the question twice before you pick.",
+      "say": "Right. Use whichever way is faster for that problem. Now, here's a trap the ACT loves. If two x equals ten, what is x plus three? Careful! Chat your answer.",
+      "sayAfter": "It's B, eight! Two x equals ten, so x is five. But the question asks for x plus three, which is eight. Five is sitting right there as choice A to catch people who stop too early. Always check what the last line is asking for.",
       "cosmoAfter": "Okay, I definitely would have picked five."
     },
     {
       "id": "m-tip1",
       "type": "steps",
       "kicker": "Insider tip · Math",
-      "title": "Letters in the answers? Pick your own numbers.",
+      "title": "Letters in the answers? Pick a number.",
       "steps": [
-        "Pick an easy number, like n = 2",
+        "Pick an easy number that fits the rules (like n = 2)",
         "Plug it into the question and each choice",
-        "Keep the choice that matches"
+        "Two choices match? Try another number"
       ],
-      "say": "You're not alone, Cosmo. That's why we practice! Another math secret. When the answer choices have letters in them, like n or x, you can pick your own number. Say a question says n is an even number. Just pick n equals two, plug it in everywhere, and see which choice works. Use easy numbers like two or ten. Avoid zero and one, because they can make several choices look right."
+      "say": "You're not alone, Cosmo. That's why we practice! One more Math tip. When the answer choices have letters in them, like n or x, you can pick your own number. If the question says n is even, try n equals two. Just make sure your number follows every rule in the question. And if two choices both work, try a second number."
     },
     {
       "id": "w3-rule",
       "type": "bigText",
       "kicker": "Quick win #3 · Reading",
       "big": "If you can't point to it, don't pick it.",
-      "caption": "The passage always proves the right answer.",
-      "say": "Quick win number three. This is for Reading. The right answer is always backed up by the passage. Not by your opinion, and not by what sounds smart. If you can't point to the words in the passage that prove it, it's probably a trap."
+      "caption": "Said directly or strongly implied, the passage backs it up.",
+      "say": "Quick win number three is for Reading. The right answer is always backed up by the passage. Not your opinion, and not just what sounds smart. Sometimes it's said directly, and sometimes you have to infer it. But either way, you should be able to point to the words that support it."
     },
     {
       "id": "w3-steps",
@@ -355,7 +362,7 @@
         "Predict the answer",
         "Match a choice"
       ],
-      "say": "So before you look at the choices, go back to the passage, find the lines, and predict the answer in your own words. Then pick the choice that matches your prediction."
+      "say": "So before you look at the choices, find the lines in the passage, and predict the answer in your own words. Then pick the choice that matches."
     },
     {
       "id": "w3-traps",
@@ -363,11 +370,11 @@
       "kicker": "Quick win #3 · Trap answers",
       "title": "Watch out for answers that are…",
       "items": [
-        "Too extreme (\"always,\" \"never\")",
+        "Too extreme (\"always,\" \"never\") without proof",
         "True, but don't answer the question",
         "Mixed-up details from different spots"
       ],
-      "say": "The trap answers usually do one of three things. They're too extreme, with words like 'always' or 'never.' They're true, but don't answer the question. Or they mix up details from different parts of the passage."
+      "say": "Wrong answers usually do one of three things. They're too extreme, with words like 'always' or 'never' that the passage doesn't support. They're true, but don't answer the question. Or they mix up details from different parts of the passage."
     },
     {
       "id": "w3-q",
@@ -390,16 +397,16 @@
       "chatSeconds": 10,
       "proof": "her hands shook",
       "explain": "A is contradicted · C is too extreme · D is never said.",
-      "say": "Your turn! Read this short passage. Which choice is best supported by the passage? Remember, if you can't point to it, don't pick it.",
-      "sayAfter": "It's B! Point to the proof: 'her hands shook.' That shows she was nervous. A is wrong, because she practiced for weeks. C says 'always,' which is too extreme. And D is never mentioned at all. That's the trap answer that sounds nice but has no proof."
+      "say": "Your turn! Read this short passage. Which choice is best supported?",
+      "sayAfter": "It's B! Point to the proof: 'her hands shook.' That supports that she was nervous. A doesn't fit, because she practiced for weeks. C says 'always,' which is too broad for one moment. And D is never mentioned. We used a real detail from the text to back up our answer."
     },
     {
       "id": "r-tip1",
       "type": "bigText",
       "kicker": "Insider tip · Reading",
-      "big": "Start with your favorite passage.",
-      "caption": "You can do the passages in any order.",
-      "say": "Insider tip for Reading. You don't have to go in order. You can do the four passages in any order you want. Take a quick look at all of them, and start with the one that looks easiest or most interesting to you. You'll warm up faster and save time. Just make sure you mark your answers in the right spots."
+      "big": "You can choose your order.",
+      "caption": "Start with a passage type you're strong at. Then keep moving.",
+      "say": "A Reading tip. You don't have to do the passages in order. If one type is easier for you, you can start there. Just don't spend long deciding, and make sure your answers go in the right spots."
     },
     {
       "id": "r-tip2",
@@ -411,16 +418,16 @@
         "Read Passage B → answer its questions",
         "Then answer the questions about both"
       ],
-      "say": "Remember the paired passage, where you compare two short passages? Don't read both at once. Read Passage A, and answer only the questions about A. Then read Passage B, and answer the questions about B. Save the questions about both passages for last. By then, you'll know both really well."
+      "say": "For the paired passages, try this. Read Passage A, and answer only its questions. Then read Passage B, and answer its questions. Save the questions about both for last. It keeps the two authors' ideas separate."
     },
     {
       "id": "sci-rule",
       "type": "bigText",
       "kicker": "Bonus · Science",
-      "big": "Read the chart, not your memory.",
-      "caption": "Most Science answers are right there in the data.",
-      "say": "Bonus round! And don't worry, Cosmo. Remember, Science on the ACT is mostly about reading data. You don't need to memorize facts. Most answers are sitting right there in the chart or table. Just find the pattern.",
-      "cosmoBefore": "Science is the section I'm most nervous about."
+      "big": "Start with the data.",
+      "caption": "Most Science questions are about graphs, tables, and experiments.",
+      "say": "Some science knowledge can help, but most Science questions are about reading data: graphs, tables, and experiments. So start by figuring out what the question asks and where the data is.",
+      "cosmoBefore": "Science worries me. Do I need to memorize a lot of biology and chemistry?"
     },
     {
       "id": "sci-q",
@@ -446,7 +453,7 @@
           ]
         ]
       },
-      "stem": "Based on the table, about how much would a plant grow with 10 hours of light?",
+      "stem": "If growth changes steadily, about how much would a plant grow with 10 hours of light?",
       "choices": [
         "5 cm",
         "7.5 cm",
@@ -456,16 +463,16 @@
       "answer": 1,
       "chatSeconds": 10,
       "work": "10 hours is between 8 and 12 → growth is between 6 and 9 cm → 7.5 cm ✓",
-      "say": "Look at this table. It shows how much a plant grows with different hours of light each day. Based on the table, about how much would a plant grow with ten hours of light? Answer in the chat!",
-      "sayAfter": "It's B, seven and a half centimeters! Ten hours is right between eight and twelve. So the growth should be right between six and nine. That's seven and a half. No science facts needed. Just the table."
+      "say": "Look at this table. It shows how much a plant grows with different hours of light each day. If growth changes steadily between eight and twelve hours, about how much would it grow with ten hours? Answer in the chat!",
+      "sayAfter": "It's B, seven and a half centimeters! Ten hours is halfway between eight and twelve. So we estimate growth halfway between six and nine centimeters. That's seven and a half. We're estimating between two data points, using only the table."
     },
     {
       "id": "s-tip1",
       "type": "bigText",
       "kicker": "Insider tip · Science",
-      "big": "Go to the questions first.",
-      "caption": "Skip the long intro. Find the chart each question points to.",
-      "say": "Science tip number one. Don't spend a long time reading the intro paragraph. Go to the questions first. Most of them tell you exactly where to look, like Figure one or Table two. Go straight there and find the answer."
+      "big": "Data question? Read it first.",
+      "caption": "If it points to a figure or table, go straight there.",
+      "say": "Science tip number one. For data questions, read the question first. If it points you to a figure or table, go straight there. If it asks about an experiment's purpose, you may need to read more of the setup."
     },
     {
       "id": "s-tip2",
@@ -477,7 +484,7 @@
         "The units (cm vs. mm, seconds vs. minutes)",
         "The key or legend"
       ],
-      "say": "Tip number two. Before you answer any chart question, check three things: the labels on the axes, the units, and the key. A lot of trap answers use the right number with the wrong units."
+      "say": "Tip number two. Before you answer a chart question, check three things: the labels on the axes, the units, and the key. A lot of wrong answers use the right number with the wrong units."
     },
     {
       "id": "s-tip3",
@@ -485,7 +492,7 @@
       "kicker": "Insider tip · Science",
       "big": "Two scientists disagree?",
       "caption": "Write each scientist's main idea in 3–4 words.",
-      "say": "And tip number three. One Science passage is usually about scientists or students who disagree. As you read each viewpoint, write their main idea in three or four words in the margin. Like 'Scientist one: heat causes it.' Then the questions get way easier, because you're not rereading everything."
+      "say": "And tip number three. Some passages compare scientists who disagree. As you read each one, write their main idea in a few words, like 'Scientist one: temperature matters.' Then it's much easier to see where they agree and disagree."
     },
     {
       "id": "bonus-q",
@@ -495,7 +502,7 @@
       "choices": [
         "Spend it all on the first question",
         "Leave them blank",
-        "Answer the quick ones, then guess on the rest",
+        "Answer the quick ones, then make sure all have an answer",
         "Go back and check old answers"
       ],
       "answer": 2,
@@ -505,9 +512,9 @@
         3
       ],
       "chatSeconds": 10,
-      "explain": "Never leave a blank, and don't let one question steal your time.",
-      "say": "Last question of the night, and it puts everything together. You have two minutes left and four English questions to go. What's your best move?",
-      "sayAfter": "It's C! Answer the quick ones first, then guess on the rest. Never leave a blank, and don't let one hard question steal time from the easy ones. Nice work, everyone!"
+      "explain": "Protect the points you can still earn. Never leave a blank.",
+      "say": "Last question! You have two minutes left in English and four questions to go. What's your best move?",
+      "sayAfter": "It's C! Answer the quick ones first. If one takes too long, make your best guess and move on. Before time runs out, make sure all four have an answer."
     },
     {
       "id": "t-tip",
@@ -520,7 +527,7 @@
         "Pass 2: go back to the marked ones with the time left"
       ],
       "sticky": "Halfway through the time? Aim to be halfway through the questions.",
-      "say": "One last strategy, and it's a big one: use two passes. On your first pass, answer every question you feel good about, and mark any question that's taking too long. Keep moving. Then, on your second pass, go back to the marked ones with the time you have left. And here's a checkpoint: when half the time is gone, try to be about halfway through the questions. That way, the easy points are always locked in first."
+      "say": "One last strategy: two passes. On your first pass, answer the questions you can do without getting stuck, and mark the hard ones. On your second pass, go back to the marked ones. And here's a checkpoint: when half the time is gone, try to be about halfway through the questions. Practice this before test day so it feels natural."
     },
     {
       "id": "recap",
@@ -530,11 +537,11 @@
       "items": [
         "Know your timing",
         "Never leave a blank",
-        "Comma lift-out test",
+        "Comma lift-out check",
         "Plug in the choices",
-        "Point to the proof"
+        "Back it up with the passage"
       ],
-      "say": "Let's put it all together. Know your timing. Never leave a blank. Use the comma lift-out test. Plug in the answer choices in Math. And in Reading, if you can't point to it, don't pick it. Every one of those is a skill on your Aced star map. Practice them, and you'll literally watch your stars get brighter."
+      "say": "Let's put it all together. Know your timing. Never leave a blank. Use the lift-out check for commas. Try plugging in answer choices in Math. And in Reading, back up your answer with the passage. Every one of these is a skill on your Aced star map, and your stars get brighter as you practice."
     },
     {
       "id": "outro",
@@ -542,11 +549,11 @@
       "title": "See you next Sunday ✦",
       "lines": [
         "aceditprep.com",
-        "Aced Mock Test · Sat, Dec 5",
-        "Next week: commas"
+        "Aced Mock Test (ACT-style) · Sat, Dec 5",
+        "Next Sunday: commas"
       ],
-      "say": "That's it for tonight! Quick recap: know your timing, use the comma test, and never leave a question blank, because there's no penalty for guessing. Head to your star map on Aced to see where you stand. And if you want to try the real thing, the Aced Mock Test is Saturday, December fifth. Next week, we're tackling commas. See you next Sunday!",
-      "cosmoAfter": "Thanks, Astra! See you all next Sunday!"
+      "say": "That's it for tonight! Head to your star map on Aced and pick a skill to practice. If you want a full ACT-style practice test, the Aced Mock Test is on Saturday, December fifth. And next Sunday at five, we're going deeper into commas: when you need one, when you don't, and the traps to watch for. See you next week!",
+      "cosmoAfter": "Thanks, Astra! I'm going to go practice my commas."
     }
   ]
 }
