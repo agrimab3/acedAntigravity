@@ -15,13 +15,15 @@ The currently configured mock test is **Saturday, December 5, 2026**, ahead of t
 Students select a supported US time zone at registration, which is locked for that registration. They must start on December 5 in that time zone, no later than **9:00 PM local time**. An existing session may continue past midnight according to its server-backed section deadlines.
 
 ## 4. Sections
-| Section | Questions | Time |
-|---|---:|---:|
-| English | 50 | 35 minutes |
-| Math | 45 | 50 minutes |
-| Reading | 36 | 40 minutes |
-| Science | 40 | 40 minutes |
-| **Total** | **171** | **165 minutes** |
+**English:** 50 questions · 35 minutes
+
+**Math:** 45 questions · 50 minutes
+
+**Reading:** 36 questions · 40 minutes
+
+**Science:** 40 questions · 40 minutes
+
+**Total:** 171 questions · 165 minutes
 
 Sections proceed in this order: English, Math, Reading, Science. The total excludes breaks and transitions.
 
