@@ -62,7 +62,7 @@ export default async function LessonsPage() {
       <div style={{ flex: "1 1 520px", display: "flex", flexDirection: "column", gap: 16 }}>
         <span style={{ display: "inline-flex", alignSelf: "flex-start", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 700, letterSpacing: ".12em", color: "#CFEFE3", background: "#10261F", border: "1px solid #2A5547", padding: "7px 14px", borderRadius: 999 }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: "#F0997B", boxShadow: "0 0 10px #F0997B" }} />LIVE EVERY SUNDAY · 5 PM PT</span>
         <h1 className="ll-h1" style={{ margin: 0, fontFamily: serif, fontSize: 58, lineHeight: 1.05 }}>Astra&apos;s <em style={{ color: "#5DCAA5" }}>Live Lessons</em></h1>
-        <p style={{ margin: 0, fontSize: 18, lineHeight: 1.6, color: "#B4BCC8", maxWidth: 520 }}>Short ACT lessons taught by Astra, Aced&apos;s AI tutor. Answer practice questions in the chat and ask anything. Free for Aced students.</p>
+        <p style={{ margin: 0, fontSize: 18, lineHeight: 1.6, color: "#B4BCC8", maxWidth: 520 }}>Short ACT lessons taught by Astra, Aced&apos;s AI tutor. Answer practice questions in the chat, and send your questions for after the lesson. Free for Aced students.</p>
       </div>
       <div className="ll-float ll-hero-art" style={{ flex: "0 0 320px", height: 250, position: "relative" }}>
         <div style={{ position: "absolute", left: 0, top: 0, width: 190, height: 250 }}><Astronaut color="#5DCAA5" label="Astra, the AI tutor" /></div>
