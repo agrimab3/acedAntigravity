@@ -1572,7 +1572,7 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
         <canvas ref={canvasRef} style={{ width: "100%", display: "block", border: "none", outline: "none", position: "relative", zIndex: 0 }} />
         <svg aria-label="Practice star" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ position: "absolute", left: 0, right: 0, top: 44, zIndex: 2, width: "100%", height: "calc(100% - 44px)", overflow: "visible", pointerEvents: "none" }}>
           <defs><radialGradient id="tourStarGlow"><stop offset="0" stopColor="#fff" stopOpacity="1" /><stop offset=".35" stopColor="#8EE0C4" stopOpacity=".9" /><stop offset="1" stopColor="#5DCAA5" stopOpacity="0" /></radialGradient></defs>
-          <circle className="tour-star-glow" cx={TOUR_STAR.x * W} cy={TOUR_STAR.y * H} r="34" fill="url(#tourStarGlow)" />
+          <circle className="tour-star-glow" cx={TOUR_STAR.x * W} cy={TOUR_STAR.y * H} r="26" fill="url(#tourStarGlow)" />
           <circle data-tour-target="bright-star" data-tour-shape="circle" cx={TOUR_STAR.x * W} cy={TOUR_STAR.y * H} r="11" fill="transparent" stroke="transparent" style={{ pointerEvents: "all", cursor: "pointer" }} onClick={() => setSelected({ si: TOUR_STAR.si, pi: TOUR_STAR.pi })}>
             <title>Practice this star</title>
           </circle>
