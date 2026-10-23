@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { requireMockTestAdminPage } from "@/lib/admin/mockTestAdmin";
@@ -63,7 +64,7 @@ export default async function StudentsAdminPage() {
   return <main className="policyPage"><article className="policyCard" style={{ maxWidth: 1240 }}>
     <p className="policyEyebrow">Aced admin</p>
     <h1>Students</h1>
-    <p style={{ marginTop: 0, color: "#6b7280" }}>Everyone who has signed in, newest first. Times are Pacific. Homepage email-list signups are on /admin/signups.</p>
+    <p style={{ marginTop: 0, color: "#6b7280" }}>Everyone who has signed in, newest first. Click a name to see everything they did. Times are Pacific. Homepage email-list signups are on /admin/signups.</p>
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 12, margin: "18px 0 26px" }}>
       {tiles.map(([label, value]) => <div key={label} style={{ border: "1px solid rgba(127,127,127,.28)", borderRadius: 16, padding: "14px 16px", background: "rgba(127,127,127,.08)", color: "inherit" }}><div style={{ fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", opacity: .7, fontWeight: 700 }}>{label}</div><div style={{ fontSize: 30, fontWeight: 700, marginTop: 4, color: "inherit" }}>{value}</div></div>)}
     </div>
@@ -71,7 +72,7 @@ export default async function StudentsAdminPage() {
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead><tr>{["Name", "Email", "Grade", "Test date", "Joined", "Setup", "Emails", "Last practice", "Drills", "Tests", "Questions", "Time", "Welcome"].map((h) => <th key={h} style={{ ...cell, borderTop: 0, textAlign: "left", fontSize: 12, textTransform: "uppercase", letterSpacing: ".08em", color: "#6b7280" }}>{h}</th>)}</tr></thead>
         <tbody>{rows.map((r, i) => <tr key={r.id ?? i}>
-          <td style={cell}>{r.name ?? "—"}</td>
+          <td style={cell}><Link href={`/admin/students/${r.id}`} style={{ color: "inherit", fontWeight: 700 }}>{r.name ?? "—"} →</Link></td>
           <td style={cell}>{r.email ?? "—"}</td>
           <td style={cell}>{r.grade_level ?? "—"}</td>
           <td style={cell}>{r.act_test_date ?? "—"}</td>
