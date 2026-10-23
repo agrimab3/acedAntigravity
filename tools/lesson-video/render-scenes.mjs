@@ -1,3 +1,6 @@
+await import("./render-scenes-cosmo.mjs");
+process.exit(0);
+
 import { mkdir, readFile, writeFile, stat } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { resolve } from "node:path";
