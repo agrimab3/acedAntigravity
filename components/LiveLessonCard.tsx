@@ -17,7 +17,7 @@ export default function LiveLessonCard() {
   const date = new Intl.DateTimeFormat("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "America/Los_Angeles" }).format(start);
   const time = new Intl.DateTimeFormat("en-US", { hour: "numeric", timeZone: "America/Los_Angeles" }).format(start).replace(" ", " ");
   return <DismissibleLiveLessonTile storageKey={`aced:live-lesson:hidden:${rawStart}`}><section data-tour-target="live-lesson" aria-label="Live lesson" className="dashboard-live-tile" style={{ position: "relative", overflow: "hidden", width: 340, height: 174, padding: "18px 64px 16px 20px", borderRadius: 20, border: "1px solid rgba(93,202,165,.38)", background: "linear-gradient(135deg,rgba(13,32,43,.96),rgba(10,17,31,.98))", boxShadow: "0 14px 35px rgba(0,0,0,.25)", color: "#fff" }}>
-    <div style={{ color: "#5DCAA5", fontSize: 11, fontWeight: 800, letterSpacing: ".1em", whiteSpace: "nowrap" }}>✦ LIVE · {date.toUpperCase()} {time} PT</div>
+    <div style={{ color: "#5DCAA5", fontSize: 11, fontWeight: 800, letterSpacing: ".1em", whiteSpace: "nowrap" }}>✦ LIVE · {date.toUpperCase()} · {time} PT</div>
     <h2 title={title} style={{ fontFamily: "Playfair Display,serif", fontSize: 20, lineHeight: 1.15, margin: "9px 0 6px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}><Link href="/lessons" style={{ color: "#fff", textDecoration: "none" }}>{title.replace(" + 3 Quick Wins", "")}</Link></h2>
     <p style={{ color: "rgba(255,255,255,.65)", margin: "0 0 13px", fontSize: 13, whiteSpace: "nowrap" }}>with Astra, our AI tutor</p>
     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>

@@ -642,6 +642,10 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
       const sectionFilter = stateRef.current.activeSec;
       const t = performance.now() * 0.001;
 
+      // Bigger tap target on phones; pick the closest star so neighbors don't steal the tap.
+      const hitRadius = canvasEl.getBoundingClientRect().width < 640 ? 34 : 18;
+      let best: Hit = null;
+      let bestDist = Infinity;
       for (let si = 0; si < SECS.length; si += 1) {
         const sec = SECS[si];
         if (sectionFilter !== "all" && sectionFilter !== sec.key) continue;
@@ -652,11 +656,12 @@ export default function Dashboard({ liveLessonCard }: { liveLessonCard?: ReactNo
         for (let pi = 0; pi < sec.points.length; pi += 1) {
           if (sec.points[pi].topicIndex === undefined) continue;
           const p = pointToCanvas(sec, sec.points[pi]);
-          if (Math.hypot(mx - p.x - dx, my - p.y - dy) < 18) return { si, pi };
+          const d = Math.hypot(mx - p.x - dx, my - p.y - dy);
+          if (d < hitRadius && d < bestDist) { best = { si, pi }; bestDist = d; }
         }
       }
 
-      return null;
+      return best;
     }
 
     const onMove = (e: MouseEvent) => {
